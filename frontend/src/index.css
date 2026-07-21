@@ -17,13 +17,15 @@ body {
   --primary-200: #9bd0cb;
   --primary-300: #73beb7;
   --primary-400: #55b0a7;
-  --primary-500: #0f766e; /* base */
+  --primary-500: #0f766e;
+  /* base */
   --primary-600: #0d6862;
   --primary-700: #0b5752;
   --primary-800: #084642;
   --primary-900: #05302d;
 
-  --secondary-color: #64748b; /* slate, for de-emphasized accents (badges, icons) */
+  --secondary-color: #64748b;
+  /* slate, for de-emphasized accents (badges, icons) */
 }
 
 /* PrimeReact components read --primary-* directly; this repoints the whole
@@ -119,17 +121,17 @@ html.dark .p-tabview-nav {
   color: var(--text-color);
 }
 
-html.dark .p-datatable .p-datatable-thead > tr > th {
+html.dark .p-datatable .p-datatable-thead>tr>th {
   background: var(--surface-section);
   color: var(--text-color-secondary);
 }
 
-html.dark .p-datatable .p-datatable-tbody > tr {
+html.dark .p-datatable .p-datatable-tbody>tr {
   background: var(--surface-card);
   color: var(--text-color);
 }
 
-html.dark .p-datatable .p-datatable-tbody > tr:hover {
+html.dark .p-datatable .p-datatable-tbody>tr:hover {
   background: var(--surface-hover);
 }
 
@@ -147,9 +149,9 @@ html.dark .p-datatable .p-sortable-column.p-highlight:not(.p-sortable-disabled):
 /* lara-light-blue hardcodes #e5e7eb (light gray) row/header dividers instead of
    reading a variable — on dark surfaces that reads as a bright line that outshines
    the dimmed text color. Repoint to the dark border scale. */
-html.dark .p-datatable .p-datatable-thead > tr > th,
-html.dark .p-datatable .p-datatable-tbody > tr > td,
-html.dark .p-datatable .p-datatable-tfoot > tr > td {
+html.dark .p-datatable .p-datatable-thead>tr>th,
+html.dark .p-datatable .p-datatable-tbody>tr>td,
+html.dark .p-datatable .p-datatable-tfoot>tr>td {
   border-color: var(--surface-border);
 }
 
@@ -164,8 +166,71 @@ html.dark .p-dropdown:not(.p-disabled).p-focus {
   background: var(--surface-0);
 }
 
+/* Tag/badge colors: lara-light-blue's defaults are saturated, high-contrast
+   chips (solid green/blue/orange/red with white text). Replace with a calmer
+   "soft chip" recipe — pale tinted background, same-hue darker text — echoing
+   the paginator active-page treatment. "info" (e.g. draft) is repointed from
+   the theme's hardcoded blue to the app's teal primary scale so it reads as
+   part of the same brand instead of a clashing accent. */
+.p-tag {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  font-weight: 600;
+}
+
+.p-tag.p-tag-success {
+  background-color: var(--green-50, #ecfdf5);
+  color: var(--green-700, #15803d);
+}
+
+.p-tag.p-tag-info {
+  background-color: var(--primary-50);
+  color: var(--primary-700);
+}
+
+.p-tag.p-tag-warning {
+  background-color: var(--yellow-50, #fffbeb);
+  color: var(--yellow-700, #b45309);
+}
+
+.p-tag.p-tag-danger {
+  background-color: var(--red-50, #fef2f2);
+  color: var(--red-700, #b91c1c);
+}
+
+.p-tag.p-tag-secondary {
+  background-color: var(--surface-100);
+  color: var(--text-color-secondary);
+}
+
 html.dark .p-tag {
-  color: var(--surface-0);
+  background: var(--primary-100);
+  color: var(--primary-800);
+}
+
+html.dark .p-tag.p-tag-success {
+  background-color: var(--green-900, #052e16);
+  color: var(--green-300, #86efac);
+}
+
+html.dark .p-tag.p-tag-info {
+  background-color: var(--primary-100);
+  color: var(--primary-800);
+}
+
+html.dark .p-tag.p-tag-warning {
+  background-color: var(--yellow-900, #451a03);
+  color: var(--yellow-300, #fcd34d);
+}
+
+html.dark .p-tag.p-tag-danger {
+  background-color: var(--red-900, #450a0a);
+  color: var(--red-300, #fca5a5);
+}
+
+html.dark .p-tag.p-tag-secondary {
+  background-color: var(--surface-100);
+  color: var(--text-color-secondary);
 }
 
 /* Paginator active page: lara-light-blue hardcodes a pale blue chip (#eff6ff bg,
@@ -187,18 +252,18 @@ html.dark .p-menu {
   color: var(--text-color);
 }
 
-html.dark .p-menu .p-menuitem > .p-menuitem-content,
-html.dark .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link,
-html.dark .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text {
+html.dark .p-menu .p-menuitem>.p-menuitem-content,
+html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link,
+html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link .p-menuitem-text {
   color: var(--text-color);
 }
 
-html.dark .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon,
-html.dark .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-submenu-icon {
+html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link .p-menuitem-icon,
+html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link .p-submenu-icon {
   color: var(--text-color-secondary);
 }
 
-html.dark .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled) > .p-menuitem-content:hover {
+html.dark .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled)>.p-menuitem-content:hover {
   background: var(--surface-hover);
   color: var(--text-color);
 }
@@ -206,13 +271,13 @@ html.dark .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled) > .p-menuitem-c
 /* Highlight (keyboard-focused item, not hover) should read as "one step up from
    the menu background", the same weight as the hover state — not an inverted,
    fully-saturated primary chip. */
-html.dark .p-menu .p-menuitem.p-highlight > .p-menuitem-content {
+html.dark .p-menu .p-menuitem.p-highlight>.p-menuitem-content {
   background: var(--surface-hover);
   color: var(--text-color);
 }
 
-html.dark .p-menu .p-menuitem.p-highlight > .p-menuitem-content .p-menuitem-link .p-menuitem-text,
-html.dark .p-menu .p-menuitem.p-highlight > .p-menuitem-content .p-menuitem-link .p-menuitem-icon {
+html.dark .p-menu .p-menuitem.p-highlight>.p-menuitem-content .p-menuitem-link .p-menuitem-text,
+html.dark .p-menu .p-menuitem.p-highlight>.p-menuitem-content .p-menuitem-link .p-menuitem-icon {
   color: var(--text-color);
 }
 
@@ -352,20 +417,46 @@ html.dark ::placeholder {
 
 .p-inputtext {
   padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+/* Dropdown/MultiSelect labels carry the .p-inputtext class but not .p-component,
+   so they missed the compact font-size above — their font stayed at the theme's
+   default 14px while plain inputs shrank to 0.85rem, making the same padding
+   compute to a visibly taller box. Matching font-size alone still leaves a ~2px
+   gap because a bare <span> and an <input> resolve default line-height
+   differently at the same font-size — pin both to the same explicit line-height
+   so the two controls' total height is byte-identical. */
+.p-dropdown-label,
+.p-multiselect-label {
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+/* Editable Dropdown renders its label as a real <input class="p-dropdown-label
+   p-inputtext">, so it also picked up the standalone input's border/background
+   (set above) — nesting a visible "box inside a box" inside the outer
+   .p-dropdown chrome. It should look exactly like the plain (non-editable)
+   label: transparent, no border of its own. */
+input.p-dropdown-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Icon-field inputs need their built-in left/right padding preserved, or the
    icon and placeholder text overlap. */
-.p-icon-field-left > .p-inputtext {
+.p-icon-field-left>.p-inputtext {
   padding-left: 2.25rem;
 }
 
-.p-icon-field-right > .p-inputtext {
+.p-icon-field-right>.p-inputtext {
   padding-right: 2.25rem;
 }
 
-.p-datatable .p-datatable-thead > tr > th,
-.p-datatable .p-datatable-tbody > tr > td {
+.p-datatable .p-datatable-thead>tr>th,
+.p-datatable .p-datatable-tbody>tr>td {
   padding: 0.5rem 0.75rem;
 }
 
@@ -382,15 +473,42 @@ html.dark ::placeholder {
 /* Clean, borderless look for surfaces around the table */
 .p-paginator,
 .p-dialog .p-dialog-header,
-.p-dialog .p-dialog-footer,
-.p-card {
+.p-dialog .p-dialog-footer {
   border-color: transparent !important;
 }
 
+/* Card: lara-light-blue's default is a Material-style triple box-shadow (visible
+   dark halo) with no border — replace with a thin, low-contrast outline and a
+   much softer single shadow, so cards read as "gently separated" rather than
+   "floating"/elevated. */
+.p-card {
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+html.dark .p-card {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* lara-light-blue's default card padding (1.25rem body, plus 1.25rem content
+   on top) reads as too roomy stacked inside the already-padded layout-main —
+   tighten both so detail pages feel dense but still breathable. */
+.p-card .p-card-body {
+  padding: 1rem;
+}
+
+.p-card .p-card-content {
+  padding: 0.75rem 0;
+}
+
+.p-card .p-card-title {
+  margin-bottom: 0.25rem;
+}
+
 /* Table: horizontal divider lines only (header/body/footer), no vertical column borders */
-.p-datatable .p-datatable-thead > tr > th,
-.p-datatable .p-datatable-tbody > tr > td,
-.p-datatable .p-datatable-tfoot > tr > td {
+.p-datatable .p-datatable-thead>tr>th,
+.p-datatable .p-datatable-tbody>tr>td,
+.p-datatable .p-datatable-tfoot>tr>td {
   border-left: none !important;
   border-right: none !important;
 }
@@ -408,11 +526,11 @@ html.dark .p-datatable-loading-overlay {
    visibly separate gray block. A very thin border keeps the field's edge
    readable without adding contrast — nearly the same tone as the background
    and the fill itself. */
-.p-inputtext,
+/* .p-inputtext,
 .p-dropdown {
   background: var(--surface-card);
   border: 1px solid var(--surface-border) !important;
-}
+} */
 
 .p-inputtext:enabled:focus,
 .p-dropdown:not(.p-disabled).p-focus {
@@ -458,7 +576,12 @@ html.dark {
   --heading-color: #b6c2c7;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--heading-color);
 }
 
@@ -466,7 +589,7 @@ h1, h2, h3, h4, h5, h6 {
 
 :root {
   --topbar-height: 3.5rem;
-  --sidebar-width: 15rem;
+  --sidebar-width: 17rem;
 }
 
 .layout-wrapper {
@@ -484,7 +607,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.5rem;
   padding: 0 1rem;
   background: var(--surface-card);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid var(--surface-border);
   z-index: 1000;
 }
 
@@ -497,14 +620,16 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+/* Todoist-style sidebar: flat, same tone as the page background (not a
+   "card" surface), no border or shadow separating it from the content area —
+   the two areas read as one continuous flat surface. */
 .layout-sidebar {
   position: fixed;
   top: var(--topbar-height);
   left: 0;
   width: var(--sidebar-width);
   height: calc(100vh - var(--topbar-height));
-  background: var(--surface-card);
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+  background: var(--surface-ground);
   overflow-y: auto;
   z-index: 999;
   transition: transform 0.2s ease-in-out, left 0.2s ease-in-out;
@@ -527,7 +652,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 8px;
   text-decoration: none;
   color: var(--text-color-secondary);
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   transition: background 0.15s;
 }
 
@@ -615,7 +740,7 @@ h1, h2, h3, h4, h5, h6 {
   flex: 1;
   min-width: 0;
   padding-left: 2.35rem;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
 }
 
 .layout-submenu-link .layout-menuitem-text {
@@ -657,7 +782,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .layout-main {
-  padding: 1.25rem;
+  padding: 1rem;
 }
 
 .layout-mask {
