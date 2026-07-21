@@ -1,448 +1,114 @@
-html {
-  font-size: 14px;
-}
-
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* ===== Brand / accent color — teal, muted so it stays calm instead of loud on either theme ===== */
-
-:root {
-  --primary-color: #0f766e;
-  --primary-color-text: #ffffff;
-  --primary-50: #e6f3f2;
-  --primary-100: #c2e2df;
-  --primary-200: #9bd0cb;
-  --primary-300: #73beb7;
-  --primary-400: #55b0a7;
-  --primary-500: #0f766e;
-  /* base */
-  --primary-600: #0d6862;
-  --primary-700: #0b5752;
-  --primary-800: #084642;
-  --primary-900: #05302d;
-
-  --secondary-color: #64748b;
-  /* slate, for de-emphasized accents (badges, icons) */
-}
-
-/* PrimeReact components read --primary-* directly; this repoints the whole
-   lara-light-blue palette to the teal scale above so it's consistent everywhere
-   (buttons, focus rings, selected states, links) without swapping theme files. */
-.p-component,
-:root {
-  --primary-color: #0f766e;
-  --primary-color-text: #ffffff;
-}
-
-/* DataTable sortable-column highlight: lara-light-blue hardcodes #eff6ff/#1d4ed8
-   (blue) instead of reading --primary-*, so the active sort column stayed blue
-   even after the palette repoint above. */
-.p-datatable .p-sortable-column.p-highlight,
-.p-datatable .p-sortable-column.p-highlight:not(.p-sortable-disabled):hover {
-  background: var(--primary-50);
-  color: var(--primary-color);
-}
-
-.p-datatable .p-sortable-column.p-highlight .p-sortable-column-icon,
-.p-datatable .p-sortable-column.p-highlight:not(.p-sortable-disabled):hover .p-sortable-column-icon {
-  color: var(--primary-color);
-}
-
-/* ===== Dark mode ===== */
-/* We keep a single theme CSS file loaded (lara-light-blue) and override its surface/text
-   variables here under html.dark, instead of swapping <link> theme files at runtime.
-   Trade-off accepted: some deeply-nested PrimeReact internals that hardcode light colors
-   in their own stylesheet may not repaint — acceptable for this app's component set
-   (DataTable, Dialog, Card, Menu, Dropdown, Tag, Avatar, Button, ConfirmDialog, Toast). */
-html.dark {
-  --surface-ground: #0f1417;
-  --surface-section: #131a1e;
-  --surface-card: #171f23;
-  --surface-overlay: #1c252a;
-  --surface-border: #2a343a;
-  --surface-hover: #202a2f;
-  --surface-0: #171f23;
-  --surface-50: #1a2226;
-  --surface-100: #202a2f;
-  --surface-200: #2a343a;
-  --surface-300: #384349;
-  --surface-400: #4b565c;
-  --surface-500: #5f6a70;
-  --surface-600: #7d8a90;
-  --surface-700: #a3afb4;
-  --surface-800: #cbd5d9;
-  --surface-900: #eef2f4;
-
-  --text-color: #e4ebee;
-  --text-color-secondary: #93a3ab;
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-  /* Same teal primary as light mode, lifted one step lighter so it still reads as an
-     accent against the dark surfaces instead of disappearing into them. */
-  --primary-color: #2dd4bf;
-  --primary-color-text: #04211e;
-  --primary-50: #05302d;
-  --primary-100: #084642;
-  --primary-200: #0b5752;
-  --primary-300: #0d6862;
-  --primary-400: #14b8a9;
-  --primary-500: #2dd4bf;
-  --primary-600: #5eead4;
-  --primary-700: #99f6e4;
-  --primary-800: #ccfbf1;
-  --primary-900: #f0fdfa;
-
-  color-scheme: dark;
-  background: var(--surface-ground);
-  color: var(--text-color);
-}
-
-html.dark body {
-  background: var(--surface-ground);
-  color: var(--text-color);
-}
-
-/* Buttons/inputs/etc. in PrimeReact's lara theme hardcode a handful of light-mode
-   colors outside the variable system — patch the ones visible in this app. */
-html.dark .p-inputtext,
-html.dark .p-dropdown,
-html.dark .p-multiselect,
-html.dark .p-dialog,
-html.dark .p-card,
-html.dark .p-menu,
-html.dark .p-datatable,
-html.dark .p-paginator,
-html.dark .p-tabview-panels,
-html.dark .p-tabview-nav {
-  background: var(--surface-card);
-  color: var(--text-color);
-}
-
-html.dark .p-datatable .p-datatable-thead>tr>th {
-  background: var(--surface-section);
-  color: var(--text-color-secondary);
-}
-
-html.dark .p-datatable .p-datatable-tbody>tr {
-  background: var(--surface-card);
-  color: var(--text-color);
-}
-
-html.dark .p-datatable .p-datatable-tbody>tr:hover {
-  background: var(--surface-hover);
-}
-
-html.dark .p-datatable .p-sortable-column.p-highlight,
-html.dark .p-datatable .p-sortable-column.p-highlight:not(.p-sortable-disabled):hover {
-  background: var(--primary-100);
-  color: var(--primary-800);
-}
-
-html.dark .p-datatable .p-sortable-column.p-highlight .p-sortable-column-icon,
-html.dark .p-datatable .p-sortable-column.p-highlight:not(.p-sortable-disabled):hover .p-sortable-column-icon {
-  color: var(--primary-800);
-}
-
-/* lara-light-blue hardcodes #e5e7eb (light gray) row/header dividers instead of
-   reading a variable — on dark surfaces that reads as a bright line that outshines
-   the dimmed text color. Repoint to the dark border scale. */
-html.dark .p-datatable .p-datatable-thead>tr>th,
-html.dark .p-datatable .p-datatable-tbody>tr>td,
-html.dark .p-datatable .p-datatable-tfoot>tr>td {
-  border-color: var(--surface-border);
-}
-
-html.dark .p-inputtext,
-html.dark .p-dropdown {
-  background: var(--surface-section);
-  border-color: var(--surface-border) !important;
-}
-
-html.dark .p-inputtext:enabled:focus,
-html.dark .p-dropdown:not(.p-disabled).p-focus {
-  background: var(--surface-0);
-}
-
-/* Tag/badge colors: lara-light-blue's defaults are saturated, high-contrast
-   chips (solid green/blue/orange/red with white text). Replace with a calmer
-   "soft chip" recipe — pale tinted background, same-hue darker text — echoing
-   the paginator active-page treatment. "info" (e.g. draft) is repointed from
-   the theme's hardcoded blue to the app's teal primary scale so it reads as
-   part of the same brand instead of a clashing accent. */
-.p-tag {
-  background: var(--primary-50);
-  color: var(--primary-700);
-  font-weight: 600;
-}
-
-.p-tag.p-tag-success {
-  background-color: var(--green-50, #ecfdf5);
-  color: var(--green-700, #15803d);
-}
-
-.p-tag.p-tag-info {
-  background-color: var(--primary-50);
-  color: var(--primary-700);
-}
-
-.p-tag.p-tag-warning {
-  background-color: var(--yellow-50, #fffbeb);
-  color: var(--yellow-700, #b45309);
-}
-
-.p-tag.p-tag-danger {
-  background-color: var(--red-50, #fef2f2);
-  color: var(--red-700, #b91c1c);
-}
-
-.p-tag.p-tag-secondary {
-  background-color: var(--surface-100);
-  color: var(--text-color-secondary);
-}
-
-html.dark .p-tag {
-  background: var(--primary-100);
-  color: var(--primary-800);
-}
-
-html.dark .p-tag.p-tag-success {
-  background-color: var(--green-900, #052e16);
-  color: var(--green-300, #86efac);
-}
-
-html.dark .p-tag.p-tag-info {
-  background-color: var(--primary-100);
-  color: var(--primary-800);
-}
-
-html.dark .p-tag.p-tag-warning {
-  background-color: var(--yellow-900, #451a03);
-  color: var(--yellow-300, #fcd34d);
-}
-
-html.dark .p-tag.p-tag-danger {
-  background-color: var(--red-900, #450a0a);
-  color: var(--red-300, #fca5a5);
-}
-
-html.dark .p-tag.p-tag-secondary {
-  background-color: var(--surface-100);
-  color: var(--text-color-secondary);
-}
-
-/* Paginator active page: lara-light-blue hardcodes a pale blue chip (#eff6ff bg,
-   #1d4ed8 text) meant for a white page — on dark surfaces it stays just as bright
-   and glares next to everything else. Use the same teal-tinted-on-dark-surface
-   treatment as the sidebar's active menu item instead. */
-html.dark .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-  background: var(--primary-100);
-  border-color: var(--primary-100);
-  color: var(--primary-800);
-}
-
-/* Menu (row-action / theme-switcher popups): lara-light-blue hardcodes #4b5563
-   item text and #e5e7eb separators for a white menu — both stay too dark/too
-   bright against the dark surface. Repoint to the dark text/border scale. */
-html.dark .p-menu {
-  background: var(--surface-overlay);
-  border-color: var(--surface-border);
-  color: var(--text-color);
-}
-
-html.dark .p-menu .p-menuitem>.p-menuitem-content,
-html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link,
-html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link .p-menuitem-text {
-  color: var(--text-color);
-}
-
-html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link .p-menuitem-icon,
-html.dark .p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link .p-submenu-icon {
-  color: var(--text-color-secondary);
-}
-
-html.dark .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled)>.p-menuitem-content:hover {
-  background: var(--surface-hover);
-  color: var(--text-color);
-}
-
-/* Highlight (keyboard-focused item, not hover) should read as "one step up from
-   the menu background", the same weight as the hover state — not an inverted,
-   fully-saturated primary chip. */
-html.dark .p-menu .p-menuitem.p-highlight>.p-menuitem-content {
-  background: var(--surface-hover);
-  color: var(--text-color);
-}
-
-html.dark .p-menu .p-menuitem.p-highlight>.p-menuitem-content .p-menuitem-link .p-menuitem-text,
-html.dark .p-menu .p-menuitem.p-highlight>.p-menuitem-content .p-menuitem-link .p-menuitem-icon {
-  color: var(--text-color);
-}
-
-html.dark .p-menu.p-menu-overlay {
-  background: var(--surface-overlay);
-  border: 1px solid var(--surface-border);
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.4);
-}
-
-html.dark .p-menu .p-submenu-header {
-  background: var(--surface-overlay);
-  color: var(--text-color-secondary);
-}
-
-html.dark .p-menu .p-menu-separator {
-  border-top-color: var(--surface-border);
-}
-
-/* TabView underline: same hardcoded #e5e7eb divider issue as the table/menu. */
-html.dark .p-tabview .p-tabview-nav {
-  border-color: var(--surface-border);
-}
-
-html.dark .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-  border-color: transparent transparent var(--surface-border) transparent;
-  color: var(--text-color-secondary);
-}
-
-html.dark ::placeholder {
-  color: var(--text-color-secondary);
-  opacity: 0.7;
-}
-
-/* lara-light-blue hardcodes #3b82f6 (blue) on the base/outlined/text Button
-   variants instead of reading --primary-color, so default buttons stayed blue
-   even after repointing the primary palette to teal above. Repoint explicitly. */
-.p-button {
-  color: var(--primary-color-text);
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.p-button:not(:disabled):hover {
-  background: var(--primary-600);
-  border-color: var(--primary-600);
-}
-
-.p-button:not(:disabled):active {
-  background: var(--primary-700);
-  border-color: var(--primary-700);
-}
-
-/* TabView active tab: lara-light-blue hardcodes blue (#3b82f6) for the active
-   link text/underline instead of reading --primary-color. Repoint to teal. */
-.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
-  box-shadow: none;
-}
-
-/* .p-button above unconditionally fills every button with --primary-color, since
-   lara-light-blue's own "outlined"/"text" rules that clear the background lose
-   to it in source order. Reset background/border here so outlined buttons are
-   actually outlined instead of rendering as a solid filled square. */
-.p-button.p-button-outlined {
-  color: var(--primary-color);
-  background: transparent;
-  border-color: var(--primary-color);
-}
-
-.p-button.p-button-outlined:not(:disabled):hover,
-.p-button.p-button-outlined:not(:disabled):active {
-  color: var(--primary-color);
-  background: var(--primary-50);
-}
-
-/* Text buttons (e.g. "Kembali") are flat chrome, not calls-to-action — neutral
-   text color at rest, only a faint surface tint on hover/active. Danger text
-   buttons keep the negative color instead of turning neutral. */
-.p-button.p-button-text:not(.p-button-danger) {
-  color: var(--text-color-secondary);
-  background: transparent;
-  border-color: transparent;
-}
-
-.p-button.p-button-text:not(.p-button-danger):not(:disabled):hover,
-.p-button.p-button-text:not(.p-button-danger):not(:disabled):active {
-  color: var(--text-color);
-  background: var(--surface-hover, var(--surface-100));
-}
-
-.p-button.p-button-text.p-button-danger {
-  color: var(--red-500, #ef4444);
-  background: transparent;
-  border-color: transparent;
-}
-
-.p-button.p-button-text.p-button-danger:not(:disabled):hover,
-.p-button.p-button-text.p-button-danger:not(:disabled):active {
-  color: var(--red-600, #dc2626);
-  background: var(--surface-hover, var(--surface-100));
-}
-
-/* Outlined danger buttons (e.g. "Hapus Permanen") are flat, not bordered —
-   no chrome/outline, just negative-colored text; a faint surface tint marks
-   hover the same way as other flat buttons. */
-.p-button.p-button-outlined.p-button-danger {
-  color: var(--red-500, #ef4444);
-  background: transparent;
-  border-color: transparent;
-}
-
-.p-button.p-button-outlined.p-button-danger:not(:disabled):hover,
-.p-button.p-button-outlined.p-button-danger:not(:disabled):active {
-  color: var(--red-600, #dc2626);
-  background: var(--surface-hover, var(--surface-100));
-  border-color: transparent;
-}
-
-/* Compact PrimeReact density, closer to Todoist's scale */
-.p-component {
   font-size: 0.85rem;
 }
 
+/* ===== Compact / dense control sizing across PrimeReact components ===== */
+
+.p-inputtext,
+.p-dropdown .p-dropdown-label,
+.p-multiselect .p-multiselect-label,
+.p-button,
+.p-chips .p-chips-multiple-container,
+.p-inputnumber-input {
+  font-size: 0.85rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
 .p-button {
-  padding: 0.4rem 0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 .p-button.p-button-icon-only {
-  padding: 0.4rem;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
 }
 
-.p-inputtext {
-  padding: 0.4rem 0.6rem;
+.p-dropdown .p-dropdown-trigger,
+.p-multiselect .p-multiselect-trigger {
+  width: 2.5rem;
+}
+
+.p-checkbox,
+.p-checkbox .p-checkbox-box {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.p-radiobutton,
+.p-radiobutton .p-radiobutton-box {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.p-datatable .p-datatable-thead>tr>th,
+.p-datatable .p-datatable-tbody>tr>td {
+  padding: 0.45rem 0.6rem;
   font-size: 0.85rem;
-  line-height: 1.2;
 }
 
-/* Dropdown/MultiSelect labels carry the .p-inputtext class but not .p-component,
-   so they missed the compact font-size above — their font stayed at the theme's
-   default 14px while plain inputs shrank to 0.85rem, making the same padding
-   compute to a visibly taller box. Matching font-size alone still leaves a ~2px
-   gap because a bare <span> and an <input> resolve default line-height
-   differently at the same font-size — pin both to the same explicit line-height
-   so the two controls' total height is byte-identical. */
-.p-dropdown-label,
-.p-multiselect-label {
+.p-datatable .p-datatable-thead>tr>th,
+.p-datatable .p-datatable-tfoot>tr>td {
+  color: var(--text-color-secondary);
+  font-weight: 600;
+}
+
+/* Sortable column icon: subtle by default, only the actively-sorted column
+   should stand out (the theme otherwise renders every sort icon at full
+   contrast regardless of whether that column is the active sort). */
+.p-datatable .p-sortable-column-icon {
+  font-size: 0.75rem;
+}
+
+.p-datatable .p-sortable-column:not(.p-highlight) .p-sortable-column-icon {
+  color: var(--text-color-secondary);
+  opacity: 0.4;
+}
+
+.p-datatable .p-sortable-column:not(.p-highlight):not(.p-sortable-disabled):hover .p-sortable-column-icon {
+  opacity: 0.7;
+}
+
+/* DataTable loading overlay: replace the theme's dark 0.4-opacity black tint
+   with a near-transparent white one — the dark tint read as too heavy while
+   data loads. Dialog/other masks keep the default .p-component-overlay. */
+.p-datatable-loading-overlay.p-component-overlay {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-color-secondary);
+}
+
+.p-tag {
+  font-size: 0.75rem;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1rem 1.25rem;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0 1.25rem 1.25rem;
+}
+
+/* Flat card: the theme's default box-shadow reads as too heavy for a plain
+   content container — replace with a low-contrast border instead. */
+.p-card {
+  box-shadow: none;
+  border: 1px solid var(--surface-border);
+}
+
+.p-card .p-card-body {
+  padding: 1rem;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  padding: 0.6rem 1rem;
   font-size: 0.85rem;
-  line-height: 1.2;
-}
-
-/* Editable Dropdown renders its label as a real <input class="p-dropdown-label
-   p-inputtext">, so it also picked up the standalone input's border/background
-   (set above) — nesting a visible "box inside a box" inside the outer
-   .p-dropdown chrome. It should look exactly like the plain (non-editable)
-   label: transparent, no border of its own. */
-input.p-dropdown-label {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
 }
 
 /* Icon-field inputs need their built-in left/right padding preserved, or the
@@ -455,107 +121,6 @@ input.p-dropdown-label {
   padding-right: 2.25rem;
 }
 
-.p-datatable .p-datatable-thead>tr>th,
-.p-datatable .p-datatable-tbody>tr>td {
-  padding: 0.5rem 0.75rem;
-}
-
-.p-menubar {
-  padding: 0.4rem 0.75rem;
-}
-
-/* Sidebar toggle: mirror the icon (not the whole button) when the sidebar is
-   collapsed, so it visually points the opposite way — no separate icon glyph needed. */
-.layout-menu-button-flipped .p-button-icon {
-  transform: scaleX(-1);
-}
-
-/* Clean, borderless look for surfaces around the table */
-.p-paginator,
-.p-dialog .p-dialog-header,
-.p-dialog .p-dialog-footer {
-  border-color: transparent !important;
-}
-
-/* Card: lara-light-blue's default is a Material-style triple box-shadow (visible
-   dark halo) with no border — replace with a thin, low-contrast outline and a
-   much softer single shadow, so cards read as "gently separated" rather than
-   "floating"/elevated. */
-.p-card {
-  border: 1px solid var(--surface-border) !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
-}
-
-html.dark .p-card {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
-}
-
-/* lara-light-blue's default card padding (1.25rem body, plus 1.25rem content
-   on top) reads as too roomy stacked inside the already-padded layout-main —
-   tighten both so detail pages feel dense but still breathable. */
-.p-card .p-card-body {
-  padding: 1rem;
-}
-
-.p-card .p-card-content {
-  padding: 0.75rem 0;
-}
-
-.p-card .p-card-title {
-  margin-bottom: 0.25rem;
-}
-
-/* Table: horizontal divider lines only (header/body/footer), no vertical column borders */
-.p-datatable .p-datatable-thead>tr>th,
-.p-datatable .p-datatable-tbody>tr>td,
-.p-datatable .p-datatable-tfoot>tr>td {
-  border-left: none !important;
-  border-right: none !important;
-}
-
-/* Loading overlay: keep it near-white and subtle instead of PrimeReact's default dark scrim */
-.p-datatable-loading-overlay {
-  background-color: rgba(255, 255, 255, 0.6);
-}
-
-html.dark .p-datatable-loading-overlay {
-  background-color: rgba(15, 20, 23, 0.6);
-}
-
-/* Unfocused fields: only a whisper darker than the surrounding surface, not a
-   visibly separate gray block. A very thin border keeps the field's edge
-   readable without adding contrast — nearly the same tone as the background
-   and the fill itself. */
-/* .p-inputtext,
-.p-dropdown {
-  background: var(--surface-card);
-  border: 1px solid var(--surface-border) !important;
-} */
-
-.p-inputtext:enabled:focus,
-.p-dropdown:not(.p-disabled).p-focus {
-  background: var(--surface-0);
-}
-
-/* Dropdown/MultiSelect: lara-light-blue draws an inner focus box-shadow inside
-   the field on focus, reading as a second rounded rectangle nested inside the
-   field border — drop it for a cleaner look. InputText keeps its focus ring. */
-.p-dropdown:not(.p-disabled).p-focus,
-.p-multiselect:not(.p-disabled).p-focus {
-  box-shadow: none;
-}
-
-/* Dropdown clear ("x") button was flush against the right edge, right next to
-   the dropdown-toggle chevron — give it breathing room from both the typed
-   text and the edge. */
-.p-dropdown-clear-icon {
-  margin-right: 0.5rem;
-}
-
-.p-dropdown .p-dropdown-label {
-  padding-right: 0.5rem;
-}
-
 /* Textarea: only vertical resize, clamped so it can't collapse to nothing or
    grow past a reasonable height, and never resizes wider than its container
    (which was letting the dialog's content overflow horizontally). */
@@ -565,24 +130,10 @@ html.dark .p-datatable-loading-overlay {
   max-height: 20rem;
 }
 
-/* Headings and page titles: softened from pure/near-black text-color to a
-   toned-down gray so they read as calm hierarchy, not shouting. Same
-   treatment in dark mode via --heading-color below. */
-:root {
-  --heading-color: #475569;
-}
-
-html.dark {
-  --heading-color: #b6c2c7;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: var(--heading-color);
+/* Sidebar toggle: mirror the icon (not the whole button) when the sidebar is
+   collapsed, so it visually points the opposite way — no separate icon glyph needed. */
+.layout-menu-button-flipped .p-button-icon {
+  transform: scaleX(-1);
 }
 
 /* ===== Admin layout (Sakai-style: fixed topbar + sidebar) ===== */
@@ -616,7 +167,7 @@ h6 {
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  color: var(--heading-color);
+  color: var(--text-color-secondary);
   font-weight: 600;
 }
 
@@ -648,12 +199,12 @@ h6 {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.6rem 0.75rem;
+  padding: 0.45rem 0.75rem;
   border-radius: 8px;
   text-decoration: none;
   color: var(--text-color-secondary);
-  font-size: 0.92rem;
   transition: background 0.15s;
+  font-size: 0.85rem;
 }
 
 .layout-menuitem-link:hover {
@@ -664,10 +215,6 @@ h6 {
   background: var(--primary-50, var(--surface-100));
   color: var(--primary-color);
   font-weight: 600;
-}
-
-.layout-menuitem-icon {
-  font-size: 0.95rem;
 }
 
 .layout-menuitem-toggle-row {
@@ -740,18 +287,12 @@ h6 {
   flex: 1;
   min-width: 0;
   padding-left: 2.35rem;
-  font-size: 0.88rem;
 }
 
 .layout-submenu-link .layout-menuitem-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.layout-submenu-more {
-  color: var(--text-color-secondary);
-  font-style: italic;
 }
 
 .layout-submenu-pin {

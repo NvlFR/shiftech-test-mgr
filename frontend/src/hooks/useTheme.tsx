@@ -3,6 +3,11 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 const STORAGE_KEY = 'theme-mode.v1';
+const THEME_LINK_ID = 'prime-theme';
+const THEME_HREF: Record<'light' | 'dark', string> = {
+  light: '/prime-themes/lara-light-blue/theme.css',
+  dark: '/prime-themes/lara-dark-blue/theme.css',
+};
 
 interface ThemeContextValue {
   mode: ThemeMode;
@@ -20,9 +25,15 @@ function resolve(mode: ThemeMode): 'light' | 'dark' {
   return mode === 'system' ? (getSystemPrefersDark() ? 'dark' : 'light') : mode;
 }
 
-// Single-theme-file approach: we keep PrimeReact's lara-light-blue CSS loaded at all times
-// and override its CSS variables under html.dark (see index.css) instead of swapping theme
-// files at runtime — avoids the flash-of-unstyled-theme that a <link> swap would cause.
+function applyTheme(next: 'light' | 'dark') {
+  document.documentElement.classList.toggle('dark', next === 'dark');
+  const link = document.getElementById(THEME_LINK_ID) as HTMLLinkElement | null;
+  if (link) link.href = THEME_HREF[next];
+}
+
+// PrimeReact ships separate light/dark theme CSS files (no shared runtime toggle) —
+// we swap the <link> href between them instead of maintaining manual CSS variable
+// overrides on top of a single light theme.
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -33,7 +44,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const next = resolve(mode);
     setResolvedMode(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    applyTheme(next);
   }, [mode]);
 
   useEffect(() => {
@@ -42,7 +53,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const listener = () => {
       const next = resolve('system');
       setResolvedMode(next);
-      document.documentElement.classList.toggle('dark', next === 'dark');
+      applyTheme(next);
     };
     media.addEventListener('change', listener);
     return () => media.removeEventListener('change', listener);

@@ -2,12 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>exp-react</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicon.svg"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Shiftech Test Manager</title>
+    <script>
+      (function () {
+        var stored = localStorage.getItem("theme-mode.v1");
+        var mode = stored === "light" || stored === "dark" ? stored : null;
+        var dark = mode
+          ? mode === "dark"
+          : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("dark", dark);
+        var link = document.createElement("link");
+        link.id = "prime-theme";
+        link.rel = "stylesheet";
+        link.href = dark
+          ? "/prime-themes/lara-dark-blue/theme.css"
+          : "/prime-themes/lara-light-blue/theme.css";
+        document.head.appendChild(link);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script
+      type="module"
+      src="/src/main.tsx"
+    ></script>
   </body>
 </html>
