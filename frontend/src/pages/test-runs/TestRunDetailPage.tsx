@@ -18,6 +18,10 @@ import { profileService } from '../../services/profileService';
 import { issueService } from '../../services/issueService';
 import type { Profile, TestResultStatus, TestResultWithDetails } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Breadcrumb } from '../../components/ui/Breadcrumb';
+import { testPlanService } from '../../services/testPlanService';
+import { projectService } from '../../services/projectService';
+import type { TestPlan } from '../../types/domain';
 import {
   TEST_RESULT_STATUS_LABEL,
   TEST_RESULT_STATUS_SEVERITY,
@@ -40,10 +44,20 @@ export function TestRunDetailPage() {
 
   const { testRun, results, summary, loading, reload } = useTestRunDetail(id ?? null);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
+  const [testPlan, setTestPlan] = useState<TestPlan | null>(null);
+  const [projectName, setProjectName] = useState<string | null>(null);
 
   useEffect(() => {
     profileService.listAll().then((all) => setApprovedUsers(all.filter((p) => p.role === 'user' || p.role === 'admin')));
   }, []);
+
+  useEffect(() => {
+    if (testRun) testPlanService.getById(testRun.testPlanId).then(setTestPlan);
+  }, [testRun]);
+
+  useEffect(() => {
+    if (testPlan) projectService.getById(testPlan.projectId).then((p) => setProjectName(p?.name ?? null));
+  }, [testPlan]);
 
   // --- Record result dialog ---
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
@@ -131,6 +145,17 @@ export function TestRunDetailPage() {
     <div>
       <Toast ref={toast} />
       <ConfirmDialog />
+
+      {testRun && testPlan && (
+        <Breadcrumb
+          items={[
+            { label: 'Projects', path: '/' },
+            { label: projectName ?? '...', path: `/projects/${testPlan.projectId}` },
+            { label: `${testPlan.code} — ${testPlan.name}`, path: `/test-plans/${testPlan.id}` },
+            { label: `${testRun.code} — ${testRun.name}` },
+          ]}
+        />
+      )}
 
       <PageHeader
         title={testRun ? `${testRun.code} — ${testRun.name}` : 'Test Run'}

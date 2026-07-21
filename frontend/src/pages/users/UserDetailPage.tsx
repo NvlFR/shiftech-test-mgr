@@ -5,6 +5,7 @@ import { Avatar } from 'primereact/avatar';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { profileService } from '../../services/profileService';
+import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import type { Profile } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import { USER_ROLE_LABEL, USER_ROLE_SEVERITY } from '../../helpers/statusLabels';
@@ -28,6 +29,13 @@ export function UserDetailPage() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: 'Users', path: '/users' },
+          { label: profile.fullName ?? profile.email },
+        ]}
+      />
+
       <Button label="Kembali" icon="pi pi-arrow-left" text onClick={() => navigate('/users')} className="mb-3" />
 
       <Card>

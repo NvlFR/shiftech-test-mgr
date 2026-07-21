@@ -17,6 +17,8 @@ import { testCaseService } from '../../services/testCaseService';
 import { testRunService } from '../../services/testRunService';
 import type { TestCase, TestPlan, TestPlanCaseWithDetails, TestRun } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Breadcrumb } from '../../components/ui/Breadcrumb';
+import { projectService } from '../../services/projectService';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
   TEST_RUN_STATUS_LABEL,
@@ -31,12 +33,17 @@ export function TestPlanDetailPage() {
   const toast = useRef<Toast>(null);
 
   const [testPlan, setTestPlan] = useState<TestPlan | null>(null);
+  const [projectName, setProjectName] = useState<string | null>(null);
   const { cases, loading: casesLoading, reload: reloadCases } = useTestPlanDetail(id ?? null);
   const { testRuns, loading: runsLoading, reload: reloadRuns } = useTestRuns(id ?? null);
 
   useEffect(() => {
     if (id) testPlanService.getById(id).then(setTestPlan);
   }, [id]);
+
+  useEffect(() => {
+    if (testPlan) projectService.getById(testPlan.projectId).then((p) => setProjectName(p?.name ?? null));
+  }, [testPlan]);
 
   // --- Add test case to plan ---
   const [addCaseDialogOpen, setAddCaseDialogOpen] = useState(false);
@@ -103,6 +110,16 @@ export function TestPlanDetailPage() {
     <div>
       <Toast ref={toast} />
       <ConfirmDialog />
+
+      {testPlan && (
+        <Breadcrumb
+          items={[
+            { label: 'Projects', path: '/' },
+            { label: projectName ?? '...', path: `/projects/${testPlan.projectId}` },
+            { label: `${testPlan.code} — ${testPlan.name}` },
+          ]}
+        />
+      )}
 
       <PageHeader title={testPlan ? `${testPlan.code} — ${testPlan.name}` : 'Detail Test Plan'} />
 

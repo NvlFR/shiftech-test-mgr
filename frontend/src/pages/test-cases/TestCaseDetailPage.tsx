@@ -4,6 +4,7 @@ import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { Chip } from 'primereact/chip';
+import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { testCaseService } from '../../services/testCaseService';
 import type { TestCaseWithDetails } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
@@ -48,6 +49,14 @@ export function TestCaseDetailPage() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: testCase.project.name, path: `/projects/${testCase.project.id}` },
+          { label: `${testCase.code} — ${testCase.title}` },
+        ]}
+      />
+
       <Button label="Kembali" icon="pi pi-arrow-left" text onClick={handleBack} className="mb-3" />
 
       <Card className="mb-3">
