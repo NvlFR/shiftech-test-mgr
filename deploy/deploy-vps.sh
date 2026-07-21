@@ -41,12 +41,12 @@
 
 set -euo pipefail
 
-SKIP_INSTALL=0
-SKIP_BUILD=0
+SKIP_INSTALL=1
+SKIP_BUILD=1
 for arg in "$@"; do
     case "$arg" in
-        --skip-install) SKIP_INSTALL=1 ;;
-        --skip-build) SKIP_BUILD=1 ;;
+        --install) SKIP_INSTALL=0 ;;
+        --build) SKIP_BUILD=0 ;;
         *)
             echo "Argumen tidak dikenal: $arg (pakai --skip-install / --skip-build)" >&2
             exit 1
