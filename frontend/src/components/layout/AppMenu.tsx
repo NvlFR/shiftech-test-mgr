@@ -63,7 +63,7 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
     <>
     <Toast ref={toast} />
     <ul className="layout-menu">
-      <AppMenuTreeItem label="Projects" icon="pi pi-folder" onAdd={openAddDialog} addLabel="Project Baru">
+      <AppMenuTreeItem label="Projects" icon="pi pi-folder" url="/" onNavigate={onNavigate} onAdd={openAddDialog} addLabel="Project Baru">
         {visibleProjects.map((project) => (
           <li key={project.id} className="layout-submenu-item">
             <NavLink
@@ -89,17 +89,6 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
             </button>
           </li>
         ))}
-        <li className="layout-submenu-item">
-          <NavLink
-            to="/"
-            end
-            onClick={onNavigate}
-            className={({ isActive }) => `layout-menuitem-link layout-submenu-link layout-submenu-more ${isActive ? 'active-route' : ''}`}
-          >
-            <i className="pi pi-ellipsis-h" />
-            <span className="layout-menuitem-text">Lihat semua project</span>
-          </NavLink>
-        </li>
       </AppMenuTreeItem>
 
       {trailingItems.map((item) => (

@@ -24,10 +24,13 @@ export function AppMenuitem({ item, onNavigate }: { item: MenuItemModel; onNavig
   );
 }
 
-// Expandable tree node (e.g. "Projects" with a flat list of project links underneath).
+// Tree node whose label links directly to `url` (e.g. "Projects" → /projects);
+// the chevron button on the right independently expands/collapses the children.
 export function AppMenuTreeItem({
   label,
   icon,
+  url,
+  onNavigate,
   defaultOpen = true,
   onAdd,
   addLabel,
@@ -35,6 +38,8 @@ export function AppMenuTreeItem({
 }: {
   label: string;
   icon: string;
+  url: string;
+  onNavigate?: () => void;
   defaultOpen?: boolean;
   onAdd?: () => void;
   addLabel?: string;
@@ -46,10 +51,15 @@ export function AppMenuTreeItem({
   return (
     <li className="layout-root-menuitem">
       <div className="layout-menuitem-toggle-row">
-        <button type="button" className="layout-menuitem-link layout-menuitem-toggle" onClick={() => setOpen((o) => !o)}>
+        <NavLink
+          to={url}
+          end
+          onClick={onNavigate}
+          className={({ isActive }) => `layout-menuitem-link layout-menuitem-toggle ${isActive ? 'active-route' : ''}`}
+        >
           <i className={`layout-menuitem-icon ${icon}`} />
           <span className="layout-menuitem-text">{label}</span>
-        </button>
+        </NavLink>
         {onAdd && (
           <button
             type="button"

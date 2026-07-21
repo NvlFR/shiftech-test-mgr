@@ -23,7 +23,7 @@ export function AppTopbar() {
         onClick={onMenuToggle}
       />
       <Link to="/" className="layout-topbar-logo">
-        <span>TestMan</span>
+        <span>Testify</span>
       </Link>
       <div className="flex-1" />
       <div className="flex align-items-center gap-2">
