@@ -16,6 +16,9 @@ import { Toast } from 'primereact/toast';
 import { projectService } from '../../services/projectService';
 import { testPlanService } from '../../services/testPlanService';
 import { testCaseService } from '../../services/testCaseService';
+import { testRunService } from '../../services/testRunService';
+import { issueService } from '../../services/issueService';
+import { profileService } from '../../services/profileService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import type {
@@ -23,6 +26,10 @@ import type {
   TestPlan,
   TestCase,
   TestCaseWithDetails,
+  TestCasePriority,
+  TestRun,
+  IssueWithDetails,
+  Profile,
   Module,
   Tag as TagEntity,
 } from '../../types/domain';
@@ -36,13 +43,19 @@ import {
   TEST_CASE_STATUS_SEVERITY,
   TEST_PLAN_STATUS_LABEL,
   TEST_PLAN_STATUS_SEVERITY,
+  TEST_RUN_STATUS_LABEL,
+  TEST_RUN_STATUS_SEVERITY,
+  TEST_RESULT_STATUS_SEVERITY,
+  ISSUE_PRIORITY_LABEL,
+  ISSUE_PRIORITY_SEVERITY,
+  ISSUE_STATUS_LABEL,
 } from '../../helpers/statusLabels';
 
 const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
-  { label: 'Rendah', value: 'low' },
-  { label: 'Sedang', value: 'medium' },
-  { label: 'Tinggi', value: 'high' },
-  { label: 'Kritis', value: 'critical' },
+  { label: TEST_CASE_PRIORITY_LABEL.low, value: 'low' },
+  { label: TEST_CASE_PRIORITY_LABEL.medium, value: 'medium' },
+  { label: TEST_CASE_PRIORITY_LABEL.high, value: 'high' },
+  { label: TEST_CASE_PRIORITY_LABEL.critical, value: 'critical' },
 ];
 
 export function ProjectDetailPage() {
@@ -55,23 +68,32 @@ export function ProjectDetailPage() {
   const [testCases, setTestCases] = useState<TestCaseWithDetails[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [tags, setTags] = useState<TagEntity[]>([]);
+  const [testRuns, setTestRuns] = useState<(TestRun & { total: number; pass: number; fail: number; testers: { id: string; fullName: string | null }[] })[]>([]);
+  const [issues, setIssues] = useState<IssueWithDetails[]>([]);
+  const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function loadAll(showLoading = true) {
     if (!id) return;
     if (showLoading) setLoading(true);
-    const [projectResult, plansResult, casesResult, modulesResult, tagsResult] = await Promise.all([
+    const [projectResult, plansResult, casesResult, modulesResult, tagsResult, runsResult, issuesResult, usersResult] = await Promise.all([
       projectService.getById(id),
       testPlanService.listByProject(id),
       testCaseService.listByProjectWithDetails(id),
       moduleService.listByProject(id),
       tagService.listByProject(id),
+      testRunService.listByProjectWithSummary(id),
+      issueService.listByProject(id),
+      profileService.listAll(),
     ]);
     setProject(projectResult);
     setTestPlans(plansResult);
     setTestCases(casesResult);
     setModules(modulesResult);
     setTags(tagsResult);
+    setTestRuns(runsResult);
+    setIssues(issuesResult);
+    setApprovedUsers(usersResult.filter((p: Profile) => p.role === 'user' || p.role === 'admin'));
     if (showLoading) setLoading(false);
   }
 
@@ -397,7 +419,7 @@ export function ProjectDetailPage() {
       <Toast ref={toast} />
       <ConfirmDialog />
 
-      <Button label="Kembali" icon="pi pi-arrow-left" text onClick={() => navigate('/')} className="mb-3" />
+      {/* <Button label="Kembali" icon="pi pi-arrow-left" text onClick={() => navigate('/')} className="mb-3" /> */}
 
       <Card className="mb-3">
         <div className="flex align-items-start justify-content-between">
@@ -470,7 +492,7 @@ export function ProjectDetailPage() {
             <div className="flex justify-content-end mb-3">
               <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />
             </div>
-            <DataTable value={testCases} size="small" emptyMessage="Belum ada test case">
+            <DataTable value={testCases} size="small" emptyMessage="Belum ada test case" onRowClick={(e) => navigate(`/test-cases/${(e.data as TestCaseWithDetails).id}?projectId=${id}`)} rowHover className="cursor-pointer">
               <Column field="code" header="Kode" style={{ width: '7rem' }} />
               <Column field="title" header="Judul" />
               <Column field="module.name" header="Module" body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} />
@@ -552,6 +574,70 @@ export function ProjectDetailPage() {
                     <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit" onClick={() => openEditTagDialog(row)} />
                     <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Hapus" onClick={() => handleDeleteTag(row)} />
                   </div>
+                )}
+              />
+            </DataTable>
+          </TabPanel>
+
+          <TabPanel header="Test Runs">
+            <DataTable value={testRuns} size="small" emptyMessage="Belum ada test run" onRowClick={(e) => navigate(`/test-runs/${(e.data as TestRun).id}`)} rowHover className="cursor-pointer">
+              <Column field="code" header="Kode" style={{ width: '7rem' }} />
+              <Column field="name" header="Nama Run" />
+              <Column field="status" header="Status" body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} />
+              <Column
+                header="Hasil"
+                body={(row: TestRun & { total: number; pass: number; fail: number }) => (
+                  <div className="flex gap-1 align-items-center">
+                    <Tag value={String(row.pass)} severity={TEST_RESULT_STATUS_SEVERITY.pass} />
+                    <Tag value={String(row.fail)} severity={TEST_RESULT_STATUS_SEVERITY.fail} />
+                    <span className="text-color-secondary text-sm">/{row.total}</span>
+                  </div>
+                )}
+              />
+              <Column
+                header="Tester"
+                body={(row: TestRun & { testers: { id: string; fullName: string | null }[] }) =>
+                  row.testers.length > 0 ? row.testers.map((t) => t.fullName ?? t.id).join(', ') : '-'
+                }
+              />
+              <Column field="completedAt" header="Selesai" body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
+            </DataTable>
+          </TabPanel>
+
+          <TabPanel header="Issues">
+            <DataTable value={issues} size="small" emptyMessage="Belum ada issue">
+              <Column field="title" header="Judul" />
+              <Column field="priority" header="Prioritas" body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} />
+              <Column
+                field="status"
+                header="Status"
+                body={(row: IssueWithDetails) => (
+                  <Dropdown
+                    value={row.status}
+                    options={(['open', 'in_progress', 'resolved', 'verified', 'closed'] as const).map((v) => ({ label: ISSUE_STATUS_LABEL[v], value: v }))}
+                    onChange={(e) => {
+                      issueService.changeStatus(row.id, e.value);
+                      setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, status: e.value } : i)));
+                    }}
+                    className="w-11rem"
+                  />
+                )}
+              />
+              <Column
+                field="assignedTo"
+                header="Ditugaskan Ke"
+                body={(row: IssueWithDetails) => (
+                  <Dropdown
+                    value={row.assignedTo}
+                    options={approvedUsers.map((u) => ({ label: u.fullName ?? u.email, value: u.id }))}
+                    onChange={(e) => {
+                      issueService.assign(row.id, e.value);
+                      setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, assignedTo: e.value } : i)));
+                    }}
+                    placeholder="Belum ditugaskan"
+                    showClear
+                    className="w-11rem"
+                  />
                 )}
               />
             </DataTable>

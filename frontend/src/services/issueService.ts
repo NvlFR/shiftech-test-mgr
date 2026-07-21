@@ -10,6 +10,10 @@ export const issueService = {
     return issueRepository.findAllByTestRun(testRunId);
   },
 
+  listByProject(projectId: string) {
+    return issueRepository.findAllByProject(projectId);
+  },
+
   create(input: {
     testResultId: string;
     title: string;

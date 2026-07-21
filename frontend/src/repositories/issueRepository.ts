@@ -18,6 +18,28 @@ export const issueRepository = {
   },
 
   // Issues across an entire test run (joined through test_results) — for a run-level issue list.
+  async findAllByProject(projectId: string): Promise<IssueWithDetails[]> {
+    const { data: runData, error: runError } = await supabase
+      .from('test_runs')
+      .select('id, test_plan:test_plans!inner(project_id)')
+      .eq('test_plan.project_id', projectId);
+    if (runError) throw runError;
+    const runIds = (runData ?? []).map((r: any) => r.id);
+    if (runIds.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from('issues')
+      .select('*, assignee:profiles(*), test_result:test_results!inner(test_run_id)')
+      .in('test_result.test_run_id', runIds)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data ?? []).map((row: any) => ({
+      ...mapIssueRow(row),
+      assignee: row.assignee ? mapProfileRow(row.assignee) : null,
+    }));
+  },
+
   async findAllByTestRun(testRunId: string): Promise<IssueWithDetails[]> {
     const { data, error } = await supabase
       .from('issues')

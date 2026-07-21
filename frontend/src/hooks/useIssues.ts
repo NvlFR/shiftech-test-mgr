@@ -2,6 +2,27 @@ import { useCallback, useEffect, useState } from 'react';
 import { issueService } from '../services/issueService';
 import type { IssueWithDetails } from '../types/domain';
 
+export function useIssuesByProject(projectId: string | null) {
+  const [issues, setIssues] = useState<IssueWithDetails[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const reload = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      setIssues(await issueService.listByProject(projectId));
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  return { issues, loading, reload };
+}
+
 export function useIssuesByTestRun(testRunId: string | null) {
   const [issues, setIssues] = useState<IssueWithDetails[]>([]);
   const [loading, setLoading] = useState(false);
