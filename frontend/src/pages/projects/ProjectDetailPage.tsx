@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
-import { DataTable } from 'primereact/datatable';
+import { DataTable, type DataTableStateEvent } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Dialog } from 'primereact/dialog';
@@ -13,6 +13,11 @@ import { Dropdown } from 'primereact/dropdown';
 import { Chips } from 'primereact/chips';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
+import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
+import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { projectService } from '../../services/projectService';
 import { testPlanService } from '../../services/testPlanService';
 import { testCaseService } from '../../services/testCaseService';
@@ -24,11 +29,16 @@ import { tagService } from '../../services/tagService';
 import type {
   Project,
   TestPlan,
+  TestPlanStatus,
   TestCase,
   TestCaseWithDetails,
   TestCasePriority,
+  TestCaseStatus,
   TestRun,
+  TestRunStatus,
   IssueWithDetails,
+  IssueStatus,
+  IssuePriority,
   Profile,
   Module,
   Tag as TagEntity,
@@ -58,6 +68,33 @@ const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
   { label: TEST_CASE_PRIORITY_LABEL.critical, value: 'critical' },
 ];
 
+const TEST_PLAN_STATUS_OPTIONS: { label: string; value: TestPlanStatus }[] = (
+  ['draft', 'active', 'completed', 'archived'] as const
+).map((v) => ({ label: TEST_PLAN_STATUS_LABEL[v], value: v }));
+
+const TEST_CASE_STATUS_OPTIONS: { label: string; value: TestCaseStatus }[] = (
+  ['active', 'archived'] as const
+).map((v) => ({ label: TEST_CASE_STATUS_LABEL[v], value: v }));
+
+const TEST_RUN_STATUS_OPTIONS: { label: string; value: TestRunStatus }[] = (
+  ['in_progress', 'completed'] as const
+).map((v) => ({ label: TEST_RUN_STATUS_LABEL[v], value: v }));
+
+const ISSUE_STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
+  ['open', 'in_progress', 'resolved', 'verified', 'closed'] as const
+).map((v) => ({ label: ISSUE_STATUS_LABEL[v], value: v }));
+
+const ISSUE_PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (
+  ['low', 'medium', 'high', 'critical'] as const
+).map((v) => ({ label: ISSUE_PRIORITY_LABEL[v], value: v }));
+
+type TestRunWithSummary = TestRun & {
+  total: number;
+  pass: number;
+  fail: number;
+  testers: { id: string; fullName: string | null }[];
+};
+
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -68,10 +105,13 @@ export function ProjectDetailPage() {
   const [testCases, setTestCases] = useState<TestCaseWithDetails[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [tags, setTags] = useState<TagEntity[]>([]);
-  const [testRuns, setTestRuns] = useState<(TestRun & { total: number; pass: number; fail: number; testers: { id: string; fullName: string | null }[] })[]>([]);
+  const [testRuns, setTestRuns] = useState<TestRunWithSummary[]>([]);
   const [issues, setIssues] = useState<IssueWithDetails[]>([]);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+  const TAB_LABELS = ['Test Plans', 'Test Cases', 'Test Runs', 'Issues'];
 
   async function loadAll(showLoading = true) {
     if (!id) return;
@@ -110,6 +150,22 @@ export function ProjectDetailPage() {
   const [planDescription, setPlanDescription] = useState('');
   const [planError, setPlanError] = useState<string | null>(null);
 
+  // Test Plans: search/filter/sort/selection
+  const [planSearch, setPlanSearch] = useState('');
+  const [planStatusFilter, setPlanStatusFilter] = useState<TestPlanStatus | null>(null);
+  const [planSortField, setPlanSortField] = useState('code');
+  const [planSortOrder, setPlanSortOrder] = useState<1 | -1>(1);
+  const [selectedPlans, setSelectedPlans] = useState<TestPlan[]>([]);
+
+  const filteredPlans = useMemo(() => {
+    const q = planSearch.trim().toLowerCase();
+    return testPlans.filter((p) => {
+      if (planStatusFilter && p.status !== planStatusFilter) return false;
+      if (q && !p.name.toLowerCase().includes(q) && !p.code.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [testPlans, planSearch, planStatusFilter]);
+
   function openCreatePlanDialog() {
     setEditingPlanId(null);
     setPlanCode('');
@@ -145,38 +201,49 @@ export function ProjectDetailPage() {
     }
   }
 
-  // --- Module dialog ---
+  function handleDeletePlan(row: TestPlan) {
+    confirmDialog({
+      header: 'Hapus Test Plan',
+      message: `Test plan "${row.name}" akan dihapus permanen. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await testPlanService.remove(row.id);
+        await loadAll(false);
+        toast.current?.show({ severity: 'success', summary: 'Test plan dihapus' });
+      },
+    });
+  }
+
+  function handleBulkDeletePlans() {
+    confirmDialog({
+      header: 'Hapus Test Plan Terpilih',
+      message: `${selectedPlans.length} test plan akan dihapus permanen. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await Promise.all(selectedPlans.map((p) => testPlanService.remove(p.id)));
+        setSelectedPlans([]);
+        await loadAll(false);
+        toast.current?.show({ severity: 'success', summary: 'Test plan terpilih dihapus' });
+      },
+    });
+  }
+
+  // --- Module quick-add (from Test Case dialog) ---
   const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
-  const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
   const [moduleCode, setModuleCode] = useState('');
   const [moduleName, setModuleName] = useState('');
   const [moduleError, setModuleError] = useState<string | null>(null);
   const moduleNameRef = useRef<HTMLInputElement>(null);
-  const [moduleDialogSource, setModuleDialogSource] = useState<'modules' | 'case'>('modules');
-
-  function openCreateModuleDialog() {
-    setModuleDialogSource('modules');
-    setEditingModuleId(null);
-    setModuleCode('');
-    setModuleName('');
-    setModuleError(null);
-    setModuleDialogOpen(true);
-  }
 
   function openCreateModuleDialogFromCase() {
-    setModuleDialogSource('case');
-    setEditingModuleId(null);
     setModuleCode('');
     setModuleName('');
-    setModuleError(null);
-    setModuleDialogOpen(true);
-  }
-
-  function openEditModuleDialog(row: Module) {
-    setModuleDialogSource('modules');
-    setEditingModuleId(row.id);
-    setModuleCode(row.code);
-    setModuleName(row.name);
     setModuleError(null);
     setModuleDialogOpen(true);
   }
@@ -185,78 +252,14 @@ export function ProjectDetailPage() {
     if (!id) return;
     setModuleError(null);
     try {
-      if (editingModuleId) {
-        await moduleService.update(editingModuleId, { name: moduleName, code: moduleCode });
-      } else {
-        const created = await moduleService.create({ projectId: id, name: moduleName, code: moduleCode });
-        if (moduleDialogSource === 'case') {
-          setCaseModuleId(created.id);
-        }
-      }
+      const created = await moduleService.create({ projectId: id, name: moduleName, code: moduleCode });
+      setCaseModuleId(created.id);
       setModuleDialogOpen(false);
       await loadAll(false);
-      toast.current?.show({ severity: 'success', summary: editingModuleId ? 'Module diperbarui' : 'Module dibuat' });
+      toast.current?.show({ severity: 'success', summary: 'Module dibuat' });
     } catch (err) {
       setModuleError(err instanceof Error ? err.message : 'Gagal menyimpan module');
     }
-  }
-
-  function handleDeleteModule(row: Module) {
-    confirmDialog({
-      header: 'Hapus Module',
-      message: `Module "${row.name}" akan dihapus. Test case yang memakai module ini akan menjadi tanpa module. Lanjutkan?`,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Hapus',
-      rejectLabel: 'Batal',
-      acceptClassName: 'p-button-danger',
-      accept: async () => {
-        await moduleService.remove(row.id);
-        await loadAll(false);
-        toast.current?.show({ severity: 'success', summary: 'Module dihapus' });
-      },
-    });
-  }
-
-  // --- Tag dialog ---
-  const [tagDialogOpen, setTagDialogOpen] = useState(false);
-  const [editingTagId, setEditingTagId] = useState<string | null>(null);
-  const [tagName, setTagName] = useState('');
-  const [tagError, setTagError] = useState<string | null>(null);
-
-  function openEditTagDialog(row: TagEntity) {
-    setEditingTagId(row.id);
-    setTagName(row.name);
-    setTagError(null);
-    setTagDialogOpen(true);
-  }
-
-  async function handleSaveTag() {
-    if (!editingTagId) return;
-    setTagError(null);
-    try {
-      await tagService.rename(editingTagId, tagName);
-      setTagDialogOpen(false);
-      await loadAll(false);
-      toast.current?.show({ severity: 'success', summary: 'Tag diperbarui' });
-    } catch (err) {
-      setTagError(err instanceof Error ? err.message : 'Gagal menyimpan tag');
-    }
-  }
-
-  function handleDeleteTag(row: TagEntity) {
-    confirmDialog({
-      header: 'Hapus Tag',
-      message: `Tag "${row.name}" akan dihapus dan dilepas dari seluruh test case yang memakainya. Lanjutkan?`,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Hapus',
-      rejectLabel: 'Batal',
-      acceptClassName: 'p-button-danger',
-      accept: async () => {
-        await tagService.remove(row.id);
-        await loadAll(false);
-        toast.current?.show({ severity: 'success', summary: 'Tag dihapus' });
-      },
-    });
   }
 
   // --- Test Case dialog ---
@@ -273,6 +276,28 @@ export function ProjectDetailPage() {
   const [caseNotes, setCaseNotes] = useState('');
   const [caseTags, setCaseTags] = useState<string[]>([]);
   const [caseError, setCaseError] = useState<string | null>(null);
+
+  // Test Cases: search/filter/sort/selection
+  const [caseSearch, setCaseSearch] = useState('');
+  const [caseStatusFilter, setCaseStatusFilter] = useState<TestCaseStatus | null>(null);
+  const [casePriorityFilter, setCasePriorityFilter] = useState<TestCasePriority | null>(null);
+  const [caseModuleFilter, setCaseModuleFilter] = useState<string | null>(null);
+  const [caseTagFilter, setCaseTagFilter] = useState<string | null>(null);
+  const [caseSortField, setCaseSortField] = useState('code');
+  const [caseSortOrder, setCaseSortOrder] = useState<1 | -1>(1);
+  const [selectedCases, setSelectedCases] = useState<TestCaseWithDetails[]>([]);
+
+  const filteredCases = useMemo(() => {
+    const q = caseSearch.trim().toLowerCase();
+    return testCases.filter((c) => {
+      if (caseStatusFilter && c.status !== caseStatusFilter) return false;
+      if (casePriorityFilter && c.priority !== casePriorityFilter) return false;
+      if (caseModuleFilter && c.moduleId !== caseModuleFilter) return false;
+      if (caseTagFilter && !c.tags.some((t) => t.id === caseTagFilter)) return false;
+      if (q && !c.title.toLowerCase().includes(q) && !c.code.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [testCases, caseSearch, caseStatusFilter, casePriorityFilter, caseModuleFilter, caseTagFilter]);
 
   function openCreateCaseDialog() {
     setEditingCaseId(null);
@@ -387,6 +412,23 @@ export function ProjectDetailPage() {
     });
   }
 
+  function handleBulkDeleteCases() {
+    confirmDialog({
+      header: 'Hapus Test Case Terpilih',
+      message: `${selectedCases.length} test case akan dihapus permanen, termasuk seluruh riwayat hasil eksekusinya. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await Promise.all(selectedCases.map((c) => testCaseService.remove(c.id)));
+        setSelectedCases([]);
+        await loadAll(false);
+        toast.current?.show({ severity: 'success', summary: 'Test case terpilih dihapus' });
+      },
+    });
+  }
+
   function handleDeletePermanently() {
     if (!project) return;
     confirmDialog({
@@ -409,79 +451,184 @@ export function ProjectDetailPage() {
     });
   }
 
+  // --- Test Runs: search/filter/sort/selection ---
+  const [runSearch, setRunSearch] = useState('');
+  const [runStatusFilter, setRunStatusFilter] = useState<TestRunStatus | null>(null);
+  const [runSortField, setRunSortField] = useState('code');
+  const [runSortOrder, setRunSortOrder] = useState<1 | -1>(1);
+  const [selectedRuns, setSelectedRuns] = useState<TestRunWithSummary[]>([]);
+
+  const filteredRuns = useMemo(() => {
+    const q = runSearch.trim().toLowerCase();
+    return testRuns.filter((r) => {
+      if (runStatusFilter && r.status !== runStatusFilter) return false;
+      if (q && !r.name.toLowerCase().includes(q) && !r.code.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [testRuns, runSearch, runStatusFilter]);
+
+  function handleBulkDeleteRuns() {
+    confirmDialog({
+      header: 'Hapus Test Run Terpilih',
+      message: `${selectedRuns.length} test run akan dihapus permanen, termasuk seluruh hasil eksekusinya. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await Promise.all(selectedRuns.map((r) => testRunService.remove(r.id)));
+        setSelectedRuns([]);
+        await loadAll(false);
+        toast.current?.show({ severity: 'success', summary: 'Test run terpilih dihapus' });
+      },
+    });
+  }
+
+  // --- Issues: search/filter/sort/selection ---
+  const [issueSearch, setIssueSearch] = useState('');
+  const [issueStatusFilter, setIssueStatusFilter] = useState<IssueStatus | null>(null);
+  const [issuePriorityFilter, setIssuePriorityFilter] = useState<IssuePriority | null>(null);
+  const [issueSortField, setIssueSortField] = useState('title');
+  const [issueSortOrder, setIssueSortOrder] = useState<1 | -1>(1);
+  const [selectedIssues, setSelectedIssues] = useState<IssueWithDetails[]>([]);
+
+  const filteredIssues = useMemo(() => {
+    const q = issueSearch.trim().toLowerCase();
+    return issues.filter((i) => {
+      if (issueStatusFilter && i.status !== issueStatusFilter) return false;
+      if (issuePriorityFilter && i.priority !== issuePriorityFilter) return false;
+      if (q && !i.title.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [issues, issueSearch, issueStatusFilter, issuePriorityFilter]);
+
+  function handleBulkDeleteIssues() {
+    confirmDialog({
+      header: 'Hapus Issue Terpilih',
+      message: `${selectedIssues.length} issue akan dihapus permanen. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await Promise.all(selectedIssues.map((i) => issueService.remove(i.id)));
+        setSelectedIssues([]);
+        await loadAll(false);
+        toast.current?.show({ severity: 'success', summary: 'Issue terpilih dihapus' });
+      },
+    });
+  }
+
   if (loading) return <p>Memuat...</p>;
   if (!project) return <p>Project tidak ditemukan.</p>;
 
   const moduleOptions = modules.map((m) => ({ label: m.name, value: m.id }));
+  const tagOptions = tags.map((t) => ({ label: t.name, value: t.id }));
+
+  function sortHandler(setField: (f: string) => void, setOrder: (o: 1 | -1) => void) {
+    return (e: DataTableStateEvent) => {
+      setField(e.sortField);
+      setOrder((e.sortOrder ?? 1) as 1 | -1);
+    };
+  }
 
   return (
     <div>
       <Toast ref={toast} />
       <ConfirmDialog />
 
-      {/* <Button label="Kembali" icon="pi pi-arrow-left" text onClick={() => navigate('/')} className="mb-3" /> */}
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: project.name, path: `/projects/${id}` },
+          { label: TAB_LABELS[activeTabIndex] },
+        ]}
+      />
 
       <Card className="mb-3">
-        <div className="flex align-items-start justify-content-between">
+        <div className="flex align-items-start justify-content-between flex-wrap gap-2">
           <div>
             <div className="flex align-items-center gap-2 mb-1">
               <h2 className="m-0">{project.name}</h2>
               <Tag value={PROJECT_STATUS_LABEL[project.status]} severity={PROJECT_STATUS_SEVERITY[project.status]} />
             </div>
-            <p className="text-color-secondary m-0">{project.description || 'Tidak ada deskripsi'}</p>
+            <p className="text-color-secondary text-sm m-0">{project.description || 'Tidak ada deskripsi'}</p>
           </div>
-          <Button icon="pi pi-trash" label="Hapus Permanen" severity="danger" outlined size="small" onClick={handleDeletePermanently} />
+          <div className="flex gap-2">
+            <Button icon="pi pi-cog" label="Pengaturan" outlined size="small" onClick={() => navigate(`/projects/${id}/settings`)} />
+            <Button icon="pi pi-trash" label="Hapus Permanen" severity="danger" outlined size="small" onClick={handleDeletePermanently} />
+          </div>
         </div>
 
-        <div className="grid mt-3">
-          <div className="col-6 md:col-3">
-            <label className="block text-color-secondary text-sm mb-1">Dibuat</label>
-            <p className="mt-0">{formatDateTime(project.createdAt)}</p>
-          </div>
-          <div className="col-6 md:col-3">
-            <label className="block text-color-secondary text-sm mb-1">Update Terakhir</label>
-            <p className="mt-0">{formatDateTime(project.updatedAt)}</p>
-          </div>
-          <div className="col-6 md:col-3">
-            <label className="block text-color-secondary text-sm mb-1">Jumlah Test Plan</label>
-            <p className="mt-0">{testPlans.length}</p>
-          </div>
-          <div className="col-6 md:col-3">
-            <label className="block text-color-secondary text-sm mb-1">Jumlah Test Case</label>
-            <p className="mt-0">{testCases.length}</p>
-          </div>
+        <div className="flex flex-wrap gap-4 mt-3 text-sm">
+          <span className="text-color-secondary">Dibuat: <span className="text-color">{formatDateTime(project.createdAt)}</span></span>
+          <span className="text-color-secondary">Update Terakhir: <span className="text-color">{formatDateTime(project.updatedAt)}</span></span>
+          <span className="text-color-secondary">Test Plan: <span className="text-color">{testPlans.length}</span></span>
+          <span className="text-color-secondary">Test Case: <span className="text-color">{testCases.length}</span></span>
         </div>
       </Card>
 
       <Card>
-        <TabView>
+        <TabView activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
           <TabPanel header="Test Plans">
-            <div className="flex justify-content-end mb-3">
+            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+              <div className="flex align-items-center gap-2 flex-wrap">
+                <IconField iconPosition="left">
+                  <InputIcon className="pi pi-search" />
+                  <InputText value={planSearch} onChange={(e) => setPlanSearch(e.target.value)} placeholder="Cari nama/kode..." />
+                </IconField>
+                <Dropdown
+                  value={planStatusFilter}
+                  options={TEST_PLAN_STATUS_OPTIONS}
+                  onChange={(e) => setPlanStatusFilter(e.value)}
+                  placeholder="Semua Status"
+                  showClear
+                  className="w-12rem"
+                />
+              </div>
               <Button label="Test Plan Baru" icon="pi pi-plus" size="small" onClick={openCreatePlanDialog} />
             </div>
-            <DataTable value={testPlans} size="small" emptyMessage="Belum ada test plan" onRowClick={(e) => navigate(`/test-plans/${(e.data as TestPlan).id}`)} rowHover className="cursor-pointer">
-              <Column field="code" header="Kode" style={{ width: '7rem' }} />
-              <Column field="name" header="Nama" />
+            <BulkActionsBar
+              selectedCount={selectedPlans.length}
+              onClear={() => setSelectedPlans([])}
+              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeletePlans} />}
+            />
+            <DataTable
+              value={filteredPlans}
+              size="small"
+              emptyMessage="Belum ada test plan"
+              onRowClick={(e) => navigate(`/test-plans/${(e.data as TestPlan).id}`)}
+              rowHover
+              className="cursor-pointer"
+              paginator
+              rows={10}
+              sortField={planSortField}
+              sortOrder={planSortOrder}
+              onSort={sortHandler(setPlanSortField, setPlanSortOrder)}
+              selection={selectedPlans}
+              onSelectionChange={(e) => setSelectedPlans(e.value as TestPlan[])}
+              dataKey="id"
+              selectionMode="checkbox"
+            >
+              <Column selectionMode="multiple" style={{ width: '3rem' }} />
+              <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
+              <Column field="name" header="Nama" sortable />
               <Column
                 field="status"
                 header="Status"
+                sortable
                 body={(row: TestPlan) => <Tag value={TEST_PLAN_STATUS_LABEL[row.status]} severity={TEST_PLAN_STATUS_SEVERITY[row.status]} />}
               />
-              <Column field="updatedAt" header="Update Terakhir" body={(row: TestPlan) => formatDateTime(row.updatedAt)} />
+              <Column field="updatedAt" header="Update Terakhir" sortable body={(row: TestPlan) => formatDateTime(row.updatedAt)} />
               <Column
-                header="Aksi"
-                style={{ width: '4rem' }}
+                header=""
+                style={{ width: '3.5rem' }}
                 body={(row: TestPlan) => (
-                  <Button
-                    icon="pi pi-pencil"
-                    text
-                    rounded
-                    size="small"
-                    aria-label="Edit"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditPlanDialog(row);
-                    }}
+                  <RowActionsMenu
+                    items={[
+                      { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditPlanDialog(row) },
+                      { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeletePlan(row) },
+                    ]}
                   />
                 )}
               />
@@ -489,21 +636,83 @@ export function ProjectDetailPage() {
           </TabPanel>
 
           <TabPanel header="Test Cases">
-            <div className="flex justify-content-end mb-3">
+            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+              <div className="flex align-items-center gap-2 flex-wrap">
+                <IconField iconPosition="left">
+                  <InputIcon className="pi pi-search" />
+                  <InputText value={caseSearch} onChange={(e) => setCaseSearch(e.target.value)} placeholder="Cari judul/kode..." />
+                </IconField>
+                <Dropdown
+                  value={caseStatusFilter}
+                  options={TEST_CASE_STATUS_OPTIONS}
+                  onChange={(e) => setCaseStatusFilter(e.value)}
+                  placeholder="Semua Status"
+                  showClear
+                  className="w-10rem"
+                />
+                <Dropdown
+                  value={casePriorityFilter}
+                  options={PRIORITY_OPTIONS}
+                  onChange={(e) => setCasePriorityFilter(e.value)}
+                  placeholder="Semua Prioritas"
+                  showClear
+                  className="w-10rem"
+                />
+                <Dropdown
+                  value={caseModuleFilter}
+                  options={moduleOptions}
+                  onChange={(e) => setCaseModuleFilter(e.value)}
+                  placeholder="Semua Module"
+                  showClear
+                  className="w-10rem"
+                />
+                <Dropdown
+                  value={caseTagFilter}
+                  options={tagOptions}
+                  onChange={(e) => setCaseTagFilter(e.value)}
+                  placeholder="Semua Tag"
+                  showClear
+                  className="w-10rem"
+                />
+              </div>
               <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />
             </div>
-            <DataTable value={testCases} size="small" emptyMessage="Belum ada test case" onRowClick={(e) => navigate(`/test-cases/${(e.data as TestCaseWithDetails).id}?projectId=${id}`)} rowHover className="cursor-pointer">
-              <Column field="code" header="Kode" style={{ width: '7rem' }} />
-              <Column field="title" header="Judul" />
-              <Column field="module.name" header="Module" body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} />
+            <BulkActionsBar
+              selectedCount={selectedCases.length}
+              onClear={() => setSelectedCases([])}
+              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteCases} />}
+            />
+            <DataTable
+              value={filteredCases}
+              size="small"
+              emptyMessage="Belum ada test case"
+              onRowClick={(e) => navigate(`/test-cases/${(e.data as TestCaseWithDetails).id}?projectId=${id}`)}
+              rowHover
+              className="cursor-pointer"
+              paginator
+              rows={10}
+              sortField={caseSortField}
+              sortOrder={caseSortOrder}
+              onSort={sortHandler(setCaseSortField, setCaseSortOrder)}
+              selection={selectedCases}
+              onSelectionChange={(e) => setSelectedCases(e.value as TestCaseWithDetails[])}
+              dataKey="id"
+              selectionMode="checkbox"
+            >
+              <Column selectionMode="multiple" style={{ width: '3rem' }} />
+              <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
+              <Column field="title" header="Judul" sortable />
+              <Column field="module.name" header="Module" sortable body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} />
               <Column
                 field="priority"
                 header="Prioritas"
+                sortable
                 body={(row: TestCaseWithDetails) => <Tag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} />}
               />
               <Column
                 field="status"
                 header="Status"
+                sortable
                 body={(row: TestCaseWithDetails) => (
                   <Tag value={TEST_CASE_STATUS_LABEL[row.status]} severity={TEST_CASE_STATUS_SEVERITY[row.status]} />
                 )}
@@ -520,73 +729,71 @@ export function ProjectDetailPage() {
                 )}
               />
               <Column
-                header="Aksi"
-                style={{ width: '9rem' }}
+                header=""
+                style={{ width: '3.5rem' }}
                 body={(row: TestCaseWithDetails) => (
-                  <div className="flex gap-1">
-                    <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit" onClick={() => openEditCaseDialog(row)} />
-                    <Button
-                      icon={row.status === 'active' ? 'pi pi-inbox' : 'pi pi-refresh'}
-                      text
-                      rounded
-                      size="small"
-                      aria-label={row.status === 'active' ? 'Arsipkan' : 'Aktifkan'}
-                      onClick={() => handleArchiveCase(row)}
-                    />
-                    <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Hapus" onClick={() => handleDeleteCase(row)} />
-                  </div>
-                )}
-              />
-            </DataTable>
-          </TabPanel>
-
-          <TabPanel header="Modules">
-            <div className="flex justify-content-end mb-3">
-              <Button label="Module Baru" icon="pi pi-plus" size="small" onClick={openCreateModuleDialog} />
-            </div>
-            <DataTable value={modules} size="small" emptyMessage="Belum ada module">
-              <Column field="code" header="Kode" style={{ width: '7rem' }} />
-              <Column field="name" header="Nama" />
-              <Column
-                header="Aksi"
-                style={{ width: '6rem' }}
-                body={(row: Module) => (
-                  <div className="flex gap-1">
-                    <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit" onClick={() => openEditModuleDialog(row)} />
-                    <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Hapus" onClick={() => handleDeleteModule(row)} />
-                  </div>
-                )}
-              />
-            </DataTable>
-          </TabPanel>
-
-          <TabPanel header="Tags">
-            <p className="text-color-secondary text-sm mb-3">
-              Tag baru otomatis dibuat saat diketik di form Test Case. Kelola tag yang sudah ada di sini.
-            </p>
-            <DataTable value={tags} size="small" emptyMessage="Belum ada tag">
-              <Column field="name" header="Nama" />
-              <Column
-                header="Aksi"
-                style={{ width: '6rem' }}
-                body={(row: TagEntity) => (
-                  <div className="flex gap-1">
-                    <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit" onClick={() => openEditTagDialog(row)} />
-                    <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Hapus" onClick={() => handleDeleteTag(row)} />
-                  </div>
+                  <RowActionsMenu
+                    items={[
+                      { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditCaseDialog(row) },
+                      {
+                        label: row.status === 'active' ? 'Arsipkan' : 'Aktifkan',
+                        icon: row.status === 'active' ? 'pi pi-inbox' : 'pi pi-refresh',
+                        command: () => handleArchiveCase(row),
+                      },
+                      { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteCase(row) },
+                    ]}
+                  />
                 )}
               />
             </DataTable>
           </TabPanel>
 
           <TabPanel header="Test Runs">
-            <DataTable value={testRuns} size="small" emptyMessage="Belum ada test run" onRowClick={(e) => navigate(`/test-runs/${(e.data as TestRun).id}`)} rowHover className="cursor-pointer">
-              <Column field="code" header="Kode" style={{ width: '7rem' }} />
-              <Column field="name" header="Nama Run" />
-              <Column field="status" header="Status" body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} />
+            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+              <div className="flex align-items-center gap-2 flex-wrap">
+                <IconField iconPosition="left">
+                  <InputIcon className="pi pi-search" />
+                  <InputText value={runSearch} onChange={(e) => setRunSearch(e.target.value)} placeholder="Cari nama/kode..." />
+                </IconField>
+                <Dropdown
+                  value={runStatusFilter}
+                  options={TEST_RUN_STATUS_OPTIONS}
+                  onChange={(e) => setRunStatusFilter(e.value)}
+                  placeholder="Semua Status"
+                  showClear
+                  className="w-12rem"
+                />
+              </div>
+            </div>
+            <BulkActionsBar
+              selectedCount={selectedRuns.length}
+              onClear={() => setSelectedRuns([])}
+              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteRuns} />}
+            />
+            <DataTable
+              value={filteredRuns}
+              size="small"
+              emptyMessage="Belum ada test run"
+              onRowClick={(e) => navigate(`/test-runs/${(e.data as TestRun).id}`)}
+              rowHover
+              className="cursor-pointer"
+              paginator
+              rows={10}
+              sortField={runSortField}
+              sortOrder={runSortOrder}
+              onSort={sortHandler(setRunSortField, setRunSortOrder)}
+              selection={selectedRuns}
+              onSelectionChange={(e) => setSelectedRuns(e.value as TestRunWithSummary[])}
+              dataKey="id"
+              selectionMode="checkbox"
+            >
+              <Column selectionMode="multiple" style={{ width: '3rem' }} />
+              <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
+              <Column field="name" header="Nama Run" sortable />
+              <Column field="status" header="Status" sortable body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} />
               <Column
                 header="Hasil"
-                body={(row: TestRun & { total: number; pass: number; fail: number }) => (
+                body={(row: TestRunWithSummary) => (
                   <div className="flex gap-1 align-items-center">
                     <Tag value={String(row.pass)} severity={TEST_RESULT_STATUS_SEVERITY.pass} />
                     <Tag value={String(row.fail)} severity={TEST_RESULT_STATUS_SEVERITY.fail} />
@@ -596,47 +803,131 @@ export function ProjectDetailPage() {
               />
               <Column
                 header="Tester"
-                body={(row: TestRun & { testers: { id: string; fullName: string | null }[] }) =>
-                  row.testers.length > 0 ? row.testers.map((t) => t.fullName ?? t.id).join(', ') : '-'
-                }
+                body={(row: TestRunWithSummary) => (row.testers.length > 0 ? row.testers.map((t) => t.fullName ?? t.id).join(', ') : '-')}
               />
-              <Column field="completedAt" header="Selesai" body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
+              <Column field="completedAt" header="Selesai" sortable body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
             </DataTable>
           </TabPanel>
 
           <TabPanel header="Issues">
-            <DataTable value={issues} size="small" emptyMessage="Belum ada issue">
-              <Column field="title" header="Judul" />
-              <Column field="priority" header="Prioritas" body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} />
+            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+              <div className="flex align-items-center gap-2 flex-wrap">
+                <IconField iconPosition="left">
+                  <InputIcon className="pi pi-search" />
+                  <InputText value={issueSearch} onChange={(e) => setIssueSearch(e.target.value)} placeholder="Cari judul..." />
+                </IconField>
+                <Dropdown
+                  value={issueStatusFilter}
+                  options={ISSUE_STATUS_OPTIONS}
+                  onChange={(e) => setIssueStatusFilter(e.value)}
+                  placeholder="Semua Status"
+                  showClear
+                  className="w-11rem"
+                />
+                <Dropdown
+                  value={issuePriorityFilter}
+                  options={ISSUE_PRIORITY_OPTIONS}
+                  onChange={(e) => setIssuePriorityFilter(e.value)}
+                  placeholder="Semua Prioritas"
+                  showClear
+                  className="w-11rem"
+                />
+              </div>
+            </div>
+            <BulkActionsBar
+              selectedCount={selectedIssues.length}
+              onClear={() => setSelectedIssues([])}
+              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteIssues} />}
+            />
+            <DataTable
+              value={filteredIssues}
+              size="small"
+              emptyMessage="Belum ada issue"
+              onRowClick={(e) => navigate(`/issues/${(e.data as IssueWithDetails).id}`)}
+              rowHover
+              className="cursor-pointer"
+              paginator
+              rows={10}
+              sortField={issueSortField}
+              sortOrder={issueSortOrder}
+              onSort={sortHandler(setIssueSortField, setIssueSortOrder)}
+              selection={selectedIssues}
+              onSelectionChange={(e) => setSelectedIssues(e.value as IssueWithDetails[])}
+              dataKey="id"
+              selectionMode="checkbox"
+            >
+              <Column selectionMode="multiple" style={{ width: '3rem' }} />
+              <Column field="title" header="Judul" sortable />
+              <Column
+                header="Test Case"
+                body={(row: IssueWithDetails) => (row.testCase ? `${row.testCase.code} - ${row.testCase.title}` : '-')}
+              />
+              <Column header="Test Run" body={(row: IssueWithDetails) => (row.testRun ? `${row.testRun.code} - ${row.testRun.name}` : '-')} />
+              <Column field="priority" header="Prioritas" sortable body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} />
               <Column
                 field="status"
                 header="Status"
                 body={(row: IssueWithDetails) => (
-                  <Dropdown
-                    value={row.status}
-                    options={(['open', 'in_progress', 'resolved', 'verified', 'closed'] as const).map((v) => ({ label: ISSUE_STATUS_LABEL[v], value: v }))}
-                    onChange={(e) => {
-                      issueService.changeStatus(row.id, e.value);
-                      setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, status: e.value } : i)));
-                    }}
-                    className="w-11rem"
-                  />
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Dropdown
+                      value={row.status}
+                      options={ISSUE_STATUS_OPTIONS}
+                      onChange={(e) => {
+                        issueService.changeStatus(row.id, e.value);
+                        setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, status: e.value } : i)));
+                      }}
+                      className="w-11rem"
+                    />
+                  </div>
                 )}
               />
               <Column
                 field="assignedTo"
                 header="Ditugaskan Ke"
                 body={(row: IssueWithDetails) => (
-                  <Dropdown
-                    value={row.assignedTo}
-                    options={approvedUsers.map((u) => ({ label: u.fullName ?? u.email, value: u.id }))}
-                    onChange={(e) => {
-                      issueService.assign(row.id, e.value);
-                      setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, assignedTo: e.value } : i)));
-                    }}
-                    placeholder="Belum ditugaskan"
-                    showClear
-                    className="w-11rem"
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Dropdown
+                      value={row.assignedTo}
+                      options={approvedUsers.map((u) => ({ label: u.fullName ?? u.email, value: u.id }))}
+                      onChange={(e) => {
+                        issueService.assign(row.id, e.value);
+                        setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, assignedTo: e.value } : i)));
+                      }}
+                      placeholder="Belum ditugaskan"
+                      showClear
+                      className="w-11rem"
+                    />
+                  </div>
+                )}
+              />
+              <Column
+                header=""
+                style={{ width: '3.5rem' }}
+                body={(row: IssueWithDetails) => (
+                  <RowActionsMenu
+                    items={[
+                      { label: 'Buka Detail', icon: 'pi pi-external-link', command: () => navigate(`/issues/${row.id}`) },
+                      {
+                        label: 'Hapus',
+                        icon: 'pi pi-trash',
+                        className: 'p-error',
+                        command: () => {
+                          confirmDialog({
+                            header: 'Hapus Issue',
+                            message: `Issue "${row.title}" akan dihapus permanen. Lanjutkan?`,
+                            icon: 'pi pi-exclamation-triangle',
+                            acceptLabel: 'Hapus',
+                            rejectLabel: 'Batal',
+                            acceptClassName: 'p-button-danger',
+                            accept: async () => {
+                              await issueService.remove(row.id);
+                              await loadAll(false);
+                              toast.current?.show({ severity: 'success', summary: 'Issue dihapus' });
+                            },
+                          });
+                        },
+                      },
+                    ]}
                   />
                 )}
               />
@@ -672,7 +963,7 @@ export function ProjectDetailPage() {
 
       {/* --- Module Dialog --- */}
       <Dialog
-        header={editingModuleId ? 'Edit Module' : 'Module Baru'}
+        header="Module Baru"
         visible={moduleDialogOpen}
         onHide={() => setModuleDialogOpen(false)}
         onShow={() => moduleNameRef.current?.focus()}
@@ -790,17 +1081,6 @@ export function ProjectDetailPage() {
         </div>
       </Dialog>
 
-      {/* --- Tag Dialog --- */}
-      <Dialog header="Edit Tag" visible={tagDialogOpen} onHide={() => setTagDialogOpen(false)} style={{ width: '25rem' }}>
-        <div className="flex flex-column gap-3">
-          {tagError && <small className="p-error">{tagError}</small>}
-          <div className="flex flex-column gap-1">
-            <label htmlFor="tag-name">Nama Tag</label>
-            <InputText id="tag-name" value={tagName} onChange={(e) => setTagName(e.target.value)} autoFocus />
-          </div>
-          <Button label="Simpan" size="small" onClick={handleSaveTag} />
-        </div>
-      </Dialog>
     </div>
   );
 }
