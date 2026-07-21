@@ -9,13 +9,17 @@ import { projectService } from '../../services/projectService';
 import type { Project, TestRun } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { formatDateTime } from '../../helpers/dateFormatter';
-import { TEST_RUN_STATUS_LABEL, TEST_RUN_STATUS_SEVERITY } from '../../helpers/statusLabels';
+import {
+  TEST_RUN_STATUS_LABEL,
+  TEST_RUN_STATUS_SEVERITY,
+  TEST_RESULT_STATUS_SEVERITY,
+} from '../../helpers/statusLabels';
 
 export function TestRunsPage() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectId, setProjectId] = useState<string | null>(null);
-  const [testRuns, setTestRuns] = useState<(TestRun & { testPlanName: string })[]>([]);
+  const [testRuns, setTestRuns] = useState<(TestRun & { testPlanName: string; total: number; pass: number; fail: number })[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export function TestRunsPage() {
       return;
     }
     setLoading(true);
-    testRunService.listByProject(projectId).then(setTestRuns).finally(() => setLoading(false));
+    testRunService.listByProjectWithSummary(projectId).then(setTestRuns).finally(() => setLoading(false));
   }, [projectId]);
 
   return (
@@ -68,7 +72,26 @@ export function TestRunsPage() {
         <Column field="name" header="Nama Run" sortable />
         <Column field="testPlanName" header="Test Plan" sortable />
         <Column field="status" header="Status" body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} sortable />
-        <Column field="startedAt" header="Dimulai" body={(row: TestRun) => formatDateTime(row.startedAt)} sortable />
+        <Column
+          header="Hasil"
+          body={(row: TestRun & { total: number; pass: number; fail: number }) => (
+            <div className="flex gap-1 align-items-center">
+              <Tag value={String(row.pass)} severity={TEST_RESULT_STATUS_SEVERITY.pass} />
+              <Tag value={String(row.fail)} severity={TEST_RESULT_STATUS_SEVERITY.fail} />
+              <span className="text-color-secondary text-sm">/{row.total}</span>
+            </div>
+          )}
+          sortable
+          sortField="pass"
+        />
+        <Column
+          header="Tester"
+          body={(row: TestRun & { testers: { id: string; fullName: string | null }[] }) =>
+            row.testers.length > 0
+              ? row.testers.map((t) => t.fullName ?? t.id).join(', ')
+              : '-'
+          }
+        />
         <Column field="completedAt" header="Selesai" body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
       </DataTable>
     </div>

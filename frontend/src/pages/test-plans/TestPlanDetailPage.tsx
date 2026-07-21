@@ -18,7 +18,12 @@ import { testRunService } from '../../services/testRunService';
 import type { TestCase, TestPlan, TestPlanCaseWithDetails, TestRun } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { formatDateTime } from '../../helpers/dateFormatter';
-import { TEST_RUN_STATUS_LABEL, TEST_RUN_STATUS_SEVERITY } from '../../helpers/statusLabels';
+import {
+  TEST_RUN_STATUS_LABEL,
+  TEST_RUN_STATUS_SEVERITY,
+  TEST_RESULT_STATUS_SEVERITY,
+} from '../../helpers/statusLabels';
+import type { TestRunWithSummary } from '../../hooks/useTestRuns';
 
 export function TestPlanDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -138,7 +143,26 @@ export function TestPlanDetailPage() {
             <Column field="code" header="Kode" style={{ width: '7rem' }} />
             <Column field="name" header="Nama Run" />
             <Column field="status" header="Status" body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} />
-            <Column field="startedAt" header="Dimulai" body={(row: TestRun) => formatDateTime(row.startedAt)} />
+            <Column
+              header="Hasil"
+              body={(row: TestRunWithSummary) => (
+                <div className="flex gap-1 align-items-center">
+                  <Tag value={String(row.pass)} severity={TEST_RESULT_STATUS_SEVERITY.pass} />
+                  <Tag value={String(row.fail)} severity={TEST_RESULT_STATUS_SEVERITY.fail} />
+                  <span className="text-color-secondary text-sm">/{row.total}</span>
+                </div>
+              )}
+              sortable
+              sortField="pass"
+            />
+            <Column
+              header="Tester"
+              body={(row: TestRunWithSummary) =>
+                row.testers.length > 0
+                  ? row.testers.map((t) => t.fullName ?? t.id).join(', ')
+                  : '-'
+              }
+            />
             <Column field="completedAt" header="Selesai" body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
           </DataTable>
         </TabPanel>

@@ -12,6 +12,26 @@ export const testRunService = {
     return testRunRepository.findAllByProject(projectId);
   },
 
+  async listByProjectWithSummary(projectId: string) {
+    const runs = await testRunRepository.findAllByProject(projectId);
+    const runIds = runs.map((r) => r.id);
+    const [summary, testers] = await Promise.all([
+      testResultRepository.getSummaryByRunIds(runIds),
+      testResultRepository.getDistinctTestersByRunIds(runIds),
+    ]);
+    return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] }));
+  },
+
+  async listByPlanWithSummary(testPlanId: string) {
+    const runs = await testRunRepository.findAllByPlan(testPlanId);
+    const runIds = runs.map((r) => r.id);
+    const [summary, testers] = await Promise.all([
+      testResultRepository.getSummaryByRunIds(runIds),
+      testResultRepository.getDistinctTestersByRunIds(runIds),
+    ]);
+    return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] }));
+  },
+
   getById(id: string) {
     return testRunRepository.findById(id);
   },
