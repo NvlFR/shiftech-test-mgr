@@ -4,8 +4,10 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 import { Toast } from 'primereact/toast';
-import { AppMenuitem, AppMenuTreeItem, type MenuItemModel } from './AppMenuitem';
+import { AppMenuitem, AppMenuSeparator, type MenuItemModel } from './AppMenuitem';
 import { useAuthContext } from '../../hooks/useAuth';
 import { useProjects } from '../../hooks/useProjects';
 import { useProjectPins } from '../../hooks/useProjectPins';
@@ -19,6 +21,8 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
   const { isAdmin } = useAuthContext();
   const { projects, reload } = useProjects({ status: 'active', sortField: 'name', sortDirection: 'asc' });
   const { isPinned, togglePin } = useProjectPins();
+
+  const [projectSearch, setProjectSearch] = useState('');
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [name, setName] = useState('');
@@ -47,23 +51,56 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
     }
   }
 
-  const sortedProjects = [...projects].sort((a, b) => {
+  const q = projectSearch.trim().toLowerCase();
+  const filteredProjects = q ? projects.filter((p) => p.name.toLowerCase().includes(q)) : projects;
+  const sortedProjects = [...filteredProjects].sort((a, b) => {
     const pinDiff = Number(isPinned(b.id)) - Number(isPinned(a.id));
     if (pinDiff !== 0) return pinDiff;
     return a.name.localeCompare(b.name);
   });
   const visibleProjects = sortedProjects.slice(0, MAX_VISIBLE_PROJECTS);
 
-  const trailingItems: MenuItemModel[] = [
-    { label: 'Test Runs', icon: 'pi pi-play-circle', url: '/test-runs' },
-    ...(isAdmin ? [{ label: 'User Management', icon: 'pi pi-users', url: '/users' }] : []),
+  const mainItems: MenuItemModel[] = [
+    { label: 'Home', icon: 'pi pi-home', url: '/home' },
+    { label: 'Projects', icon: 'pi pi-folder', url: '/', end: true },
+    ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }] : []),
   ];
 
   return (
     <>
-    <Toast ref={toast} />
-    <ul className="layout-menu">
-      <AppMenuTreeItem label="Projects" icon="pi pi-folder" url="/" onNavigate={onNavigate} onAdd={openAddDialog} addLabel="Project Baru">
+      <Toast ref={toast} />
+      <ul className="layout-menu">
+        {mainItems.map((item) => (
+          <AppMenuitem key={item.url} item={item} onNavigate={onNavigate} />
+        ))}
+
+        <AppMenuSeparator />
+
+        <li className="layout-menu-section-header">
+          <span>Top Projects</span>
+          <button
+            type="button"
+            className="layout-menuitem-add"
+            title="Project Baru"
+            aria-label="Project Baru"
+            onClick={openAddDialog}
+          >
+            <i className="pi pi-plus" />
+          </button>
+        </li>
+
+        <li className="layout-menu-search">
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              value={projectSearch}
+              onChange={(e) => setProjectSearch(e.target.value)}
+              placeholder="Saring project..."
+              className="w-full"
+            />
+          </IconField>
+        </li>
+
         {visibleProjects.map((project) => (
           <li key={project.id} className="layout-submenu-item">
             <NavLink
@@ -89,46 +126,47 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
             </button>
           </li>
         ))}
-      </AppMenuTreeItem>
 
-      {trailingItems.map((item) => (
-        <AppMenuitem key={item.url} item={item} onNavigate={onNavigate} />
-      ))}
-    </ul>
+        {visibleProjects.length === 0 && (
+          <li className="layout-menu-empty">
+            <span className="text-color-secondary text-sm">Tidak ada project ditemukan</span>
+          </li>
+        )}
+      </ul>
 
-    <Dialog
-      header="Project Baru"
-      visible={addDialogOpen}
-      onHide={() => setAddDialogOpen(false)}
-      onShow={() => nameRef.current?.focus()}
-      style={{ width: '30rem' }}
-    >
-      <div className="flex flex-column gap-3">
-        {error && <small className="p-error">{error}</small>}
-        <div className="flex flex-column gap-1">
-          <label htmlFor="add-project-name">Nama</label>
-          <InputText
-            id="add-project-name"
-            ref={nameRef}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSave();
-            }}
-          />
+      <Dialog
+        header="Project Baru"
+        visible={addDialogOpen}
+        onHide={() => setAddDialogOpen(false)}
+        onShow={() => nameRef.current?.focus()}
+        style={{ width: '30rem' }}
+      >
+        <div className="flex flex-column gap-3">
+          {error && <small className="p-error">{error}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="add-project-name">Nama</label>
+            <InputText
+              id="add-project-name"
+              ref={nameRef}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave();
+              }}
+            />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="add-project-description">Deskripsi</label>
+            <InputTextarea
+              id="add-project-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <Button label="Simpan" size="small" onClick={handleSave} />
         </div>
-        <div className="flex flex-column gap-1">
-          <label htmlFor="add-project-description">Deskripsi</label>
-          <InputTextarea
-            id="add-project-description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-          />
-        </div>
-        <Button label="Simpan" size="small" onClick={handleSave} />
-      </div>
-    </Dialog>
+      </Dialog>
     </>
   );
 }

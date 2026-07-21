@@ -1,21 +1,26 @@
+import { Link } from 'react-router-dom';
+import { Button } from 'primereact/button';
 import { AppMenu } from './AppMenu';
 import { useLayoutContext } from './LayoutContext';
 
 export function AppSidebar() {
-  const { onMenuToggle, isDesktop } = useLayoutContext();
-
-  function handleNavigate() {
-    if (!isDesktop()) onMenuToggle();
-  }
+  const { closeMenu } = useLayoutContext();
 
   return (
     <div className="layout-sidebar">
-      <AppMenu onNavigate={handleNavigate} />
+      <div className="layout-sidebar-header">
+        <Link to="/" className="layout-sidebar-logo" onClick={closeMenu}>
+          <i className="pi pi-check-square" />
+          <span>Testify</span>
+        </Link>
+        <Button icon="pi pi-times" text rounded aria-label="Tutup menu" onClick={closeMenu} />
+      </div>
+      <AppMenu onNavigate={closeMenu} />
     </div>
   );
 }
 
 export function AppSidebarMask() {
-  const { onMenuToggle } = useLayoutContext();
-  return <div className="layout-mask" onClick={onMenuToggle} />;
+  const { closeMenu } = useLayoutContext();
+  return <div className="layout-mask" onClick={closeMenu} />;
 }

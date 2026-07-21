@@ -1,40 +1,29 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
-interface LayoutState {
-  staticMenuDesktopInactive: boolean;
-  staticMenuMobileActive: boolean;
-}
-
 interface LayoutContextValue {
-  layoutState: LayoutState;
+  menuActive: boolean;
   onMenuToggle: () => void;
-  isDesktop: () => boolean;
+  closeMenu: () => void;
 }
 
 const LayoutContext = createContext<LayoutContextValue | undefined>(undefined);
 
-// Mirrors PrimeReact's Sakai admin template layout state machine, trimmed to
-// the single "static" menu mode: sidebar pushes content on desktop, overlays on mobile.
+// Sidebar always behaves as a slide-in overlay panel (same on desktop and
+// mobile) — closed by default, opened via the topbar hamburger, closed via
+// its own X button, a nav click, or the backdrop mask.
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [layoutState, setLayoutState] = useState<LayoutState>({
-    staticMenuDesktopInactive: false,
-    staticMenuMobileActive: false,
-  });
-
-  function isDesktop() {
-    return window.innerWidth > 991;
-  }
+  const [menuActive, setMenuActive] = useState(false);
 
   function onMenuToggle() {
-    if (isDesktop()) {
-      setLayoutState((prev) => ({ ...prev, staticMenuDesktopInactive: !prev.staticMenuDesktopInactive }));
-    } else {
-      setLayoutState((prev) => ({ ...prev, staticMenuMobileActive: !prev.staticMenuMobileActive }));
-    }
+    setMenuActive((prev) => !prev);
+  }
+
+  function closeMenu() {
+    setMenuActive(false);
   }
 
   return (
-    <LayoutContext.Provider value={{ layoutState, onMenuToggle, isDesktop }}>
+    <LayoutContext.Provider value={{ menuActive, onMenuToggle, closeMenu }}>
       {children}
     </LayoutContext.Provider>
   );

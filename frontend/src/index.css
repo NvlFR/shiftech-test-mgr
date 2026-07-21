@@ -3,6 +3,32 @@ body {
   font-size: 0.85rem;
 }
 
+.entity-link {
+  color: var(--primary-color);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.entity-link:hover {
+  color: var(--primary-700, var(--primary-color));
+  text-decoration: underline;
+}
+
+.breadcrumb-link {
+  text-decoration: none;
+  padding: 0.15rem 0.45rem;
+  margin: -0.15rem -0.45rem;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.breadcrumb-link:hover {
+  background: var(--primary-50, var(--surface-100));
+  color: var(--primary-color);
+}
+
 /* ===== Compact / dense control sizing across PrimeReact components ===== */
 
 .p-inputtext,
@@ -130,12 +156,6 @@ h1, h2, h3, h4, h5, h6 {
   max-height: 20rem;
 }
 
-/* Sidebar toggle: mirror the icon (not the whole button) when the sidebar is
-   collapsed, so it visually points the opposite way — no separate icon glyph needed. */
-.layout-menu-button-flipped .p-button-icon {
-  transform: scaleX(-1);
-}
-
 /* ===== Admin layout (Sakai-style: fixed topbar + sidebar) ===== */
 
 :root {
@@ -171,19 +191,47 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* Todoist-style sidebar: flat, same tone as the page background (not a
-   "card" surface), no border or shadow separating it from the content area —
-   the two areas read as one continuous flat surface. */
+/* GitHub-style slide-in panel: covers the full viewport height, including
+   the area behind the topbar, rather than docking below it. */
 .layout-sidebar {
   position: fixed;
-  top: var(--topbar-height);
+  top: 0;
   left: 0;
   width: var(--sidebar-width);
-  height: calc(100vh - var(--topbar-height));
-  background: var(--surface-ground);
+  height: 100vh;
+  background: var(--surface-card);
+  border-right: 1px solid var(--surface-border);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
   overflow-y: auto;
-  z-index: 999;
-  transition: transform 0.2s ease-in-out, left 0.2s ease-in-out;
+  z-index: 1100;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease-in-out;
+}
+
+.layout-wrapper.layout-menu-active .layout-sidebar {
+  transform: translateX(0);
+}
+
+.layout-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.layout-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.layout-sidebar-logo .pi {
+  font-size: 1.25rem;
+  color: var(--primary-color);
 }
 
 .layout-menu {
@@ -215,6 +263,35 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--primary-50, var(--surface-100));
   color: var(--primary-color);
   font-weight: 600;
+}
+
+.layout-menu-separator {
+  border-top: 1px solid var(--surface-border);
+  margin: 0.5rem 0.25rem;
+}
+
+.layout-menu-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem 0.25rem;
+  color: var(--text-color-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.layout-menu-search {
+  padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.layout-menu-search .p-inputtext {
+  width: 100%;
+}
+
+.layout-menu-empty {
+  padding: 0.5rem 0.75rem;
 }
 
 .layout-menuitem-toggle-row {
@@ -317,50 +394,44 @@ h1, h2, h3, h4, h5, h6 {
 
 .layout-main-container {
   padding-top: var(--topbar-height);
-  padding-left: var(--sidebar-width);
   min-height: 100vh;
-  transition: padding-left 0.2s ease-in-out;
 }
 
 .layout-main {
   padding: 1rem;
 }
 
+/* Lightweight fade-in used when route/page content swaps in, so navigation
+   doesn't feel like an abrupt pop-in (or a blocking "Memuat..." flash). */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-fade-in {
+  animation: page-fade-in 0.15s ease-out;
+}
+
 .layout-mask {
   display: none;
 }
 
-/* Desktop: hamburger collapses the sidebar and reclaims its space */
-.layout-wrapper.layout-static-inactive .layout-sidebar {
-  transform: translateX(-100%);
-}
-
-.layout-wrapper.layout-static-inactive .layout-main-container {
-  padding-left: 0;
-}
-
-/* Mobile: sidebar is an overlay, hidden by default */
-@media (max-width: 991px) {
-  .layout-sidebar {
-    transform: translateX(-100%);
-  }
-
-  .layout-main-container {
-    padding-left: 0;
-  }
-
-  .layout-wrapper.layout-mobile-active .layout-sidebar {
-    transform: translateX(0);
-  }
-
-  .layout-wrapper.layout-mobile-active .layout-mask {
-    display: block;
-    position: fixed;
-    top: var(--topbar-height);
-    left: 0;
-    width: 100%;
-    height: calc(100vh - var(--topbar-height));
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 998;
-  }
+/* Sidebar is always a slide-in overlay (desktop and mobile alike) — the
+   backdrop mask dims the whole page, topbar included, while it's open. */
+.layout-wrapper.layout-menu-active .layout-mask {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1050;
 }
