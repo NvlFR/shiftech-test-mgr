@@ -113,14 +113,18 @@ export const testCaseRepository = {
   async findCasesForPlan(testPlanId: string): Promise<TestPlanCaseWithDetails[]> {
     const { data, error } = await supabase
       .from('test_plan_cases')
-      .select('*, test_case:test_cases(*)')
+      .select('*, test_case:test_cases(*, module:modules(*), test_case_tags(tag:tags(*)))')
       .eq('test_plan_id', testPlanId)
       .order('order', { ascending: true });
 
     if (error) throw error;
     return (data ?? []).map((row: any) => ({
       ...mapTestPlanCaseRow(row),
-      testCase: mapTestCaseRow(row.test_case),
+      testCase: {
+        ...mapTestCaseRow(row.test_case),
+        module: row.test_case.module ? mapModuleRow(row.test_case.module) : null,
+        tags: (row.test_case.test_case_tags ?? []).map((t: any) => mapTagRow(t.tag)),
+      },
     }));
   },
 
