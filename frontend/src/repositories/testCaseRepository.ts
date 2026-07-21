@@ -37,6 +37,24 @@ export const testCaseRepository = {
     return data ? mapTestCaseRow(data) : null;
   },
 
+  async findByIdWithDetails(id: string): Promise<(TestCaseWithDetails & { project: { id: string; name: string } }) | null> {
+    const { data, error } = await supabase
+      .from('test_cases')
+      .select('*, module:modules(*), test_case_tags(tag:tags(*)), project:projects(id, name)')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    return {
+      ...mapTestCaseRow(data),
+      module: data.module ? mapModuleRow(data.module) : null,
+      tags: (data.test_case_tags ?? []).map((t: any) => mapTagRow(t.tag)),
+      project: data.project,
+    };
+  },
+
   // `code` optional — omit/empty lets the `set_test_case_code` DB trigger auto-generate TC-####.
   async create(input: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt' | 'code'> & { code?: string | null }): Promise<TestCase> {
     const { data, error } = await supabase

@@ -15,6 +15,10 @@ export const testCaseService = {
     return testCaseRepository.findById(id);
   },
 
+  getByIdWithDetails(id: string) {
+    return testCaseRepository.findByIdWithDetails(id);
+  },
+
   async create(input: {
     projectId: string;
     moduleId: string | null;

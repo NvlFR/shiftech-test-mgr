@@ -9,6 +9,7 @@ import { ProjectDetailPage } from './pages/projects/ProjectDetailPage';
 import { TestPlansPage } from './pages/test-plans/TestPlansPage';
 import { TestPlanDetailPage } from './pages/test-plans/TestPlanDetailPage';
 import { TestCasesPage } from './pages/test-cases/TestCasesPage';
+import { TestCaseDetailPage } from './pages/test-cases/TestCaseDetailPage';
 import { TestRunsPage } from './pages/test-runs/TestRunsPage';
 import { TestRunDetailPage } from './pages/test-runs/TestRunDetailPage';
 import { TestRunIssuesPage } from './pages/test-runs/TestRunIssuesPage';
@@ -28,6 +29,7 @@ function App() {
           <Route path="/test-plans" element={<TestPlansPage />} />
           <Route path="/test-plans/:id" element={<TestPlanDetailPage />} />
           <Route path="/test-cases" element={<TestCasesPage />} />
+          <Route path="/test-cases/:id" element={<TestCaseDetailPage />} />
           <Route path="/test-runs" element={<TestRunsPage />} />
           <Route path="/test-runs/:id" element={<TestRunDetailPage />} />
           <Route path="/test-runs/:id/issues" element={<TestRunIssuesPage />} />
