@@ -1,12 +1,14 @@
-# exp-react (TestManager) — OpenCode Project Rules
+# shiftech-test-mgr (TestManager) — OpenCode Project Rules
 
-Aplikasi internal manajemen Test Plan & Test Case. Eksperimen arsitektur clean layering di React SPA. Owner: Fahmi Fauzi Rahman.
+Aplikasi internal manajemen Test Plan & Test Case. Eksperimen arsitektur clean
+layering di React SPA. Owner: Fahmi Fauzi Rahman.
 
 ## Tech Stack
 
 - **Frontend**: React 19 + TypeScript, Vite (SPA murni, tanpa SSR)
 - **UI Library**: PrimeReact v10 (stable) + PrimeFlex (utility CSS) + PrimeIcons
-- **Storage/Backend**: Supabase (Postgres, BaaS) via `@supabase/supabase-js` — tidak ada backend custom
+- **Storage/Backend**: Supabase (Postgres, BaaS) via `@supabase/supabase-js` —
+  tidak ada backend custom
 - **Routing**: react-router-dom
 - **Data fetching cache**: @tanstack/react-query (tersedia, dipakai bertahap)
 - **Form & validation**: react-hook-form + zod (tersedia, dipakai bertahap)
@@ -87,10 +89,15 @@ Project
 ```
 
 Aturan yang tidak boleh dilanggar saat menambah/mengubah kode di modul ini:
-- `test_cases`/`test_plan_cases` tidak pernah punya kolom hasil — selalu tambahkan ke `test_results`
+
+- `test_cases`/`test_plan_cases` tidak pernah punya kolom hasil — selalu
+  tambahkan ke `test_results`
 - Re-run = Test Run baru, bukan update Test Run lama
-- Status Test Run "completed" HANYA berubah lewat aksi manual user (`testRunService.complete()`), TIDAK PERNAH inferred otomatis dari semua result terisi
-- Summary/progress (jumlah pass/fail/dst) SELALU dihitung on-the-fly (`testRunService.getWithResults`), JANGAN buat kolom cache untuk itu
+- Status Test Run "completed" HANYA berubah lewat aksi manual user
+  (`testRunService.complete()`), TIDAK PERNAH inferred otomatis dari semua
+  result terisi
+- Summary/progress (jumlah pass/fail/dst) SELALU dihitung on-the-fly
+  (`testRunService.getWithResults`), JANGAN buat kolom cache untuk itu
 - Issue selalu 1:many terhadap Test Result
 - `test_results.tester_id` selalu FK ke `profiles`, jangan ganti jadi teks bebas
 
@@ -98,54 +105,89 @@ Aturan yang tidak boleh dilanggar saat menambah/mengubah kode di modul ini:
 
 Dijalankan dari dalam folder `frontend/`:
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Vite dev server |
-| `npm run build` | Type-check (`tsc -b`) + Vite build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | ESLint |
+| Command           | Description                        |
+| ----------------- | ---------------------------------- |
+| `npm run dev`     | Vite dev server                    |
+| `npm run build`   | Type-check (`tsc -b`) + Vite build |
+| `npm run preview` | Preview production build           |
+| `npm run lint`    | ESLint                             |
 
-Database: tidak ada CLI migration. Jalankan berurutan di Supabase SQL Editor: `supabase/schema.sql` → `supabase/schema_auth.sql` → `supabase/schema_project_lifecycle.sql` (urutan penting — masing-masing bergantung pada fungsi/tabel dari file sebelumnya).
+Database: tidak ada CLI migration. Jalankan berurutan di Supabase SQL Editor:
+`supabase/schema.sql` → `supabase/schema_auth.sql` →
+`supabase/schema_project_lifecycle.sql` (urutan penting — masing-masing
+bergantung pada fungsi/tabel dari file sebelumnya).
 
 **Setup Google OAuth (wajib, aksi manual di luar kode):**
-1. Google Cloud Console → buat OAuth 2.0 Client ID (Web application), tambahkan redirect URI dari Supabase (`https://<project>.supabase.co/auth/v1/callback`)
-2. Supabase Dashboard → Authentication → Providers → Google → isi Client ID & Secret
-3. Supabase Dashboard → Authentication → URL Configuration → pastikan Site URL & Redirect URLs mencakup origin app (`http://localhost:5173` untuk dev)
-4. Setelah login pertama kali, admin pertama di-set manual: `update profiles set role = 'admin' where email = '...'` di SQL Editor
+
+1. Google Cloud Console → buat OAuth 2.0 Client ID (Web application), tambahkan
+   redirect URI dari Supabase (`https://<project>.supabase.co/auth/v1/callback`)
+2. Supabase Dashboard → Authentication → Providers → Google → isi Client ID &
+   Secret
+3. Supabase Dashboard → Authentication → URL Configuration → pastikan Site URL &
+   Redirect URLs mencakup origin app (`http://localhost:5173` untuk dev)
+4. Setelah login pertama kali, admin pertama di-set manual:
+   `update profiles set role = 'admin' where email = '...'` di SQL Editor
 
 ## Coding Conventions
 
 ### Naming
+
 - Bahasa Inggris untuk semua kode: variable, function, class, file, tabel, kolom
 - Label UI ke pengguna boleh Bahasa Indonesia
-- File: PascalCase untuk komponen (`.tsx`), camelCase untuk service/repository/hook (`.ts`)
+- File: PascalCase untuk komponen (`.tsx`), camelCase untuk
+  service/repository/hook (`.ts`)
 - Hook selalu prefix `use` (React Rules of Hooks)
 
 ### Judul Halaman (`PageHeader`)
-Semua halaman list pakai `<PageHeader title="..." actions={<Button .../>} />` (`components/ui/PageHeader.tsx`) untuk baris judul + tombol aksi utama — jangan tulis ulang `<div className="flex justify-content-between align-items-center mb-3"><h2 className="m-0">...` secara manual. Ini sempat tidak seragam antar halaman (beda margin/wrapper) dan sudah dirapikan ke satu komponen; pertahankan itu saat menambah halaman baru. Halaman detail (judul = nama entity di dalam `Card`) tetap pola manual seperti `ProjectDetailPage`/`UserDetailPage`, bukan lewat `PageHeader`.
+
+Semua halaman list pakai `<PageHeader title="..." actions={<Button .../>} />`
+(`components/ui/PageHeader.tsx`) untuk baris judul + tombol aksi utama — jangan
+tulis ulang
+`<div className="flex justify-content-between align-items-center mb-3"><h2 className="m-0">...`
+secara manual. Ini sempat tidak seragam antar halaman (beda margin/wrapper) dan
+sudah dirapikan ke satu komponen; pertahankan itu saat menambah halaman baru.
+Halaman detail (judul = nama entity di dalam `Card`) tetap pola manual seperti
+`ProjectDetailPage`/`UserDetailPage`, bukan lewat `PageHeader`.
 
 ### Architecture Pattern (WAJIB diikuti, urutan layer tidak boleh dilompati)
+
 ```
 Page/Component → Hook → Service → Repository → Supabase
 ```
-- **Repository**: hanya query Supabase + panggil mapper. Tidak ada `if`/validasi bisnis.
-- **Service**: validasi input, business rule, orkestrasi lintas repository (mis. hitung summary progress). Dipanggil oleh hook atau langsung oleh page untuk aksi one-off (create/update).
-- **Hook**: state (`useState`) + lifecycle (`useEffect`) + expose `reload()`. Tidak ada logic bisnis di sini, hanya plumbing React.
-- **Component/Page**: render + panggil hook/service. Tidak pernah import `supabase` client atau repository langsung.
+
+- **Repository**: hanya query Supabase + panggil mapper. Tidak ada `if`/validasi
+  bisnis.
+- **Service**: validasi input, business rule, orkestrasi lintas repository (mis.
+  hitung summary progress). Dipanggil oleh hook atau langsung oleh page untuk
+  aksi one-off (create/update).
+- **Hook**: state (`useState`) + lifecycle (`useEffect`) + expose `reload()`.
+  Tidak ada logic bisnis di sini, hanya plumbing React.
+- **Component/Page**: render + panggil hook/service. Tidak pernah import
+  `supabase` client atau repository langsung.
 
 ### Data Mapping
+
 - Supabase table & column: `snake_case` (mis. `project_id`, `expected_result`)
-- Domain type (`frontend/src/types/domain.ts`): `camelCase` (mis. `projectId`, `expectedResult`)
-- Konversi HANYA di `frontend/src/helpers/mappers.ts` — jangan mapping manual berulang di repository lain
+- Domain type (`frontend/src/types/domain.ts`): `camelCase` (mis. `projectId`,
+  `expectedResult`)
+- Konversi HANYA di `frontend/src/helpers/mappers.ts` — jangan mapping manual
+  berulang di repository lain
 
 ### PrimeReact Usage
-- Import tema di `main.tsx` saja: `primereact/resources/themes/lara-light-blue/theme.css`
-- Gunakan PrimeFlex class (`flex`, `gap-2`, `align-items-center`, dll) untuk layout, bukan custom CSS baru
-- Komponen data-heavy: `DataTable` + `Column` (server-side atau client-side paging sesuai kebutuhan)
-- Notifikasi: pakai `Toast` (belum diinisialisasi — tambahkan `useRef<Toast>` + `<Toast ref>` di layout saat dibutuhkan)
+
+- Import tema di `main.tsx` saja:
+  `primereact/resources/themes/lara-light-blue/theme.css`
+- Gunakan PrimeFlex class (`flex`, `gap-2`, `align-items-center`, dll) untuk
+  layout, bukan custom CSS baru
+- Komponen data-heavy: `DataTable` + `Column` (server-side atau client-side
+  paging sesuai kebutuhan)
+- Notifikasi: pakai `Toast` (belum diinisialisasi — tambahkan `useRef<Toast>` +
+  `<Toast ref>` di layout saat dibutuhkan)
 
 ### Module Creation Order (fitur/modul baru)
-1. Tabel di file `supabase/schema_*.sql` BARU (jangan edit file yang sudah ada — buat file bernomor urut berikutnya)
+
+1. Tabel di file `supabase/schema_*.sql` BARU (jangan edit file yang sudah ada —
+   buat file bernomor urut berikutnya)
 2. Domain type (`types/domain.ts`)
 3. Mapper (`helpers/mappers.ts`)
 4. Repository (`repositories/{module}Repository.ts`)
@@ -157,23 +199,29 @@ Page/Component → Hook → Service → Repository → Supabase
 
 ### Auth & RBAC
 
-- Login: Google OAuth via Supabase Auth SAJA — jangan tambahkan provider lain kecuali diminta eksplisit
+- Login: Google OAuth via Supabase Auth SAJA — jangan tambahkan provider lain
+  kecuali diminta eksplisit
 - Role: `pending` → `user` → `admin` (lihat `types/domain.ts` → `UserRole`)
-- Selalu konsumsi state auth via `useAuthContext()` (`hooks/useAuth.tsx`) — JANGAN panggil `supabase.auth.*` langsung dari component/page
-- Route baru yang butuh login: bungkus dengan `<ProtectedRoute>` di `App.tsx`. Route khusus admin: tambahkan lagi `<AdminRoute>` di dalamnya
-- Kalau menambah field/aksi baru pada `profiles`, tetap lewat `profileRepository`/`profileService` — pola sama seperti modul lain
-- RLS adalah lapisan keamanan yang sebenarnya — route guard di frontend cuma UX. Kalau menambah tabel baru, pastikan policy `is_approved()`/`is_admin()` (dari `schema_auth.sql`) diterapkan, jangan biarkan permissive
+- Selalu konsumsi state auth via `useAuthContext()` (`hooks/useAuth.tsx`) —
+  JANGAN panggil `supabase.auth.*` langsung dari component/page
+- Route baru yang butuh login: bungkus dengan `<ProtectedRoute>` di `App.tsx`.
+  Route khusus admin: tambahkan lagi `<AdminRoute>` di dalamnya
+- Kalau menambah field/aksi baru pada `profiles`, tetap lewat
+  `profileRepository`/`profileService` — pola sama seperti modul lain
+- RLS adalah lapisan keamanan yang sebenarnya — route guard di frontend cuma UX.
+  Kalau menambah tabel baru, pastikan policy `is_approved()`/`is_admin()` (dari
+  `schema_auth.sql`) diterapkan, jangan biarkan permissive
 
 ## Key Packages
 
-| Package | Usage |
-|---------|-------|
-| primereact | UI component library (setara PrimeVue) |
-| primeflex | Utility CSS (flex, spacing) |
-| primeicons | Icon set |
-| @supabase/supabase-js | Client Postgres BaaS |
-| react-router-dom | Client-side routing |
-| @tanstack/react-query | Data fetching/cache (opsional, dipakai bertahap) |
+| Package               | Usage                                                       |
+| --------------------- | ----------------------------------------------------------- |
+| primereact            | UI component library (setara PrimeVue)                      |
+| primeflex             | Utility CSS (flex, spacing)                                 |
+| primeicons            | Icon set                                                    |
+| @supabase/supabase-js | Client Postgres BaaS                                        |
+| react-router-dom      | Client-side routing                                         |
+| @tanstack/react-query | Data fetching/cache (opsional, dipakai bertahap)            |
 | react-hook-form + zod | Form state + schema validation (opsional, dipakai bertahap) |
 
 ## Internal Documentation
