@@ -1,0 +1,98 @@
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import type { Session } from '@supabase/supabase-js';
+import { supabase } from '../config/supabaseClient';
+import { profileService } from '../services/profileService';
+import type { Profile } from '../types/domain';
+
+interface AuthContextValue {
+  session: Session | null;
+  profile: Profile | null;
+  loading: boolean;
+  isAdmin: boolean;
+  isApproved: boolean;
+  isPending: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  reloadProfile: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+// Auth layer: wraps Supabase session + the `profiles` row (role) into one place.
+// Components read role/approval status via useAuthContext() instead of querying Supabase directly.
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function loadProfile(userId: string) {
+    setProfile(await profileService.getOwnProfile(userId));
+  }
+
+  useEffect(() => {
+    // onAuthStateChange fires once immediately with the current session (INITIAL_SESSION)
+    // and again after Supabase finishes exchanging the OAuth redirect code for a session.
+    // Relying on it alone (instead of racing it against getSession()) avoids a redirect-to-login
+    // flash: if getSession() resolved with session=null before the OAuth exchange completed,
+    // `loading` would flip to false and ProtectedRoute would bounce the user to /login
+    // right before the real session arrived.
+    const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        await loadProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.subscription.unsubscribe();
+  }, []);
+
+  async function signInWithGoogle() {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    // Don't rely solely on onAuthStateChange to clear local state — force it here too,
+    // then hard-reload so any stray Supabase client state/subscriptions are fully reset.
+    setSession(null);
+    setProfile(null);
+    window.location.assign('/login');
+  }
+
+  async function reloadProfile() {
+    if (session?.user) await loadProfile(session.user.id);
+  }
+
+  const role = profile?.role ?? null;
+
+  return (
+    <AuthContext.Provider
+      value={{
+        session,
+        profile,
+        loading,
+        isAdmin: role === 'admin',
+        isApproved: role === 'user' || role === 'admin',
+        isPending: role === 'pending',
+        signInWithGoogle,
+        signOut,
+        reloadProfile,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuthContext() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuthContext must be used within AuthProvider');
+  return ctx;
+}

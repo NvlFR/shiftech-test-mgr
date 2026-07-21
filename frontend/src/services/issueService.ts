@@ -1,0 +1,37 @@
+import { issueRepository } from '../repositories/issueRepository';
+import type { IssuePriority } from '../types/domain';
+
+export const issueService = {
+  listByTestResult(testResultId: string) {
+    return issueRepository.findAllByTestResult(testResultId);
+  },
+
+  listByTestRun(testRunId: string) {
+    return issueRepository.findAllByTestRun(testRunId);
+  },
+
+  create(input: {
+    testResultId: string;
+    title: string;
+    description?: string;
+    actualResult?: string;
+    expectedResult?: string;
+    priority?: IssuePriority;
+  }) {
+    if (!input.title.trim()) throw new Error('Judul issue tidak boleh kosong');
+    return issueRepository.create({
+      testResultId: input.testResultId,
+      title: input.title.trim(),
+      description: input.description?.trim() || null,
+      actualResult: input.actualResult?.trim() || null,
+      expectedResult: input.expectedResult?.trim() || null,
+      priority: input.priority ?? 'medium',
+      status: 'open',
+      assignedTo: null,
+    });
+  },
+
+  changeStatus: issueRepository.updateStatus,
+  assign: issueRepository.assign,
+  remove: issueRepository.remove,
+};
