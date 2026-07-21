@@ -122,21 +122,21 @@ export function ProjectsPage() {
 
   const menuItems = menuRow
     ? [
-        { label: 'Lihat Detail', icon: 'pi pi-eye', command: () => navigate(`/projects/${menuRow.id}`) },
-        { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditDialog(menuRow) },
-        { separator: true },
-        ...(menuRow.status !== 'active'
-          ? [{ label: 'Jadikan Aktif', icon: 'pi pi-play', command: () => handleChangeStatus(menuRow, 'active') }]
-          : []),
-        ...(menuRow.status !== 'inactive'
-          ? [{ label: 'Jadikan Nonaktif', icon: 'pi pi-pause', command: () => handleChangeStatus(menuRow, 'inactive') }]
-          : []),
-        ...(menuRow.status !== 'archived'
-          ? [{ label: 'Arsipkan', icon: 'pi pi-inbox', command: () => handleChangeStatus(menuRow, 'archived') }]
-          : []),
-        { separator: true },
-        { label: 'Hapus Permanen', icon: 'pi pi-trash', command: () => handleDeletePermanently(menuRow) },
-      ]
+      { label: 'Lihat Detail', icon: 'pi pi-eye', command: () => navigate(`/projects/${menuRow.id}`) },
+      { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditDialog(menuRow) },
+      { separator: true },
+      ...(menuRow.status !== 'active'
+        ? [{ label: 'Jadikan Aktif', icon: 'pi pi-play', command: () => handleChangeStatus(menuRow, 'active') }]
+        : []),
+      ...(menuRow.status !== 'inactive'
+        ? [{ label: 'Jadikan Nonaktif', icon: 'pi pi-pause', command: () => handleChangeStatus(menuRow, 'inactive') }]
+        : []),
+      ...(menuRow.status !== 'archived'
+        ? [{ label: 'Arsipkan', icon: 'pi pi-inbox', command: () => handleChangeStatus(menuRow, 'archived') }]
+        : []),
+      { separator: true },
+      { label: 'Hapus Permanen', icon: 'pi pi-trash', command: () => handleDeletePermanently(menuRow) },
+    ]
     : [];
 
   return (
@@ -152,7 +152,7 @@ export function ProjectsPage() {
           <InputIcon className="pi pi-search" />
           <InputText
             className="w-full"
-            placeholder="Cari nama project..."
+            placeholder="Cari project..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

@@ -8,16 +8,11 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { useProfiles } from '../../hooks/useProfiles';
 import { profileService } from '../../services/profileService';
-import type { Profile, UserRole } from '../../types/domain';
+import type { Profile } from '../../types/domain';
 import { useAuthContext } from '../../hooks/useAuth';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import { PageHeader } from '../../components/ui/PageHeader';
-
-const ROLE_SEVERITY: Record<UserRole, 'warning' | 'info' | 'success'> = {
-  pending: 'warning',
-  user: 'info',
-  admin: 'success',
-};
+import { USER_ROLE_LABEL, USER_ROLE_SEVERITY } from '../../helpers/statusLabels';
 
 export function UserManagementPage() {
   const { profiles, loading, reload } = useProfiles();
@@ -105,7 +100,7 @@ export function UserManagementPage() {
       <DataTable value={profiles} loading={loading} paginator rows={10} emptyMessage="Belum ada user" size="small">
         <Column field="email" header="Email" sortable />
         <Column field="fullName" header="Nama" sortable />
-        <Column field="role" header="Role" body={(row: Profile) => <Tag value={row.role} severity={ROLE_SEVERITY[row.role]} />} sortable />
+        <Column field="role" header="Role" body={(row: Profile) => <Tag value={USER_ROLE_LABEL[row.role]} severity={USER_ROLE_SEVERITY[row.role]} />} sortable />
         <Column field="createdAt" header="Terdaftar" body={(row: Profile) => formatDateTime(row.createdAt)} sortable />
         <Column header="Aksi" body={actionsTemplate} />
       </DataTable>

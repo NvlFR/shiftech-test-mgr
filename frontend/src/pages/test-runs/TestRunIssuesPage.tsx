@@ -7,23 +7,13 @@ import { Dropdown } from 'primereact/dropdown';
 import { useIssuesByTestRun } from '../../hooks/useIssues';
 import { issueService } from '../../services/issueService';
 import { profileService } from '../../services/profileService';
-import type { Issue, IssueStatus, IssueWithDetails, Profile } from '../../types/domain';
+import type { IssueStatus, IssueWithDetails, Profile } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { ISSUE_PRIORITY_LABEL, ISSUE_PRIORITY_SEVERITY, ISSUE_STATUS_LABEL } from '../../helpers/statusLabels';
 
-const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = [
-  { label: 'Open', value: 'open' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Resolved', value: 'resolved' },
-  { label: 'Verified', value: 'verified' },
-  { label: 'Closed', value: 'closed' },
-];
-
-const PRIORITY_SEVERITY: Record<Issue['priority'], 'success' | 'info' | 'warning' | 'danger'> = {
-  low: 'success',
-  medium: 'info',
-  high: 'warning',
-  critical: 'danger',
-};
+const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
+  ['open', 'in_progress', 'resolved', 'verified', 'closed'] as const
+).map((value) => ({ label: ISSUE_STATUS_LABEL[value], value }));
 
 export function TestRunIssuesPage() {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +40,7 @@ export function TestRunIssuesPage() {
 
       <DataTable value={issues} loading={loading} paginator rows={10} emptyMessage="Belum ada issue" size="small">
         <Column field="title" header="Judul" sortable />
-        <Column field="priority" header="Prioritas" body={(row: IssueWithDetails) => <Tag value={row.priority} severity={PRIORITY_SEVERITY[row.priority]} />} sortable />
+        <Column field="priority" header="Prioritas" body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} sortable />
         <Column
           field="status"
           header="Status"
@@ -59,8 +49,7 @@ export function TestRunIssuesPage() {
               value={row.status}
               options={STATUS_OPTIONS}
               onChange={(e) => handleChangeStatus(row, e.value)}
-              className="w-10rem"
-              pt={{ input: { className: 'p-0' } }}
+              className="w-12rem"
             />
           )}
         />

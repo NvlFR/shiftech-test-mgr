@@ -5,14 +5,9 @@ import { Avatar } from 'primereact/avatar';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { profileService } from '../../services/profileService';
-import type { Profile, UserRole } from '../../types/domain';
+import type { Profile } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
-
-const ROLE_SEVERITY: Record<UserRole, 'warning' | 'info' | 'success'> = {
-  pending: 'warning',
-  user: 'info',
-  admin: 'success',
-};
+import { USER_ROLE_LABEL, USER_ROLE_SEVERITY } from '../../helpers/statusLabels';
 
 export function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -43,7 +38,7 @@ export function UserDetailPage() {
             <p className="m-0 text-color-secondary">{profile.email}</p>
           </div>
           <div className="flex-1" />
-          <Tag value={profile.role} severity={ROLE_SEVERITY[profile.role]} />
+          <Tag value={USER_ROLE_LABEL[profile.role]} severity={USER_ROLE_SEVERITY[profile.role]} />
         </div>
 
         <div className="grid">

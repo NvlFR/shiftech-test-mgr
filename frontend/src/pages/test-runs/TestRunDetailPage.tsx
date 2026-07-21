@@ -18,14 +18,12 @@ import { profileService } from '../../services/profileService';
 import { issueService } from '../../services/issueService';
 import type { Profile, TestResultStatus, TestResultWithDetails } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
-
-const RESULT_SEVERITY: Record<TestResultStatus, 'success' | 'danger' | 'warning' | 'secondary' | 'info'> = {
-  pass: 'success',
-  fail: 'danger',
-  blocked: 'warning',
-  skip: 'secondary',
-  not_run: 'info',
-};
+import {
+  TEST_RESULT_STATUS_LABEL,
+  TEST_RESULT_STATUS_SEVERITY,
+  TEST_RUN_STATUS_LABEL,
+  TEST_RUN_STATUS_SEVERITY,
+} from '../../helpers/statusLabels';
 
 const RESULT_OPTIONS: { label: string; value: TestResultStatus }[] = [
   { label: 'Pass', value: 'pass' },
@@ -147,7 +145,7 @@ export function TestRunDetailPage() {
 
       {testRun && (
         <div className="flex align-items-center gap-2 mb-3">
-          <Tag value={testRun.status} severity={testRun.status === 'completed' ? 'success' : 'info'} />
+          <Tag value={TEST_RUN_STATUS_LABEL[testRun.status]} severity={TEST_RUN_STATUS_SEVERITY[testRun.status]} />
           <span className="text-color-secondary text-sm">
             {summary.pass} pass · {summary.fail} fail · {summary.skip} skip · {summary.blocked} blocked · {summary.notRun} belum dites
           </span>
@@ -168,7 +166,7 @@ export function TestRunDetailPage() {
         <Column field="testCase.code" header="Kode" sortable style={{ width: '7rem' }} />
         <Column field="testCase.title" header="Test Case" sortable />
         <Column field="testCase.priority" header="Prioritas" sortable />
-        <Column field="status" header="Hasil" body={(row: TestResultWithDetails) => <Tag value={row.status} severity={RESULT_SEVERITY[row.status]} />} sortable />
+        <Column field="status" header="Hasil" body={(row: TestResultWithDetails) => <Tag value={TEST_RESULT_STATUS_LABEL[row.status]} severity={TEST_RESULT_STATUS_SEVERITY[row.status]} />} sortable />
         <Column field="tester.fullName" header="Tester" body={(row: TestResultWithDetails) => row.tester?.fullName ?? row.tester?.email ?? '-'} />
         <Column field="notes" header="Catatan" />
         <Column
