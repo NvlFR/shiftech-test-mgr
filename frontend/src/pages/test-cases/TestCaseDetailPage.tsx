@@ -4,7 +4,7 @@ import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { Chip } from 'primereact/chip';
-import { Chips } from 'primereact/chips';
+import { MultiSelect } from 'primereact/multiselect';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -14,8 +14,9 @@ import { Toast } from 'primereact/toast';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { testCaseService } from '../../services/testCaseService';
 import { moduleService } from '../../services/moduleService';
+import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import type { Module, TestCasePriority, TestCaseWithDetails } from '../../types/domain';
+import type { Module, Tag as TagEntity, TestCasePriority, TestCaseWithDetails } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
   TEST_CASE_PRIORITY_LABEL,
@@ -42,6 +43,7 @@ export function TestCaseDetailPage() {
   const [testCase, setTestCase] = useState<TestCaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [modules, setModules] = useState<Module[]>([]);
+  const [tags, setTags] = useState<TagEntity[]>([]);
   const { canEditContent, canDeleteContent } = useProjectRole(testCase?.project.id);
 
   async function reload() {
@@ -60,7 +62,10 @@ export function TestCaseDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    if (testCase?.project.id) moduleService.listByProject(testCase.project.id).then(setModules);
+    if (testCase?.project.id) {
+      moduleService.listByProject(testCase.project.id).then(setModules);
+      tagService.listByProject(testCase.project.id).then(setTags);
+    }
   }, [testCase?.project.id]);
 
   function handleBack() {
@@ -68,6 +73,60 @@ export function TestCaseDetailPage() {
       navigate(`/projects/${projectId}`);
     } else {
       navigate('/test-cases');
+    }
+  }
+
+  // --- Module quick-add (from Edit dialog) ---
+  const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
+  const [moduleCode, setModuleCode] = useState('');
+  const [moduleName, setModuleName] = useState('');
+  const [moduleError, setModuleError] = useState<string | null>(null);
+  const moduleNameRef = useRef<HTMLInputElement>(null);
+
+  function openCreateModuleDialog() {
+    setModuleCode('');
+    setModuleName('');
+    setModuleError(null);
+    setModuleDialogOpen(true);
+  }
+
+  async function handleSaveModule() {
+    if (!testCase) return;
+    setModuleError(null);
+    try {
+      const created = await moduleService.create({ projectId: testCase.project.id, name: moduleName, code: moduleCode });
+      setModules((prev) => [...prev, created]);
+      setEditModuleId(created.id);
+      setModuleDialogOpen(false);
+      toast.current?.show({ severity: 'success', summary: 'Module dibuat' });
+    } catch (err) {
+      setModuleError(err instanceof Error ? err.message : 'Gagal menyimpan module');
+    }
+  }
+
+  // --- Tag quick-add (from Edit dialog) ---
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const [tagError, setTagError] = useState<string | null>(null);
+  const tagNameRef = useRef<HTMLInputElement>(null);
+
+  function openCreateTagDialog() {
+    setNewTagName('');
+    setTagError(null);
+    setTagDialogOpen(true);
+  }
+
+  async function handleSaveTag() {
+    if (!testCase) return;
+    setTagError(null);
+    try {
+      const created = await tagService.create(testCase.project.id, newTagName);
+      setTags((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+      setEditTags((prev) => [...prev, created.name]);
+      setTagDialogOpen(false);
+      toast.current?.show({ severity: 'success', summary: 'Tag dibuat' });
+    } catch (err) {
+      setTagError(err instanceof Error ? err.message : 'Gagal menyimpan tag');
     }
   }
 
@@ -146,8 +205,20 @@ export function TestCaseDetailPage() {
     });
   }
 
-  if (loading) return <p>Memuat...</p>;
-  if (!testCase) return <p>Test case tidak ditemukan.</p>;
+  if (loading || !testCase) {
+    return (
+      <div>
+        <Breadcrumb
+          items={[
+            { label: 'Projects', path: '/' },
+            { label: testCase ? testCase.project.name : '…', path: testCase ? `/projects/${testCase.project.id}` : undefined },
+            { label: loading ? '…' : 'Test case tidak ditemukan' },
+          ]}
+        />
+        {!loading && <p>Test case tidak ditemukan.</p>}
+      </div>
+    );
+  }
 
   const moduleOptions = modules.map((m) => ({ label: m.name, value: m.id }));
 
@@ -250,15 +321,18 @@ export function TestCaseDetailPage() {
           <div className="grid">
             <div className="col-12 md:col-6 flex flex-column gap-1">
               <label htmlFor="edit-case-module">Module</label>
-              <Dropdown
-                id="edit-case-module"
-                value={editModuleId}
-                options={moduleOptions}
-                onChange={(e) => setEditModuleId(e.value)}
-                showClear
-                placeholder="Pilih module"
-                className="w-full"
-              />
+              <div className="flex align-items-center gap-1">
+                <Dropdown
+                  id="edit-case-module"
+                  value={editModuleId}
+                  options={moduleOptions}
+                  onChange={(e) => setEditModuleId(e.value)}
+                  showClear
+                  placeholder="Pilih module"
+                  className="w-full"
+                />
+                <Button icon="pi pi-plus" type="button" text rounded size="small" aria-label="Module Baru" onClick={openCreateModuleDialog} style={{ width: '2rem', height: '2rem', flexShrink: 0 }} />
+              </div>
             </div>
             <div className="col-12 md:col-6 flex flex-column gap-1">
               <label htmlFor="edit-case-priority">Prioritas</label>
@@ -299,7 +373,19 @@ export function TestCaseDetailPage() {
 
           <div className="flex flex-column gap-1">
             <label htmlFor="edit-case-tags">Tag</label>
-            <Chips id="edit-case-tags" value={editTags} onChange={(e) => setEditTags(e.value ?? [])} placeholder="Ketik lalu Enter" />
+            <div className="flex align-items-center gap-1">
+              <MultiSelect
+                id="edit-case-tags"
+                value={editTags}
+                options={tags.map((t) => ({ label: t.name, value: t.name }))}
+                onChange={(e) => setEditTags(e.value ?? [])}
+                placeholder="Pilih tag"
+                display="chip"
+                filter
+                className="w-full"
+              />
+              <Button icon="pi pi-plus" type="button" text rounded size="small" aria-label="Tag Baru" onClick={openCreateTagDialog} style={{ width: '2rem', height: '2rem', flexShrink: 0 }} />
+            </div>
           </div>
 
           <div className="flex flex-column gap-1">
@@ -308,6 +394,64 @@ export function TestCaseDetailPage() {
           </div>
 
           <Button label="Simpan" size="small" onClick={handleSaveEdit} />
+        </div>
+      </Dialog>
+
+      {/* --- Module Quick-Add Dialog --- */}
+      <Dialog
+        header="Module Baru"
+        visible={moduleDialogOpen}
+        onHide={() => setModuleDialogOpen(false)}
+        onShow={() => moduleNameRef.current?.focus()}
+        style={{ width: '25rem' }}
+      >
+        <div className="flex flex-column gap-3">
+          {moduleError && <small className="p-error">{moduleError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="module-code">Kode</label>
+            <InputText id="module-code" value={moduleCode} onChange={(e) => setModuleCode(e.target.value)} placeholder="Otomatis jika dikosongkan" />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="module-name">Nama Module</label>
+            <InputText
+              id="module-name"
+              ref={moduleNameRef}
+              value={moduleName}
+              onChange={(e) => setModuleName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveModule();
+              }}
+              placeholder="mis. Autentikasi, Dashboard, Pembelian"
+            />
+          </div>
+          <Button label="Simpan" size="small" onClick={handleSaveModule} />
+        </div>
+      </Dialog>
+
+      {/* --- Tag Quick-Add Dialog --- */}
+      <Dialog
+        header="Tag Baru"
+        visible={tagDialogOpen}
+        onHide={() => setTagDialogOpen(false)}
+        onShow={() => tagNameRef.current?.focus()}
+        style={{ width: '25rem' }}
+      >
+        <div className="flex flex-column gap-3">
+          {tagError && <small className="p-error">{tagError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="tag-name">Nama Tag</label>
+            <InputText
+              id="tag-name"
+              ref={tagNameRef}
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveTag();
+              }}
+              placeholder="mis. Regression, Smoke, UI"
+            />
+          </div>
+          <Button label="Simpan" size="small" onClick={handleSaveTag} />
         </div>
       </Dialog>
     </div>

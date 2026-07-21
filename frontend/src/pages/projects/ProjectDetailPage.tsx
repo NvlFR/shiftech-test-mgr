@@ -10,7 +10,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
-import { Chips } from 'primereact/chips';
+import { MultiSelect } from 'primereact/multiselect';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { IconField } from 'primereact/iconfield';
@@ -349,6 +349,32 @@ export function ProjectDetailPage() {
     }
   }
 
+  // --- Tag quick-add (from Test Case dialog) ---
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const [tagError, setTagError] = useState<string | null>(null);
+  const tagNameRef = useRef<HTMLInputElement>(null);
+
+  function openCreateTagDialogFromCase() {
+    setNewTagName('');
+    setTagError(null);
+    setTagDialogOpen(true);
+  }
+
+  async function handleSaveTag() {
+    if (!id) return;
+    setTagError(null);
+    try {
+      const created = await tagService.create(id, newTagName);
+      setCaseTags((prev) => [...prev, created.name]);
+      setTagDialogOpen(false);
+      await loadAll();
+      toast.current?.show({ severity: 'success', summary: 'Tag dibuat' });
+    } catch (err) {
+      setTagError(err instanceof Error ? err.message : 'Gagal menyimpan tag');
+    }
+  }
+
   // --- Test Case dialog ---
   const [caseDialogOpen, setCaseDialogOpen] = useState(false);
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null);
@@ -605,8 +631,17 @@ export function ProjectDetailPage() {
   }
 
   if (!project) {
-    if (projectLoading) return null;
-    return <p>Project tidak ditemukan.</p>;
+    return (
+      <div className="page-fade-in">
+        <Breadcrumb
+          items={[
+            { label: 'Projects', path: '/' },
+            { label: projectLoading ? '…' : 'Project tidak ditemukan' },
+          ]}
+        />
+        {!projectLoading && <p>Project tidak ditemukan.</p>}
+      </div>
+    );
   }
 
   const moduleOptions = modules.map((m) => ({ label: m.name, value: m.id }));
@@ -1214,6 +1249,33 @@ export function ProjectDetailPage() {
         </div>
       </Dialog>
 
+      {/* --- Tag Dialog --- */}
+      <Dialog
+        header="Tag Baru"
+        visible={tagDialogOpen}
+        onHide={() => setTagDialogOpen(false)}
+        onShow={() => tagNameRef.current?.focus()}
+        style={{ width: '25rem' }}
+      >
+        <div className="flex flex-column gap-3">
+          {tagError && <small className="p-error">{tagError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="tag-name">Nama Tag</label>
+            <InputText
+              id="tag-name"
+              ref={tagNameRef}
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveTag();
+              }}
+              placeholder="mis. Regression, Smoke, UI"
+            />
+          </div>
+          <Button label="Simpan" size="small" onClick={handleSaveTag} />
+        </div>
+      </Dialog>
+
       {/* --- Test Case Dialog --- */}
       <Dialog
         header={editingCaseId ? 'Edit Test Case' : 'Test Case Baru'}
@@ -1232,7 +1294,7 @@ export function ProjectDetailPage() {
           <div className="grid">
             <div className="col-12 md:col-6 flex flex-column gap-1">
               <label htmlFor="case-module">Module</label>
-              <div className="flex gap-1">
+              <div className="flex align-items-center gap-1">
                 <Dropdown
                   id="case-module"
                   value={caseModuleId}
@@ -1247,8 +1309,11 @@ export function ProjectDetailPage() {
                   icon="pi pi-plus"
                   type="button"
                   text
+                  rounded
+                  size="small"
                   aria-label="Module Baru"
                   onClick={openCreateModuleDialogFromCase}
+                  style={{ width: '2rem', height: '2rem', flexShrink: 0 }}
                 />
               </div>
             </div>
@@ -1291,7 +1356,19 @@ export function ProjectDetailPage() {
 
           <div className="flex flex-column gap-1">
             <label htmlFor="case-tags">Tag</label>
-            <Chips id="case-tags" value={caseTags} onChange={(e) => setCaseTags(e.value ?? [])} placeholder="Ketik lalu Enter" />
+            <div className="flex align-items-center gap-1">
+              <MultiSelect
+                id="case-tags"
+                value={caseTags}
+                options={tags.map((t) => ({ label: t.name, value: t.name }))}
+                onChange={(e) => setCaseTags(e.value ?? [])}
+                placeholder="Pilih tag"
+                display="chip"
+                filter
+                className="w-full"
+              />
+              <Button icon="pi pi-plus" type="button" text rounded size="small" aria-label="Tag Baru" onClick={openCreateTagDialogFromCase} style={{ width: '2rem', height: '2rem', flexShrink: 0 }} />
+            </div>
           </div>
 
           <div className="flex flex-column gap-1">
