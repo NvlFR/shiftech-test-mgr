@@ -9,6 +9,8 @@ import type {
   TestRun,
   TestResult,
   Issue,
+  ProjectMember,
+  ProjectMemberWithProfile,
 } from '../types/domain';
 
 // Supabase columns are snake_case; domain types are camelCase.
@@ -22,6 +24,23 @@ export function mapProjectRow(row: any): Project {
     status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export function mapProjectMemberRow(row: any): ProjectMember {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    userId: row.user_id,
+    role: row.role,
+    createdAt: row.created_at,
+  };
+}
+
+export function mapProjectMemberWithProfileRow(row: any): ProjectMemberWithProfile {
+  return {
+    ...mapProjectMemberRow(row),
+    profile: mapProfileRow(row.profile),
   };
 }
 

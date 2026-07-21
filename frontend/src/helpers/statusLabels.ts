@@ -1,6 +1,7 @@
 import type {
   IssuePriority,
   IssueStatus,
+  ProjectMemberRole,
   ProjectStatus,
   TestCasePriority,
   TestCaseStatus,
@@ -128,4 +129,14 @@ export const USER_ROLE_SEVERITY: Record<UserRole, TagSeverity> = {
   pending: 'warning',
   user: 'info',
   admin: 'success',
+};
+
+export const PROJECT_MEMBER_ROLE_LABEL: Record<ProjectMemberRole, string> = {
+  manager: 'Manager',
+  member: 'Anggota',
+};
+
+export const PROJECT_MEMBER_ROLE_SEVERITY: Record<ProjectMemberRole, TagSeverity> = {
+  manager: 'success',
+  member: 'info',
 };
