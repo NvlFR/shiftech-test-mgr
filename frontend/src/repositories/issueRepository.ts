@@ -1,13 +1,25 @@
 import { supabase } from '../config/supabaseClient';
-import { mapIssueRow, mapProfileRow } from '../helpers/mappers';
+import { mapIssueRow, mapModuleRow, mapProfileRow, mapTagRow } from '../helpers/mappers';
 import type { Issue, IssueStatus, IssueWithDetails } from '../types/domain';
+
+function mapTestCaseSummary(testCase: any) {
+  if (!testCase) return null;
+  return {
+    id: testCase.id,
+    code: testCase.code,
+    title: testCase.title,
+    priority: testCase.priority,
+    module: testCase.module ? mapModuleRow(testCase.module) : null,
+    tags: (testCase.test_case_tags ?? []).map((t: any) => mapTagRow(t.tag)),
+  };
+}
 
 export const issueRepository = {
   async findById(id: string): Promise<(IssueWithDetails & { projectId: string | null }) | null> {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name, test_plan:test_plans(project_id)))',
+        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, test_plan:test_plans(project_id)))',
       )
       .eq('id', id)
       .maybeSingle();
@@ -18,7 +30,7 @@ export const issueRepository = {
     return {
       ...mapIssueRow(data),
       assignee: data.assignee ? mapProfileRow(data.assignee) : null,
-      testCase: data.test_result?.test_case ?? null,
+      testCase: mapTestCaseSummary(data.test_result?.test_case),
       testRun: data.test_result?.test_run ?? null,
       projectId: data.test_result?.test_run?.test_plan?.project_id ?? null,
     };
@@ -69,7 +81,7 @@ export const issueRepository = {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name))',
+        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name))',
       )
       .in('test_result.test_run_id', runIds)
       .order('created_at', { ascending: false });
@@ -78,7 +90,7 @@ export const issueRepository = {
     return (data ?? []).map((row: any) => ({
       ...mapIssueRow(row),
       assignee: row.assignee ? mapProfileRow(row.assignee) : null,
-      testCase: row.test_result?.test_case ?? null,
+      testCase: mapTestCaseSummary(row.test_result?.test_case),
       testRun: row.test_result?.test_run ?? null,
     }));
   },
@@ -101,7 +113,7 @@ export const issueRepository = {
     }));
   },
 
-  async create(input: Omit<Issue, 'id' | 'createdAt' | 'updatedAt'>): Promise<Issue> {
+  async create(input: Omit<Issue, 'id' | 'code' | 'createdAt' | 'updatedAt'>): Promise<Issue> {
     const { data, error } = await supabase
       .from('issues')
       .insert({
