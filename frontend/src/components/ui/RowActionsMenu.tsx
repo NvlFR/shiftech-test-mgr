@@ -19,7 +19,7 @@ export function RowActionsMenu({ items }: RowActionsMenuProps) {
         text
         rounded
         size="small"
-        aria-label="Aksi"
+        aria-label=""
         onClick={(e) => {
           e.stopPropagation();
           menuRef.current?.toggle(e);

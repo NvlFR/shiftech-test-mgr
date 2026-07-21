@@ -14,6 +14,7 @@ import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { useProjects } from '../../hooks/useProjects';
+import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { projectService } from '../../services/projectService';
 import type { Project, ProjectSortField, ProjectStatus } from '../../types/domain';
 import type { ProjectQuery } from '../../repositories/projectRepository';
@@ -145,6 +146,8 @@ export function ProjectsPage() {
       <ConfirmDialog />
       <Menu model={menuItems} popup ref={menuRef} />
 
+      <Breadcrumb items={[{ label: 'Projects' }]} />
+
       <PageHeader title="Projects" actions={<Button label="Project Baru" icon="pi pi-plus" size="small" onClick={openCreateDialog} />} />
 
       <div className="flex gap-2 mb-3">
@@ -188,7 +191,7 @@ export function ProjectsPage() {
         />
         <Column field="createdAt" header="Dibuat" body={(row: Project) => formatDate(row.createdAt)} sortable />
         <Column
-          header="Aksi"
+          header=""
           style={{ width: '4rem' }}
           body={(row: Project) => (
             <Button

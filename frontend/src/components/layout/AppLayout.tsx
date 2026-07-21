@@ -3,13 +3,13 @@ import { classNames } from 'primereact/utils';
 import { AppTopbar } from './AppTopbar';
 import { AppSidebar, AppSidebarMask } from './AppSidebar';
 import { LayoutProvider, useLayoutContext } from './LayoutContext';
+import { BreadcrumbProvider } from './BreadcrumbContext';
 
 function AppLayoutInner() {
-  const { layoutState } = useLayoutContext();
+  const { menuActive } = useLayoutContext();
 
   const wrapperClass = classNames('layout-wrapper', {
-    'layout-static-inactive': layoutState.staticMenuDesktopInactive,
-    'layout-mobile-active': layoutState.staticMenuMobileActive,
+    'layout-menu-active': menuActive,
   });
 
   return (
@@ -29,7 +29,9 @@ function AppLayoutInner() {
 export function AppLayout() {
   return (
     <LayoutProvider>
-      <AppLayoutInner />
+      <BreadcrumbProvider>
+        <AppLayoutInner />
+      </BreadcrumbProvider>
     </LayoutProvider>
   );
 }
