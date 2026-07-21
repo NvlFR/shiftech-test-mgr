@@ -162,12 +162,23 @@ export function IssueDetailPage() {
     });
   }
 
-  if (loading) return <p>Memuat...</p>;
-  if (!issue) return <p>Issue tidak ditemukan.</p>;
+  if (loading || !issue) {
+    const breadcrumbItems: BreadcrumbItem[] = [
+      { label: 'Projects', path: '/' },
+      { label: issue ? (projectName ?? '…') : '…', path: issue?.projectId ? `/projects/${issue.projectId}` : undefined },
+      { label: loading ? '…' : 'Issue tidak ditemukan' },
+    ];
+    return (
+      <div>
+        <Breadcrumb items={breadcrumbItems} />
+        {!loading && <p>Issue tidak ditemukan.</p>}
+      </div>
+    );
+  }
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Projects', path: '/' },
-    { label: projectName ?? '...', path: issue.projectId ? `/projects/${issue.projectId}` : undefined },
+    { label: projectName ?? '…', path: issue.projectId ? `/projects/${issue.projectId}` : undefined },
     { label: issue.code, path: `/issues/${issue.id}` },
   ];
 

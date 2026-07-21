@@ -158,16 +158,14 @@ export function TestRunDetailPage() {
       <Toast ref={toast} />
       <ConfirmDialog />
 
-      {testRun && testPlan && (
-        <Breadcrumb
-          items={[
-            { label: 'Projects', path: '/' },
-            { label: projectName ?? '...', path: `/projects/${testPlan.projectId}` },
-            { label: `${testPlan.code}`, path: `/test-plans/${testPlan.id}` },
-            { label: `${testRun.code}`, path: `/test-runs/${testRun.id}` },
-          ]}
-        />
-      )}
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: testPlan ? (projectName ?? '…') : '…', path: testPlan ? `/projects/${testPlan.projectId}` : undefined },
+          { label: testPlan ? testPlan.code : '…', path: testPlan ? `/test-plans/${testPlan.id}` : undefined },
+          { label: testRun ? testRun.code : '…', path: testRun ? `/test-runs/${testRun.id}` : undefined },
+        ]}
+      />
 
       <PageHeader
         title={testRun ? `${testRun.code} — ${testRun.name}` : 'Test Run'}

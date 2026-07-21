@@ -99,14 +99,12 @@ export function TestRunIssuesPage() {
     <div>
       <ConfirmDialog />
 
-      {testRun && testPlan && (
-        <Breadcrumb
-          items={[
-            { label: 'Projects', path: '/' },
-            { label: projectName ?? '...', path: `/projects/${testPlan.projectId}` },
-          ]}
-        />
-      )}
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: testPlan ? (projectName ?? '…') : '…', path: testPlan ? `/projects/${testPlan.projectId}` : undefined },
+        ]}
+      />
 
       <PageHeader
         title="Issues"
