@@ -1,28 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Dropdown } from 'primereact/dropdown';
+import { Toast } from 'primereact/toast';
 import { useTestPlans } from '../../hooks/useTestPlans';
+import { useProjectRole } from '../../hooks/useProjectRole';
 import { projectService } from '../../services/projectService';
-import type { Project, TestPlan } from '../../types/domain';
+import { testPlanService } from '../../services/testPlanService';
+import type { Project, TestPlan, TestPlanStatus } from '../../types/domain';
 import { formatDate } from '../../helpers/dateFormatter';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
 import { TEST_PLAN_STATUS_LABEL, TEST_PLAN_STATUS_SEVERITY } from '../../helpers/statusLabels';
+
+const TEST_PLAN_STATUS_OPTIONS: TestPlanStatus[] = ['draft', 'active', 'completed', 'archived'];
 
 export function TestPlansPage() {
   const navigate = useNavigate();
+  const toast = useRef<Toast>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectId, setProjectId] = useState<string | null>(null);
-  const { testPlans, loading } = useTestPlans(projectId);
+  const { testPlans, loading, reload } = useTestPlans(projectId);
+  const { canEditContent } = useProjectRole(projectId ?? undefined);
 
   useEffect(() => {
     projectService.list().then(setProjects);
   }, []);
 
+  async function handleChangeStatus(row: TestPlan, status: TestPlanStatus) {
+    if (status === row.status) return;
+    await testPlanService.changeStatus(row.id, status);
+    await reload();
+    toast.current?.show({ severity: 'success', summary: `Status diubah ke ${TEST_PLAN_STATUS_LABEL[status]}` });
+  }
+
   return (
     <div>
+      <Toast ref={toast} />
       <PageHeader
         title="Test Plans"
         actions={
@@ -49,6 +65,20 @@ export function TestPlansPage() {
         <Column field="name" header="Nama" sortable />
         <Column field="status" header="Status" body={(row: TestPlan) => <Tag value={TEST_PLAN_STATUS_LABEL[row.status]} severity={TEST_PLAN_STATUS_SEVERITY[row.status]} />} />
         <Column field="updatedAt" header="Update Terakhir" body={(row: TestPlan) => formatDate(row.updatedAt)} sortable />
+        {canEditContent && (
+          <Column
+            header=""
+            style={{ width: '4rem' }}
+            body={(row: TestPlan) => (
+              <RowActionsMenu
+                items={TEST_PLAN_STATUS_OPTIONS.filter((s) => s !== row.status).map((status) => ({
+                  label: `Ubah ke ${TEST_PLAN_STATUS_LABEL[status]}`,
+                  command: () => handleChangeStatus(row, status),
+                }))}
+              />
+            )}
+          />
+        )}
       </DataTable>
     </div>
   );

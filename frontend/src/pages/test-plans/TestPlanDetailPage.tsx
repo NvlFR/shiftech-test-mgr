@@ -21,13 +21,15 @@ import { testCaseService } from '../../services/testCaseService';
 import { testRunService } from '../../services/testRunService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
-import type { Module, Tag as TagEntity, TestCase, TestCasePriority, TestPlan, TestPlanCaseWithDetails, TestRun, TestRunStatus } from '../../types/domain';
+import type { Module, Tag as TagEntity, TestCase, TestCasePriority, TestPlan, TestPlanCaseWithDetails, TestPlanStatus, TestRun, TestRunStatus } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
+  TEST_PLAN_STATUS_LABEL,
+  TEST_PLAN_STATUS_SEVERITY,
   TEST_RUN_STATUS_LABEL,
   TEST_RUN_STATUS_SEVERITY,
   TEST_RESULT_STATUS_SEVERITY,
@@ -46,6 +48,10 @@ const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
 const TEST_RUN_STATUS_OPTIONS: { label: string; value: TestRunStatus }[] = (
   ['in_progress', 'completed'] as const
 ).map((v) => ({ label: TEST_RUN_STATUS_LABEL[v], value: v }));
+
+const TEST_PLAN_STATUS_OPTIONS: { label: string; value: TestPlanStatus }[] = (
+  ['draft', 'active', 'completed', 'archived'] as const
+).map((v) => ({ label: TEST_PLAN_STATUS_LABEL[v], value: v }));
 
 export function TestPlanDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -184,6 +190,13 @@ export function TestPlanDetailPage() {
     }
   }
 
+  async function handleChangeStatus(status: TestPlanStatus) {
+    if (!testPlan || status === testPlan.status) return;
+    const updated = await testPlanService.changeStatus(testPlan.id, status);
+    setTestPlan(updated);
+    toast.current?.show({ severity: 'success', summary: `Status diubah ke ${TEST_PLAN_STATUS_LABEL[status]}` });
+  }
+
   function handleDeleteRun(row: TestRun) {
     confirmDialog({
       header: 'Hapus Test Run',
@@ -205,17 +218,31 @@ export function TestPlanDetailPage() {
       <Toast ref={toast} />
       <ConfirmDialog />
 
-      {testPlan && (
-        <Breadcrumb
-          items={[
-            { label: 'Projects', path: '/' },
-            { label: projectName ?? '...', path: `/projects/${testPlan.projectId}` },
-            { label: `${testPlan.code}` }
-          ]}
-        />
-      )}
+      <Breadcrumb
+        items={[
+          { label: 'Projects', path: '/' },
+          { label: testPlan ? (projectName ?? '…') : '…', path: testPlan ? `/projects/${testPlan.projectId}` : undefined },
+          { label: testPlan ? testPlan.code : '…' },
+        ]}
+      />
 
-      <PageHeader title={testPlan ? `${testPlan.code} — ${testPlan.name}` : 'Detail Test Plan'} />
+      <PageHeader
+        title={testPlan ? `${testPlan.code} — ${testPlan.name}` : 'Detail Test Plan'}
+        actions={
+          testPlan && (
+            canEditContent ? (
+              <Dropdown
+                value={testPlan.status}
+                options={TEST_PLAN_STATUS_OPTIONS}
+                onChange={(e) => handleChangeStatus(e.value)}
+                className="w-10rem"
+              />
+            ) : (
+              <Tag value={TEST_PLAN_STATUS_LABEL[testPlan.status]} severity={TEST_PLAN_STATUS_SEVERITY[testPlan.status]} />
+            )
+          )
+        }
+      />
 
       <TabView>
         <TabPanel header="Test Cases">
