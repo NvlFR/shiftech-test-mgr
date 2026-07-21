@@ -24,6 +24,20 @@ export interface Project {
   updatedAt: string;
 }
 
+export type ProjectMemberRole = 'manager' | 'member';
+
+export interface ProjectMember {
+  id: string;
+  projectId: string;
+  userId: string;
+  role: ProjectMemberRole;
+  createdAt: string;
+}
+
+export interface ProjectMemberWithProfile extends ProjectMember {
+  profile: Profile;
+}
+
 export interface Module {
   id: string;
   projectId: string;
@@ -145,4 +159,6 @@ export interface Issue {
 
 export interface IssueWithDetails extends Issue {
   assignee: Profile | null;
+  testCase: { id: string; code: string; title: string } | null;
+  testRun: { id: string; code: string; name: string } | null;
 }

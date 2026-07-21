@@ -3,6 +3,43 @@ import { mapIssueRow, mapProfileRow } from '../helpers/mappers';
 import type { Issue, IssueStatus, IssueWithDetails } from '../types/domain';
 
 export const issueRepository = {
+  async findById(id: string): Promise<(IssueWithDetails & { projectId: string | null }) | null> {
+    const { data, error } = await supabase
+      .from('issues')
+      .select(
+        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name, test_plan:test_plans(project_id)))',
+      )
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    return {
+      ...mapIssueRow(data),
+      assignee: data.assignee ? mapProfileRow(data.assignee) : null,
+      testCase: data.test_result?.test_case ?? null,
+      testRun: data.test_result?.test_run ?? null,
+      projectId: data.test_result?.test_run?.test_plan?.project_id ?? null,
+    };
+  },
+
+  async update(
+    id: string,
+    changes: Partial<Pick<Issue, 'title' | 'description' | 'actualResult' | 'expectedResult' | 'priority'>>,
+  ): Promise<Issue> {
+    const payload: Record<string, unknown> = {};
+    if (changes.title !== undefined) payload.title = changes.title;
+    if (changes.description !== undefined) payload.description = changes.description;
+    if (changes.actualResult !== undefined) payload.actual_result = changes.actualResult;
+    if (changes.expectedResult !== undefined) payload.expected_result = changes.expectedResult;
+    if (changes.priority !== undefined) payload.priority = changes.priority;
+
+    const { data, error } = await supabase.from('issues').update(payload).eq('id', id).select('*').single();
+    if (error) throw error;
+    return mapIssueRow(data);
+  },
+
   async findAllByTestResult(testResultId: string): Promise<IssueWithDetails[]> {
     const { data, error } = await supabase
       .from('issues')
@@ -14,6 +51,8 @@ export const issueRepository = {
     return (data ?? []).map((row: any) => ({
       ...mapIssueRow(row),
       assignee: row.assignee ? mapProfileRow(row.assignee) : null,
+      testCase: null,
+      testRun: null,
     }));
   },
 
@@ -29,7 +68,9 @@ export const issueRepository = {
 
     const { data, error } = await supabase
       .from('issues')
-      .select('*, assignee:profiles(*), test_result:test_results!inner(test_run_id)')
+      .select(
+        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name))',
+      )
       .in('test_result.test_run_id', runIds)
       .order('created_at', { ascending: false });
 
@@ -37,13 +78,17 @@ export const issueRepository = {
     return (data ?? []).map((row: any) => ({
       ...mapIssueRow(row),
       assignee: row.assignee ? mapProfileRow(row.assignee) : null,
+      testCase: row.test_result?.test_case ?? null,
+      testRun: row.test_result?.test_run ?? null,
     }));
   },
 
   async findAllByTestRun(testRunId: string): Promise<IssueWithDetails[]> {
     const { data, error } = await supabase
       .from('issues')
-      .select('*, assignee:profiles(*), test_result:test_results!inner(test_run_id)')
+      .select(
+        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name))',
+      )
       .eq('test_result.test_run_id', testRunId)
       .order('created_at', { ascending: false });
 
@@ -51,6 +96,8 @@ export const issueRepository = {
     return (data ?? []).map((row: any) => ({
       ...mapIssueRow(row),
       assignee: row.assignee ? mapProfileRow(row.assignee) : null,
+      testCase: row.test_result?.test_case ?? null,
+      testRun: row.test_result?.test_run ?? null,
     }));
   },
 
