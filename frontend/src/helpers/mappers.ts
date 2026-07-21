@@ -114,6 +114,7 @@ export function mapTestRunRow(row: any): TestRun {
     status: row.status,
     startedAt: row.started_at,
     completedAt: row.completed_at,
+    notes: row.notes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -136,6 +137,7 @@ export function mapTestResultRow(row: any): TestResult {
 export function mapIssueRow(row: any): Issue {
   return {
     id: row.id,
+    code: row.code,
     testResultId: row.test_result_id,
     title: row.title,
     description: row.description,

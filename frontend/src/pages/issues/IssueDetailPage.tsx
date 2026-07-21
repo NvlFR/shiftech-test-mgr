@@ -12,6 +12,7 @@ import { Toast } from 'primereact/toast';
 import { issueService } from '../../services/issueService';
 import { profileService } from '../../services/profileService';
 import { projectService } from '../../services/projectService';
+import { useProjectRole } from '../../hooks/useProjectRole';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import type { BreadcrumbItem } from '../../components/ui/Breadcrumb';
 import type { IssuePriority, IssueStatus, IssueWithDetails, Profile } from '../../types/domain';
@@ -20,6 +21,8 @@ import {
   ISSUE_PRIORITY_LABEL,
   ISSUE_PRIORITY_SEVERITY,
   ISSUE_STATUS_LABEL,
+  TEST_CASE_PRIORITY_LABEL,
+  TEST_CASE_PRIORITY_SEVERITY,
 } from '../../helpers/statusLabels';
 
 const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
@@ -43,6 +46,7 @@ export function IssueDetailPage() {
   const [loading, setLoading] = useState(true);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [projectName, setProjectName] = useState<string | null>(null);
+  const { canManageIssues, canDeleteContent } = useProjectRole(issue?.projectId ?? undefined);
 
   async function reload() {
     if (!id) return;
@@ -119,9 +123,9 @@ export function IssueDetailPage() {
     await reload();
   }
 
-  async function handleAssign(assignedTo: string | null) {
+  async function handleAssign(assignedTo: string | null | undefined) {
     if (!issue) return;
-    await issueService.assign(issue.id, assignedTo);
+    await issueService.assign(issue.id, assignedTo ?? null);
     await reload();
   }
 
@@ -142,22 +146,30 @@ export function IssueDetailPage() {
     });
   }
 
+  function handleArchive() {
+    if (!issue) return;
+    confirmDialog({
+      header: 'Arsipkan Issue',
+      message: `Issue "${issue.title}" akan diarsipkan (ditutup). Lanjutkan?`,
+      icon: 'pi pi-info-circle',
+      acceptLabel: 'Arsipkan',
+      rejectLabel: 'Batal',
+      accept: async () => {
+        await issueService.changeStatus(issue.id, 'closed');
+        await reload();
+        toast.current?.show({ severity: 'success', summary: 'Issue diarsipkan' });
+      },
+    });
+  }
+
   if (loading) return <p>Memuat...</p>;
   if (!issue) return <p>Issue tidak ditemukan.</p>;
 
-  const breadcrumbItems: BreadcrumbItem[] = testRunId && issue.testRun
-    ? [
-        { label: 'Projects', path: '/' },
-        { label: projectName ?? '...', path: issue.projectId ? `/projects/${issue.projectId}` : undefined },
-        { label: `${issue.testRun.code} — ${issue.testRun.name}`, path: `/test-runs/${testRunId}` },
-        { label: 'Issues', path: `/test-runs/${testRunId}/issues` },
-        { label: issue.title },
-      ]
-    : [
-        { label: 'Projects', path: '/' },
-        { label: projectName ?? '...', path: issue.projectId ? `/projects/${issue.projectId}` : undefined },
-        { label: issue.title },
-      ];
+  const breadcrumbItems: BreadcrumbItem[] = [
+    { label: 'Projects', path: '/' },
+    { label: projectName ?? '...', path: issue.projectId ? `/projects/${issue.projectId}` : undefined },
+    { label: issue.code, path: `/issues/${issue.id}` },
+  ];
 
   return (
     <div>
@@ -167,34 +179,88 @@ export function IssueDetailPage() {
       <Breadcrumb items={breadcrumbItems} />
 
       <div className="flex justify-content-between align-items-center mb-3">
-        <Button label="Kembali" icon="pi pi-arrow-left" text onClick={handleBack} />
+        <div>
+          <h2>Rincian Issue</h2>
+        </div>
         <div className="flex gap-2">
-          <Button label="Edit" icon="pi pi-pencil" size="small" outlined onClick={openEditDialog} />
-          <Button label="Hapus" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleDelete} />
+          {canManageIssues && <Button label="Edit" icon="pi pi-pencil" size="small" outlined onClick={openEditDialog} />}
+          {canDeleteContent ? (
+            <Button label="Hapus" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleDelete} />
+          ) : (
+            canManageIssues &&
+            issue.status !== 'closed' && (
+              <Button label="Arsipkan" icon="pi pi-inbox" size="small" outlined onClick={handleArchive} />
+            )
+          )}
         </div>
       </div>
 
       <Card className="mb-3">
         <div className="flex align-items-center gap-2 mb-1">
-          <h2 className="m-0">{issue.title}</h2>
+          <h2 className="m-0">{issue.code} — {issue.title}</h2>
           <Tag value={ISSUE_PRIORITY_LABEL[issue.priority]} severity={ISSUE_PRIORITY_SEVERITY[issue.priority]} />
         </div>
 
         <div className="flex flex-wrap gap-4 mt-3 text-sm">
           <span className="text-color-secondary">
-            Test Case: <span className="text-color">{issue.testCase ? `${issue.testCase.code} - ${issue.testCase.title}` : '-'}</span>
+            Test Case:{' '}
+            {issue.testCase ? (
+              <a
+                className="entity-link"
+                onClick={() => navigate(`/test-cases/${issue.testCase!.id}`)}
+              >
+                {issue.testCase.code} - {issue.testCase.title}
+              </a>
+            ) : (
+              <span className="text-color">-</span>
+            )}
           </span>
           <span className="text-color-secondary">
-            Test Run: <span className="text-color">{issue.testRun ? `${issue.testRun.code} - ${issue.testRun.name}` : '-'}</span>
+            Test Run:{' '}
+            {issue.testRun ? (
+              <a
+                className="entity-link"
+                onClick={() => navigate(`/test-runs/${issue.testRun!.id}`)}
+              >
+                {issue.testRun.code} - {issue.testRun.name}
+              </a>
+            ) : (
+              <span className="text-color">-</span>
+            )}
           </span>
           <span className="text-color-secondary">Dibuat: <span className="text-color">{formatDateTime(issue.createdAt)}</span></span>
           <span className="text-color-secondary">Update Terakhir: <span className="text-color">{formatDateTime(issue.updatedAt)}</span></span>
         </div>
 
+        {issue.testCase && (
+          <div className="flex flex-wrap align-items-center gap-4 mt-2 text-sm">
+            <span className="text-color-secondary">
+              Modul: <span className="text-color">{issue.testCase.module?.name ?? '-'}</span>
+            </span>
+            <span className="text-color-secondary flex align-items-center gap-2">
+              Prioritas Test Case:{' '}
+              <Tag
+                value={TEST_CASE_PRIORITY_LABEL[issue.testCase.priority]}
+                severity={TEST_CASE_PRIORITY_SEVERITY[issue.testCase.priority]}
+              />
+            </span>
+            {issue.testCase.tags.length > 0 && (
+              <span className="text-color-secondary flex align-items-center gap-2">
+                Tag:
+                <span className="flex flex-wrap gap-1">
+                  {issue.testCase.tags.map((tag) => (
+                    <Tag key={tag.id} value={tag.name} severity="info" />
+                  ))}
+                </span>
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="grid mt-3">
           <div className="col-12 md:col-6 flex flex-column gap-1">
             <label className="text-color-secondary text-sm">Status</label>
-            <Dropdown value={issue.status} options={STATUS_OPTIONS} onChange={(e) => handleChangeStatus(e.value)} className="w-full" />
+            <Dropdown value={issue.status} options={STATUS_OPTIONS} onChange={(e) => handleChangeStatus(e.value)} disabled={!canManageIssues} className="w-full" />
           </div>
           <div className="col-12 md:col-6 flex flex-column gap-1">
             <label className="text-color-secondary text-sm">Ditugaskan Ke</label>
@@ -204,6 +270,7 @@ export function IssueDetailPage() {
               onChange={(e) => handleAssign(e.value)}
               placeholder="Belum ditugaskan"
               showClear
+              disabled={!canManageIssues}
               className="w-full"
             />
           </div>

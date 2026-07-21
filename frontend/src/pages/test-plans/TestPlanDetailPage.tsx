@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -7,25 +7,45 @@ import { Button } from 'primereact/button';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { Dropdown } from 'primereact/dropdown';
 import { MultiSelect } from 'primereact/multiselect';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
+import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { useTestPlanDetail } from '../../hooks/useTestPlanDetail';
 import { useTestRuns } from '../../hooks/useTestRuns';
 import { testPlanService } from '../../services/testPlanService';
 import { testCaseService } from '../../services/testCaseService';
 import { testRunService } from '../../services/testRunService';
-import type { TestCase, TestPlan, TestPlanCaseWithDetails, TestRun } from '../../types/domain';
+import { moduleService } from '../../services/moduleService';
+import { tagService } from '../../services/tagService';
+import type { Module, Tag as TagEntity, TestCase, TestCasePriority, TestPlan, TestPlanCaseWithDetails, TestRun, TestRunStatus } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { projectService } from '../../services/projectService';
+import { useProjectRole } from '../../hooks/useProjectRole';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
   TEST_RUN_STATUS_LABEL,
   TEST_RUN_STATUS_SEVERITY,
   TEST_RESULT_STATUS_SEVERITY,
+  TEST_CASE_PRIORITY_LABEL,
+  TEST_CASE_PRIORITY_SEVERITY,
 } from '../../helpers/statusLabels';
 import type { TestRunWithSummary } from '../../hooks/useTestRuns';
+
+const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
+  { label: TEST_CASE_PRIORITY_LABEL.low, value: 'low' },
+  { label: TEST_CASE_PRIORITY_LABEL.medium, value: 'medium' },
+  { label: TEST_CASE_PRIORITY_LABEL.high, value: 'high' },
+  { label: TEST_CASE_PRIORITY_LABEL.critical, value: 'critical' },
+];
+
+const TEST_RUN_STATUS_OPTIONS: { label: string; value: TestRunStatus }[] = (
+  ['in_progress', 'completed'] as const
+).map((v) => ({ label: TEST_RUN_STATUS_LABEL[v], value: v }));
 
 export function TestPlanDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +56,40 @@ export function TestPlanDetailPage() {
   const [projectName, setProjectName] = useState<string | null>(null);
   const { cases, loading: casesLoading, reload: reloadCases } = useTestPlanDetail(id ?? null);
   const { testRuns, loading: runsLoading, reload: reloadRuns } = useTestRuns(id ?? null);
+  const { canEditContent, canDeleteContent, canRunTests } = useProjectRole(testPlan?.projectId);
+
+  // --- Test Cases: search/filter ---
+  const [caseSearch, setCaseSearch] = useState('');
+  const [casePriorityFilter, setCasePriorityFilter] = useState<TestCasePriority | null>(null);
+  const [caseModuleFilter, setCaseModuleFilter] = useState<string | null>(null);
+  const [caseTagFilter, setCaseTagFilter] = useState<string | null>(null);
+  const [selectedCases, setSelectedCases] = useState<TestPlanCaseWithDetails[]>([]);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [tags, setTags] = useState<TagEntity[]>([]);
+
+  const filteredCases = useMemo(() => {
+    const q = caseSearch.trim().toLowerCase();
+    return cases.filter((c) => {
+      if (casePriorityFilter && c.testCase.priority !== casePriorityFilter) return false;
+      if (caseModuleFilter && c.testCase.module?.id !== caseModuleFilter) return false;
+      if (caseTagFilter && !c.testCase.tags.some((t) => t.id === caseTagFilter)) return false;
+      if (q && !c.testCase.title.toLowerCase().includes(q) && !c.testCase.code.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [cases, caseSearch, casePriorityFilter, caseModuleFilter, caseTagFilter]);
+
+  // --- Test Runs: search/filter ---
+  const [runSearch, setRunSearch] = useState('');
+  const [runStatusFilter, setRunStatusFilter] = useState<TestRunStatus | null>(null);
+
+  const filteredRuns = useMemo(() => {
+    const q = runSearch.trim().toLowerCase();
+    return testRuns.filter((r) => {
+      if (runStatusFilter && r.status !== runStatusFilter) return false;
+      if (q && !r.name.toLowerCase().includes(q) && !r.code.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [testRuns, runSearch, runStatusFilter]);
 
   useEffect(() => {
     if (id) testPlanService.getById(id).then(setTestPlan);
@@ -43,6 +97,13 @@ export function TestPlanDetailPage() {
 
   useEffect(() => {
     if (testPlan) projectService.getById(testPlan.projectId).then((p) => setProjectName(p?.name ?? null));
+  }, [testPlan]);
+
+  useEffect(() => {
+    if (testPlan) {
+      moduleService.listByProject(testPlan.projectId).then(setModules);
+      tagService.listByProject(testPlan.projectId).then(setTags);
+    }
   }, [testPlan]);
 
   // --- Add test case to plan ---
@@ -82,6 +143,23 @@ export function TestPlanDetailPage() {
     });
   }
 
+  function handleBulkRemoveCases() {
+    confirmDialog({
+      header: 'Keluarkan Test Case Terpilih',
+      message: `${selectedCases.length} test case akan dikeluarkan dari plan ini. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Keluarkan',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await Promise.all(selectedCases.map((row) => testPlanService.removeCase(row.id)));
+        setSelectedCases([]);
+        await reloadCases();
+        toast.current?.show({ severity: 'success', summary: 'Test case terpilih dikeluarkan dari plan' });
+      },
+    });
+  }
+
   // --- Test Run ---
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [runName, setRunName] = useState('');
@@ -106,6 +184,22 @@ export function TestPlanDetailPage() {
     }
   }
 
+  function handleDeleteRun(row: TestRun) {
+    confirmDialog({
+      header: 'Hapus Test Run',
+      message: `Test run "${row.name}" akan dihapus permanen, termasuk seluruh hasil eksekusinya. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await testRunService.remove(row.id);
+        await reloadRuns();
+        toast.current?.show({ severity: 'success', summary: 'Test run dihapus' });
+      },
+    });
+  }
+
   return (
     <div>
       <Toast ref={toast} />
@@ -116,7 +210,7 @@ export function TestPlanDetailPage() {
           items={[
             { label: 'Projects', path: '/' },
             { label: projectName ?? '...', path: `/projects/${testPlan.projectId}` },
-            { label: `${testPlan.code} — ${testPlan.name}` },
+            { label: `${testPlan.code}` }
           ]}
         />
       )}
@@ -125,29 +219,132 @@ export function TestPlanDetailPage() {
 
       <TabView>
         <TabPanel header="Test Cases">
-          <div className="flex justify-content-end mb-3">
-            <Button label="Tambah Test Case" icon="pi pi-plus" size="small" onClick={openAddCaseDialog} />
+          <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <div className="flex align-items-center gap-2 flex-wrap">
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText value={caseSearch} onChange={(e) => setCaseSearch(e.target.value)} placeholder="Cari judul/kode..." />
+              </IconField>
+              <Dropdown
+                value={casePriorityFilter}
+                options={PRIORITY_OPTIONS}
+                onChange={(e) => setCasePriorityFilter(e.value)}
+                placeholder="Semua Prioritas"
+                showClear
+                className="w-10rem"
+              />
+              <Dropdown
+                value={caseModuleFilter}
+                options={modules.map((m) => ({ label: m.name, value: m.id }))}
+                onChange={(e) => setCaseModuleFilter(e.value)}
+                placeholder="Semua Module"
+                showClear
+                className="w-10rem"
+              />
+              <Dropdown
+                value={caseTagFilter}
+                options={tags.map((t) => ({ label: t.name, value: t.id }))}
+                onChange={(e) => setCaseTagFilter(e.value)}
+                placeholder="Semua Tag"
+                showClear
+                className="w-10rem"
+              />
+            </div>
+            {canEditContent && (
+              <Button label="Tambah Test Case" icon="pi pi-plus" size="small" onClick={openAddCaseDialog} />
+            )}
           </div>
-          <DataTable value={cases} loading={casesLoading} paginator rows={10} emptyMessage="Belum ada test case di plan ini" size="small">
-            <Column field="testCase.code" header="Kode" sortable style={{ width: '7rem' }} />
-            <Column field="testCase.title" header="Test Case" sortable />
-            <Column field="testCase.priority" header="Prioritas" sortable />
+          {canEditContent && (
+            <BulkActionsBar
+              selectedCount={selectedCases.length}
+              onClear={() => setSelectedCases([])}
+              actions={<Button label="Keluarkan Terpilih" icon="pi pi-times" size="small" severity="danger" outlined onClick={handleBulkRemoveCases} />}
+            />
+          )}
+          <DataTable
+            value={filteredCases}
+            loading={casesLoading}
+            paginator
+            rows={10}
+            emptyMessage="Belum ada test case di plan ini"
+            size="small"
+            selection={selectedCases}
+            onSelectionChange={(e: { value: TestPlanCaseWithDetails[] }) => setSelectedCases(e.value)}
+            dataKey="id"
+            selectionMode={canEditContent ? 'checkbox' : null}
+          >
+            {canEditContent && <Column selectionMode="multiple" style={{ width: '3rem' }} />}
             <Column
-              header="Aksi"
-              style={{ width: '4rem' }}
+              field="testCase.code"
+              header="Kode"
+              sortable
+              style={{ width: '7rem' }}
               body={(row: TestPlanCaseWithDetails) => (
-                <Button icon="pi pi-times" text rounded size="small" severity="danger" aria-label="Keluarkan" onClick={() => handleRemoveCase(row)} />
+                <a
+                  className="entity-link"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/test-cases/${row.testCase.id}?projectId=${testPlan?.projectId}`);
+                  }}
+                >
+                  {row.testCase.code}
+                </a>
               )}
             />
+            <Column field="testCase.title" header="Test Case" sortable />
+            <Column field="testCase.module.name" header="Modul" sortable body={(row: TestPlanCaseWithDetails) => row.testCase.module?.name ?? '-'} />
+            <Column
+              header="Tag"
+              body={(row: TestPlanCaseWithDetails) => (
+                <div className="flex flex-wrap gap-1">
+                  {row.testCase.tags.map((t) => (
+                    <Tag key={t.id} value={t.name} severity="info" />
+                  ))}
+                </div>
+              )}
+            />
+            <Column
+              field="testCase.priority"
+              header="Prioritas"
+              sortable
+              body={(row: TestPlanCaseWithDetails) => (
+                <Tag value={TEST_CASE_PRIORITY_LABEL[row.testCase.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.testCase.priority]} />
+              )}
+            />
+            {canEditContent && (
+              <Column
+                header=""
+                style={{ width: '4rem' }}
+                body={(row: TestPlanCaseWithDetails) => (
+                  <Button icon="pi pi-times" text rounded size="small" severity="danger" aria-label="Keluarkan" onClick={() => handleRemoveCase(row)} />
+                )}
+              />
+            )}
           </DataTable>
         </TabPanel>
 
         <TabPanel header="Test Runs">
-          <div className="flex justify-content-end mb-3">
-            <Button label="Mulai Test Run" icon="pi pi-play" size="small" onClick={openStartRunDialog} />
+          <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <div className="flex align-items-center gap-2 flex-wrap">
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText value={runSearch} onChange={(e) => setRunSearch(e.target.value)} placeholder="Cari nama/kode..." />
+              </IconField>
+              <Dropdown
+                value={runStatusFilter}
+                options={TEST_RUN_STATUS_OPTIONS}
+                onChange={(e) => setRunStatusFilter(e.value)}
+                placeholder="Semua Status"
+                showClear
+                className="w-10rem"
+              />
+            </div>
+            {canRunTests && (
+              <Button label="Mulai Test Run" icon="pi pi-play" size="small" onClick={openStartRunDialog} />
+            )}
           </div>
           <DataTable
-            value={testRuns}
+            value={filteredRuns}
             loading={runsLoading}
             paginator
             rows={10}
@@ -181,6 +378,26 @@ export function TestPlanDetailPage() {
               }
             />
             <Column field="completedAt" header="Selesai" body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
+            {canDeleteContent && (
+              <Column
+                header=""
+                style={{ width: '4rem' }}
+                body={(row: TestRun) => (
+                  <Button
+                    icon="pi pi-trash"
+                    text
+                    rounded
+                    size="small"
+                    severity="danger"
+                    aria-label="Hapus"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteRun(row);
+                    }}
+                  />
+                )}
+              />
+            )}
           </DataTable>
         </TabPanel>
       </TabView>

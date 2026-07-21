@@ -6,6 +6,10 @@ export const projectMemberService = {
     return projectMemberRepository.findAllByProject(projectId);
   },
 
+  getOwnRole(projectId: string, userId: string) {
+    return projectMemberRepository.findOwnRole(projectId, userId);
+  },
+
   add(projectId: string, userId: string, role: ProjectMemberRole = 'member') {
     return projectMemberRepository.add(projectId, userId, role);
   },

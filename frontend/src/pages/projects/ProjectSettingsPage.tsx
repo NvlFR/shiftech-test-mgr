@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
@@ -20,11 +20,16 @@ import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { profileService } from '../../services/profileService';
 import { projectMemberService } from '../../services/projectMemberService';
+import { useProjectRole } from '../../hooks/useProjectRole';
 import type { Project, Module, Tag as TagEntity, Profile, ProjectMemberWithProfile, ProjectMemberRole } from '../../types/domain';
 import { PROJECT_MEMBER_ROLE_LABEL } from '../../helpers/statusLabels';
+import { Tag } from 'primereact/tag';
+import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
 
 const MEMBER_ROLE_OPTIONS: { label: string; value: ProjectMemberRole }[] = [
   { label: PROJECT_MEMBER_ROLE_LABEL.member, value: 'member' },
+  { label: PROJECT_MEMBER_ROLE_LABEL.supervisor, value: 'supervisor' },
+  { label: PROJECT_MEMBER_ROLE_LABEL.tester, value: 'tester' },
   { label: PROJECT_MEMBER_ROLE_LABEL.manager, value: 'manager' },
 ];
 
@@ -32,6 +37,7 @@ export function ProjectSettingsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
+  const { loading: roleLoading, canManageSettings, canArchiveProject, canDeleteProject } = useProjectRole(id);
 
   const [project, setProject] = useState<Project | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
@@ -306,7 +312,46 @@ export function ProjectSettingsPage() {
     });
   }
 
-  if (loading) return <p>Memuat...</p>;
+  function handleArchiveProject() {
+    if (!project) return;
+    confirmDialog({
+      header: 'Arsipkan Project',
+      message: `Project "${project.name}" akan diarsipkan. Lanjutkan?`,
+      icon: 'pi pi-info-circle',
+      acceptLabel: 'Arsipkan',
+      rejectLabel: 'Batal',
+      accept: async () => {
+        await projectService.changeStatus(project.id, 'archived');
+        setProject({ ...project, status: 'archived' });
+        toast.current?.show({ severity: 'success', summary: 'Project diarsipkan' });
+      },
+    });
+  }
+
+  function handleDeletePermanently() {
+    if (!project) return;
+    confirmDialog({
+      header: 'Hapus Permanen',
+      message: (
+        <span>
+          Project <strong>"{project.name}"</strong> beserta seluruh test plan dan test case di dalamnya akan{' '}
+          <strong>dihapus permanen dan tidak bisa dikembalikan</strong>. Lanjutkan?
+        </span>
+      ),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus Permanen',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await projectService.deletePermanently(project.id);
+        toast.current?.show({ severity: 'success', summary: 'Project dihapus permanen' });
+        navigate('/');
+      },
+    });
+  }
+
+  if (loading || roleLoading) return <p>Memuat...</p>;
+  if (!canManageSettings) return <Navigate to={`/projects/${id}`} replace />;
   if (!project) return <p>Project tidak ditemukan.</p>;
 
   return (
@@ -478,6 +523,36 @@ export function ProjectSettingsPage() {
               />
             </DataTable>
           </TabPanel>
+
+          {(canArchiveProject || canDeleteProject) && (
+            <TabPanel header="Danger Zone">
+              <div className="flex flex-column gap-3" style={{ maxWidth: '32rem' }}>
+                {canArchiveProject && project.status !== 'archived' && (
+                  <div className="flex align-items-center justify-content-between gap-3 p-3 border-1 border-round surface-border">
+                    <div>
+                      <div className="font-medium">Arsipkan Project</div>
+                      <div className="text-color-secondary text-sm">
+                        Project ini status: <Tag value={PROJECT_STATUS_LABEL[project.status]} severity={PROJECT_STATUS_SEVERITY[project.status]} />.
+                        Project yang diarsipkan tidak muncul di daftar aktif.
+                      </div>
+                    </div>
+                    <Button label="Arsipkan" icon="pi pi-inbox" severity="warning" outlined onClick={handleArchiveProject} />
+                  </div>
+                )}
+                {canDeleteProject && (
+                  <div className="flex align-items-center justify-content-between gap-3 p-3 border-1 border-round surface-border">
+                    <div>
+                      <div className="font-medium">Hapus Permanen</div>
+                      <div className="text-color-secondary text-sm">
+                        Menghapus project beserta seluruh test plan dan test case. Tindakan ini tidak bisa dibatalkan.
+                      </div>
+                    </div>
+                    <Button label="Hapus Permanen" icon="pi pi-trash" severity="danger" outlined onClick={handleDeletePermanently} />
+                  </div>
+                )}
+              </div>
+            </TabPanel>
+          )}
         </TabView>
       </Card>
 

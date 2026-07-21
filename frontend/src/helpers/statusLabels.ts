@@ -133,10 +133,14 @@ export const USER_ROLE_SEVERITY: Record<UserRole, TagSeverity> = {
 
 export const PROJECT_MEMBER_ROLE_LABEL: Record<ProjectMemberRole, string> = {
   manager: 'Manager',
+  supervisor: 'Supervisor',
+  tester: 'Tester',
   member: 'Anggota',
 };
 
 export const PROJECT_MEMBER_ROLE_SEVERITY: Record<ProjectMemberRole, TagSeverity> = {
   manager: 'success',
-  member: 'info',
+  supervisor: 'warning',
+  tester: 'info',
+  member: 'secondary',
 };

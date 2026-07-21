@@ -26,6 +26,7 @@ import { issueService } from '../../services/issueService';
 import { profileService } from '../../services/profileService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
+import { useProjectRole } from '../../hooks/useProjectRole';
 import type {
   Project,
   TestPlan,
@@ -89,18 +90,55 @@ const ISSUE_PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (
 ).map((v) => ({ label: ISSUE_PRIORITY_LABEL[v], value: v }));
 
 type TestRunWithSummary = TestRun & {
+  testPlanId: string;
+  testPlanName: string;
   total: number;
   pass: number;
   fail: number;
   testers: { id: string; fullName: string | null }[];
 };
 
+type ProjectTabData = {
+  testPlans: TestPlan[];
+  testCases: TestCaseWithDetails[];
+  modules: Module[];
+  tags: TagEntity[];
+  testRuns: TestRunWithSummary[];
+  issues: IssueWithDetails[];
+  approvedUsers: Profile[];
+};
+
+// Module-level cache so switching projects/tabs and coming back is instant
+// instead of re-fetching + showing a loading state every time.
+const projectCache = new Map<string, Project>();
+const tabDataCache = new Map<string, Partial<ProjectTabData>>();
+
+function getTabCache(projectId: string): Partial<ProjectTabData> {
+  let entry = tabDataCache.get(projectId);
+  if (!entry) {
+    entry = {};
+    tabDataCache.set(projectId, entry);
+  }
+  return entry;
+}
+
+// Index within TAB_LABELS -> which cache keys that tab needs loaded.
+const TAB_DEPENDENCIES: (keyof ProjectTabData)[][] = [
+  ['testPlans'],
+  ['testCases', 'modules', 'tags'],
+  ['testRuns'],
+  ['issues', 'approvedUsers'],
+];
+
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
+  const { canEditContent, canDeleteContent, canManageIssues } = useProjectRole(id);
 
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<Project | null>(id ? projectCache.get(id) ?? null : null);
+  const [projectLoading, setProjectLoading] = useState(!project);
+
   const [testPlans, setTestPlans] = useState<TestPlan[]>([]);
   const [testCases, setTestCases] = useState<TestCaseWithDetails[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
@@ -108,39 +146,88 @@ export function ProjectDetailPage() {
   const [testRuns, setTestRuns] = useState<TestRunWithSummary[]>([]);
   const [issues, setIssues] = useState<IssueWithDetails[]>([]);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tabLoading, setTabLoading] = useState<Record<number, boolean>>({});
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const TAB_LABELS = ['Test Plans', 'Test Cases', 'Test Runs', 'Issues'];
+  function applyTabData(data: Partial<ProjectTabData>) {
+    if (data.testPlans) setTestPlans(data.testPlans);
+    if (data.testCases) setTestCases(data.testCases);
+    if (data.modules) setModules(data.modules);
+    if (data.tags) setTags(data.tags);
+    if (data.testRuns) setTestRuns(data.testRuns);
+    if (data.issues) setIssues(data.issues);
+    if (data.approvedUsers) setApprovedUsers(data.approvedUsers);
+  }
 
-  async function loadAll(showLoading = true) {
+  // Loads only what a given tab needs, using the per-project cache. Keys
+  // already present in cache are skipped, so re-visiting a tab is instant.
+  async function loadTab(projectId: string, tabIndex: number, force = false) {
+    const keys = TAB_DEPENDENCIES[tabIndex];
+    const cache = getTabCache(projectId);
+    const missing = force ? keys : keys.filter((k) => cache[k] === undefined);
+
+    if (missing.length === 0) {
+      applyTabData(cache);
+      return;
+    }
+
+    if (cache[missing[0]] === undefined) {
+      setTabLoading((prev) => ({ ...prev, [tabIndex]: true }));
+    }
+
+    const fetchers: Partial<Record<keyof ProjectTabData, () => Promise<unknown>>> = {
+      testPlans: () => testPlanService.listByProject(projectId),
+      testCases: () => testCaseService.listByProjectWithDetails(projectId),
+      modules: () => moduleService.listByProject(projectId),
+      tags: () => tagService.listByProject(projectId),
+      testRuns: () => testRunService.listByProjectWithSummary(projectId),
+      issues: () => issueService.listByProject(projectId),
+      approvedUsers: async () => {
+        const all = await profileService.listAll();
+        return all.filter((p: Profile) => p.role === 'user' || p.role === 'admin');
+      },
+    };
+
+    const results = await Promise.all(missing.map((k) => fetchers[k]!()));
+    missing.forEach((k, i) => {
+      (cache as Record<string, unknown>)[k] = results[i];
+    });
+
+    applyTabData(cache);
+    setTabLoading((prev) => ({ ...prev, [tabIndex]: false }));
+  }
+
+  // After any mutation: drop the whole project's cached tab data (modules/tags
+  // are shared across tabs, e.g. a new module from the Test Case dialog) and
+  // re-fetch just the tab currently in view.
+  async function loadAll() {
     if (!id) return;
-    if (showLoading) setLoading(true);
-    const [projectResult, plansResult, casesResult, modulesResult, tagsResult, runsResult, issuesResult, usersResult] = await Promise.all([
-      projectService.getById(id),
-      testPlanService.listByProject(id),
-      testCaseService.listByProjectWithDetails(id),
-      moduleService.listByProject(id),
-      tagService.listByProject(id),
-      testRunService.listByProjectWithSummary(id),
-      issueService.listByProject(id),
-      profileService.listAll(),
-    ]);
-    setProject(projectResult);
-    setTestPlans(plansResult);
-    setTestCases(casesResult);
-    setModules(modulesResult);
-    setTags(tagsResult);
-    setTestRuns(runsResult);
-    setIssues(issuesResult);
-    setApprovedUsers(usersResult.filter((p: Profile) => p.role === 'user' || p.role === 'admin'));
-    if (showLoading) setLoading(false);
+    tabDataCache.delete(id);
+    await loadTab(id, activeTabIndex, true);
   }
 
   useEffect(() => {
-    loadAll();
+    if (!id) return;
+    const cached = projectCache.get(id);
+    setProject(cached ?? null);
+    setProjectLoading(!cached);
+    setActiveTabIndex(0);
+
+    projectService.getById(id).then((result) => {
+      if (result) projectCache.set(id, result);
+      setProject(result);
+      setProjectLoading(false);
+    });
+
+    loadTab(id, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    loadTab(id, activeTabIndex);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, activeTabIndex]);
 
   // --- Test Plan dialog ---
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
@@ -194,7 +281,7 @@ export function ProjectDetailPage() {
         await testPlanService.create({ projectId: id, name: planName, description: planDescription, code: planCode });
       }
       setPlanDialogOpen(false);
-      await loadAll(false);
+      await loadAll();
       toast.current?.show({ severity: 'success', summary: editingPlanId ? 'Test plan diperbarui' : 'Test plan dibuat' });
     } catch (err) {
       setPlanError(err instanceof Error ? err.message : 'Gagal menyimpan test plan');
@@ -211,7 +298,7 @@ export function ProjectDetailPage() {
       acceptClassName: 'p-button-danger',
       accept: async () => {
         await testPlanService.remove(row.id);
-        await loadAll(false);
+        await loadAll();
         toast.current?.show({ severity: 'success', summary: 'Test plan dihapus' });
       },
     });
@@ -228,7 +315,7 @@ export function ProjectDetailPage() {
       accept: async () => {
         await Promise.all(selectedPlans.map((p) => testPlanService.remove(p.id)));
         setSelectedPlans([]);
-        await loadAll(false);
+        await loadAll();
         toast.current?.show({ severity: 'success', summary: 'Test plan terpilih dihapus' });
       },
     });
@@ -255,7 +342,7 @@ export function ProjectDetailPage() {
       const created = await moduleService.create({ projectId: id, name: moduleName, code: moduleCode });
       setCaseModuleId(created.id);
       setModuleDialogOpen(false);
-      await loadAll(false);
+      await loadAll();
       toast.current?.show({ severity: 'success', summary: 'Module dibuat' });
     } catch (err) {
       setModuleError(err instanceof Error ? err.message : 'Gagal menyimpan module');
@@ -368,7 +455,7 @@ export function ProjectDetailPage() {
         });
       }
       setCaseDialogOpen(false);
-      await loadAll(false);
+      await loadAll();
       toast.current?.show({ severity: 'success', summary: editingCaseId ? 'Test case diperbarui' : 'Test case dibuat' });
     } catch (err) {
       setCaseError(err instanceof Error ? err.message : 'Gagal menyimpan test case');
@@ -391,7 +478,7 @@ export function ProjectDetailPage() {
         } else {
           await testCaseService.reactivate(row.id);
         }
-        await loadAll(false);
+        await loadAll();
       },
     });
   }
@@ -406,7 +493,7 @@ export function ProjectDetailPage() {
       acceptClassName: 'p-button-danger',
       accept: async () => {
         await testCaseService.remove(row.id);
-        await loadAll(false);
+        await loadAll();
         toast.current?.show({ severity: 'success', summary: 'Test case dihapus' });
       },
     });
@@ -423,30 +510,8 @@ export function ProjectDetailPage() {
       accept: async () => {
         await Promise.all(selectedCases.map((c) => testCaseService.remove(c.id)));
         setSelectedCases([]);
-        await loadAll(false);
+        await loadAll();
         toast.current?.show({ severity: 'success', summary: 'Test case terpilih dihapus' });
-      },
-    });
-  }
-
-  function handleDeletePermanently() {
-    if (!project) return;
-    confirmDialog({
-      header: 'Hapus Permanen',
-      message: (
-        <span>
-          Project <strong>"{project.name}"</strong> beserta seluruh test plan dan test case di dalamnya akan{' '}
-          <strong>dihapus permanen dan tidak bisa dikembalikan</strong>. Lanjutkan?
-        </span>
-      ),
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Hapus Permanen',
-      rejectLabel: 'Batal',
-      acceptClassName: 'p-button-danger',
-      accept: async () => {
-        await projectService.deletePermanently(project.id);
-        toast.current?.show({ severity: 'success', summary: 'Project dihapus permanen' });
-        navigate('/');
       },
     });
   }
@@ -467,6 +532,22 @@ export function ProjectDetailPage() {
     });
   }, [testRuns, runSearch, runStatusFilter]);
 
+  function handleDeleteRun(row: TestRunWithSummary) {
+    confirmDialog({
+      header: 'Hapus Test Run',
+      message: `Test run "${row.name}" akan dihapus permanen, termasuk seluruh hasil eksekusinya. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await testRunService.remove(row.id);
+        await loadAll();
+        toast.current?.show({ severity: 'success', summary: 'Test run dihapus' });
+      },
+    });
+  }
+
   function handleBulkDeleteRuns() {
     confirmDialog({
       header: 'Hapus Test Run Terpilih',
@@ -478,7 +559,7 @@ export function ProjectDetailPage() {
       accept: async () => {
         await Promise.all(selectedRuns.map((r) => testRunService.remove(r.id)));
         setSelectedRuns([]);
-        await loadAll(false);
+        await loadAll();
         toast.current?.show({ severity: 'success', summary: 'Test run terpilih dihapus' });
       },
     });
@@ -491,16 +572,20 @@ export function ProjectDetailPage() {
   const [issueSortField, setIssueSortField] = useState('title');
   const [issueSortOrder, setIssueSortOrder] = useState<1 | -1>(1);
   const [selectedIssues, setSelectedIssues] = useState<IssueWithDetails[]>([]);
+  const [issueModuleFilter, setIssueModuleFilter] = useState<string | null>(null);
+  const [issueTagFilter, setIssueTagFilter] = useState<string | null>(null);
 
   const filteredIssues = useMemo(() => {
     const q = issueSearch.trim().toLowerCase();
     return issues.filter((i) => {
       if (issueStatusFilter && i.status !== issueStatusFilter) return false;
       if (issuePriorityFilter && i.priority !== issuePriorityFilter) return false;
-      if (q && !i.title.toLowerCase().includes(q)) return false;
+      if (issueModuleFilter && i.testCase?.module?.id !== issueModuleFilter) return false;
+      if (issueTagFilter && !i.testCase?.tags.some((t) => t.id === issueTagFilter)) return false;
+      if (q && !i.title.toLowerCase().includes(q) && !i.code.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [issues, issueSearch, issueStatusFilter, issuePriorityFilter]);
+  }, [issues, issueSearch, issueStatusFilter, issuePriorityFilter, issueModuleFilter, issueTagFilter]);
 
   function handleBulkDeleteIssues() {
     confirmDialog({
@@ -513,14 +598,16 @@ export function ProjectDetailPage() {
       accept: async () => {
         await Promise.all(selectedIssues.map((i) => issueService.remove(i.id)));
         setSelectedIssues([]);
-        await loadAll(false);
+        await loadAll();
         toast.current?.show({ severity: 'success', summary: 'Issue terpilih dihapus' });
       },
     });
   }
 
-  if (loading) return <p>Memuat...</p>;
-  if (!project) return <p>Project tidak ditemukan.</p>;
+  if (!project) {
+    if (projectLoading) return null;
+    return <p>Project tidak ditemukan.</p>;
+  }
 
   const moduleOptions = modules.map((m) => ({ label: m.name, value: m.id }));
   const tagOptions = tags.map((t) => ({ label: t.name, value: t.id }));
@@ -533,15 +620,14 @@ export function ProjectDetailPage() {
   }
 
   return (
-    <div>
+    <div className="page-fade-in">
       <Toast ref={toast} />
       <ConfirmDialog />
 
       <Breadcrumb
         items={[
           { label: 'Projects', path: '/' },
-          { label: project.name, path: `/projects/${id}` },
-          { label: TAB_LABELS[activeTabIndex] },
+          { label: project.name, path: `/projects/${id}` }
         ]}
       />
 
@@ -555,8 +641,7 @@ export function ProjectDetailPage() {
             <p className="text-color-secondary text-sm m-0">{project.description || 'Tidak ada deskripsi'}</p>
           </div>
           <div className="flex gap-2">
-            <Button icon="pi pi-cog" label="Pengaturan" outlined size="small" onClick={() => navigate(`/projects/${id}/settings`)} />
-            <Button icon="pi pi-trash" label="Hapus Permanen" severity="danger" outlined size="small" onClick={handleDeletePermanently} />
+            <Button icon="pi pi-cog" outlined size="small" onClick={() => navigate(`/projects/${id}/settings`)} />
           </div>
         </div>
 
@@ -586,15 +671,18 @@ export function ProjectDetailPage() {
                   className="w-12rem"
                 />
               </div>
-              <Button label="Test Plan Baru" icon="pi pi-plus" size="small" onClick={openCreatePlanDialog} />
+              {canEditContent && <Button label="Test Plan Baru" icon="pi pi-plus" size="small" onClick={openCreatePlanDialog} />}
             </div>
-            <BulkActionsBar
-              selectedCount={selectedPlans.length}
-              onClear={() => setSelectedPlans([])}
-              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeletePlans} />}
-            />
+            {canDeleteContent && (
+              <BulkActionsBar
+                selectedCount={selectedPlans.length}
+                onClear={() => setSelectedPlans([])}
+                actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeletePlans} />}
+              />
+            )}
             <DataTable
               value={filteredPlans}
+              loading={tabLoading[0]}
               size="small"
               emptyMessage="Belum ada test plan"
               onRowClick={(e) => navigate(`/test-plans/${(e.data as TestPlan).id}`)}
@@ -626,8 +714,10 @@ export function ProjectDetailPage() {
                 body={(row: TestPlan) => (
                   <RowActionsMenu
                     items={[
-                      { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditPlanDialog(row) },
-                      { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeletePlan(row) },
+                      ...(canEditContent ? [{ label: 'Edit', icon: 'pi pi-pencil', command: () => openEditPlanDialog(row) }] : []),
+                      ...(canDeleteContent
+                        ? [{ label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeletePlan(row) }]
+                        : []),
                     ]}
                   />
                 )}
@@ -675,15 +765,18 @@ export function ProjectDetailPage() {
                   className="w-10rem"
                 />
               </div>
-              <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />
+              {canEditContent && <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />}
             </div>
-            <BulkActionsBar
-              selectedCount={selectedCases.length}
-              onClear={() => setSelectedCases([])}
-              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteCases} />}
-            />
+            {canDeleteContent && (
+              <BulkActionsBar
+                selectedCount={selectedCases.length}
+                onClear={() => setSelectedCases([])}
+                actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteCases} />}
+              />
+            )}
             <DataTable
               value={filteredCases}
+              loading={tabLoading[1]}
               size="small"
               emptyMessage="Belum ada test case"
               onRowClick={(e) => navigate(`/test-cases/${(e.data as TestCaseWithDetails).id}?projectId=${id}`)}
@@ -734,13 +827,19 @@ export function ProjectDetailPage() {
                 body={(row: TestCaseWithDetails) => (
                   <RowActionsMenu
                     items={[
-                      { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditCaseDialog(row) },
-                      {
-                        label: row.status === 'active' ? 'Arsipkan' : 'Aktifkan',
-                        icon: row.status === 'active' ? 'pi pi-inbox' : 'pi pi-refresh',
-                        command: () => handleArchiveCase(row),
-                      },
-                      { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteCase(row) },
+                      ...(canEditContent
+                        ? [
+                          { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditCaseDialog(row) },
+                          {
+                            label: row.status === 'active' ? 'Arsipkan' : 'Aktifkan',
+                            icon: row.status === 'active' ? 'pi pi-inbox' : 'pi pi-refresh',
+                            command: () => handleArchiveCase(row),
+                          },
+                        ]
+                        : []),
+                      ...(canDeleteContent
+                        ? [{ label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteCase(row) }]
+                        : []),
                     ]}
                   />
                 )}
@@ -765,13 +864,16 @@ export function ProjectDetailPage() {
                 />
               </div>
             </div>
-            <BulkActionsBar
-              selectedCount={selectedRuns.length}
-              onClear={() => setSelectedRuns([])}
-              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteRuns} />}
-            />
+            {canDeleteContent && (
+              <BulkActionsBar
+                selectedCount={selectedRuns.length}
+                onClear={() => setSelectedRuns([])}
+                actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteRuns} />}
+              />
+            )}
             <DataTable
               value={filteredRuns}
+              loading={tabLoading[2]}
               size="small"
               emptyMessage="Belum ada test run"
               onRowClick={(e) => navigate(`/test-runs/${(e.data as TestRun).id}`)}
@@ -790,6 +892,22 @@ export function ProjectDetailPage() {
               <Column selectionMode="multiple" style={{ width: '3rem' }} />
               <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
               <Column field="name" header="Nama Run" sortable />
+              <Column
+                header="Test Plan"
+                field="testPlanName"
+                sortable
+                body={(row: TestRunWithSummary) => (
+                  <a
+                    className="entity-link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/test-plans/${row.testPlanId}`);
+                    }}
+                  >
+                    {row.testPlanName}
+                  </a>
+                )}
+              />
               <Column field="status" header="Status" sortable body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} />
               <Column
                 header="Hasil"
@@ -806,6 +924,20 @@ export function ProjectDetailPage() {
                 body={(row: TestRunWithSummary) => (row.testers.length > 0 ? row.testers.map((t) => t.fullName ?? t.id).join(', ') : '-')}
               />
               <Column field="completedAt" header="Selesai" sortable body={(row: TestRun) => (row.completedAt ? formatDateTime(row.completedAt) : '-')} />
+              <Column
+                header=""
+                style={{ width: '3.5rem' }}
+                body={(row: TestRunWithSummary) => (
+                  <RowActionsMenu
+                    items={[
+                      { label: 'Lihat Detail', icon: 'pi pi-eye', command: () => navigate(`/test-runs/${row.id}`) },
+                      ...(canDeleteContent
+                        ? [{ label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteRun(row) }]
+                        : []),
+                    ]}
+                  />
+                )}
+              />
             </DataTable>
           </TabPanel>
 
@@ -832,15 +964,34 @@ export function ProjectDetailPage() {
                   showClear
                   className="w-11rem"
                 />
+                <Dropdown
+                  value={issueModuleFilter}
+                  options={moduleOptions}
+                  onChange={(e) => setIssueModuleFilter(e.value)}
+                  placeholder="Semua Module"
+                  showClear
+                  className="w-10rem"
+                />
+                <Dropdown
+                  value={issueTagFilter}
+                  options={tagOptions}
+                  onChange={(e) => setIssueTagFilter(e.value)}
+                  placeholder="Semua Tag"
+                  showClear
+                  className="w-10rem"
+                />
               </div>
             </div>
-            <BulkActionsBar
-              selectedCount={selectedIssues.length}
-              onClear={() => setSelectedIssues([])}
-              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteIssues} />}
-            />
+            {canDeleteContent && (
+              <BulkActionsBar
+                selectedCount={selectedIssues.length}
+                onClear={() => setSelectedIssues([])}
+                actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteIssues} />}
+              />
+            )}
             <DataTable
               value={filteredIssues}
+              loading={tabLoading[3]}
               size="small"
               emptyMessage="Belum ada issue"
               onRowClick={(e) => navigate(`/issues/${(e.data as IssueWithDetails).id}`)}
@@ -857,12 +1008,56 @@ export function ProjectDetailPage() {
               selectionMode="checkbox"
             >
               <Column selectionMode="multiple" style={{ width: '3rem' }} />
+              <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
               <Column field="title" header="Judul" sortable />
               <Column
                 header="Test Case"
-                body={(row: IssueWithDetails) => (row.testCase ? `${row.testCase.code} - ${row.testCase.title}` : '-')}
+                body={(row: IssueWithDetails) =>
+                  row.testCase ? (
+                    <a
+                      className="entity-link"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/test-cases/${row.testCase!.id}?projectId=${id}`);
+                      }}
+                    >
+                      {row.testCase.code} - {row.testCase.title}
+                    </a>
+                  ) : (
+                    '-'
+                  )
+                }
               />
-              <Column header="Test Run" body={(row: IssueWithDetails) => (row.testRun ? `${row.testRun.code} - ${row.testRun.name}` : '-')} />
+              <Column
+                header="Test Run"
+                body={(row: IssueWithDetails) =>
+                  row.testRun ? (
+                    <a
+                      className="entity-link"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/test-runs/${row.testRun!.id}`);
+                      }}
+                    >
+                      {row.testRun.code} - {row.testRun.name}
+                    </a>
+                  ) : (
+                    '-'
+                  )
+                }
+              />
+              <Column
+                header="Modul"
+                body={(row: IssueWithDetails) => row.testCase?.module?.name ?? '-'}
+              />
+              <Column
+                header="Tag"
+                body={(row: IssueWithDetails) => (
+                  <div className="flex flex-wrap gap-1">
+                    {row.testCase?.tags.map((t) => <Tag key={t.id} value={t.name} severity="info" />) ?? '-'}
+                  </div>
+                )}
+              />
               <Column field="priority" header="Prioritas" sortable body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} />
               <Column
                 field="status"
@@ -876,6 +1071,7 @@ export function ProjectDetailPage() {
                         issueService.changeStatus(row.id, e.value);
                         setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, status: e.value } : i)));
                       }}
+                      disabled={!canManageIssues}
                       className="w-11rem"
                     />
                   </div>
@@ -895,6 +1091,7 @@ export function ProjectDetailPage() {
                       }}
                       placeholder="Belum ditugaskan"
                       showClear
+                      disabled={!canManageIssues}
                       className="w-11rem"
                     />
                   </div>
@@ -907,26 +1104,51 @@ export function ProjectDetailPage() {
                   <RowActionsMenu
                     items={[
                       { label: 'Buka Detail', icon: 'pi pi-external-link', command: () => navigate(`/issues/${row.id}`) },
-                      {
-                        label: 'Hapus',
-                        icon: 'pi pi-trash',
-                        className: 'p-error',
-                        command: () => {
-                          confirmDialog({
-                            header: 'Hapus Issue',
-                            message: `Issue "${row.title}" akan dihapus permanen. Lanjutkan?`,
-                            icon: 'pi pi-exclamation-triangle',
-                            acceptLabel: 'Hapus',
-                            rejectLabel: 'Batal',
-                            acceptClassName: 'p-button-danger',
-                            accept: async () => {
-                              await issueService.remove(row.id);
-                              await loadAll(false);
-                              toast.current?.show({ severity: 'success', summary: 'Issue dihapus' });
+                      ...(canDeleteContent
+                        ? [
+                          {
+                            label: 'Hapus',
+                            icon: 'pi pi-trash',
+                            className: 'p-error',
+                            command: () => {
+                              confirmDialog({
+                                header: 'Hapus Issue',
+                                message: `Issue "${row.title}" akan dihapus permanen. Lanjutkan?`,
+                                icon: 'pi pi-exclamation-triangle',
+                                acceptLabel: 'Hapus',
+                                rejectLabel: 'Batal',
+                                acceptClassName: 'p-button-danger',
+                                accept: async () => {
+                                  await issueService.remove(row.id);
+                                  await loadAll();
+                                  toast.current?.show({ severity: 'success', summary: 'Issue dihapus' });
+                                },
+                              });
                             },
-                          });
-                        },
-                      },
+                          },
+                        ]
+                        : canManageIssues && row.status !== 'closed'
+                          ? [
+                            {
+                              label: 'Arsipkan',
+                              icon: 'pi pi-inbox',
+                              command: () => {
+                                confirmDialog({
+                                  header: 'Arsipkan Issue',
+                                  message: `Issue "${row.title}" akan diarsipkan (ditutup). Lanjutkan?`,
+                                  icon: 'pi pi-info-circle',
+                                  acceptLabel: 'Arsipkan',
+                                  rejectLabel: 'Batal',
+                                  accept: async () => {
+                                    await issueService.changeStatus(row.id, 'closed');
+                                    setIssues((prev) => prev.map((i) => (i.id === row.id ? { ...i, status: 'closed' } : i)));
+                                    toast.current?.show({ severity: 'success', summary: 'Issue diarsipkan' });
+                                  },
+                                });
+                              },
+                            },
+                          ]
+                          : []),
                     ]}
                   />
                 )}

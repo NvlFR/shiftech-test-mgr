@@ -13,6 +13,17 @@ export const projectMemberRepository = {
     return (data ?? []).map(mapProjectMemberWithProfileRow);
   },
 
+  async findOwnRole(projectId: string, userId: string): Promise<ProjectMemberRole | null> {
+    const { data, error } = await supabase
+      .from('project_members')
+      .select('role')
+      .eq('project_id', projectId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) throw error;
+    return data?.role ?? null;
+  },
+
   async add(projectId: string, userId: string, role: ProjectMemberRole): Promise<ProjectMemberWithProfile> {
     const { data, error } = await supabase
       .from('project_members')

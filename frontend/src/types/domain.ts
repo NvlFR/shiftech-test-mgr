@@ -24,7 +24,7 @@ export interface Project {
   updatedAt: string;
 }
 
-export type ProjectMemberRole = 'manager' | 'member';
+export type ProjectMemberRole = 'manager' | 'supervisor' | 'tester' | 'member';
 
 export interface ProjectMember {
   id: string;
@@ -104,7 +104,7 @@ export interface TestPlanCase {
 }
 
 export interface TestPlanCaseWithDetails extends TestPlanCase {
-  testCase: TestCase;
+  testCase: TestCaseWithDetails;
 }
 
 export type TestRunStatus = 'in_progress' | 'completed';
@@ -117,6 +117,7 @@ export interface TestRun {
   status: TestRunStatus;
   startedAt: string;
   completedAt: string | null;
+  notes: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -145,6 +146,7 @@ export type IssueStatus = 'open' | 'in_progress' | 'resolved' | 'verified' | 'cl
 
 export interface Issue {
   id: string;
+  code: string;
   testResultId: string;
   title: string;
   description: string | null;
@@ -159,6 +161,15 @@ export interface Issue {
 
 export interface IssueWithDetails extends Issue {
   assignee: Profile | null;
-  testCase: { id: string; code: string; title: string } | null;
+  testCase:
+    | {
+        id: string;
+        code: string;
+        title: string;
+        priority: TestCasePriority;
+        module: Module | null;
+        tags: Tag[];
+      }
+    | null;
   testRun: { id: string; code: string; name: string } | null;
 }
