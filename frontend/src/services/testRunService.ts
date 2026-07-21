@@ -63,8 +63,8 @@ export const testRunService = {
 
   // "Completed" is always a manual action (per product decision) — never inferred
   // automatically from every result being filled in.
-  complete(id: string) {
-    return testRunRepository.updateStatus(id, 'completed');
+  complete(id: string, notes?: string | null) {
+    return testRunRepository.updateStatus(id, 'completed', notes);
   },
 
   reopen(id: string) {

@@ -16,7 +16,7 @@ export const testRunRepository = {
 
   // Cross-plan listing for a whole project — joins through test_plans since
   // test_runs only has test_plan_id, not project_id directly.
-  async findAllByProject(projectId: string): Promise<(TestRun & { testPlanName: string })[]> {
+  async findAllByProject(projectId: string): Promise<(TestRun & { testPlanId: string; testPlanName: string })[]> {
     const { data, error } = await supabase
       .from('test_runs')
       .select('*, test_plan:test_plans!inner(project_id, name)')
@@ -24,7 +24,11 @@ export const testRunRepository = {
       .order('started_at', { ascending: false });
 
     if (error) throw error;
-    return (data ?? []).map((row: any) => ({ ...mapTestRunRow(row), testPlanName: row.test_plan.name }));
+    return (data ?? []).map((row: any) => ({
+      ...mapTestRunRow(row),
+      testPlanId: row.test_plan_id,
+      testPlanName: row.test_plan.name,
+    }));
   },
 
   async findById(id: string): Promise<TestRun | null> {
@@ -51,9 +55,10 @@ export const testRunRepository = {
     return mapTestRunRow(data);
   },
 
-  async updateStatus(id: string, status: TestRunStatus): Promise<TestRun> {
+  async updateStatus(id: string, status: TestRunStatus, notes?: string | null): Promise<TestRun> {
     const payload: Record<string, unknown> = { status };
     if (status === 'completed') payload.completed_at = new Date().toISOString();
+    if (notes !== undefined) payload.notes = notes;
     const { data, error } = await supabase.from('test_runs').update(payload).eq('id', id).select('*').single();
     if (error) throw error;
     return mapTestRunRow(data);
