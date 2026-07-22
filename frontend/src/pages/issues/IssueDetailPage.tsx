@@ -10,10 +10,14 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { issueService } from '../../services/issueService';
+import { issueAttachmentService } from '../../services/issueAttachmentService';
+import type { IssueAttachment } from '../../types/domain';
 import { profileService } from '../../services/profileService';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
+import { useAuthContext } from '../../hooks/useAuth';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
+import { CommentsPanel } from '../../components/ui/CommentsPanel';
 import type { BreadcrumbItem } from '../../components/ui/Breadcrumb';
 import type { IssuePriority, IssueStatus, IssueWithDetails, Profile } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
@@ -41,11 +45,16 @@ export function IssueDetailPage() {
   const [searchParams] = useSearchParams();
   const testRunId = searchParams.get('testRunId');
   const toast = useRef<Toast>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
+  const { profile } = useAuthContext();
 
   const [issue, setIssue] = useState<IssueDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [projectName, setProjectName] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<IssueAttachment[]>([]);
+  const [attachmentsLoading, setAttachmentsLoading] = useState(false);
+  const [attachmentUploading, setAttachmentUploading] = useState(false);
   const { canManageIssues, canDeleteContent } = useProjectRole(issue?.projectId ?? undefined);
 
   async function reload() {
@@ -62,6 +71,21 @@ export function IssueDetailPage() {
       setApprovedUsers(users.filter((p) => p.role === 'user' || p.role === 'admin'));
       setLoading(false);
     });
+  }, [id]);
+
+  async function reloadAttachments() {
+    if (!id) return;
+    setAttachmentsLoading(true);
+    try {
+      setAttachments(await issueAttachmentService.listByIssue(id));
+    } finally {
+      setAttachmentsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void reloadAttachments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -160,6 +184,49 @@ export function IssueDetailPage() {
         toast.current?.show({ severity: 'success', summary: 'Issue diarsipkan' });
       },
     });
+  }
+
+  async function handleAttachmentSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !issue || !profile) return;
+
+    setAttachmentUploading(true);
+    try {
+      const attachment = await issueAttachmentService.upload(issue.id, file, profile.id);
+      setAttachments((current) => [attachment, ...current]);
+      toast.current?.show({ severity: 'success', summary: 'Attachment berhasil diupload' });
+    } catch (err) {
+      toast.current?.show({ severity: 'error', summary: 'Upload attachment gagal', detail: err instanceof Error ? err.message : undefined });
+    } finally {
+      setAttachmentUploading(false);
+    }
+  }
+
+  function handleRemoveAttachment(attachment: IssueAttachment) {
+    confirmDialog({
+      header: 'Hapus Attachment',
+      message: `File "${attachment.fileName}" akan dihapus permanen. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        try {
+          await issueAttachmentService.remove(attachment);
+          setAttachments((current) => current.filter((item) => item.id !== attachment.id));
+          toast.current?.show({ severity: 'success', summary: 'Attachment dihapus' });
+        } catch (err) {
+          toast.current?.show({ severity: 'error', summary: 'Gagal menghapus attachment', detail: err instanceof Error ? err.message : undefined });
+        }
+      },
+    });
+  }
+
+  function formatFileSize(size: number) {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   if (loading || !issue) {
@@ -305,6 +372,44 @@ export function IssueDetailPage() {
           <p className="m-0" style={{ whiteSpace: 'pre-wrap' }}>{issue.expectedResult}</p>
         </Card>
       )}
+
+      {issue.projectId && <CommentsPanel projectId={issue.projectId} targetType="issue" targetId={issue.id} canManage={canManageIssues} />}
+
+      <Card title={`Attachment (${attachments.length})`} className="mb-3">
+        <div className="flex justify-content-between align-items-center gap-2 mb-3">
+          <span className="text-color-secondary text-sm">Maksimal 10 MB per file.</span>
+          {canManageIssues && (
+            <>
+              <input ref={attachmentInputRef} type="file" onChange={handleAttachmentSelected} hidden />
+              <Button label="Upload File" icon="pi pi-upload" size="small" onClick={() => attachmentInputRef.current?.click()} loading={attachmentUploading} />
+            </>
+          )}
+        </div>
+        {attachmentsLoading ? (
+          <span className="text-color-secondary">Memuat attachment...</span>
+        ) : attachments.length === 0 ? (
+          <span className="text-color-secondary">Belum ada attachment.</span>
+        ) : (
+          <div className="flex flex-column gap-2">
+            {attachments.map((attachment) => (
+              <div key={attachment.id} className="flex align-items-center justify-content-between gap-2 border-1 surface-border border-round p-2">
+                <div className="flex align-items-center gap-2 min-w-0">
+                  <i className="pi pi-paperclip text-primary" />
+                  {attachment.url ? (
+                    <a href={attachment.url} target="_blank" rel="noreferrer" className="entity-link white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                      {attachment.fileName}
+                    </a>
+                  ) : (
+                    <span>{attachment.fileName}</span>
+                  )}
+                  <span className="text-color-secondary text-sm">({formatFileSize(attachment.sizeBytes)})</span>
+                </div>
+                {canManageIssues && <Button icon="pi pi-trash" severity="danger" text rounded aria-label={`Hapus ${attachment.fileName}`} onClick={() => handleRemoveAttachment(attachment)} />}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       {/* --- Edit Dialog --- */}
       <Dialog header="Edit Issue" visible={editDialogOpen} onHide={() => setEditDialogOpen(false)} style={{ width: '32rem' }}>

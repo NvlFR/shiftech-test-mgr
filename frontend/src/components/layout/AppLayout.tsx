@@ -4,6 +4,7 @@ import { AppTopbar } from './AppTopbar';
 import { AppSidebar, AppSidebarMask } from './AppSidebar';
 import { LayoutProvider, useLayoutContext } from './LayoutContext';
 import { BreadcrumbProvider } from './BreadcrumbContext';
+import { ProjectProvider } from '../../hooks/useProjectContext';
 
 function AppLayoutInner() {
   const { menuActive } = useLayoutContext();
@@ -30,7 +31,9 @@ export function AppLayout() {
   return (
     <LayoutProvider>
       <BreadcrumbProvider>
-        <AppLayoutInner />
+        <ProjectProvider>
+          <AppLayoutInner />
+        </ProjectProvider>
       </BreadcrumbProvider>
     </LayoutProvider>
   );

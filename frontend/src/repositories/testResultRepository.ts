@@ -27,7 +27,7 @@ export const testResultRepository = {
     }));
   },
 
-  async getSummaryByRunIds(runIds: string[]): Promise<Record<string, { total: number; pass: number; fail: number }>> {
+  async getSummaryByRunIds(runIds: string[]): Promise<Record<string, { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number }>> {
     if (runIds.length === 0) return {};
     const { data, error } = await supabase
       .from('test_results')
@@ -35,14 +35,17 @@ export const testResultRepository = {
       .in('test_run_id', runIds);
 
     if (error) throw error;
-    const map: Record<string, { total: number; pass: number; fail: number }> = {};
-    for (const runId of runIds) map[runId] = { total: 0, pass: 0, fail: 0 };
+    const map: Record<string, { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number }> = {};
+    for (const runId of runIds) map[runId] = { total: 0, pass: 0, fail: 0, skip: 0, blocked: 0, notRun: 0 };
     for (const row of data ?? []) {
       const entry = map[row.test_run_id];
       if (!entry) continue;
       entry.total++;
       if (row.status === 'pass') entry.pass++;
       if (row.status === 'fail') entry.fail++;
+      if (row.status === 'skip') entry.skip++;
+      if (row.status === 'blocked') entry.blocked++;
+      if (row.status === 'not_run') entry.notRun++;
     }
     return map;
   },

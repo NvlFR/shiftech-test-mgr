@@ -169,3 +169,35 @@ Lihat `frontend/src/types/domain.ts` untuk tipe lengkap, dan `supabase/schema*.s
 - [`docs/TASKS.md`](docs/TASKS.md) — Work breakdown (Epic → Feature → Task) dengan status.
 - [`FEATURES.md`](./FEATURES.md) — Checklist status fitur per modul.
 - [`TODO.md`](./TODO.md) — Sprint board aktif. **Titik mulai sesi kerja.**
+
+---
+
+## Wajib Menggunakan Graphify
+
+Repository ini memiliki knowledge graph pada `graphify-out/` untuk membantu
+menelusuri struktur codebase dengan konteks yang lebih kecil dan hemat token.
+
+- Semua agent WAJIB menggunakan Graphify terlebih dahulu saat menelusuri atau
+  membaca struktur codebase, dependency, relasi antar file, modul, service,
+  repository, schema, atau alur fitur.
+- Untuk codebase question, jalankan `graphify query "<question>"` terlebih
+  dahulu. Gunakan `graphify path "<A>" "<B>"` untuk relasi dan `graphify explain
+  "<concept>"` untuk konsep tertentu.
+- Setelah hasil Graphify didapat, baca file sumber hanya pada node, path, dan
+  relasi yang relevan. Gunakan `rg` atau `find` setelah Graphify untuk detail
+  simbol atau verifikasi, bukan sebagai langkah awal penelusuran struktur.
+- Jika `graphify-out/graph.json` belum ada atau stale, buat/perbarui graph
+  terlebih dahulu dengan `graphify extract . --code-only` atau `graphify update .`.
+- Setelah mengubah kode, jalankan `graphify update .` agar knowledge graph tetap
+  sinkron.
+
+## Worklog Wajib
+
+- Semua agent WAJIB selalu mencatat pekerjaan di `WORKLOG.md`.
+- Catat setiap perubahan kode, konfigurasi, database, instalasi tool/dependency,
+  keputusan teknis, hasil verifikasi, warning, dan blocker.
+- Tambahkan entri baru dengan tanggal dan ringkasan singkat; jangan menghapus
+  atau menimpa histori pekerjaan sebelumnya.
+- Jika `WORKLOG.md` belum ada, buat file tersebut sebelum menyelesaikan tugas.
+- Sebelum menyatakan tugas selesai, pastikan perubahan yang dilakukan sudah
+  tercatat di `WORKLOG.md`.

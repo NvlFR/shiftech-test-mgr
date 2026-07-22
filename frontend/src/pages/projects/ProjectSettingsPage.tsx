@@ -20,8 +20,10 @@ import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { profileService } from '../../services/profileService';
 import { projectMemberService } from '../../services/projectMemberService';
+import { environmentService } from '../../services/environmentService';
+import { useEnvironments } from '../../hooks/useEnvironments';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import type { Project, Module, Tag as TagEntity, Profile, ProjectMemberWithProfile, ProjectMemberRole } from '../../types/domain';
+import type { Project, Module, Tag as TagEntity, Profile, ProjectMemberWithProfile, ProjectMemberRole, Environment } from '../../types/domain';
 import { PROJECT_MEMBER_ROLE_LABEL } from '../../helpers/statusLabels';
 import { Tag } from 'primereact/tag';
 import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
@@ -38,6 +40,7 @@ export function ProjectSettingsPage() {
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const { loading: roleLoading, canManageSettings, canArchiveProject, canDeleteProject } = useProjectRole(id);
+  const { environments, loading: environmentsLoading, reload: reloadEnvironments } = useEnvironments(id ?? null);
 
   const [project, setProject] = useState<Project | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
@@ -236,6 +239,56 @@ export function ProjectSettingsPage() {
     });
   }
 
+  // --- Environments ---
+  const [environmentDialogOpen, setEnvironmentDialogOpen] = useState(false);
+  const [editingEnvironmentId, setEditingEnvironmentId] = useState<string | null>(null);
+  const [environmentName, setEnvironmentName] = useState('');
+  const [environmentBaseUrl, setEnvironmentBaseUrl] = useState('');
+  const [environmentError, setEnvironmentError] = useState<string | null>(null);
+
+  function openCreateEnvironmentDialog() {
+    setEditingEnvironmentId(null);
+    setEnvironmentName('');
+    setEnvironmentBaseUrl('');
+    setEnvironmentError(null);
+    setEnvironmentDialogOpen(true);
+  }
+
+  function openEditEnvironmentDialog(row: Environment) {
+    setEditingEnvironmentId(row.id);
+    setEnvironmentName(row.name);
+    setEnvironmentBaseUrl(row.baseUrl ?? '');
+    setEnvironmentError(null);
+    setEnvironmentDialogOpen(true);
+  }
+
+  async function handleSaveEnvironment() {
+    if (!id) return;
+    setEnvironmentError(null);
+    try {
+      if (editingEnvironmentId) await environmentService.update(editingEnvironmentId, { name: environmentName, baseUrl: environmentBaseUrl });
+      else await environmentService.create({ projectId: id, name: environmentName, baseUrl: environmentBaseUrl });
+      setEnvironmentDialogOpen(false);
+      await reloadEnvironments();
+      toast.current?.show({ severity: 'success', summary: editingEnvironmentId ? 'Environment diperbarui' : 'Environment dibuat' });
+    } catch (err) {
+      setEnvironmentError(err instanceof Error ? err.message : 'Gagal menyimpan environment');
+    }
+  }
+
+  function handleDeleteEnvironment(row: Environment) {
+    confirmDialog({
+      header: 'Hapus Environment',
+      message: `Environment "${row.name}" akan dihapus. Histori test run tetap tersimpan, tetapi tidak lagi memiliki referensi environment. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle', acceptLabel: 'Hapus', rejectLabel: 'Batal', acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await environmentService.remove(row.id);
+        await reloadEnvironments();
+        toast.current?.show({ severity: 'success', summary: 'Environment dihapus' });
+      },
+    });
+  }
+
   // --- Members ---
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [memberUserId, setMemberUserId] = useState<string | null>(null);
@@ -321,7 +374,7 @@ export function ProjectSettingsPage() {
       acceptLabel: 'Arsipkan',
       rejectLabel: 'Batal',
       accept: async () => {
-        await projectService.changeStatus(project.id, 'archived');
+        await projectService.archive(project.id);
         setProject({ ...project, status: 'archived' });
         toast.current?.show({ severity: 'success', summary: 'Project diarsipkan' });
       },
@@ -371,6 +424,8 @@ export function ProjectSettingsPage() {
         <div className="flex align-items-center gap-2">
           <Button icon="pi pi-arrow-left" text rounded aria-label="Kembali" onClick={() => navigate(`/projects/${id}`)} />
           <h2 className="m-0">Pengaturan Project — {project.name}</h2>
+          <Button label="Integrasi" icon="pi pi-share-alt" size="small" outlined className="ml-auto" onClick={() => navigate(`/projects/${id}/integrations`)} />
+          <Button label="Backup & Retensi" icon="pi pi-database" size="small" outlined className="ml-auto" onClick={() => navigate(`/projects/${id}/data-management`)} />
         </div>
       </Card>
 
@@ -471,6 +526,23 @@ export function ProjectSettingsPage() {
                   />
                 )}
               />
+            </DataTable>
+          </TabPanel>
+
+          <TabPanel header="Environment">
+            <div className="flex justify-content-between align-items-center mb-2">
+              <span className="text-color-secondary text-sm">Environment yang tersedia saat memulai test run.</span>
+              <Button label="Environment Baru" icon="pi pi-plus" size="small" onClick={openCreateEnvironmentDialog} />
+            </div>
+            <DataTable value={environments} loading={environmentsLoading} emptyMessage="Belum ada environment" size="small">
+              <Column field="name" header="Nama" />
+              <Column field="baseUrl" header="Base URL" body={(row: Environment) => row.baseUrl ?? '-'} />
+              <Column header="" style={{ width: '7rem' }} body={(row: Environment) => (
+                <div className="flex gap-1">
+                  <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit" onClick={() => openEditEnvironmentDialog(row)} />
+                  <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Hapus" onClick={() => handleDeleteEnvironment(row)} />
+                </div>
+              )} />
             </DataTable>
           </TabPanel>
 
@@ -584,6 +656,26 @@ export function ProjectSettingsPage() {
             />
           </div>
           <Button label="Simpan" size="small" onClick={handleSaveModule} />
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={editingEnvironmentId ? 'Edit Environment' : 'Environment Baru'}
+        visible={environmentDialogOpen}
+        onHide={() => setEnvironmentDialogOpen(false)}
+        style={{ width: '28rem' }}
+      >
+        <div className="flex flex-column gap-3">
+          {environmentError && <small className="p-error">{environmentError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="environment-name">Nama Environment</label>
+            <InputText id="environment-name" value={environmentName} onChange={(e) => setEnvironmentName(e.target.value)} placeholder="Development, Staging, UAT, Production" autoFocus />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="environment-base-url">Base URL (opsional)</label>
+            <InputText id="environment-base-url" value={environmentBaseUrl} onChange={(e) => setEnvironmentBaseUrl(e.target.value)} placeholder="https://staging.example.com" />
+          </div>
+          <Button label="Simpan" size="small" onClick={handleSaveEnvironment} />
         </div>
       </Dialog>
 

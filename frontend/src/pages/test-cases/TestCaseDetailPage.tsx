@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Card } from 'primereact/card';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { Chip } from 'primereact/chip';
@@ -12,12 +14,14 @@ import { Dropdown } from 'primereact/dropdown';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
+import { CommentsPanel } from '../../components/ui/CommentsPanel';
 import { testCaseService } from '../../services/testCaseService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import type { Module, Tag as TagEntity, TestCasePriority, TestCaseWithDetails } from '../../types/domain';
+import type { Module, Tag as TagEntity, TestCasePriority, TestCaseVersion, TestCaseWithDetails } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
+import { AttachmentPanel } from '../../components/ui/AttachmentPanel';
 import {
   TEST_CASE_PRIORITY_LABEL,
   TEST_CASE_PRIORITY_SEVERITY,
@@ -44,19 +48,22 @@ export function TestCaseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [modules, setModules] = useState<Module[]>([]);
   const [tags, setTags] = useState<TagEntity[]>([]);
+  const [versions, setVersions] = useState<TestCaseVersion[]>([]);
   const { canEditContent, canDeleteContent } = useProjectRole(testCase?.project.id);
 
   async function reload() {
     if (!id) return;
     const result = await testCaseService.getByIdWithDetails(id);
     setTestCase(result as TestCaseDetail | null);
+    setVersions(await testCaseService.listVersions(id));
   }
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    testCaseService.getByIdWithDetails(id).then((result) => {
+    Promise.all([testCaseService.getByIdWithDetails(id), testCaseService.listVersions(id)]).then(([result, history]) => {
       setTestCase(result as TestCaseDetail | null);
+      setVersions(history);
       setLoading(false);
     });
   }, [id]);
@@ -205,6 +212,17 @@ export function TestCaseDetailPage() {
     });
   }
 
+  async function handleDuplicate() {
+    if (!testCase) return;
+    try {
+      const duplicate = await testCaseService.duplicate(testCase.id);
+      toast.current?.show({ severity: 'success', summary: 'Test case diduplikasi' });
+      navigate(`/test-cases/${duplicate.id}?projectId=${testCase.project.id}`);
+    } catch (err) {
+      toast.current?.show({ severity: 'error', summary: 'Duplikasi gagal', detail: err instanceof Error ? err.message : undefined });
+    }
+  }
+
   if (loading || !testCase) {
     return (
       <div>
@@ -240,6 +258,7 @@ export function TestCaseDetailPage() {
           <h2>Test Case Detail</h2>
         </div>
         <div className="flex gap-2">
+          {canEditContent && <Button label="Duplikat" icon="pi pi-copy" size="small" outlined onClick={handleDuplicate} />}
           {canEditContent && <Button label="Edit" icon="pi pi-pencil" size="small" outlined onClick={openEditDialog} />}
           {canDeleteContent && <Button label="Hapus" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleDelete} />}
         </div>
@@ -302,11 +321,19 @@ export function TestCaseDetailPage() {
         <p className="m-0" style={{ whiteSpace: 'pre-wrap' }}>{testCase.expectedResult}</p>
       </Card>
 
+      <Card title="Riwayat perubahan steps & expected result" className="mb-3">
+        <DataTable value={versions} size="small" emptyMessage="Belum ada riwayat versi"><Column field="version" header="Versi" /><Column field="createdAt" header="Waktu" body={(row: TestCaseVersion) => formatDateTime(row.createdAt)} /><Column field="steps" header="Steps" /><Column field="expectedResult" header="Expected result" /></DataTable>
+      </Card>
+
+      <AttachmentPanel kind="test_case" entityId={testCase.id} canUpload={canEditContent} canDelete={canDeleteContent} />
+
       {testCase.notes && (
         <Card title="Catatan" className="mb-3">
           <p className="m-0" style={{ whiteSpace: 'pre-wrap' }}>{testCase.notes}</p>
         </Card>
       )}
+
+      <CommentsPanel projectId={testCase.project.id} targetType="test_case" targetId={testCase.id} canManage={canEditContent} />
 
       {/* --- Edit Dialog --- */}
       <Dialog header="Edit Test Case" visible={editDialogOpen} onHide={() => setEditDialogOpen(false)} style={{ width: '40rem' }}>

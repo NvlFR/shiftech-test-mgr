@@ -26,6 +26,15 @@ export interface Project {
 
 export type ProjectMemberRole = 'manager' | 'supervisor' | 'tester' | 'member';
 
+export type ApiTokenScope = 'read:project' | 'write:test-runs' | 'write:test-results' | 'write:issues';
+export interface ApiToken { id: string; projectId: string; name: string; tokenPrefix: string; scopes: ApiTokenScope[]; revokedAt: string | null; createdAt: string; updatedAt: string; }
+export interface CreatedApiToken extends ApiToken { token: string; }
+export type WebhookEvent = 'test_run.created' | 'test_run.updated' | 'test_result.updated' | 'issue.created' | 'issue.updated';
+export interface Webhook { id: string; projectId: string; name: string; url: string; events: WebhookEvent[]; isActive: boolean; maxRetries: number; createdAt: string; updatedAt: string; }
+export interface CreatedWebhook extends Webhook { secret: string; }
+export type WebhookDeliveryStatus = 'pending' | 'delivered' | 'retrying' | 'failed';
+export interface WebhookDelivery { id: string; webhookId: string; projectId: string; event: WebhookEvent; resourceId: string; status: WebhookDeliveryStatus; attemptCount: number; nextAttemptAt: string; responseStatus: number | null; deliveredAt: string | null; lastError: string | null; createdAt: string; }
+
 export interface ProjectMember {
   id: string;
   projectId: string;
@@ -67,6 +76,15 @@ export interface TestPlan {
   updatedAt: string;
 }
 
+export interface Environment {
+  id: string;
+  projectId: string;
+  name: string;
+  baseUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Test Case is a reusable template — it never stores a pass/fail result itself.
 // Results live on TestResult, one row per (TestRun x TestCase).
 export type TestCasePriority = 'low' | 'medium' | 'high' | 'critical';
@@ -85,13 +103,53 @@ export interface TestCase {
   priority: TestCasePriority;
   status: TestCaseStatus;
   notes: string | null;
+  assignedTo: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
+export interface TestCaseVersion {
+  id: string;
+  testCaseId: string;
+  version: number;
+  steps: string;
+  expectedResult: string;
+  changedBy: string | null;
+  createdAt: string;
+}
+
+export type TestCaseFilters = {
+  moduleId?: string | null;
+  tagId?: string | null;
+  priority?: TestCasePriority | null;
+  status?: TestCaseStatus | null;
+  assignedTo?: string | null;
+};
+
 export interface TestCaseWithDetails extends TestCase {
   module: Module | null;
   tags: Tag[];
+}
+
+export type CommentTargetType = 'test_case' | 'issue';
+
+export interface CommentMention {
+  commentId: string;
+  mentionedUserId: string;
+  profile: Profile;
+}
+
+export interface Comment {
+  id: string;
+  projectId: string;
+  targetType: CommentTargetType;
+  targetId: string;
+  authorId: string;
+  author: Profile | null;
+  body: string;
+  mentions: CommentMention[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Junction: which test cases are in scope for a plan. No result columns here —
@@ -118,9 +176,42 @@ export interface TestRun {
   startedAt: string;
   completedAt: string | null;
   notes: string | null;
+  environmentId: string | null;
+  browser: string | null;
+  device: string | null;
+  buildVersion: string | null;
+  release: string | null;
+  pipelineId: string | null;
+  branch: string | null;
+  commitSha: string | null;
+  buildNumber: string | null;
+  ciProvider: string | null;
+  externalRunId: string | null;
   createdAt: string;
   updatedAt: string;
 }
+
+export type CicdProvider = 'github_actions' | 'gitlab_ci' | 'jenkins' | 'runner_internal' | 'generic';
+
+export interface CicdPipeline {
+  id: string;
+  projectId: string;
+  testPlanId: string;
+  name: string;
+  provider: CicdProvider;
+  tokenPrefix: string;
+  active: boolean;
+  lastUsedAt: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CicdPipelineSecret { pipeline: CicdPipeline; token: string; }
+export type CicdIngestStatus = Exclude<TestResultStatus, 'not_run'>;
+export interface CicdIngestResultInput { testCaseId?: string; testCaseCode?: string; status: CicdIngestStatus; notes?: string; executedAt?: string; }
+export interface CicdIngestPayload { name?: string; branch?: string; commitSha?: string; buildNumber?: string; externalRunId?: string; environmentId?: string; buildVersion?: string; release?: string; results: CicdIngestResultInput[]; }
+export interface CicdIngestResponse { runId: string; runCode: string; status: TestRunStatus; provider: CicdProvider; summary: { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number; progressPercent: number }; }
 
 export type TestResultStatus = 'pass' | 'fail' | 'skip' | 'blocked' | 'not_run';
 
@@ -132,6 +223,15 @@ export interface TestResult {
   status: TestResultStatus;
   executedAt: string | null;
   notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TestRunAssignment {
+  id: string;
+  testRunId: string;
+  testCaseId: string;
+  testerId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -173,3 +273,132 @@ export interface IssueWithDetails extends Issue {
     | null;
   testRun: { id: string; code: string; name: string } | null;
 }
+
+export interface IssueAttachment {
+  id: string;
+  issueId: string;
+  fileName: string;
+  storagePath: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedBy: string;
+  createdAt: string;
+  url: string | null;
+}
+
+export type AttachmentEntityKind = 'test_case' | 'test_run';
+
+export interface Attachment {
+  id: string;
+  entityKind: AttachmentEntityKind;
+  testCaseId: string | null;
+  testRunId: string | null;
+  fileName: string;
+  storagePath: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedBy: string;
+  createdAt: string;
+  url: string | null;
+}
+
+export interface Notification {
+  id: string;
+  recipientId: string;
+  issueId: string | null;
+  kind: 'issue_assigned' | 'issue_status_changed';
+  message: string;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export type RequirementStatus = 'draft' | 'approved' | 'deprecated';
+export type RequirementPriority = TestCasePriority;
+export type RequirementLinkType = 'test_case' | 'test_plan' | 'test_result' | 'issue';
+export interface Requirement { id: string; projectId: string; key: string; title: string; description: string | null; status: RequirementStatus; priority: RequirementPriority; createdBy: string | null; createdAt: string; updatedAt: string; }
+export interface RequirementLink { id: string; requirementId: string; type: RequirementLinkType; targetId: string; targetLabel: string; createdBy: string | null; createdAt: string; }
+export interface RequirementWithLinks extends Requirement { links: RequirementLink[]; }
+export interface RequirementCoverage { total: number; covered: number; uncovered: number; percentage: number; }
+
+export interface DashboardStats {
+  projects: number;
+  activeProjects: number;
+  testCases: number;
+  activeTestCases: number;
+  testPlans: number;
+  activeTestPlans: number;
+  testRuns: number;
+  inProgressRuns: number;
+  completedRuns: number;
+  results: Record<TestResultStatus, number>;
+  issues: Record<IssueStatus, number>;
+}
+
+export interface DashboardReportFilters {
+  projectId?: string | null;
+  release?: string | null;
+  environmentId?: string | null;
+  testerId?: string | null;
+  dateFrom?: string | null;
+  dateTo?: string | null;
+}
+
+export interface DashboardReportRun {
+  id: string;
+  code: string;
+  name: string;
+  projectId: string;
+  projectName: string;
+  testPlanName: string;
+  environmentName: string | null;
+  release: string | null;
+  status: TestRunStatus;
+  startedAt: string;
+  completedAt: string | null;
+  total: number;
+  executed: number;
+  pass: number;
+  fail: number;
+  skip: number;
+  blocked: number;
+  notRun: number;
+  passRate: number;
+  failRate: number;
+  progressPercent: number;
+}
+
+export interface DashboardIssueAging {
+  total: number;
+  open: number;
+  inProgress: number;
+  resolved: number;
+  closed: number;
+  averageDays: number;
+  oldestDays: number;
+}
+
+export interface DashboardReport {
+  generatedAt: string;
+  filters: DashboardReportFilters;
+  runs: DashboardReportRun[];
+  totals: {
+    totalRuns: number;
+    totalResults: number;
+    executed: number;
+    pass: number;
+    fail: number;
+    skip: number;
+    blocked: number;
+    notRun: number;
+    passRate: number;
+    failRate: number;
+    progressPercent: number;
+  };
+  issueAging: DashboardIssueAging;
+}
+
+export interface RetentionPolicy { id: string; projectId: string | null; retentionDays: number; attachmentRetentionDays: number | null; enabled: boolean; createdBy: string | null; createdAt: string; updatedAt: string; }
+export interface RetentionCleanupPreview { projectId: string | null; attachmentCutoff: string; testAttachmentCount: number; issueAttachmentCount: number; }
+export interface RetentionCleanupResult { testAttachments: number; issueAttachments: number; cutoff: string; }
+export interface RestorePreview { valid: boolean; projectName: string; modules: number; tags: number; testCases: number; testPlans: number; testRuns: number; testResults: number; issues: number; attachments: number; }
+export interface RestoreResult { projectId: string; inserted: number; skipped: number; }

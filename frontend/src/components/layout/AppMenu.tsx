@@ -62,8 +62,9 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
 
   const mainItems: MenuItemModel[] = [
     { label: 'Home', icon: 'pi pi-home', url: '/home' },
+    { label: 'Trend & Reporting', icon: 'pi pi-chart-line', url: '/dashboard' },
     { label: 'Projects', icon: 'pi pi-folder', url: '/', end: true },
-    ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }] : []),
+    ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }, { label: 'Retensi Global', icon: 'pi pi-database', url: '/admin/data-retention' }] : []),
   ];
 
   return (
@@ -123,6 +124,12 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
               }}
             >
               <i className={isPinned(project.id) ? 'pi pi-star-fill' : 'pi pi-star'} />
+            </button>
+            <button type="button" className="layout-submenu-pin" title="Requirements" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/requirements`); }}>
+              <i className="pi pi-sitemap" />
+            </button>
+            <button type="button" className="layout-submenu-pin" title="Integrasi CI/CD" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/integrations/cicd`); }}>
+              <i className="pi pi-bolt" />
             </button>
           </li>
         ))}

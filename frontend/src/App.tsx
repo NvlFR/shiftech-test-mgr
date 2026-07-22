@@ -17,6 +17,11 @@ import { TestRunIssuesPage } from './pages/test-runs/TestRunIssuesPage';
 import { IssueDetailPage } from './pages/issues/IssueDetailPage';
 import { UserManagementPage } from './pages/users/UserManagementPage';
 import { UserDetailPage } from './pages/users/UserDetailPage';
+import { RequirementsPage } from './pages/requirements/RequirementsPage';
+import { CicdIntegrationPage } from './pages/integrations/CicdIntegrationPage';
+import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
+import { ProjectDataManagementPage } from './pages/projects/ProjectDataManagementPage';
+import { DashboardReportPage } from './pages/dashboard/DashboardReportPage';
 
 function App() {
   return (
@@ -28,8 +33,13 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<ProjectsPage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/dashboard" element={<DashboardReportPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/projects/:id/settings" element={<ProjectSettingsPage />} />
+          <Route path="/projects/:id/integrations" element={<IntegrationsPage />} />
+          <Route path="/projects/:id/requirements" element={<RequirementsPage />} />
+          <Route path="/projects/:id/integrations/cicd" element={<CicdIntegrationPage />} />
+          <Route path="/projects/:id/data-management" element={<ProjectDataManagementPage />} />
           <Route path="/test-plans" element={<TestPlansPage />} />
           <Route path="/test-plans/:id" element={<TestPlanDetailPage />} />
           <Route path="/test-cases" element={<TestCasesPage />} />
@@ -39,6 +49,7 @@ function App() {
           <Route path="/issues/:id" element={<IssueDetailPage />} />
 
           <Route element={<AdminRoute />}>
+            <Route path="/admin/data-retention" element={<ProjectDataManagementPage />} />
             <Route path="/users" element={<UserManagementPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
           </Route>

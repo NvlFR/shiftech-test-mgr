@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -7,9 +7,9 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { useTestPlans } from '../../hooks/useTestPlans';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import { projectService } from '../../services/projectService';
+import { useProjectContext } from '../../hooks/useProjectContext';
 import { testPlanService } from '../../services/testPlanService';
-import type { Project, TestPlan, TestPlanStatus } from '../../types/domain';
+import type { TestPlan, TestPlanStatus } from '../../types/domain';
 import { formatDate } from '../../helpers/dateFormatter';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
@@ -20,14 +20,9 @@ const TEST_PLAN_STATUS_OPTIONS: TestPlanStatus[] = ['draft', 'active', 'complete
 export function TestPlansPage() {
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [projectId, setProjectId] = useState<string | null>(null);
+  const { projects, projectId, setProjectId } = useProjectContext();
   const { testPlans, loading, reload } = useTestPlans(projectId);
   const { canEditContent } = useProjectRole(projectId ?? undefined);
-
-  useEffect(() => {
-    projectService.list().then(setProjects);
-  }, []);
 
   async function handleChangeStatus(row: TestPlan, status: TestPlanStatus) {
     if (status === row.status) return;

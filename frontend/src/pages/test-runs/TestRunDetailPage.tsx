@@ -24,6 +24,7 @@ import { testPlanService } from '../../services/testPlanService';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import type { TestPlan } from '../../types/domain';
+import { AttachmentPanel } from '../../components/ui/AttachmentPanel';
 import {
   TEST_RESULT_STATUS_LABEL,
   TEST_RESULT_STATUS_SEVERITY,
@@ -51,7 +52,7 @@ export function TestRunDetailPage() {
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [testPlan, setTestPlan] = useState<TestPlan | null>(null);
   const [projectName, setProjectName] = useState<string | null>(null);
-  const { canRunTests, canManageIssues } = useProjectRole(testPlan?.projectId);
+  const { canRunTests, canManageIssues, canDeleteContent } = useProjectRole(testPlan?.projectId);
 
   const issueCountByResult = runIssues.reduce<Record<string, number>>((acc, issue) => {
     acc[issue.testResultId] = (acc[issue.testResultId] ?? 0) + 1;
@@ -76,6 +77,16 @@ export function TestRunDetailPage() {
   const [resultStatus, setResultStatus] = useState<TestResultStatus>('pass');
   const [resultTesterId, setResultTesterId] = useState<string | null>(null);
   const [resultNotes, setResultNotes] = useState('');
+  const [selectedResults, setSelectedResults] = useState<TestResultWithDetails[]>([]);
+  const [assignmentTesterId, setAssignmentTesterId] = useState<string | null>(null);
+
+  async function handleAssignSelected() {
+    if (!id || !assignmentTesterId || selectedResults.length === 0) return;
+    await testRunService.assign(id, selectedResults.map((result) => result.testCaseId), assignmentTesterId);
+    setSelectedResults([]);
+    await reload();
+    toast.current?.show({ severity: 'success', summary: 'Pembagian eksekusi diperbarui' });
+  }
 
   function openResultDialog(row: TestResultWithDetails) {
     setActiveResult(row);
@@ -214,7 +225,18 @@ export function TestRunDetailPage() {
         <ProgressBar value={summary.progressPercent} showValue={false} />
       </div>
 
-      <DataTable value={results} loading={loading} paginator rows={10} emptyMessage="Belum ada test case" size="small">
+      {testRun && <AttachmentPanel kind="test_run" entityId={testRun.id} canUpload={canRunTests} canDelete={canDeleteContent} />}
+
+      {canRunTests && (
+        <div className="flex align-items-center gap-2 flex-wrap mb-2">
+          <span className="text-sm text-color-secondary">Bagi test case terpilih:</span>
+          <Dropdown value={assignmentTesterId} options={approvedUsers.map((u) => ({ label: u.fullName ?? u.email, value: u.id }))} onChange={(e) => setAssignmentTesterId(e.value)} placeholder="Pilih tester" showClear className="w-15rem" />
+          <Button label="Tetapkan" icon="pi pi-users" size="small" onClick={handleAssignSelected} disabled={!assignmentTesterId || selectedResults.length === 0} />
+        </div>
+      )}
+
+      <DataTable value={results} selection={selectedResults} onSelectionChange={(e) => setSelectedResults(e.value as TestResultWithDetails[])} selectionMode="multiple" loading={loading} paginator rows={10} emptyMessage="Belum ada test case" size="small">
+        {canRunTests && <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />}
         <Column field="testCase.code" header="Kode" sortable style={{ width: '7rem' }} />
         <Column field="testCase.title" header="Test Case" sortable />
         <Column

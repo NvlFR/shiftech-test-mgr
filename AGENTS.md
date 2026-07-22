@@ -231,3 +231,30 @@ Page/Component → Hook → Service → Repository → Supabase
 - `docs/TASKS.md` — Work breakdown (Epic → Feature → Task)
 - `FEATURES.md` — Feature status checklist
 - `TODO.md` — Active sprint board
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+Rules:
+- Semua agent WAJIB menggunakan Graphify terlebih dahulu saat menelusuri atau membaca struktur codebase, dependency, relasi antar file, modul, service, repository, schema, atau alur fitur. Ini berlaku untuk pertanyaan analisis, debugging, review, dan implementasi.
+- Langkah awal wajib: gunakan `graphify query`, `graphify path`, atau `graphify explain` sesuai kebutuhan sebelum membuka banyak file atau menjalankan pencarian struktur dengan `rg`/`find`. Tujuannya mempersempit konteks dan menghemat token.
+- Setelah hasil Graphify didapat, baca file sumber hanya pada node, path, dan relasi yang relevan. Pencarian langsung boleh digunakan sebagai langkah lanjutan untuk detail simbol atau verifikasi.
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+
+## Worklog Wajib
+
+- Semua agent WAJIB selalu mencatat pekerjaan di `WORKLOG.md`.
+- Catat setiap perubahan kode, konfigurasi, database, instalasi tool/dependency,
+  keputusan teknis, hasil verifikasi, warning, dan blocker.
+- Tambahkan entri baru dengan tanggal dan ringkasan singkat; jangan menghapus
+  atau menimpa histori pekerjaan sebelumnya.
+- Jika `WORKLOG.md` belum ada, buat file tersebut sebelum menyelesaikan tugas.
+- Sebelum menyatakan tugas selesai, pastikan perubahan yang dilakukan sudah
+  tercatat di `WORKLOG.md`.

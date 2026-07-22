@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { testRunService } from '../services/testRunService';
 import type { TestRun } from '../types/domain';
+import type { TestRunFilters } from '../repositories/testRunRepository';
 
 export interface TestRunWithSummary extends TestRun {
   total: number;
@@ -9,7 +10,9 @@ export interface TestRunWithSummary extends TestRun {
   testers: { id: string; fullName: string | null }[];
 }
 
-export function useTestRuns(testPlanId: string | null) {
+const EMPTY_FILTERS: TestRunFilters = {};
+
+export function useTestRuns(testPlanId: string | null, filters: TestRunFilters = EMPTY_FILTERS) {
   const [testRuns, setTestRuns] = useState<TestRunWithSummary[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -20,11 +23,11 @@ export function useTestRuns(testPlanId: string | null) {
     }
     setLoading(true);
     try {
-      setTestRuns(await testRunService.listByPlanWithSummary(testPlanId));
+      setTestRuns(await testRunService.listByPlanWithSummary(testPlanId, filters));
     } finally {
       setLoading(false);
     }
-  }, [testPlanId]);
+  }, [testPlanId, filters]);
 
   useEffect(() => {
     reload();

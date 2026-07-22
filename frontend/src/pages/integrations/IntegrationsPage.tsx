@@ -1,0 +1,32 @@
+import { useState } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
+import { Card } from 'primereact/card';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
+import { MultiSelect } from 'primereact/multiselect';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { TabView, TabPanel } from 'primereact/tabview';
+import { Message } from 'primereact/message';
+import { useProjectRole } from '../../hooks/useProjectRole';
+import { useIntegrations } from '../../hooks/useIntegrations';
+import { integrationService } from '../../services/integrationService';
+import type { ApiTokenScope, WebhookEvent } from '../../types/domain';
+
+const scopeOptions: { label: string; value: ApiTokenScope }[] = [{ label: 'Baca project', value: 'read:project' }, { label: 'Tulis Test Run', value: 'write:test-runs' }, { label: 'Tulis Test Result', value: 'write:test-results' }, { label: 'Tulis Issue', value: 'write:issues' }];
+const eventOptions: { label: string; value: WebhookEvent }[] = ['test_run.created', 'test_run.updated', 'test_result.updated', 'issue.created', 'issue.updated'].map((value) => ({ label: value, value: value as WebhookEvent }));
+
+export function IntegrationsPage() {
+  const { id } = useParams<{ id: string }>(); const { canManageSettings, loading: roleLoading } = useProjectRole(id); const { tokens, webhooks, deliveries, loading, reload } = useIntegrations(id);
+  const [tokenName, setTokenName] = useState(''); const [scopes, setScopes] = useState<ApiTokenScope[]>(['read:project']); const [webhookName, setWebhookName] = useState(''); const [webhookUrl, setWebhookUrl] = useState(''); const [events, setEvents] = useState<WebhookEvent[]>(['test_run.updated']); const [maxRetries, setMaxRetries] = useState(5); const [oneTimeSecret, setOneTimeSecret] = useState<string | null>(null); const [error, setError] = useState<string | null>(null);
+  if (roleLoading) return <p>Memuat...</p>; if (!canManageSettings) return <Navigate to={`/projects/${id}`} replace />;
+  async function createToken() { if (!id) return; setError(null); try { const result = await integrationService.createToken({ projectId: id, name: tokenName, scopes }); setOneTimeSecret(result.token); setTokenName(''); await reload(); } catch (e) { setError(e instanceof Error ? e.message : 'Gagal membuat token'); } }
+  async function createWebhook() { if (!id) return; setError(null); try { const result = await integrationService.createWebhook({ projectId: id, name: webhookName, url: webhookUrl, events, maxRetries }); setOneTimeSecret(result.secret); setWebhookName(''); setWebhookUrl(''); await reload(); } catch (e) { setError(e instanceof Error ? e.message : 'Gagal membuat webhook'); } }
+  return <div><Card className="mb-3"><h2 className="m-0">Integrasi Project</h2><p className="text-color-secondary mb-0">Token dan secret hanya ditampilkan sekali. Simpan di secret manager CI/CD, bukan browser.</p></Card>{error && <Message severity="error" text={error} className="mb-3" />} {oneTimeSecret && <Message severity="warn" text={`Nilai rahasia satu kali: ${oneTimeSecret}`} className="mb-3" />}
+    <Card><TabView>
+      <TabPanel header="API Token"><div className="flex gap-2 mb-3 flex-wrap"><InputText value={tokenName} onChange={(e) => setTokenName(e.target.value)} placeholder="Nama token" /><MultiSelect value={scopes} options={scopeOptions} onChange={(e) => setScopes(e.value)} placeholder="Scope" display="chip" /><Button label="Buat token" icon="pi pi-key" onClick={createToken} /></div><DataTable value={tokens} loading={loading} size="small" emptyMessage="Belum ada token"><Column field="name" header="Nama" /><Column field="tokenPrefix" header="Prefix" /><Column field="scopes" header="Scope" body={(r: typeof tokens[number]) => r.scopes.join(', ')} /><Column field="revokedAt" header="Status" body={(r: typeof tokens[number]) => r.revokedAt ? 'Dicabut' : 'Aktif'} /><Column header="Aksi" body={(r: typeof tokens[number]) => <Button label="Cabut" size="small" severity="danger" outlined disabled={!!r.revokedAt} onClick={async () => { await integrationService.revokeToken(r.id); await reload(); }} />} /></DataTable></TabPanel>
+      <TabPanel header="Webhook"><div className="flex flex-column gap-2 mb-3"><div className="flex gap-2 flex-wrap"><InputText value={webhookName} onChange={(e) => setWebhookName(e.target.value)} placeholder="Nama webhook" /><InputText value={webhookUrl} onChange={(e) => setWebhookUrl(e.target.value)} placeholder="https://example.com/webhook" className="flex-1" /><MultiSelect value={events} options={eventOptions} onChange={(e) => setEvents(e.value)} placeholder="Event" display="chip" /><InputNumber value={maxRetries} onValueChange={(e) => setMaxRetries(e.value ?? 5)} min={0} max={10} /><Button label="Buat webhook" icon="pi pi-send" onClick={createWebhook} /></div><small className="text-color-secondary">Delivery dijalankan worker/Edge Function. Retry menggunakan status pending/retrying dan backoff di queue.</small></div><DataTable value={webhooks} loading={loading} size="small" emptyMessage="Belum ada webhook"><Column field="name" header="Nama" /><Column field="url" header="URL" /><Column field="events" header="Event" body={(r: typeof webhooks[number]) => r.events.join(', ')} /><Column field="isActive" header="Status" body={(r: typeof webhooks[number]) => r.isActive ? 'Aktif' : 'Nonaktif'} /><Column header="Aksi" body={(r: typeof webhooks[number]) => <Button label={r.isActive ? 'Nonaktifkan' : 'Aktifkan'} size="small" outlined onClick={async () => { await integrationService.updateWebhook(r.id, { isActive: !r.isActive }); await reload(); }} />} /></DataTable></TabPanel>
+      <TabPanel header="Delivery Log"><DataTable value={deliveries} loading={loading} size="small" emptyMessage="Belum ada delivery"><Column field="event" header="Event" /><Column field="status" header="Status" /><Column field="attemptCount" header="Percobaan" /><Column field="responseStatus" header="HTTP" body={(r: typeof deliveries[number]) => r.responseStatus ?? '-'} /><Column field="lastError" header="Error" body={(r: typeof deliveries[number]) => r.lastError ?? '-'} /></DataTable></TabPanel>
+    </TabView></Card></div>;
+}

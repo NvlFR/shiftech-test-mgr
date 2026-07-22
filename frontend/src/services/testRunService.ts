@@ -2,34 +2,35 @@ import { testRunRepository } from '../repositories/testRunRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
 import { testCaseRepository } from '../repositories/testCaseRepository';
 import type { TestResultStatus } from '../types/domain';
+import type { TestRunFilters } from '../repositories/testRunRepository';
 
 export const testRunService = {
-  listByPlan(testPlanId: string) {
-    return testRunRepository.findAllByPlan(testPlanId);
+  listByPlan(testPlanId: string, filters?: TestRunFilters) {
+    return testRunRepository.findAllByPlan(testPlanId, filters);
   },
 
-  listByProject(projectId: string) {
-    return testRunRepository.findAllByProject(projectId);
+  listByProject(projectId: string, filters?: TestRunFilters) {
+    return testRunRepository.findAllByProject(projectId, filters);
   },
 
-  async listByProjectWithSummary(projectId: string) {
-    const runs = await testRunRepository.findAllByProject(projectId);
+  async listByProjectWithSummary(projectId: string, filters?: TestRunFilters) {
+    const runs = await testRunRepository.findAllByProject(projectId, filters);
     const runIds = runs.map((r) => r.id);
     const [summary, testers] = await Promise.all([
       testResultRepository.getSummaryByRunIds(runIds),
       testResultRepository.getDistinctTestersByRunIds(runIds),
     ]);
-    return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] }));
+    return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] })).filter((run) => !filters?.testerId || run.testers.some((tester) => tester.id === filters.testerId));
   },
 
-  async listByPlanWithSummary(testPlanId: string) {
-    const runs = await testRunRepository.findAllByPlan(testPlanId);
+  async listByPlanWithSummary(testPlanId: string, filters?: TestRunFilters) {
+    const runs = await testRunRepository.findAllByPlan(testPlanId, filters);
     const runIds = runs.map((r) => r.id);
     const [summary, testers] = await Promise.all([
       testResultRepository.getSummaryByRunIds(runIds),
       testResultRepository.getDistinctTestersByRunIds(runIds),
     ]);
-    return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] }));
+    return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] })).filter((run) => !filters?.testerId || run.testers.some((tester) => tester.id === filters.testerId));
   },
 
   getById(id: string) {
@@ -39,7 +40,7 @@ export const testRunService = {
   // Starting a run snapshots every test case currently in the plan's scope into
   // test_results as 'not_run' — later edits to the plan's case list don't retroactively
   // change what this run covers, matching how a real regression cycle has a fixed scope.
-  async start(testPlanId: string, name: string, code?: string) {
+  async start(testPlanId: string, name: string, options: { code?: string; environmentId?: string | null; browser?: string; device?: string; buildVersion?: string; release?: string } = {}) {
     if (!name.trim()) throw new Error('Nama test run tidak boleh kosong');
 
     const planCases = await testCaseRepository.findCasesForPlan(testPlanId);
@@ -47,7 +48,12 @@ export const testRunService = {
       throw new Error('Test plan ini belum punya test case — tambahkan test case dulu sebelum memulai run');
     }
 
-    const run = await testRunRepository.create({ testPlanId, name: name.trim(), code: code?.trim() || null });
+    const run = await testRunRepository.create({
+      testPlanId, name: name.trim(), code: options.code?.trim() || null,
+      environmentId: options.environmentId || null, browser: options.browser?.trim() || null,
+      device: options.device?.trim() || null, buildVersion: options.buildVersion?.trim() || null,
+      release: options.release?.trim() || null,
+    });
     await testResultRepository.seedForRun(
       run.id,
       planCases.map((pc) => pc.testCaseId),
@@ -96,5 +102,14 @@ export const testRunService = {
 
   recordResult(id: string, testerId: string, status: TestResultStatus, notes: string | null) {
     return testResultRepository.recordResult(id, { status, testerId, notes });
+  },
+
+  assign(testRunId: string, testCaseIds: string[], testerId: string) {
+    if (!testRunId || !testCaseIds.length || !testerId) throw new Error('Run, test case, dan tester wajib dipilih');
+    return testRunRepository.assign(testRunId, testCaseIds, testerId);
+  },
+
+  listAssignments(testRunId: string) {
+    return testRunRepository.listAssignments(testRunId);
   },
 };

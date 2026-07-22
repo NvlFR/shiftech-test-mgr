@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabaseClient';
-import { mapModuleRow, mapTagRow, mapTestCaseRow, mapTestPlanCaseRow } from '../helpers/mappers';
-import type { TestCase, TestCaseWithDetails, TestPlanCase, TestPlanCaseWithDetails } from '../types/domain';
+import { mapModuleRow, mapTagRow, mapTestCaseRow, mapTestCaseVersionRow, mapTestPlanCaseRow } from '../helpers/mappers';
+import type { TestCase, TestCaseVersion, TestCaseWithDetails, TestPlanCase, TestPlanCaseWithDetails } from '../types/domain';
 
 export const testCaseRepository = {
   async findAllByProject(projectId: string): Promise<TestCase[]> {
@@ -56,7 +56,7 @@ export const testCaseRepository = {
   },
 
   // `code` optional — omit/empty lets the `set_test_case_code` DB trigger auto-generate TC-####.
-  async create(input: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt' | 'code'> & { code?: string | null }): Promise<TestCase> {
+  async create(input: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt' | 'code' | 'assignedTo'> & { code?: string | null; assignedTo?: string | null }): Promise<TestCase> {
     const { data, error } = await supabase
       .from('test_cases')
       .insert({
@@ -71,6 +71,7 @@ export const testCaseRepository = {
         priority: input.priority,
         status: input.status,
         notes: input.notes,
+        assigned_to: input.assignedTo ?? null,
       })
       .select('*')
       .single();
@@ -91,6 +92,7 @@ export const testCaseRepository = {
     if (changes.priority !== undefined) payload.priority = changes.priority;
     if (changes.status !== undefined) payload.status = changes.status;
     if (changes.notes !== undefined) payload.notes = changes.notes;
+    if (changes.assignedTo !== undefined) payload.assigned_to = changes.assignedTo;
 
     const { data, error } = await supabase
       .from('test_cases')
@@ -101,6 +103,23 @@ export const testCaseRepository = {
 
     if (error) throw error;
     return mapTestCaseRow(data);
+  },
+
+  async listVersions(testCaseId: string): Promise<TestCaseVersion[]> {
+    const { data, error } = await supabase.from('test_case_versions').select('*').eq('test_case_id', testCaseId).order('version', { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map(mapTestCaseVersionRow);
+  },
+
+  async bulkUpdate(ids: string[], changes: Partial<Pick<TestCase, 'priority' | 'status' | 'moduleId' | 'assignedTo'>>): Promise<void> {
+    if (!ids.length) return;
+    const payload: Record<string, unknown> = {};
+    if (changes.priority !== undefined) payload.priority = changes.priority;
+    if (changes.status !== undefined) payload.status = changes.status;
+    if (changes.moduleId !== undefined) payload.module_id = changes.moduleId;
+    if (changes.assignedTo !== undefined) payload.assigned_to = changes.assignedTo;
+    const { error } = await supabase.from('test_cases').update(payload).in('id', ids);
+    if (error) throw error;
   },
 
   async remove(id: string): Promise<void> {

@@ -11,7 +11,7 @@ interface AuthContextValue {
   isAdmin: boolean;
   isApproved: boolean;
   isPending: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithPassword: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   reloadProfile: () => Promise<void>;
 }
@@ -50,11 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.subscription.unsubscribe();
   }, []);
 
-  async function signInWithGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin },
+  async function signInWithPassword(email: string, password: string) {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
     });
+
+    if (error) throw error;
   }
 
   async function signOut() {
@@ -81,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: role === 'admin',
         isApproved: role === 'user' || role === 'admin',
         isPending: role === 'pending',
-        signInWithGoogle,
+        signInWithPassword,
         signOut,
         reloadProfile,
       }}

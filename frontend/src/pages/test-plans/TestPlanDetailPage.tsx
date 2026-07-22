@@ -26,6 +26,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
+import { useEnvironments } from '../../hooks/useEnvironments';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
   TEST_PLAN_STATUS_LABEL,
@@ -63,6 +64,7 @@ export function TestPlanDetailPage() {
   const { cases, loading: casesLoading, reload: reloadCases } = useTestPlanDetail(id ?? null);
   const { testRuns, loading: runsLoading, reload: reloadRuns } = useTestRuns(id ?? null);
   const { canEditContent, canDeleteContent, canRunTests } = useProjectRole(testPlan?.projectId);
+  const { environments } = useEnvironments(testPlan?.projectId ?? null);
 
   // --- Test Cases: search/filter ---
   const [caseSearch, setCaseSearch] = useState('');
@@ -87,15 +89,27 @@ export function TestPlanDetailPage() {
   // --- Test Runs: search/filter ---
   const [runSearch, setRunSearch] = useState('');
   const [runStatusFilter, setRunStatusFilter] = useState<TestRunStatus | null>(null);
+  const [runTesterFilter, setRunTesterFilter] = useState<string | null>(null);
+  const [runEnvironmentFilter, setRunEnvironmentFilter] = useState<string | null>(null);
+  const [runBrowserFilter, setRunBrowserFilter] = useState('');
+  const [runDeviceFilter, setRunDeviceFilter] = useState('');
+  const [runBuildFilter, setRunBuildFilter] = useState('');
+  const [runReleaseFilter, setRunReleaseFilter] = useState('');
 
   const filteredRuns = useMemo(() => {
     const q = runSearch.trim().toLowerCase();
     return testRuns.filter((r) => {
       if (runStatusFilter && r.status !== runStatusFilter) return false;
+      if (runTesterFilter && !r.testers.some((tester) => tester.id === runTesterFilter)) return false;
+      if (runEnvironmentFilter && r.environmentId !== runEnvironmentFilter) return false;
+      if (runBrowserFilter.trim() && !(r.browser ?? '').toLowerCase().includes(runBrowserFilter.trim().toLowerCase())) return false;
+      if (runDeviceFilter.trim() && !(r.device ?? '').toLowerCase().includes(runDeviceFilter.trim().toLowerCase())) return false;
+      if (runBuildFilter.trim() && !(r.buildVersion ?? '').toLowerCase().includes(runBuildFilter.trim().toLowerCase())) return false;
+      if (runReleaseFilter.trim() && !(r.release ?? '').toLowerCase().includes(runReleaseFilter.trim().toLowerCase())) return false;
       if (q && !r.name.toLowerCase().includes(q) && !r.code.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [testRuns, runSearch, runStatusFilter]);
+  }, [testRuns, runSearch, runStatusFilter, runTesterFilter, runEnvironmentFilter, runBrowserFilter, runDeviceFilter, runBuildFilter, runReleaseFilter]);
 
   useEffect(() => {
     if (id) testPlanService.getById(id).then(setTestPlan);
@@ -169,10 +183,20 @@ export function TestPlanDetailPage() {
   // --- Test Run ---
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [runName, setRunName] = useState('');
+  const [runEnvironmentId, setRunEnvironmentId] = useState<string | null>(null);
+  const [runBrowser, setRunBrowser] = useState('');
+  const [runDevice, setRunDevice] = useState('');
+  const [runBuildVersion, setRunBuildVersion] = useState('');
+  const [runRelease, setRunRelease] = useState('');
   const [runError, setRunError] = useState<string | null>(null);
 
   function openStartRunDialog() {
     setRunName(`Run ${new Date().toLocaleDateString('id-ID')}`);
+    setRunEnvironmentId(null);
+    setRunBrowser('');
+    setRunDevice('');
+    setRunBuildVersion('');
+    setRunRelease('');
     setRunError(null);
     setRunDialogOpen(true);
   }
@@ -181,7 +205,7 @@ export function TestPlanDetailPage() {
     if (!id) return;
     setRunError(null);
     try {
-      const run = await testRunService.start(id, runName);
+      const run = await testRunService.start(id, runName, { environmentId: runEnvironmentId, browser: runBrowser, device: runDevice, buildVersion: runBuildVersion, release: runRelease });
       setRunDialogOpen(false);
       await reloadRuns();
       navigate(`/test-runs/${run.id}`);
@@ -231,12 +255,14 @@ export function TestPlanDetailPage() {
         actions={
           testPlan && (
             canEditContent ? (
-              <Dropdown
-                value={testPlan.status}
-                options={TEST_PLAN_STATUS_OPTIONS}
-                onChange={(e) => handleChangeStatus(e.value)}
-                className="w-10rem"
-              />
+              <div className="flex align-items-center gap-2 flex-wrap">
+                <Dropdown
+                  value={testPlan.status}
+                  options={TEST_PLAN_STATUS_OPTIONS}
+                  onChange={(e) => handleChangeStatus(e.value)}
+                  className="w-10rem"
+                />
+              </div>
             ) : (
               <Tag value={TEST_PLAN_STATUS_LABEL[testPlan.status]} severity={TEST_PLAN_STATUS_SEVERITY[testPlan.status]} />
             )
@@ -365,6 +391,12 @@ export function TestPlanDetailPage() {
                 showClear
                 className="w-10rem"
               />
+              <Dropdown value={runTesterFilter} options={testRuns.flatMap((run) => run.testers).filter((tester, index, all) => all.findIndex((item) => item.id === tester.id) === index).map((tester) => ({ label: tester.fullName ?? tester.id, value: tester.id }))} onChange={(e) => setRunTesterFilter(e.value)} placeholder="Semua Tester" showClear className="w-12rem" />
+              <Dropdown value={runEnvironmentFilter} options={environments.map((environment) => ({ label: environment.name, value: environment.id }))} onChange={(e) => setRunEnvironmentFilter(e.value)} placeholder="Semua Environment" showClear className="w-13rem" />
+              <InputText value={runBrowserFilter} onChange={(e) => setRunBrowserFilter(e.target.value)} placeholder="Browser" />
+              <InputText value={runDeviceFilter} onChange={(e) => setRunDeviceFilter(e.target.value)} placeholder="Device" />
+              <InputText value={runBuildFilter} onChange={(e) => setRunBuildFilter(e.target.value)} placeholder="Build version" />
+              <InputText value={runReleaseFilter} onChange={(e) => setRunReleaseFilter(e.target.value)} placeholder="Release" />
             </div>
             {canRunTests && (
               <Button label="Mulai Test Run" icon="pi pi-play" size="small" onClick={openStartRunDialog} />
@@ -383,6 +415,10 @@ export function TestPlanDetailPage() {
           >
             <Column field="code" header="Kode" style={{ width: '7rem' }} />
             <Column field="name" header="Nama Run" />
+            <Column field="browser" header="Browser" />
+            <Column field="device" header="Device" />
+            <Column field="buildVersion" header="Build" />
+            <Column field="release" header="Release" />
             <Column field="status" header="Status" body={(row: TestRun) => <Tag value={TEST_RUN_STATUS_LABEL[row.status]} severity={TEST_RUN_STATUS_SEVERITY[row.status]} />} />
             <Column
               header="Hasil"
@@ -446,12 +482,28 @@ export function TestPlanDetailPage() {
       </Dialog>
 
       {/* --- Start Test Run Dialog --- */}
-      <Dialog header="Mulai Test Run" visible={runDialogOpen} onHide={() => setRunDialogOpen(false)} style={{ width: '25rem' }}>
+      <Dialog header="Mulai Test Run" visible={runDialogOpen} onHide={() => setRunDialogOpen(false)} style={{ width: '30rem' }}>
         <div className="flex flex-column gap-3">
           {runError && <small className="p-error">{runError}</small>}
           <div className="flex flex-column gap-1">
             <label htmlFor="run-name">Nama Test Run</label>
             <InputText id="run-name" value={runName} onChange={(e) => setRunName(e.target.value)} autoFocus />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="run-environment">Environment</label>
+            <Dropdown id="run-environment" value={runEnvironmentId} options={environments.map((e) => ({ label: e.baseUrl ? `${e.name} — ${e.baseUrl}` : e.name, value: e.id }))} onChange={(e) => setRunEnvironmentId(e.value)} placeholder="Pilih environment" showClear className="w-full" />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="run-browser">Browser</label>
+            <InputText id="run-browser" value={runBrowser} onChange={(e) => setRunBrowser(e.target.value)} placeholder="Chrome 128" />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="run-device">Device</label>
+            <InputText id="run-device" value={runDevice} onChange={(e) => setRunDevice(e.target.value)} placeholder="Desktop / Android" />
+          </div>
+          <div className="flex gap-2">
+            <div className="flex flex-column gap-1 flex-1"><label htmlFor="run-build-version">Build Version</label><InputText id="run-build-version" value={runBuildVersion} onChange={(e) => setRunBuildVersion(e.target.value)} /></div>
+            <div className="flex flex-column gap-1 flex-1"><label htmlFor="run-release">Release</label><InputText id="run-release" value={runRelease} onChange={(e) => setRunRelease(e.target.value)} /></div>
           </div>
           <Button label="Mulai" size="small" onClick={handleStartRun} />
         </div>

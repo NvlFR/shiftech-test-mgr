@@ -1,0 +1,4 @@
+import { useCallback, useEffect, useState } from 'react';
+import { integrationService } from '../services/integrationService';
+import type { ApiToken, Webhook, WebhookDelivery } from '../types/domain';
+export function useIntegrations(projectId: string | undefined) { const [tokens, setTokens] = useState<ApiToken[]>([]); const [webhooks, setWebhooks] = useState<Webhook[]>([]); const [deliveries, setDeliveries] = useState<WebhookDelivery[]>([]); const [loading, setLoading] = useState(false); const reload = useCallback(async () => { if (!projectId) return; setLoading(true); try { const [t, w, d] = await Promise.all([integrationService.listTokens(projectId), integrationService.listWebhooks(projectId), integrationService.listDeliveries(projectId)]); setTokens(t); setWebhooks(w); setDeliveries(d); } finally { setLoading(false); } }, [projectId]); useEffect(() => { reload(); }, [reload]); return { tokens, webhooks, deliveries, loading, reload }; }

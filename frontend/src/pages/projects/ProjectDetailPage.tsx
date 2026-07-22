@@ -27,6 +27,9 @@ import { profileService } from '../../services/profileService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
+import { parseTestCaseExcel, type ImportedTestCaseRow } from '../../helpers/testCaseExcel';
+import { downloadTestCaseImportTemplate, exportTestCasesToExcel } from '../../helpers/excelExporter';
+import { exportTestCasesToPdf } from '../../helpers/pdfExporter';
 import type {
   Project,
   TestPlan,
@@ -389,6 +392,11 @@ export function ProjectDetailPage() {
   const [caseNotes, setCaseNotes] = useState('');
   const [caseTags, setCaseTags] = useState<string[]>([]);
   const [caseError, setCaseError] = useState<string | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importRows, setImportRows] = useState<ImportedTestCaseRow[]>([]);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const importFileRef = useRef<HTMLInputElement>(null);
 
   // Test Cases: search/filter/sort/selection
   const [caseSearch, setCaseSearch] = useState('');
@@ -485,6 +493,49 @@ export function ProjectDetailPage() {
       toast.current?.show({ severity: 'success', summary: editingCaseId ? 'Test case diperbarui' : 'Test case dibuat' });
     } catch (err) {
       setCaseError(err instanceof Error ? err.message : 'Gagal menyimpan test case');
+    }
+  }
+
+  async function handleImportFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setImportError(null);
+    try {
+      setImportRows(await parseTestCaseExcel(file));
+      setImportDialogOpen(true);
+    } catch (err) {
+      setImportRows([]);
+      setImportError(err instanceof Error ? err.message : 'Gagal membaca file Excel');
+      toast.current?.show({ severity: 'error', summary: 'Import gagal', detail: err instanceof Error ? err.message : undefined });
+    }
+  }
+
+  async function handleImportCases() {
+    if (!id) return;
+    const validRows = importRows.filter((row) => row.errors.length === 0);
+    if (validRows.length === 0) {
+      setImportError('Tidak ada baris valid untuk diimport.');
+      return;
+    }
+
+    setImporting(true);
+    setImportError(null);
+    try {
+      const result = await testCaseService.importMany(id, validRows);
+      setImportDialogOpen(false);
+      setImportRows([]);
+      await loadAll();
+      toast.current?.show({
+        severity: result.errors.length ? 'warn' : 'success',
+        summary: `${result.imported} test case berhasil diimport`,
+        detail: result.errors.length ? `${result.errors.length} baris gagal disimpan.` : undefined,
+      });
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Gagal mengimport test case');
+    } finally {
+      setImporting(false);
     }
   }
 
@@ -800,7 +851,18 @@ export function ProjectDetailPage() {
                   className="w-10rem"
                 />
               </div>
-              {canEditContent && <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />}
+              <div className="flex gap-2">
+                <Button label="Export Excel" icon="pi pi-download" size="small" outlined onClick={() => exportTestCasesToExcel(project, filteredCases)} disabled={!filteredCases.length} />
+                <Button label="Export PDF" icon="pi pi-file-pdf" size="small" outlined onClick={() => exportTestCasesToPdf(project, filteredCases)} disabled={!filteredCases.length} />
+                {canEditContent && (
+                  <>
+                    <input ref={importFileRef} type="file" accept=".xlsx,.xls" onChange={handleImportFile} hidden />
+                    <Button label="Template" icon="pi pi-file" size="small" text onClick={downloadTestCaseImportTemplate} />
+                    <Button label="Import Excel" icon="pi pi-file-excel" size="small" outlined onClick={() => importFileRef.current?.click()} />
+                    <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />
+                  </>
+                )}
+              </div>
             </div>
             {canDeleteContent && (
               <BulkActionsBar
@@ -1377,6 +1439,37 @@ export function ProjectDetailPage() {
           </div>
 
           <Button label="Simpan" size="small" onClick={handleSaveCase} />
+        </div>
+      </Dialog>
+
+      <Dialog
+        header="Import Test Case dari Excel"
+        visible={importDialogOpen}
+        onHide={() => setImportDialogOpen(false)}
+        style={{ width: '60rem' }}
+        footer={
+          <div className="flex justify-content-end gap-2">
+            <Button label="Batal" outlined onClick={() => setImportDialogOpen(false)} disabled={importing} />
+            <Button label={`Import ${importRows.filter((row) => row.errors.length === 0).length} Baris`} icon="pi pi-upload" onClick={handleImportCases} loading={importing} />
+          </div>
+        }
+      >
+        <div className="flex flex-column gap-3">
+          <p className="text-color-secondary mt-0 mb-0">
+            Kolom wajib: <strong>title</strong>, <strong>steps</strong>, dan <strong>expected_result</strong>. Module dan tag yang belum ada akan dibuat otomatis.
+          </p>
+          <Button label="Download Template Excel" icon="pi pi-download" outlined onClick={downloadTestCaseImportTemplate} className="align-self-start" />
+          {importError && <small className="p-error">{importError}</small>}
+          <div className="overflow-auto" style={{ maxHeight: '24rem' }}>
+            <DataTable value={importRows} size="small" emptyMessage="Tidak ada data untuk ditampilkan">
+              <Column field="rowNumber" header="Baris" style={{ width: '5rem' }} />
+              <Column field="code" header="Kode" />
+              <Column field="title" header="Judul" />
+              <Column field="moduleName" header="Module" />
+              <Column field="priority" header="Prioritas" />
+              <Column field="errors" header="Validasi" body={(row: ImportedTestCaseRow) => row.errors.length ? <span className="p-error">{row.errors.join(', ')}</span> : <Tag value="Valid" severity="success" />} />
+            </DataTable>
+          </div>
         </div>
       </Dialog>
 

@@ -24,6 +24,14 @@ export const projectService = {
     return projectRepository.updateStatus(id, status);
   },
 
+  archive(id: string) {
+    return projectRepository.updateStatus(id, 'archived');
+  },
+
+  restore(id: string) {
+    return projectRepository.updateStatus(id, 'active');
+  },
+
   deletePermanently(id: string) {
     return projectRepository.deletePermanently(id);
   },

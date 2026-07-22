@@ -85,7 +85,13 @@ export function ProjectsPage() {
   }
 
   async function handleChangeStatus(row: Project, status: ProjectStatus) {
-    await projectService.changeStatus(row.id, status);
+    if (status === 'archived') {
+      await projectService.archive(row.id);
+    } else if (status === 'active' && row.status === 'archived') {
+      await projectService.restore(row.id);
+    } else {
+      await projectService.changeStatus(row.id, status);
+    }
     await reload();
     toast.current?.show({ severity: 'success', summary: 'Status diperbarui', detail: row.name });
   }
