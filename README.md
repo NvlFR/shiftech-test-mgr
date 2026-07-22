@@ -1,11 +1,7 @@
 # TestManager (shiftech-test-mgr)
 
 Aplikasi internal sederhana untuk manajemen **Test Plan** dan **Test Case**
-suatu project — dibangun sebagai eksperimen arsitektur **React + PrimeReact +
-Supabase**.
-
-Ini bagian dari seri eksperimen framework di `software-projects/` (lihat juga
-[`exp-prime-vue`](../exp-prime-vue) untuk versi Vue).
+suatu project.
 
 ## Stack
 
