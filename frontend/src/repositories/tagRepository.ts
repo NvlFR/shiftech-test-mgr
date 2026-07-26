@@ -10,11 +10,14 @@ export const tagRepository = {
   },
 
   async findOrCreate(projectId: string, name: string): Promise<Tag> {
+    // Exact match, not ilike: `_`/`%` in a tag name are literal characters, but ilike would
+    // treat them as wildcards (matching the wrong tag, or several rows → maybeSingle throws).
+    // `.eq` also mirrors the case-sensitive `unique (project_id, name)` DB constraint.
     const { data: existing, error: findError } = await supabase
       .from('tags')
       .select('*')
       .eq('project_id', projectId)
-      .ilike('name', name)
+      .eq('name', name)
       .maybeSingle();
     if (findError) throw findError;
     if (existing) return mapTagRow(existing);

@@ -1,0 +1,178 @@
+import { useEffect, useState } from 'react';
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
+import { Checkbox } from 'primereact/checkbox';
+import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { Message } from 'primereact/message';
+import { MultiSelect } from 'primereact/multiselect';
+import { Tag } from 'primereact/tag';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { useAiTestCaseGenerator } from '../../hooks/useAiTestCaseGenerator';
+import { toAiTestCaseSource } from '../../helpers/aiTestCaseParser';
+import type { AiTestCaseDraft } from '../../types/aiTestCase';
+import type { Module, Tag as TagEntity, TestCaseWithDetails } from '../../types/domain';
+import { TEST_CASE_PRIORITY_LABEL } from '../../helpers/statusLabels';
+
+interface ReviewDraft extends AiTestCaseDraft {
+  moduleId: string | null;
+}
+
+interface Props {
+  visible: boolean;
+  projectId: string;
+  modules: Module[];
+  tags: TagEntity[];
+  existingTestCases: TestCaseWithDetails[];
+  onHide: () => void;
+  onSaved: () => Promise<void> | void;
+}
+
+const priorityOptions = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ value, label: TEST_CASE_PRIORITY_LABEL[value] }));
+const maxCaseOptions = [5, 10, 20, 50].map((value) => ({ value, label: `${value} test case` }));
+
+export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, existingTestCases, onHide, onSaved }: Props) {
+  const generator = useAiTestCaseGenerator();
+  const [requirement, setRequirement] = useState('');
+  const [includeScenarios, setIncludeScenarios] = useState(true);
+  const [includeEdgeCases, setIncludeEdgeCases] = useState(true);
+  const [maxCases, setMaxCases] = useState(10);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [reviewDrafts, setReviewDrafts] = useState<ReviewDraft[]>([]);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (generator.result) setReviewDrafts(generator.result.drafts.map((draft) => ({ ...draft, moduleId: null })));
+  }, [generator.result]);
+
+  function updateDraft(index: number, changes: Partial<ReviewDraft>) {
+    setReviewDrafts((current) => current.map((draft, draftIndex) => draftIndex === index ? { ...draft, ...changes } : draft));
+  }
+
+  async function handleFileChange(file: File | undefined) {
+    if (!file) return;
+    try {
+      await generator.setFileSource(file);
+      setRequirement('');
+      setFileName(file.name);
+      setSaveError(null);
+    } catch (reason) {
+      setSaveError(reason instanceof Error ? reason.message : 'Dokumen tidak dapat dibaca.');
+    }
+  }
+
+  async function handleGenerate() {
+    try {
+      const sourceOverride = requirement.trim() ? toAiTestCaseSource(requirement) : undefined;
+      if (sourceOverride) generator.setTextSource(requirement);
+      await generator.generate(projectId, { includeScenarios, includeEdgeCases, maxCases }, sourceOverride);
+      setSaveError(null);
+    } catch (reason) {
+      setSaveError(reason instanceof Error ? reason.message : 'Gagal menghasilkan test case.');
+    }
+  }
+
+  async function persistDrafts() {
+    setSaveError(null);
+    try {
+      for (const draft of reviewDrafts) await generator.saveDraft(projectId, draft, draft.moduleId);
+      await onSaved();
+      onHide();
+    } catch (reason) {
+      setSaveError(reason instanceof Error ? reason.message : 'Gagal menyimpan test case.');
+    }
+  }
+
+  function handleApprove() {
+    const warnings = reviewDrafts.flatMap((draft) => generator.findDuplicates(draft, existingTestCases));
+    if (warnings.length) {
+      confirmDialog({
+        header: 'Kemungkinan duplikat',
+        message: `${warnings.length} kemungkinan test case duplikat ditemukan. Tetap simpan sebagai test case baru?`,
+        acceptLabel: 'Tetap Simpan',
+        rejectLabel: 'Kembali Review',
+        accept: () => { void persistDrafts(); },
+      });
+      return;
+    }
+    void persistDrafts();
+  }
+
+  function handleClose() {
+    generator.reset();
+    setReviewDrafts([]);
+    setRequirement('');
+    setFileName(null);
+    setSaveError(null);
+    onHide();
+  }
+
+  return (
+    <>
+      <ConfirmDialog />
+      <Dialog header="Generate Test Case dengan AI" visible={visible} onHide={handleClose} style={{ width: 'min(72rem, 96vw)' }} modal>
+        <div className="flex flex-column gap-3">
+          <Message severity="info" text="Hasil AI selalu berupa draf. Review semua field sebelum menyetujui penyimpanan." />
+          <div className="grid">
+            <div className="col-12 md:col-8 flex flex-column gap-2">
+              <label htmlFor="ai-requirement">Requirement atau deskripsi fitur</label>
+              <InputTextarea id="ai-requirement" value={requirement} onChange={(event) => { setRequirement(event.target.value); setFileName(null); }} rows={7} placeholder="Contoh: pengguna dapat reset password melalui email..." />
+              <div className="flex align-items-center gap-2 flex-wrap">
+                <label htmlFor="ai-document" className="p-button p-button-outlined p-button-sm cursor-pointer">
+                  <i className="pi pi-upload mr-2" />Upload Excel / Dokumen
+                </label>
+                <input id="ai-document" type="file" accept=".xlsx,.xls,.csv,.txt,.md,.json" className="hidden" onChange={(event) => { void handleFileChange(event.target.files?.[0]); }} />
+                {fileName && <small className="text-color-secondary">{fileName}</small>}
+              </div>
+            </div>
+            <div className="col-12 md:col-4 flex flex-column gap-3">
+              <span className="font-medium">Opsi generasi</span>
+              <div className="flex align-items-center gap-2"><Checkbox inputId="ai-scenarios" checked={includeScenarios} onChange={(event) => setIncludeScenarios(Boolean(event.checked))} /><label htmlFor="ai-scenarios">Skenario tambahan</label></div>
+              <div className="flex align-items-center gap-2"><Checkbox inputId="ai-edge-cases" checked={includeEdgeCases} onChange={(event) => setIncludeEdgeCases(Boolean(event.checked))} /><label htmlFor="ai-edge-cases">Edge case</label></div>
+              <Dropdown value={maxCases} options={maxCaseOptions} optionLabel="label" optionValue="value" onChange={(event) => setMaxCases(event.value)} aria-label="Jumlah maksimum test case" />
+              <Button label="Generate Draf" icon="pi pi-sparkles" loading={generator.loading} onClick={() => { void handleGenerate(); }} disabled={!requirement.trim() && !generator.source} />
+            </div>
+          </div>
+
+          {(generator.error || saveError) && <Message severity="error" text={generator.error ?? saveError ?? ''} />}
+          {generator.result && <small className="text-color-secondary">Provider: {generator.result.provider}{generator.result.model ? ` · Model: ${generator.result.model}` : ''}</small>}
+
+          {reviewDrafts.map((draft, index) => {
+            const duplicates = generator.findDuplicates(draft, existingTestCases);
+            return (
+              <Card key={`${index}-${draft.title}`} title={`Draf ${index + 1}`} className="surface-50">
+                <div className="flex flex-column gap-3">
+                  {duplicates.length > 0 && <Message severity="warn" text={`Kemungkinan duplikat: ${duplicates.map((item) => `${item.testCase.code} (${Math.round(item.confidence * 100)}%) — ${item.reason}`).join(' ')}`} />}
+                  <div className="grid">
+                    <div className="col-12 md:col-8 flex flex-column gap-1"><label htmlFor={`ai-title-${index}`}>Judul</label><InputText id={`ai-title-${index}`} value={draft.title} onChange={(event) => updateDraft(index, { title: event.target.value })} /></div>
+                    <div className="col-12 md:col-4 flex flex-column gap-1"><label htmlFor={`ai-priority-${index}`}>Prioritas</label><Dropdown id={`ai-priority-${index}`} value={draft.priority} options={priorityOptions} optionLabel="label" optionValue="value" onChange={(event) => updateDraft(index, { priority: event.value })} /></div>
+                    <div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor={`ai-module-${index}`}>Module</label><Dropdown id={`ai-module-${index}`} value={draft.moduleId} options={modules.map((module) => ({ label: module.name, value: module.id }))} onChange={(event) => updateDraft(index, { moduleId: event.value })} placeholder="Pilih module (opsional)" showClear /></div>
+                    <div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor={`ai-tags-${index}`}>Tag</label><MultiSelect id={`ai-tags-${index}`} value={draft.tags} options={tags.map((tag) => ({ label: tag.name, value: tag.name }))} onChange={(event) => updateDraft(index, { tags: event.value ?? [] })} display="chip" filter placeholder="Pilih tag" /></div>
+                  </div>
+                  <div className="grid">
+                    <div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor={`ai-objective-${index}`}>Tujuan</label><InputTextarea id={`ai-objective-${index}`} value={draft.objective} onChange={(event) => updateDraft(index, { objective: event.target.value })} rows={3} /></div>
+                    <div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor={`ai-preconditions-${index}`}>Prasyarat</label><InputTextarea id={`ai-preconditions-${index}`} value={draft.preconditions} onChange={(event) => updateDraft(index, { preconditions: event.target.value })} rows={3} /></div>
+                    <div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor={`ai-steps-${index}`}>Langkah Pengujian</label><InputTextarea id={`ai-steps-${index}`} value={draft.steps} onChange={(event) => updateDraft(index, { steps: event.target.value })} rows={5} /></div>
+                    <div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor={`ai-expected-${index}`}>Hasil yang Diharapkan</label><InputTextarea id={`ai-expected-${index}`} value={draft.expectedResult} onChange={(event) => updateDraft(index, { expectedResult: event.target.value })} rows={5} /></div>
+                  </div>
+                  <div className="grid">
+                    <div className="col-12 md:col-6"><span className="font-medium block mb-2">Skenario</span><div className="flex flex-wrap gap-2">{draft.scenarios.length ? draft.scenarios.map((item) => <Tag key={item} value={item} severity="info" />) : <small className="text-color-secondary">Tidak ada skenario tambahan.</small>}</div></div>
+                    <div className="col-12 md:col-6"><span className="font-medium block mb-2">Edge case</span><div className="flex flex-wrap gap-2">{draft.edgeCases.length ? draft.edgeCases.map((item) => <Tag key={item} value={item} severity="warning" />) : <small className="text-color-secondary">Tidak ada edge case tambahan.</small>}</div></div>
+                  </div>
+                  <div className="flex flex-column gap-1"><label htmlFor={`ai-notes-${index}`}>Catatan</label><InputTextarea id={`ai-notes-${index}`} value={draft.notes} onChange={(event) => updateDraft(index, { notes: event.target.value })} rows={2} /></div>
+                </div>
+              </Card>
+            );
+          })}
+
+          <div className="flex justify-content-end gap-2">
+            <Button label="Batal" text onClick={handleClose} />
+            <Button label="Setujui & Simpan Semua" icon="pi pi-check" loading={generator.saving} disabled={!reviewDrafts.length} onClick={handleApprove} />
+          </div>
+        </div>
+      </Dialog>
+    </>
+  );
+}

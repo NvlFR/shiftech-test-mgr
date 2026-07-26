@@ -1,6 +1,7 @@
 import { testRunRepository } from '../repositories/testRunRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
 import { testCaseRepository } from '../repositories/testCaseRepository';
+import { calculateTestRunSummary } from '../helpers/testRunSummary';
 import type { TestResultStatus } from '../types/domain';
 import type { TestRunFilters } from '../repositories/testRunRepository';
 
@@ -86,21 +87,17 @@ export const testRunService = {
 
     // Overall status is always derived, never stored — this is the "automatic" half
     // of the product decision (manual completion, automatic summary).
-    const total = results.length;
-    const counts = {
-      pass: results.filter((r) => r.status === 'pass').length,
-      fail: results.filter((r) => r.status === 'fail').length,
-      skip: results.filter((r) => r.status === 'skip').length,
-      blocked: results.filter((r) => r.status === 'blocked').length,
-      notRun: results.filter((r) => r.status === 'not_run').length,
-    };
-    const executed = total - counts.notRun;
-    const progressPercent = total === 0 ? 0 : Math.round((executed / total) * 100);
-
-    return { results, summary: { total, executed, progressPercent, ...counts } };
+    return { results, summary: calculateTestRunSummary(results) };
   },
 
-  recordResult(id: string, testerId: string, status: TestResultStatus, notes: string | null) {
+  async recordResult(id: string, testerId: string, status: TestResultStatus, notes: string | null) {
+    // A completed run is frozen — results must not change silently. Reopen it first (manual action,
+    // mirroring the manual-completion product decision) before recording again.
+    const context = await testResultRepository.findExecutionContext(id);
+    if (!context) throw new Error('Test result tidak ditemukan');
+    if (context.runStatus === 'completed') {
+      throw new Error('Test run sudah selesai — buka kembali (reopen) untuk mencatat hasil');
+    }
     return testResultRepository.recordResult(id, { status, testerId, notes });
   },
 

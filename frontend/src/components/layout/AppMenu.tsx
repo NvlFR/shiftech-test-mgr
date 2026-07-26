@@ -131,6 +131,9 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
             <button type="button" className="layout-submenu-pin" title="Integrasi CI/CD" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/integrations/cicd`); }}>
               <i className="pi pi-bolt" />
             </button>
+            <button type="button" className="layout-submenu-pin" title="Automation (Playwright)" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/automation`); }}>
+              <i className="pi pi-play" />
+            </button>
           </li>
         ))}
 

@@ -21,6 +21,9 @@ import type {
   Webhook,
   WebhookDelivery,
   CicdPipeline,
+  AutomationRunner,
+  AutomationScript,
+  AutomationJob,
 } from '../types/domain';
 import type { Attachment } from '../types/domain';
 
@@ -28,6 +31,9 @@ export function mapApiTokenRow(row: any): ApiToken { return { id: row.id, projec
 export function mapWebhookRow(row: any): Webhook { return { id: row.id, projectId: row.project_id, name: row.name, url: row.url, events: row.events ?? [], isActive: row.is_active, maxRetries: row.max_retries, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapWebhookDeliveryRow(row: any): WebhookDelivery { return { id: row.id, webhookId: row.webhook_id, projectId: row.project_id, event: row.event, resourceId: row.resource_id, status: row.status, attemptCount: row.attempt_count, nextAttemptAt: row.next_attempt_at, responseStatus: row.response_status ?? null, deliveredAt: row.delivered_at ?? null, lastError: row.last_error ?? null, createdAt: row.created_at }; }
 export function mapCicdPipelineRow(row: any): CicdPipeline { return { id: row.id, projectId: row.project_id, testPlanId: row.test_plan_id, name: row.name, provider: row.provider, tokenPrefix: row.token_prefix, active: row.active, lastUsedAt: row.last_used_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapAutomationRunnerRow(row: any): AutomationRunner { return { id: row.id, projectId: row.project_id, name: row.name, labels: row.labels ?? [], tokenPrefix: row.token_prefix, active: row.active, lastSeenAt: row.last_seen_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapAutomationScriptRow(row: any): AutomationScript { return { id: row.id, projectId: row.project_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, runnerLabels: row.runner_labels ?? [], createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapAutomationJobRow(row: any): AutomationJob { return { id: row.id, projectId: row.project_id, testRunId: row.test_run_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, requiredLabels: row.required_labels ?? [], status: row.status, attempt: row.attempt, maxAttempts: row.max_attempts, runnerId: row.runner_id ?? null, artifacts: row.artifacts ?? [], errorMessage: row.error_message ?? null, queuedAt: row.queued_at, startedAt: row.started_at ?? null, finishedAt: row.finished_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
 
 // Supabase columns are snake_case; domain types are camelCase.
 // Repositories map raw rows through these functions before returning to services.

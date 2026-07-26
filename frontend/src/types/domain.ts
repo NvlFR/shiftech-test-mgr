@@ -213,7 +213,73 @@ export interface CicdIngestResultInput { testCaseId?: string; testCaseCode?: str
 export interface CicdIngestPayload { name?: string; branch?: string; commitSha?: string; buildNumber?: string; externalRunId?: string; environmentId?: string; buildVersion?: string; release?: string; results: CicdIngestResultInput[]; }
 export interface CicdIngestResponse { runId: string; runCode: string; status: TestRunStatus; provider: CicdProvider; summary: { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number; progressPercent: number }; }
 
+// --- Automation: Playwright Local Runner ---
+// Browsers run on a local runner (separate CLI/agent), never on the central
+// server. The server only stores mappings, enqueues jobs, and records results.
+export type AutomationJobStatus = 'queued' | 'running' | 'passed' | 'failed' | 'canceled';
+
+export interface AutomationRunner {
+  id: string;
+  projectId: string;
+  name: string;
+  labels: string[];
+  tokenPrefix: string;
+  active: boolean;
+  lastSeenAt: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface AutomationRunnerSecret { runner: AutomationRunner; token: string; }
+
+export interface AutomationScript {
+  id: string;
+  projectId: string;
+  testCaseId: string;
+  scriptRef: string;
+  runnerLabels: string[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AutomationArtifact { type: 'screenshot' | 'video' | 'trace' | 'log'; url: string; name?: string; path?: string; bucket?: string; }
+
+export interface AutomationJob {
+  id: string;
+  projectId: string;
+  testRunId: string;
+  testCaseId: string;
+  scriptRef: string;
+  requiredLabels: string[];
+  status: AutomationJobStatus;
+  attempt: number;
+  maxAttempts: number;
+  runnerId: string | null;
+  artifacts: AutomationArtifact[];
+  errorMessage: string | null;
+  queuedAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AutomationEnqueueResponse { runId: string; runCode: string; jobCount: number; }
+
 export type TestResultStatus = 'pass' | 'fail' | 'skip' | 'blocked' | 'not_run';
+
+export interface TestRunSummary {
+  total: number;
+  executed: number;
+  progressPercent: number;
+  pass: number;
+  fail: number;
+  skip: number;
+  blocked: number;
+  notRun: number;
+}
 
 export interface TestResult {
   id: string;

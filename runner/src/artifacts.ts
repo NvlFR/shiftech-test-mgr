@@ -1,0 +1,43 @@
+import { readdirSync, statSync, existsSync } from 'node:fs';
+import { join, relative, extname } from 'node:path';
+import type { ReportArtifact } from './api.js';
+
+export interface CollectedArtifact {
+  type: ReportArtifact['type'];
+  name: string;
+  localPath: string;
+}
+
+function classify(file: string): ReportArtifact['type'] | null {
+  const name = file.toLowerCase();
+  const ext = extname(name);
+  if (name.includes('trace') && ext === '.zip') return 'trace';
+  if (['.png', '.jpg', '.jpeg'].includes(ext)) return 'screenshot';
+  if (['.webm', '.mp4'].includes(ext)) return 'video';
+  if (['.txt', '.log'].includes(ext)) return 'log';
+  return null;
+}
+
+function walk(dir: string): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...walk(full));
+    else out.push(full);
+  }
+  return out;
+}
+
+// Collect artifact files produced by a job run. Returns local file references;
+// uploading/URL construction is handled separately (see upload.ts).
+export function collectArtifacts(jobOutputDir: string): CollectedArtifact[] {
+  if (!existsSync(jobOutputDir)) return [];
+  const artifacts: CollectedArtifact[] = [];
+  for (const file of walk(jobOutputDir)) {
+    const type = classify(file);
+    if (!type) continue;
+    const name = relative(jobOutputDir, file).split(/[\\/]/).join('/');
+    artifacts.push({ type, name, localPath: file });
+  }
+  return artifacts;
+}

@@ -2,6 +2,127 @@
 
 Catatan perubahan dan pekerjaan pada project TestManager.
 
+## 2026-07-26
+
+### Persiapan commit setelah sync fork
+
+- Memeriksa status branch, reflog, dan riwayat commit setelah proses sync/pull fork.
+- Tidak ditemukan merge conflict atau merge/rebase yang sedang berjalan.
+- Perubahan kerja akan diamankan dalam commit baru; folder `.codex/` tetap dikecualikan dari commit sesuai keputusan sebelumnya.
+
+### 2026-07-26 — Section 3: webhook HTTP delivery (schema_028) — FUNGSIONAL
+
+- Menutup satu-satunya gap fungsional Section 3: webhook hanya enqueue tanpa pengirim. CI/CD "kirim status balik" ternyata sudah jalan (response sinkron `ingest_cicd_test_run`), jadi tidak perlu diubah.
+- Kendala desain: HMAC butuh raw secret, tapi skema hanya menyimpan `secret_hash` (SHA-256). Solusi: raw secret disimpan di Supabase Vault (`supabase_vault` 0.3.1 sudah terpasang di target).
+- `schema_028_webhook_dispatch.sql` (diterapkan sebagai migration `028a`+`028b`): `create extension pg_net`, `pg_cron`. Kolom `webhook_deliveries.request_id` + status baru `sending`. `create_webhook` di-recreate agar juga menulis secret ke Vault; tambah `rotate_webhook_secret(uuid)` (rotate + backfill Vault untuk webhook lama). Dispatcher in-database: `dispatch_pending_webhooks` (klaim SKIP LOCKED → HMAC-SHA256 via `pgcrypto.hmac` → `net.http_post`, header `X-TM-Signature: sha256=…`), `reconcile_webhook_deliveries` (baca `net._http_response` → delivered/retrying/failed + exponential backoff), `run_webhook_dispatch` wrapper. Dijadwalkan `cron.schedule('webhook-dispatch','* * * * *', ...)`.
+- Keamanan: fungsi dispatcher di-`revoke` dari public/anon/authenticated (hanya dijalankan cron sebagai owner); `rotate_webhook_secret` di-grant ke `authenticated`. Body ditandatangani atas `payload::text` (sama dengan yang dikirim `pg_net`).
+- Verifikasi end-to-end pada target: webhook uji → `postman-echo.com/post` → `dispatch` set `sending`/request_id, `reconcile` set `delivered` + HTTP 200; signature yang diterima endpoint == HMAC yang dihitung ulang (`signature_valid=true`). Data uji dibersihkan. Target tidak punya webhook lama, jadi tidak ada yang perlu di-rotate.
+- Frontend: `integrationRepository.rotateWebhookSecret` → service passthrough → tombol "Rotate secret" di tab Webhook `IntegrationsPage` (tampilkan secret sekali via `oneTimeSecret`); teks helper diperbarui (dispatcher pg_cron + HMAC). `npm run build` (tsc -b + vite) hijau; hanya warning bundle-size lama.
+- Sisa Section 3: backup/restore binary Storage (saat ini metadata-only).
+
+### 2026-07-26 — Audit fungsional semua fitur FEATURE_BACKLOG
+
+- Verifikasi 3-lapis (kode frontend ter-wire → migration/tabel di Supabase target `fohuxwzczepdqyrfkovc` → Edge Function/Storage runtime) untuk semua item `[x]`.
+- DB target: 27 migration terterap (s/d `027`), semua tabel inti + P1/P2/P3 ada, RLS aktif, `get_advisors` security = 0 ERROR (68 WARN: search_path/security-definer executable — non-blocking). Buckets `issue-attachments`, `test-attachments`, `automation-artifacts` ada.
+- GAP KRITIS ditemukan: (1) Edge Function `ai-gateway` BELUM di-deploy (hanya `automation-artifacts` ACTIVE) → seluruh fitur AI Section 4 gagal saat runtime (semua repo `functions.invoke('ai-gateway')`). (2) Webhook Section 3: enqueue jalan (trigger `trg_p2_webhook_*` → `webhook_deliveries`), tapi TIDAK ada dispatcher HTTP (pg_net/pg_cron tidak terpasang, tidak ada Edge Function pengirim) → delivery + HMAC tidak pernah menembak. (3) CI/CD "kirim status balik ke pipeline" (outbound) ikut terdampak gap dispatcher yang sama. (4) Backup/restore metadata-only (bukan binary Storage) — sesuai catatan backlog.
+- Section 5 Automation terverifikasi fungsional end-to-end sesi sebelumnya (enqueue→poll→playwright→hasil→artifact upload). Item `[ ]` jujur: Scheduled Test Run, validasi/sandbox script runner.
+- Tidak ada perubahan kode pada sesi audit ini; murni verifikasi read-only.
+
+### 2026-07-26 — Coordinator: integrasi AI Integration
+
+- Menjalankan Graphify build/query/path wajib sebelum membaca source; setelah perubahan Graphify diperbarui. Agent paralel digunakan untuk arsitektur/security, Edge Function, generator Test Case, analisis Test Run, Issue/assistant, dan QA review.
+- Mengintegrasikan `supabase/functions/ai-gateway/` dengan provider abstraction mock/OpenAI/Gemini, canonical action contract, Zod validation, bearer auth, project/RLS isolation, redaction, timeout/retry terbatas, durable RPC rate limit, dan structured error/envelope. Mock menjadi default development; secret hanya di Edge Function.
+- Menambahkan `supabase/schema_023_p3_ai_integration.sql`: penguatan `is_admin`/`is_approved`/`has_project_access`, tabel metadata `ai_audit_events`, tabel/rpc `ai_rate_limits`/`consume_ai_rate_limit`, RLS, dan tanpa penyimpanan prompt/response mentah.
+- Menambahkan frontend layer `aiRepository`, AI services/hooks, parser Excel/document, Zod draft validation, UI review/save Test Case, UI analisis Test Run read-only, UI draft Issue/duplicate review, serta AI Assistant project-scoped. Semua approval dicatat sebagai metadata audit; Issue severity/reproduction steps dipertahankan di description karena schema Issue existing belum memiliki kolom tersebut.
+- Menambahkan Vitest (`npm run test`) dan `src/helpers/aiIntegration.test.ts` untuk validasi output, duplicate confidence, dan summary. Menambahkan `docs/AI_INTEGRATION.md` serta memperbarui README Edge Function dan FEATURE_BACKLOG AI.
+- Verifikasi: `npm run test` lulus (1 file, 4 test); `npm run build` lulus; `npm run lint` lulus dengan warning lama Fast Refresh/dependency hook saja; `git diff --check` lulus. Deno/Supabase CLI dan Supabase remote tidak tersedia, sehingga contract test Edge Function, penerapan migration/RLS remote, dan deployment provider belum diverifikasi.
+- Warning: build menghasilkan bundle utama sekitar 2.26 MB; npm audit melaporkan 3 high vulnerabilities setelah instalasi Vitest dan perlu ditinjau terpisah. Migration 023 serta secret provider wajib diterapkan sebelum production.
+
+### 2026-07-26 — Final integration verification AI
+
+- Menyelaraskan canonical request/response antara frontend dan Edge Function (termasuk envelope `data/meta`, action `generate_test_cases`, `test_run_analysis`, `issue_draft`, `duplicate_issue_detection`, `assistant_search`) dan menambahkan retrieval requirement/history yang tetap project-scoped.
+- Menambahkan durable audit update policy, approval audit event, manager approval guard, UI AI Issue draft, dan AI Assistant panel.
+- `graphify update .` berhasil; query AI architecture dan path TestRun→TestResult berjalan setelah update.
+- Final: `npm run test` 4/4 lulus, `npm run build` lulus, `npm run lint` exit 0 dengan 6 warning existing, `git diff --check` lulus. `npm audit --omit=dev` tidak dapat diverifikasi karena DNS registry (`EAI_AGAIN`); npm install sebelumnya melaporkan 3 high vulnerabilities yang perlu follow-up.
+
+## 2026-07-26 — Fix permission denied attachment RLS helpers (schema_027)
+
+- User kena "permission denied for function attachment_project_id" saat membuka attachment. Root cause pre-existing (bukan dari pekerjaan automation): `attachment_project_id(text,uuid)`, `can_upload_attachment(text,uuid)`, `can_delete_attachment(text,uuid)` kehilangan EXECUTE untuk role `authenticated` akibat revoke terlalu luas di hardening lama. Ketiganya SECURITY DEFINER dan dipanggil DI DALAM policy RLS `attachments` + `storage.objects` (bucket test-attachments) yang dievaluasi sebagai role pemanggil → caller wajib punya EXECUTE.
+- Migration `schema_027_fix_attachment_helper_grants.sql` (via MCP): `grant execute ... to authenticated` untuk ketiga fungsi. Konsisten dengan helper RLS lain (`has_project_access`/`has_issue_access`) yang memang executable oleh authenticated. Verifikasi: `has_function_privilege('authenticated', ...)` = true untuk ketiganya. Target kini di migration `027_fix_attachment_helper_grants`.
+
+## 2026-07-26 — Auto-upload artifact ke Supabase Storage (BERHASIL end-to-end)
+
+- Menambahkan auto-upload artifact binary (screenshot/video/trace/log) ke Supabase Storage. Desain aman: service role TIDAK pernah ke runner; runner minta signed upload URL ke Edge Function memakai runner token (pola sama seperti ai-gateway).
+- DB: migration `schema_026_automation_artifacts_storage.sql` — bucket private `automation-artifacts` + policy select `storage.objects` untuk project member (`has_project_access(split_part(name,'/',1)::uuid)`). Path object: `{project_id}/{job_id}/{filename}`. Diterapkan via MCP.
+- Edge Function `supabase/functions/automation-artifacts/index.ts` (deployed via MCP, verify_jwt=true): validasi runner token (sha256 → `automation_runners`) + kepemilikan job, lalu `createSignedUploadUrl` per file dan mengembalikan `uploadUrl` absolut. Service role diambil dari env Edge Function.
+- Runner: modul baru `src/upload.ts` (minta signed URL → PUT tiap file → fallback ke path lokal bila upload mati/gagal), `collectArtifacts` kini mengembalikan file lokal (`CollectedArtifact`), executor mengembalikan artifact lokal, loop `runner.ts` memanggil `uploadArtifacts` sebelum `report`. Config toggle `TM_ARTIFACT_UPLOAD` (default true). `ReportArtifact` menambah `path`/`bucket`.
+- Frontend: `AutomationArtifact` menambah `path`/`bucket`; `automationRepository.getArtifactSignedUrl` (`storage.createSignedUrl`, 120s); `AutomationPage` membuka artifact via signed URL saat diklik (fallback http / info bila lokal).
+- Verifikasi end-to-end (re-enqueue, runner versi baru): 2 job selesai (pass+fail), object fisik tersimpan di bucket = 8 file (2 screenshot, 2 video, 2 trace .zip, 2 log), 3.7 MB. Metadata `automation_jobs.artifacts` berisi `path`+`bucket`. Verifikasi lokal: runner `typecheck` EXIT 0; frontend `build` + `lint` (oxlint) EXIT 0 tanpa error baru. `graphify update` → 1433 node.
+- Sisa/blocker: pembersihan artifact lama belum dihubungkan ke retensi (bucket automation-artifacts belum masuk `cleanup_retention`); mengandalkan Edge Function berarti butuh runtime Edge (sudah aktif di target). Runner uji masih berjalan di background pada sesi ini.
+
+## 2026-07-26 — Uji end-to-end automation BERHASIL
+
+- Setup runner lokal untuk uji: `runner/.env` (URL/anon key/token runner `local-dev`), `npm run build`, `runner/example-project` (Playwright + `smoke.spec.ts` PASS, `broken.spec.ts` FAIL), `npx playwright install chromium`. Runner dijalankan di background (`node dist/index.js`) → log `Runner authenticated` + `Polling for jobs`.
+- Data uji: project `Sample Project`, plan `TP-0001 Release QA - Sample` (TC-0001, TC-0002). Mapping via UI: TC-0001→`tests/smoke.spec.ts`, TC-0002→`tests/broken.spec.ts`. Enqueue via UI.
+- Hasil terverifikasi (log runner + `execute_sql`): runner menarik 2 job, menjalankan Playwright lokal, melapor balik. Run `TR-0003` (in_progress, manual completion). TC-0001 → job `passed`, `test_results.status=pass`, 4 artifact. TC-0002 → job `failed`, `test_results.status=fail`, 4 artifact. Loop enqueue→poll→execute→report→test_results terbukti utuh.
+- Catatan: artifact dilaporkan sebagai metadata path `file://` lokal (TM_ARTIFACT_BASE_URL kosong) — belum upload binary ke Storage (deliverable terpisah). Runner masih berjalan di background pada sesi ini.
+
+## 2026-07-26 — Fix 2 bug runtime pasca-apply (schema_025)
+
+- Uji manual "Runner Baru" gagal → cek `get_logs(postgres)` menemukan 2 bug laten dari migration lama yang baru pertama kali dijalankan di Supabase nyata:
+  1. `function digest(text, unknown) does not exist`: pgcrypto (`digest`/`gen_random_bytes`) ada di schema `extensions` pada Supabase, tapi fungsi token dibuat dengan `search_path = public`. Terkonfirmasi via `pg_proc`→`digest_schema=extensions`.
+  2. `audit_logs violates check constraint audit_logs_action_check`: `write_audit_log()` menulis `lower(tg_op)` = insert/update/delete, sedangkan constraint hanya izinkan created/updated/deleted → semua write ke 8 tabel teraudit (termasuk `test_runs`/`test_results` yang dipakai enqueue automation) ter-rollback.
+- Migration baru `supabase/schema_025_fix_pgcrypto_and_audit.sql` (diterapkan via MCP): `alter function ... set search_path = public, extensions` untuk 5 fungsi automation + 3 fungsi CI/CD + 2 fungsi API/webhook yang memakai `digest`; dan `create or replace write_audit_log()` dengan mapping `case tg_op INSERT→created/UPDATE→updated/DELETE→deleted` (execute tetap di-revoke).
+- Verifikasi: memanggil `heartbeat_automation_runner('dummy')` kini mengembalikan `INVALID_RUNNER_TOKEN` (bukan lagi error `digest`), membuktikan pgcrypto resolve. Target kini di migration `025_fix_pgcrypto_and_audit`.
+- Catatan: log juga menampilkan `permission denied for function attachment_project_id` (fitur backup/attachment RLS) — belum diperbaiki, tidak memblokir automation; perlu ditinjau terpisah. Bug yang sama (`digest` search_path & audit action verb) juga ada di file repo `schema_019/020/022/schema_p2_workflow`; schema_025 memperbaikinya di DB secara forward-only tanpa mengedit migration lama.
+
+## 2026-07-26 — Apply migration P2+P3 ke Supabase target (via MCP)
+
+- Menambahkan Supabase MCP server (`.mcp.json`, project_ref `fohuxwzczepdqyrfkovc`); user authenticate via `/mcp`. Semua DDL dijalankan lewat `mcp__supabase__apply_migration` (transaksional per migration).
+- Temuan: target ternyata masih di migration `017_p1_rpc_hardening` — seluruh P2 (018-022), AI (023), DAN file un-numbered `schema_p2_workflow.sql` (audit_logs, test_case_versions, notifications) BELUM pernah keapply. `schema_p2_workflow` adalah prasyarat karena `integration_audit` menulis ke `audit_logs`, dan `schema_024` butuh kolom `test_runs.ci_provider` dari `schema_020`.
+- Menerapkan berurutan (dikonfirmasi user): `p2_workflow_base` → `018_p2_dashboard_reporting` → `019_p2_api_webhooks` → `020_p2_cicd` → `021_p2_backup_retention` → `022_p2_security_hardening` → `023_p3_ai_integration` → `024_p3_automation`. Semua sukses. `list_migrations` mengonfirmasi target kini di `024_p3_automation` (25 migration total).
+- Menambahkan `drop policy if exists` sebelum setiap `create policy` pada versi yang diterapkan (018/019/021/022/023) agar idempotent; isi fungsi/tabel identik dengan file repo.
+- Verifikasi automation via `execute_sql`: 3 tabel (`automation_runners/scripts/jobs`), 7 RPC, 9 RLS policy, kolom `test_runs.ci_provider` ada, RLS aktif di ketiga tabel.
+- `get_advisors(security)`: 0 ERROR. Warning `security_definer_function_executable` (59) menyala di semua RPC project (by-design, otorisasi internal via token hash / `can_edit_project_content`); `function_search_path_mutable` (7) dan `rls_enabled_no_policy` (`api_token_rate_limits`) semuanya pre-existing dari migration lama. Satu perbaikan diterapkan: `revoke execute on validate_automation_script_case()` (trigger helper, bukan RPC publik) — ikut konvensi hardening schema_022; file `schema_024` lokal ikut diperbarui.
+- Blocker tersisa: uji end-to-end runner↔server (butuh runner CLI dijalankan + project Playwright nyata); webhook HTTP dispatcher, HMAC signing, dan binary Storage upload/artifact tetap butuh Edge Function/worker + secret store (belum di-deploy). Edge Function `ai-gateway` juga belum di-deploy ke target.
+
+## 2026-07-26 — CLI Playwright Local Runner (folder runner/)
+
+- Membuat deliverable terpisah `runner/`: CLI/agent Node 20+ TypeScript yang menjalankan Playwright di mesin lokal dan melapor ke server pusat lewat RPC `schema_024`. Sengaja tanpa runtime dependency — Playwright dipanggil via CLI (`child_process`), komunikasi server via `fetch` bawaan Node; hanya devDependency TypeScript + @types/node.
+- Struktur: `src/config.ts` (loader `.env` zero-dep, env override menang), `src/logger.ts`, `src/api.ts` (client RPC `heartbeat`/`poll`/`report` ke `${SUPABASE_URL}/rest/v1/rpc/*` dengan anon key + runner token di body), `src/artifacts.ts` (kumpulkan screenshot/video/trace/log → metadata), `src/executor.ts` (`npx playwright test <script_ref> --output=... --trace=on`, timeout, isolasi per-job dir), `src/runner.ts` (loop heartbeat→poll→execute→report + graceful shutdown SIGINT/SIGTERM + fail-fast token ditolak), `src/index.ts` (entry).
+- Mapping hasil: exit 0→`pass`, selain itu→`fail`, timeout/spawn error→`blocked`; `retry` diminta saat `attempt < max_attempts` (server yang memutuskan requeue). Routing via label runner (subset match) dilakukan server di `poll_automation_job`.
+- Koneksi outbound-only (pull-based): runner tidak membuka port apa pun, aman di balik NAT/firewall/VPN. Konsisten dengan model arsitektur Section 5.
+- Tambahan: `Dockerfile` (base image resmi `mcr.microsoft.com/playwright`, project under test di-mount saat runtime), `README.md`, `.env.example`, `.gitignore`, `package.json`, `tsconfig.json` (NodeNext, import relatif pakai ekstensi `.js`).
+- Verifikasi: `npm install --ignore-scripts` (3 paket, tanpa download browser), `npm run typecheck` (tsc --noEmit) EXIT 0, `npm run build` menghasilkan `dist/` lengkap. Belum ada uji end-to-end runner↔server karena butuh Supabase target + project Playwright nyata.
+
+## 2026-07-26 — Implementasi Section 5 Automation (sisi server pusat, Local Runner)
+
+- Graphify: `graphify query "cicd pipeline token ingest test run orchestration"` untuk orientasi (modul CI/CD `schema_020` jadi template terdekat), lalu `graphify update .` di akhir — graph jadi 1286 node, 2684 edge, 102 community. Warning lama `hooks.json` zero nodes tetap muncul.
+- Migration baru `supabase/schema_024_p3_automation.sql` (tidak mengubah migration lama): tabel `automation_runners`, `automation_scripts` (mapping Test Case↔script, referensi bukan body), `automation_jobs`; trigger `set_updated_at` + validasi project; RLS project-scoped (jobs read-only untuk client, semua write via RPC); token disimpan hash SHA-256 (prefix `tm_`).
+- RPC kontrak Local Runner (pull-based, outbound-only, security definer): `create_automation_runner`, `rotate_automation_runner_token` (authenticated); `enqueue_automation_jobs` (buat Test Run in_progress + seed `test_results` + antre job per Test Case yang punya script); `poll_automation_job` (FOR UPDATE SKIP LOCKED + `required_labels <@ runner.labels` untuk multi-runner); `report_automation_job` (hasil→`test_results` pass/fail/blocked/skip, retry saat sisa attempt, simpan artifact metadata); `heartbeat_automation_runner`; `cancel_automation_job`. Grant: RPC manager→authenticated, RPC runner→anon+authenticated (sejalan pola `ingest_cicd_test_run`).
+- Frontend mengikuti layering: `types/domain.ts` (AutomationRunner/Script/Job/Artifact + status), `helpers/mappers.ts` (3 mapper), `repositories/automationRepository.ts`, `services/automationService.ts` (generate token 32-byte, normalisasi label, validasi), `hooks/useAutomation.ts`, `pages/automation/AutomationPage.tsx` (tab Runner/Mapping Script/Job + dialog enqueue & tampil token sekali). Route `/projects/:id/automation` di `App.tsx` dan menu pin di `AppMenu.tsx`.
+- Keputusan: server pusat tidak pernah menjalankan browser; Run tetap `in_progress` (completion manual); hasil selalu di `test_results`, tidak di `test_cases`/`test_plan_cases`. Test Case tanpa script mapping tetap `not_run` untuk tes manual.
+- Verifikasi lokal: `npm run build` (tsc -b && vite build) berhasil; `npm run lint` (oxlint) berhasil tanpa error, hanya 9 warning lama (Fast Refresh, exhaustive-deps) — tidak ada warning dari file baru.
+- Belum dikerjakan / blocker: migration `schema_024` BELUM dijalankan/diverifikasi pada Supabase target sesi ini (checkbox backlog tetap `[ ]` sesuai konvensi). CLI/agent Local Runner adalah deliverable project terpisah (memakai RPC di atas). Scheduled Test Run dan Storage adapter untuk artifact binary belum ada — job hanya menyimpan metadata/URL artifact.
+
+## 2026-07-26 — Perjelas Section 5 FEATURE_BACKLOG.md (Playwright Local Runner)
+
+- Merombak Section 5 "Automation dan Playwright" untuk menegaskan bahwa Playwright TIDAK dijalankan di server pusat self-hosted.
+- Menetapkan model arsitektur **Local Runner** (mirip self-hosted runner GitHub Actions): CLI/agent di mesin lokal tester/on-prem yang berada di jaringan yang sama dengan aplikasi under test.
+- Koneksi **pull-based (outbound-only)** dipilih (rekomendasi, user menyerahkan keputusan): runner polling job ke server pusat via API token (reuse token P2), push hasil + artifact balik. Mesin lokal tidak perlu buka port, aman di balik NAT/firewall/VPN.
+- Menyusun ulang checklist jadi 3 kelompok: Playwright Local Runner (sisi mesin lokal), Orkestrasi job (sisi server pusat), Skalabilitas & keamanan. Server pusat hanya enqueue job, terima hasil, simpan artifact ke Storage — tidak menjalankan browser.
+- Menyelaraskan penamaan pada Section 7 (urutan implementasi) mengikuti struktur baru.
+- Perubahan dokumentasi saja; tidak menyentuh kode, schema, atau migration.
+
+## 2026-07-26 — Sub-agent 4: AI Test Run Analysis frontend contract
+
+- Menjalankan Graphify query `test run analysis regression summary retest recommendation` dan path `TestRun` → `TestResult` sebelum membaca source.
+- Menambahkan kontrak frontend `v1` untuk gateway `ai-gateway` dengan action `test_run_analysis`; request hanya membawa `projectId` dan `testRunId`, sehingga provider AI tidak dipanggil langsung dari browser.
+- Menambahkan schema Zod strict untuk response analysis, scope check project/Test Run, mode `review_only`, status `draft`/`review_required`, regression summary, failure patterns, risk areas, dan retest recommendations.
+- Menambahkan `aiTestRunAnalysisRepository`, `aiTestRunAnalysisService`, `useTestRunAnalysis`, helper kalkulasi summary, serta `TestRunAnalysisPanel` read-only pada detail Test Run. Panel menampilkan PASS/FAIL/SKIP/BLOCKED/NOT RUN dan tidak memiliki aksi untuk mengubah result/run.
+- Tidak mengubah Edge Function, migration SQL, route global, `test_cases`, `test_plan_cases`, atau status Test Result/Test Run.
+- Verifikasi unit test dilewati karena package/toolchain Vitest belum tersedia dan sesuai instruksi check-in tidak menjalankan command panjang tambahan. Build/lint/Graphify update perlu dijalankan oleh coordinator setelah integrasi.
+
 ## 2026-07-22 — P2 Reporting, Integrasi, Backup, Retention, dan QA final
 
 - Implementation plan dibuat sebelum coding. Graphify wajib dijalankan dengan
@@ -330,3 +451,53 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 - `npm run build` tidak dapat dinyatakan lulus pada kondisi workspace saat ini: type-check menemukan error lint/type dari fitur backup/retention dan integrasi CI/CD agen lain (`RetentionCleanupPreview`, `RetentionPolicy`, `RestorePreview`, mapper restore/retention, dan signature `integrationService`), serta satu error reporting yang sudah diperbaiki dengan menambahkan `id` pada select `test_results`.
 - `graphify update .` berhasil; Graphify melaporkan AST 114/114 file dan warning dua `hooks.json` menghasilkan zero nodes.
 - Verifikasi Supabase remote belum dilakukan; migration 018 perlu dijalankan berurutan setelah migration sebelumnya. FEATURE_BACKLOG Dashboard Trend belum dicentang karena build integrasi dan verifikasi remote masih blocker.
+
+### 2026-07-26 — Audit potensi bug (read-only, tanpa perubahan kode)
+
+- Graphify dijalankan lebih dulu untuk orientasi (query: test run summary, dashboard report, hooks, issue/requirement/attachment, tag/excel, auth). Pembacaan source hanya pada node relevan; skema diverifikasi via `supabase/schema_test_management_v2.sql`.
+- Tidak ada perubahan kode pada sesi ini — hanya temuan. Ringkasan temuan (severity):
+  - HIGH: `tagRepository.findOrCreate` memakai `.ilike('name', name)` → karakter `_`/`%` pada nama tag diperlakukan sebagai wildcard; dedup salah, dan bila pola cocok >1 baris `.maybeSingle()` melempar error → save/import tag gagal. Rekomendasi: `.eq('name', name)` (sesuai unique constraint case-sensitive) atau escape wildcard.
+  - HIGH: `useAuth.tsx` — `loadProfile` di dalam `onAuthStateChange` tanpa try/finally; bila `getOwnProfile` reject, `setLoading(false)` tak pernah jalan → app stuck di loading screen.
+  - MEDIUM: batas default 1000 baris PostgREST pada `dashboardReportRepository.findResults/findRuns` dan `testResultRepository.getSummaryByRunIds` (agregasi client-side) → total/pass/fail/progress bisa terpotong diam-diam pada data besar. Rekomendasi: agregasi via RPC atau paginasi `.range()`.
+  - MEDIUM: race stale-response di `useTestRunDetail`/`useTestPlanDetail`/`useTestRuns` (tanpa cancellation guard seperti di `useProjectRole`).
+  - MEDIUM (laten): `useTestRuns(testPlanId, filters)` — bila dipanggil dengan objek `filters` inline, `useCallback` berubah tiap render → loop reload. Saat ini hanya dipanggil tanpa filters.
+  - LOW: `issueService.create` tak memvalidasi test result FAIL (PRD: issue 0..N per FAIL); `recordResult` tak mencegah pencatatan pada run `completed` dan tetap set `executed_at` walau status dikembalikan ke `not_run`; fallback `getSummaryByRunIds` di testRunService mengabaikan skip/blocked/notRun (dead code); komentar `issueRepository.findAllByProject` salah label ("across an entire test run").
+- Verifikasi: pembacaan statis + konfirmasi skema (default `test_results.status='not_run'`, unique `tags(project_id,name)`). Build/lint tidak dijalankan (tanpa perubahan kode).
+### 2026-07-26 — Sub-agent 5: Frontend AI Issue dan Assistant Contract
+
+- Graphify wajib dijalankan lebih dulu: query `issue duplicate detection AI assistant project search` dan path `TestCase` → `Issue`.
+- Menambahkan kontrak frontend `aiRepository` untuk memanggil Supabase Edge Function `ai-gateway`; frontend tidak memegang provider/API key.
+- Menambahkan Zod validation, draft Issue dari Test Result FAIL, review gate sebelum save, duplicate candidate confidence/reason dengan allow-list project aktif, serta assistant search terstruktur yang memfilter response ke project aktif.
+- Menambahkan hook `useAiIssueWorkflow` dan `useAiAssistant` yang mengambil auth context dan project context; tidak menambah route, migration, Edge Function, atau mengubah scope agent lain.
+- Karena schema `issues` saat ini belum memiliki `severity`/`reproduction_steps`, adapter save mempertahankan data tersebut di description secara eksplisit tanpa migration.
+- Verifikasi: patch berhasil diterapkan; full build/lint/test tidak dijalankan sesuai arahan coordinator untuk menghentikan command panjang. Vitest belum tersedia di `package.json`.
+
+### 2026-07-26 — Fix bug hasil audit (HIGH + race guard)
+
+- Graphify dipakai untuk orientasi ulang sebelum edit; perubahan hanya pada baris spesifik yang sudah teridentifikasi di audit.
+- FIX HIGH #1 — `frontend/src/repositories/tagRepository.ts`: `findOrCreate` diganti dari `.ilike('name', name)` ke `.eq('name', name)`. Menghindari `_`/`%` diperlakukan sebagai wildcard (dedup salah / `maybeSingle()` melempar saat >1 baris cocok → save & import tag gagal) sekaligus konsisten dengan constraint `unique (project_id, name)`.
+- FIX HIGH #2 — `frontend/src/hooks/useAuth.tsx`: `loadProfile` di dalam `onAuthStateChange` dibungkus `try/finally` agar `setLoading(false)` selalu jalan meski profil gagal dimuat (mencegah app terkunci di loading screen).
+- FIX MEDIUM #4 — race guard `requestRef` (monotonic id) di `useTestRunDetail.ts`, `useTestPlanDetail.ts`, `useTestRuns.ts` agar respons lama tak menimpa yang baru saat id berubah cepat.
+- FIX LOW — koreksi komentar `issueRepository.findAllByProject` (sebelumnya salah label "across an entire test run").
+- Belum diperbaiki (butuh keputusan desain, direkomendasikan sebagai follow-up): #3 batas 1000 baris PostgREST pada agregasi dashboard report/summary (perlu paginasi `.range()` atau RPC agregasi server-side); #5 footgun `useTestRuns` bila `filters` inline (laten, belum terpicu); #6/#7 business rule (issue hanya untuk FAIL, larangan record pada run completed).
+- Verifikasi: `npx tsc -b --noEmit` → exit 0 (typecheck lulus). `npm run lint` (oxlint) → exit 0, hanya warning lama yang tidak berkaitan dengan file yang diubah. Build penuh & verifikasi Supabase remote tidak dijalankan pada sesi ini.
+
+### 2026-07-26 — Fix bug #3: paginasi agregasi (batas 1000 baris PostgREST)
+
+- Graphify dipakai untuk orientasi ulang sebelum edit; perubahan pada baris query spesifik yang sudah teridentifikasi.
+- Tambah helper `frontend/src/repositories/paginate.ts` (`fetchAllRows`): loop `.range(from, to)` sampai page < pageSize (default 1000), agar row set penuh terbaca — bukan terpotong diam-diam di 1000 baris.
+- Terapkan pada agregasi client-side:
+  - `dashboardReportRepository.findRuns`, `findResults`, `findIssues`
+  - `testResultRepository.getSummaryByRunIds`, `getDistinctTestersByRunIds`
+- Dampak: total/pass/fail/passRate/failRate/progress di Dashboard Report dan summary Test Run kini akurat pada data > 1000 baris.
+- Catatan sisa (belum diubah): `.in(resultIds/runIds)` dengan list sangat besar berpotensi kena batas panjang query string PostgREST — isu terpisah dari row cap, dicatat untuk follow-up bila jumlah id membesar.
+- Verifikasi: `npx tsc -b --noEmit` → exit 0; `npm run lint` (oxlint) → exit 0, tanpa warning baru dari file yang diubah.
+
+### 2026-07-26 — Fix bug #5, #6, #7 (footgun hook + business rule)
+
+- Graphify dipakai untuk orientasi call site (TestRunDetailPage, aiIssueService) sebelum edit. Dikonfirmasi AI issue workflow sudah membatasi draft ke result FAIL, sehingga guard service konsisten dan tidak memutus alur AI.
+- FIX #5 — `frontend/src/hooks/useTestRuns.ts`: dependency `useCallback` diubah dari objek `filters` (identitas) ke `filtersKey = JSON.stringify(filters)`, dan filters di-parse ulang di dalam callback. Menghilangkan risiko loop reload tak berujung bila caller mengoper objek `filters` inline. Lolos exhaustive-deps tanpa warning.
+- FIX #6 — `frontend/src/services/issueService.ts`: `create` kini async dan memvalidasi via `testResultRepository.findExecutionContext` bahwa test result berstatus `fail` sebelum membuat issue (PRD: Issue 0..N per hasil FAIL). Berlaku untuk semua caller (dialog manual, AI workflow, otomatisasi mendatang), bukan hanya UI.
+- FIX #7a — `frontend/src/services/testRunService.ts`: `recordResult` kini async, menolak pencatatan bila run sudah `completed` ("buka kembali/reopen dulu"). Ditambah guard UX di `TestRunDetailPage` — tombol "Catat" disembunyikan saat run completed (alur reopen sudah ada).
+- FIX #7b — `frontend/src/repositories/testResultRepository.ts`: `executed_at` di-set `null` saat status dikembalikan ke `not_run` (sebelumnya selalu stamp now → timestamp eksekusi tertinggal padahal summary menghitungnya belum dieksekusi). Ditambah method `findExecutionContext` (1 round trip: status result + status run) untuk mendukung guard #6/#7a.
+- Verifikasi: `npx tsc -b --noEmit` → exit 0; `npm run lint` (oxlint) → exit 0, tanpa warning baru dari file yang diubah. Build penuh & verifikasi Supabase remote tidak dijalankan pada sesi ini.

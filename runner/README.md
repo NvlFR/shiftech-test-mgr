@@ -1,0 +1,92 @@
+# TestManager — Playwright Local Runner
+
+CLI/agent yang menjalankan automation Playwright **di mesin lokal / on-prem**,
+lalu melapor ke server pusat TestManager. Ini bagian "Local Runner" dari
+Section 5 di [`../FEATURE_BACKLOG.md`](../FEATURE_BACKLOG.md).
+
+## Kenapa runner terpisah?
+
+Server pusat (Supabase + frontend) yang di-deploy self-hosted **tidak menjalankan
+browser** dan sering tidak punya akses ke aplikasi yang diuji (localhost /
+jaringan internal / VPN). Runner ini di-install di mesin yang **bisa mengakses
+aplikasi under test**, lalu **konek keluar (outbound-only)** ke server pusat:
+
+```
+Mesin lokal (tester / on-prem)            Server pusat (self-hosted)
+  Playwright Local Runner  ── poll ──▶   Supabase RPC (runner token)
+        │                  ◀── job ──        │
+   [npx playwright test]                     │
+        │                  ── report ──▶   test_results + artifact metadata
+```
+
+Runner **tidak membuka port** apa pun — aman di balik NAT/firewall.
+
+## Prasyarat
+
+- Node.js 20+.
+- Sebuah project Playwright (punya `playwright.config.*` dan file test) yang bisa
+  menjalankan aplikasi under test. Runner memanggil Playwright via CLI, jadi
+  versi Playwright mengikuti project itu.
+- Migration `supabase/schema_024_p3_automation.sql` sudah dijalankan di Supabase.
+- Sebuah runner sudah dibuat di UI (Automation → **Runner Baru**) — salin token
+  sekali-tampilnya.
+
+## Setup
+
+```bash
+cd runner
+cp .env.example .env      # isi TM_SUPABASE_URL, TM_SUPABASE_ANON_KEY, TM_RUNNER_TOKEN, TM_PROJECT_DIR
+npm install               # hanya devDependency (TypeScript); runner tanpa runtime deps
+npm run build
+npm start
+```
+
+`script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
+terhadap `TM_PROJECT_DIR`.
+
+## Cara kerja
+
+1. **Heartbeat** saat start (fail-fast kalau token ditolak) lalu tiap
+   `TM_HEARTBEAT_INTERVAL_SECONDS` → UI menampilkan Online/Offline.
+2. **Poll** `poll_automation_job`; server mengklaim satu job antre yang
+   `required_labels`-nya subset dari label runner (`FOR UPDATE SKIP LOCKED`,
+   aman untuk banyak runner).
+3. **Execute**: `npx playwright test <script_ref> --output=artifacts/<jobId> --trace=on`
+   di dalam `TM_PROJECT_DIR`, dengan timeout `TM_JOB_TIMEOUT_SECONDS`.
+4. **Report** `report_automation_job`: exit code 0 → `pass`, selain itu → `fail`
+   (timeout/spawn error → `blocked`). Kalau gagal dan masih ada sisa attempt,
+   runner meminta `retry` dan server mengembalikan job ke antrean.
+
+## Konfigurasi (`.env`)
+
+Lihat [`.env.example`](.env.example) untuk daftar lengkap dan penjelasan tiap
+variabel (URL server, token, direktori project, interval poll/heartbeat, timeout,
+dan opsi artifact).
+
+## Label / routing
+
+Label runner = kapabilitas yang diiklankan (mis. `chromium`, `staging`,
+`vpn-internal`). Saat memetakan script ke Test Case di UI, isi **Label runner**
+agar job hanya diambil runner yang cocok. Job tanpa label bisa diambil runner mana
+pun di project yang sama.
+
+## Artifact
+
+Runner mengumpulkan screenshot/video/trace/log dari output Playwright dan
+melaporkan **metadata**-nya. Jika `TM_ARTIFACT_BASE_URL` diisi, URL artifact
+dibentuk `${TM_ARTIFACT_BASE_URL}/<jobId>/<file>` (asumsi direktori itu di-serve).
+Jika kosong, dilaporkan sebagai path `file://`. Upload binary ke Storage
+(Supabase/S3/MinIO) adalah deliverable terpisah.
+
+## Docker
+
+```bash
+docker build -t testmanager-local-runner .
+docker run --rm --env-file .env \
+  -v /path/to/playwright-project:/project \
+  -e TM_PROJECT_DIR=/project \
+  testmanager-local-runner
+```
+
+Base image `mcr.microsoft.com/playwright` sudah menyertakan browser + dependency
+OS-nya. Jalankan di jaringan yang sama dengan aplikasi under test.

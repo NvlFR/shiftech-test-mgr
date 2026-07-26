@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { testPlanService } from '../services/testPlanService';
 import type { TestPlanCaseWithDetails } from '../types/domain';
 
@@ -7,14 +7,19 @@ import type { TestPlanCaseWithDetails } from '../types/domain';
 export function useTestPlanDetail(testPlanId: string | null) {
   const [cases, setCases] = useState<TestPlanCaseWithDetails[]>([]);
   const [loading, setLoading] = useState(false);
+  // Monotonic request id: a slower earlier fetch must not overwrite a newer one when testPlanId changes.
+  const requestRef = useRef(0);
 
   const reload = useCallback(async () => {
     if (!testPlanId) return;
+    const requestId = ++requestRef.current;
     setLoading(true);
     try {
-      setCases(await testPlanService.listCases(testPlanId));
+      const result = await testPlanService.listCases(testPlanId);
+      if (requestId !== requestRef.current) return;
+      setCases(result);
     } finally {
-      setLoading(false);
+      if (requestId === requestRef.current) setLoading(false);
     }
   }, [testPlanId]);
 

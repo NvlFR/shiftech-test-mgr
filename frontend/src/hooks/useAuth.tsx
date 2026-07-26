@@ -39,12 +39,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // right before the real session arrived.
     const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
-      if (session?.user) {
-        await loadProfile(session.user.id);
-      } else {
-        setProfile(null);
+      try {
+        if (session?.user) {
+          await loadProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
+      } finally {
+        // Must run even if loadProfile rejects (network/RLS error) — otherwise `loading`
+        // stays true forever and the app is stuck on the loading screen.
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.subscription.unsubscribe();

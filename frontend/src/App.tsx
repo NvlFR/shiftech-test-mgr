@@ -20,6 +20,7 @@ import { UserDetailPage } from './pages/users/UserDetailPage';
 import { RequirementsPage } from './pages/requirements/RequirementsPage';
 import { CicdIntegrationPage } from './pages/integrations/CicdIntegrationPage';
 import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
+import { AutomationPage } from './pages/automation/AutomationPage';
 import { ProjectDataManagementPage } from './pages/projects/ProjectDataManagementPage';
 import { DashboardReportPage } from './pages/dashboard/DashboardReportPage';
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/projects/:id/integrations" element={<IntegrationsPage />} />
           <Route path="/projects/:id/requirements" element={<RequirementsPage />} />
           <Route path="/projects/:id/integrations/cicd" element={<CicdIntegrationPage />} />
+          <Route path="/projects/:id/automation" element={<AutomationPage />} />
           <Route path="/projects/:id/data-management" element={<ProjectDataManagementPage />} />
           <Route path="/test-plans" element={<TestPlansPage />} />
           <Route path="/test-plans/:id" element={<TestPlanDetailPage />} />

@@ -23,8 +23,11 @@ import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { testPlanService } from '../../services/testPlanService';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
+import { useTestRunAnalysis } from '../../hooks/useTestRunAnalysis';
 import type { TestPlan } from '../../types/domain';
 import { AttachmentPanel } from '../../components/ui/AttachmentPanel';
+import { TestRunAnalysisPanel } from '../../components/test-runs/TestRunAnalysisPanel';
+import { AiIssueDraftDialog } from '../../components/ai/AiIssueDraftDialog';
 import {
   TEST_RESULT_STATUS_LABEL,
   TEST_RESULT_STATUS_SEVERITY,
@@ -53,6 +56,7 @@ export function TestRunDetailPage() {
   const [testPlan, setTestPlan] = useState<TestPlan | null>(null);
   const [projectName, setProjectName] = useState<string | null>(null);
   const { canRunTests, canManageIssues, canDeleteContent } = useProjectRole(testPlan?.projectId);
+  const { analysis, loading: analysisLoading, error: analysisError, analyze: analyzeTestRun } = useTestRunAnalysis(testPlan?.projectId ?? null, id ?? null);
 
   const issueCountByResult = runIssues.reduce<Record<string, number>>((acc, issue) => {
     acc[issue.testResultId] = (acc[issue.testResultId] ?? 0) + 1;
@@ -111,6 +115,8 @@ export function TestRunDetailPage() {
   const [issueActual, setIssueActual] = useState('');
   const [issueExpected, setIssueExpected] = useState('');
   const [issueError, setIssueError] = useState<string | null>(null);
+  const [aiIssueDialogOpen, setAiIssueDialogOpen] = useState(false);
+  const [aiIssueResult, setAiIssueResult] = useState<TestResultWithDetails | null>(null);
 
   function openIssueDialog(row: TestResultWithDetails) {
     setActiveResult(row);
@@ -222,8 +228,19 @@ export function TestRunDetailPage() {
           </span>
           <span>{summary.progressPercent}%</span>
         </div>
-        <ProgressBar value={summary.progressPercent} showValue={false} />
+      <ProgressBar value={summary.progressPercent} showValue={false} />
       </div>
+
+      {testRun && testPlan && (
+        <TestRunAnalysisPanel
+          summary={summary}
+          analysis={analysis}
+          loading={analysisLoading}
+          error={analysisError}
+          canAnalyze
+          onAnalyze={analyzeTestRun}
+        />
+      )}
 
       {testRun && <AttachmentPanel kind="test_run" entityId={testRun.id} canUpload={canRunTests} canDelete={canDeleteContent} />}
 
@@ -274,9 +291,12 @@ export function TestRunDetailPage() {
             style={{ width: '9rem' }}
             body={(row: TestResultWithDetails) => (
               <div className="flex gap-1">
-                {canRunTests && <Button label="Catat" icon="pi pi-pencil" size="small" text onClick={() => openResultDialog(row)} />}
+                {canRunTests && testRun?.status !== 'completed' && <Button label="Catat" icon="pi pi-pencil" size="small" text onClick={() => openResultDialog(row)} />}
                 {canManageIssues && row.status === 'fail' && (
-                  <Button icon="pi pi-flag" size="small" text severity="danger" aria-label="Buat Issue" onClick={() => openIssueDialog(row)} />
+                  <>
+                    <Button icon="pi pi-flag" size="small" text severity="danger" aria-label="Buat Issue" onClick={() => openIssueDialog(row)} />
+                    <Button icon="pi pi-sparkles" size="small" text severity="help" aria-label="Buat draft Issue dengan AI" onClick={() => { setAiIssueResult(row); setAiIssueDialogOpen(true); }} />
+                  </>
                 )}
               </div>
             )}
@@ -337,6 +357,8 @@ export function TestRunDetailPage() {
           <Button label="Buat Issue" size="small" onClick={handleCreateIssue} />
         </div>
       </Dialog>
+
+      {testPlan && <AiIssueDraftDialog visible={aiIssueDialogOpen} projectId={testPlan.projectId} result={aiIssueResult} onHide={() => setAiIssueDialogOpen(false)} onSaved={() => navigate(`/test-runs/${id}/issues`)} />}
 
       {/* --- Complete Run Dialog --- */}
       <Dialog header="Selesaikan Test Run" visible={completeDialogOpen} onHide={() => setCompleteDialogOpen(false)} style={{ width: '28rem' }}>

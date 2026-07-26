@@ -14,6 +14,8 @@ import type { Module, Profile, Tag, TestCasePriority, TestCaseStatus, TestCaseWi
 import { useProjectContext } from '../../hooks/useProjectContext';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { TEST_CASE_PRIORITY_LABEL, TEST_CASE_PRIORITY_SEVERITY, TEST_CASE_STATUS_LABEL, TEST_CASE_STATUS_SEVERITY } from '../../helpers/statusLabels';
+import { AiTestCaseGeneratorDialog } from '../../components/ai/AiTestCaseGeneratorDialog';
+import { AiAssistantPanel } from '../../components/ai/AiAssistantPanel';
 
 const priorities: { label: string; value: TestCasePriority }[] = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ label: TEST_CASE_PRIORITY_LABEL[value], value }));
 const statuses: { label: string; value: TestCaseStatus }[] = (['active', 'archived'] as const).map((value) => ({ label: TEST_CASE_STATUS_LABEL[value], value }));
@@ -28,6 +30,7 @@ export function TestCasesPage() {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<{ moduleId: string | null; tagId: string | null; priority: TestCasePriority | null; status: TestCaseStatus | null; assignedTo: string | null }>({ moduleId: null, tagId: null, priority: null, status: null, assignedTo: null });
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [bulk, setBulk] = useState<{ priority: TestCasePriority | null; status: TestCaseStatus | null; moduleId: string | null; assignedTo: string | null; tagNames: string[] | null }>({ priority: null, status: null, moduleId: null, assignedTo: null, tagNames: null });
 
   const reload = useCallback(async () => {
@@ -46,8 +49,9 @@ export function TestCasesPage() {
   }
 
   return <div>
-    <PageHeader title="Test Cases" actions={<div className="flex gap-2"><Button label={`Bulk update (${selected.length})`} icon="pi pi-pencil" size="small" disabled={!selected.length} onClick={() => setBulkOpen(true)} /><Dropdown value={projectId} options={projects.map((p) => ({ label: p.name, value: p.id }))} onChange={(e) => setProjectId(e.value)} placeholder="Pilih project" className="w-15rem" showClear /></div>} />
+    <PageHeader title="Test Cases" actions={<div className="flex gap-2"><Button label="Generate dengan AI" icon="pi pi-sparkles" size="small" outlined disabled={!projectId} onClick={() => setAiDialogOpen(true)} /><Button label={`Bulk update (${selected.length})`} icon="pi pi-pencil" size="small" disabled={!selected.length} onClick={() => setBulkOpen(true)} /><Dropdown value={projectId} options={projects.map((p) => ({ label: p.name, value: p.id }))} onChange={(e) => setProjectId(e.value)} placeholder="Pilih project" className="w-15rem" showClear /></div>} />
     {!projectId && <p className="text-color-secondary">Pilih project untuk melihat test case.</p>}
+    {projectId && <AiAssistantPanel />}
     {projectId && <div className="flex flex-wrap gap-2 mb-3">
       <Dropdown value={filter.moduleId} options={modules.map((m) => ({ label: m.name, value: m.id }))} onChange={(e) => setFilter({ ...filter, moduleId: e.value })} placeholder="Semua module" showClear />
       <Dropdown value={filter.tagId} options={tags.map((t) => ({ label: t.name, value: t.id }))} onChange={(e) => setFilter({ ...filter, tagId: e.value })} placeholder="Semua tag" showClear />
@@ -68,5 +72,6 @@ export function TestCasesPage() {
     <Dialog header="Bulk update Test Case" visible={bulkOpen} onHide={() => setBulkOpen(false)} style={{ width: '28rem' }}>
       <div className="flex flex-column gap-3"><small>Field yang dikosongkan tidak diubah.</small><Dropdown value={bulk.priority} options={priorities} onChange={(e) => setBulk({ ...bulk, priority: e.value })} placeholder="Prioritas" showClear /><Dropdown value={bulk.status} options={statuses} onChange={(e) => setBulk({ ...bulk, status: e.value })} placeholder="Status" showClear /><Dropdown value={bulk.moduleId} options={modules.map((m) => ({ label: m.name, value: m.id }))} onChange={(e) => setBulk({ ...bulk, moduleId: e.value })} placeholder="Module" showClear /><Dropdown value={bulk.assignedTo} options={profiles.map((p) => ({ label: p.fullName ?? p.email, value: p.id }))} onChange={(e) => setBulk({ ...bulk, assignedTo: e.value })} placeholder="Assignee" showClear /><MultiSelect value={bulk.tagNames} options={tags.map((t) => ({ label: t.name, value: t.name }))} onChange={(e) => setBulk({ ...bulk, tagNames: e.value })} placeholder="Tag" display="chip" filter showClear /><Button label="Terapkan" onClick={() => void applyBulk()} /></div>
     </Dialog>
+    {projectId && <AiTestCaseGeneratorDialog visible={aiDialogOpen} projectId={projectId} modules={modules} tags={tags} existingTestCases={testCases} onHide={() => setAiDialogOpen(false)} onSaved={reload} />}
   </div>;
 }

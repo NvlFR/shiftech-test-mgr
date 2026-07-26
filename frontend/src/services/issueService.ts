@@ -1,4 +1,5 @@
 import { issueRepository } from '../repositories/issueRepository';
+import { testResultRepository } from '../repositories/testResultRepository';
 import type { Issue, IssuePriority } from '../types/domain';
 
 export const issueService = {
@@ -18,7 +19,7 @@ export const issueService = {
     return issueRepository.findAllByProject(projectId);
   },
 
-  create(input: {
+  async create(input: {
     testResultId: string;
     title: string;
     description?: string;
@@ -27,6 +28,11 @@ export const issueService = {
     priority?: IssuePriority;
   }) {
     if (!input.title.trim()) throw new Error('Judul issue tidak boleh kosong');
+    // Domain rule (PRD): an Issue is filed against a FAILED test result. Enforce here so every
+    // caller (manual dialog, AI workflow, future automation) is bound by it, not just the UI.
+    const context = await testResultRepository.findExecutionContext(input.testResultId);
+    if (!context) throw new Error('Test result tidak ditemukan');
+    if (context.resultStatus !== 'fail') throw new Error('Issue hanya bisa dibuat untuk hasil yang FAIL');
     return issueRepository.create({
       testResultId: input.testResultId,
       title: input.title.trim(),

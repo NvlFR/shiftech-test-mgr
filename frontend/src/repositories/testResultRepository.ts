@@ -1,6 +1,7 @@
 import { supabase } from '../config/supabaseClient';
 import { mapProfileRow, mapTestCaseRow, mapTestResultRow } from '../helpers/mappers';
-import type { TestResult, TestResultStatus, TestResultWithDetails } from '../types/domain';
+import { fetchAllRows } from './paginate';
+import type { TestResult, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
 
 export const testResultRepository = {
   // One row per test case in the plan, seeded as 'not_run' the moment a run starts —
@@ -29,15 +30,13 @@ export const testResultRepository = {
 
   async getSummaryByRunIds(runIds: string[]): Promise<Record<string, { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number }>> {
     if (runIds.length === 0) return {};
-    const { data, error } = await supabase
-      .from('test_results')
-      .select('test_run_id, status')
-      .in('test_run_id', runIds);
+    const data = await fetchAllRows<any>((from, to) =>
+      supabase.from('test_results').select('test_run_id, status').in('test_run_id', runIds).range(from, to),
+    );
 
-    if (error) throw error;
     const map: Record<string, { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number }> = {};
     for (const runId of runIds) map[runId] = { total: 0, pass: 0, fail: 0, skip: 0, blocked: 0, notRun: 0 };
-    for (const row of data ?? []) {
+    for (const row of data) {
       const entry = map[row.test_run_id];
       if (!entry) continue;
       entry.total++;
@@ -52,14 +51,11 @@ export const testResultRepository = {
 
   async getDistinctTestersByRunIds(runIds: string[]): Promise<Record<string, { id: string; fullName: string | null }[]>> {
     if (runIds.length === 0) return {};
-    const { data, error } = await supabase
-      .from('test_results')
-      .select('test_run_id, tester_id')
-      .in('test_run_id', runIds)
-      .not('tester_id', 'is', null);
+    const data = await fetchAllRows<any>((from, to) =>
+      supabase.from('test_results').select('test_run_id, tester_id').in('test_run_id', runIds).not('tester_id', 'is', null).range(from, to),
+    );
 
-    if (error) throw error;
-    const profileIds = [...new Set((data ?? []).map((r: any) => r.tester_id).filter(Boolean))];
+    const profileIds = [...new Set(data.map((r: any) => r.tester_id).filter(Boolean))];
     const map: Record<string, { id: string; fullName: string | null }[]> = {};
     if (profileIds.length === 0) return map;
 
@@ -94,7 +90,9 @@ export const testResultRepository = {
         status: input.status,
         tester_id: input.testerId,
         notes: input.notes,
-        executed_at: new Date().toISOString(),
+        // Reverting a result to 'not_run' must clear executed_at — otherwise the row shows an
+        // execution timestamp while the summary counts it as not-yet-executed.
+        executed_at: input.status === 'not_run' ? null : new Date().toISOString(),
       })
       .eq('id', id)
       .select('*')
@@ -102,5 +100,21 @@ export const testResultRepository = {
 
     if (error) throw error;
     return mapTestResultRow(data);
+  },
+
+  // Lightweight lookup for business-rule guards: a result's own status plus its run's status,
+  // in one round trip. Used to enforce "issue only for FAIL" and "no recording on a completed run".
+  async findExecutionContext(
+    resultId: string,
+  ): Promise<{ resultStatus: TestResultStatus; runStatus: TestRunStatus } | null> {
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('status, test_run:test_runs(status)')
+      .eq('id', resultId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    const run = (data as any).test_run;
+    return { resultStatus: (data as any).status, runStatus: run?.status };
   },
 };
