@@ -9,6 +9,8 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 - Memeriksa status branch, reflog, dan riwayat commit setelah proses sync/pull fork.
 - Tidak ditemukan merge conflict atau merge/rebase yang sedang berjalan.
 - Perubahan kerja akan diamankan dalam commit baru; folder `.codex/` tetap dikecualikan dari commit sesuai keputusan sebelumnya.
+- Percobaan push ke `origin/master` ditolak karena remote berada 244 commit di depan lokal (`non-fast-forward`); tidak ada force-push yang dilakukan.
+- Menyiapkan penggantian histori `origin/master` dengan histori lokal menggunakan backup branch dan `git push --force-with-lease` sesuai permintaan.
 
 ### 2026-07-26 — Section 3: webhook HTTP delivery (schema_028) — FUNGSIONAL
 
