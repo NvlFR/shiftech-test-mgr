@@ -397,11 +397,11 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 
 **Discovery / read**
 
-- [ ] `project.list`, `project.get` — daftar & detail project yang bisa diakses token.
+- [x] `project.list`, `project.get` — daftar & detail project yang bisa diakses token.
 - [ ] `requirement.list`, `requirement.get`, `requirement.coverage` — termasuk
       requirement yang belum punya test (reuse Section 2 Traceability).
-- [ ] `testcase.search` — filter module, tag, priority, status, free-text.
-- [ ] `testcase.get` — detail lengkap + steps + expected result + versi.
+- [x] `testcase.search` — filter module, tag, priority, status, free-text.
+- [x] `testcase.get` — detail lengkap + steps + expected result + versi.
 - [ ] `testplan.list`, `testplan.get` — beserta isi test case-nya.
 - [ ] `testrun.list`, `testrun.get` — summary dihitung on-the-fly (tidak ada kolom hasil).
 - [ ] `testresult.list` — filter status PASS/FAIL/SKIP/BLOCKED, tester, run.

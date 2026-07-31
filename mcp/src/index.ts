@@ -4,18 +4,25 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { loadConfig } from "./config.js";
 import { AuthRepository } from "./repositories/authRepository.js";
 import { AuthService } from "./services/authService.js";
+import { ReadRepository } from "./repositories/readRepository.js";
+import { ReadService } from "./services/readService.js";
+import { createReadToolRegistrar } from "./tools/readTools.js";
 import { registerTools, toolRegistry } from "./tools/registry.js";
 
 const config = loadConfig();
 const authService = new AuthService(config, new AuthRepository(config));
 const session = await authService.createSession();
+const readService = new ReadService(session, new ReadRepository(config));
 
 const server = new McpServer({
   name: "testmanager",
   version: "0.1.0",
 });
 
-registerTools(server, toolRegistry, config.readonly);
+registerTools(server, {
+  read: [...toolRegistry.read, createReadToolRegistrar(session, readService)],
+  write: toolRegistry.write,
+}, config.readonly);
 
 const transport = new StdioServerTransport();
 
@@ -26,9 +33,5 @@ const shutdown = async (): Promise<void> => {
 
 process.once("SIGINT", () => void shutdown());
 process.once("SIGTERM", () => void shutdown());
-
-// Future tools must receive this single authenticated, project-scoped session
-// and call assertToolArguments before invoking their service layer.
-void session;
 
 await server.connect(transport);

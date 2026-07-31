@@ -30,6 +30,7 @@ export interface ErrorEnvelope {
 }
 
 export interface ToolResponse {
+  [key: string]: unknown;
   content: Array<{ type: "text"; text: string }>;
   isError?: true;
 }

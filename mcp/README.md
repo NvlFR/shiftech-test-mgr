@@ -2,7 +2,7 @@
 
 Fondasi MCP server TestManager berbasis Node.js 20+, TypeScript, dan transport
 stdio. Server mengautentikasi API token saat startup dan hanya membuka sesi jika
-token aktif terikat ke `TM_PROJECT_ID`. Versi ini belum mendaftarkan tool.
+token aktif terikat ke `TM_PROJECT_ID`.
 
 ## Persyaratan
 
@@ -55,3 +55,16 @@ repository yang dibatasi `ProjectSession.projectId`; RLS tetap menjadi batas
 keamanan terakhir. Jalankan `supabase/schema_047_mcp_auth.sql` setelah
 `supabase/schema_025_fix_pgcrypto_and_audit.sql` melalui proses
 migration proyek sebelum mengoperasikan server (jangan memasukkan token ke SQL).
+Migration read tools `supabase/schema_048_mcp_read_batch_1.sql` juga harus
+dijalankan sesudahnya.
+
+## Tool read batch 1
+
+- `testmanager.project.list` dan `testmanager.project.get`
+- `testmanager.testcase.search`: filter module UUID/nama/kode, tag, priority,
+  status, free-text, serta pagination cursor
+- `testmanager.testcase.get`: detail, simple/structured steps, expected result,
+  dan seluruh riwayat versi
+
+Semua query mengirim token hanya dalam body RPC internal. RPC memvalidasi ulang
+token aktif dan project scope; hasil dari project lain tidak dapat dikembalikan.

@@ -1487,3 +1487,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Saat `TM_MCP_READONLY=1`, registry berhenti setelah mendaftarkan grup baca sehingga registrar tool tulis sama sekali tidak dijalankan dan tool tulis tidak muncul pada discovery MCP. Mode normal tetap mendaftarkan kedua grup.
 - Menambahkan contract test untuk kedua mode dan memperjelas perilaku registrasi pada dokumentasi MCP.
 - Verifikasi lulus: `cd mcp && npm test`, `cd mcp && npm run build`, dan `git diff --check`. Tidak mengakses Supabase target, tidak mengubah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-05 tool read batch 1
+
+- Menjalankan `graphify query` sebelum menelusuri fondasi MCP dan mengikuti katalog Discovery/read Section 8.2 `FEATURE_BACKLOG.md`.
+- Menambahkan tool read-only `testmanager.project.list`, `testmanager.project.get`, `testmanager.testcase.search`, dan `testmanager.testcase.get` melalui layering `Tool → ReadService → ReadRepository → Supabase RPC`.
+- `testcase.search` mendukung filter module UUID/nama/kode, tag, priority, status, free-text, pagination cursor stabil, batas 100 item, dan envelope respons bersama. `testcase.get` mengembalikan metadata lengkap, simple steps, structured steps, expected result, serta riwayat versi terurut terbaru.
+- Menambahkan migration `schema_048_mcp_read_batch_1.sql` tanpa menjalankannya ke target. RPC security-definer read-only memvalidasi ulang hash token aktif dan project scope pada setiap panggilan agar API token tidak melewati batas project meskipun query berjalan di luar sesi JWT user.
+- Menambahkan mapper snake_case ke camelCase, tipe domain MCP, dependency langsung `zod`, dokumentasi tool, serta contract/unit test untuk payload RPC, mapping, redaksi error upstream, cursor, validasi UUID, dan penolakan lintas project.
+- Verifikasi lulus: `cd mcp && npm test` (5 suite), `cd mcp && npm run build`, dan `git diff --check`. Tidak mengakses atau menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
