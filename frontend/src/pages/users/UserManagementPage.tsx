@@ -20,7 +20,7 @@ import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator'
 import { useScreenSize } from '../../hooks/useScreenSize';
 import type { UserRole } from '../../types/domain';
 
-const ROLE_OPTIONS: { label: string; value: UserRole }[] = (['pending', 'user', 'admin'] as const)
+const ROLE_OPTIONS: { label: string; value: UserRole }[] = (['pending', 'rejected', 'user', 'admin'] as const)
   .map((value) => ({ label: USER_ROLE_LABEL[value], value }));
 
 export function UserManagementPage() {
@@ -46,6 +46,22 @@ export function UserManagementPage() {
     await profileService.approve(row.id);
     toast.current?.show({ severity: 'success', summary: 'User disetujui', detail: row.email });
     await reload();
+  }
+
+  function handleReject(row: Profile) {
+    confirmDialog({
+      header: 'Tolak User',
+      message: `Pendaftaran "${row.email}" akan ditolak. User tetap dapat disetujui ulang oleh admin. Lanjutkan?`,
+      icon: 'pi pi-times-circle',
+      acceptLabel: 'Tolak',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        await profileService.reject(row.id);
+        toast.current?.show({ severity: 'warn', summary: 'User ditolak', detail: row.email });
+        await reload();
+      },
+    });
   }
 
   async function handlePromote(row: Profile) {
@@ -95,8 +111,11 @@ export function UserManagementPage() {
     return (
       <div className="flex gap-2">
         <Button icon="pi pi-eye" size="small" text rounded aria-label="Detail" onClick={() => navigate(`/users/${row.id}`)} />
-        {row.role === 'pending' && (
+        {(row.role === 'pending' || row.role === 'rejected') && (
           <Button label="Approve" icon="pi pi-check" size="small" onClick={() => handleApprove(row)} />
+        )}
+        {row.role === 'pending' && (
+          <Button label="Tolak" icon="pi pi-times" size="small" severity="danger" outlined onClick={() => handleReject(row)} />
         )}
         {row.role === 'user' && (
           <Button label="Jadikan Admin" icon="pi pi-shield" size="small" severity="secondary" outlined onClick={() => handlePromote(row)} />
@@ -104,7 +123,7 @@ export function UserManagementPage() {
         {row.role === 'admin' && !isSelf && (
           <Button label="Turunkan ke User" icon="pi pi-user" size="small" severity="secondary" outlined onClick={() => handleDemote(row)} />
         )}
-        {row.role !== 'pending' && !isSelf && (
+        {row.role !== 'pending' && row.role !== 'rejected' && !isSelf && (
           <Button icon="pi pi-lock" size="small" severity="warning" outlined aria-label="Cabut Akses" onClick={() => handleRevokeAccess(row)} />
         )}
         {!isSelf && (

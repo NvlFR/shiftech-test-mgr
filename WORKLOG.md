@@ -1332,3 +1332,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memverifikasi bahwa `TestCasesPage.tsx` pada baseline saat ini sudah menyediakan Dropdown priority (`low`, `medium`, `high`, `critical`) dan status (`active`, `archived`), meneruskan nilainya lewat `testCaseService.listFiltered()`, serta membersihkan keduanya melalui aksi Reset.
 - Tidak mengubah source fitur karena scope E03-T06 sudah terpenuhi oleh implementasi existing; tidak ada migration, perubahan database, dependency, commit, push, atau refactor di luar scope.
 - Verifikasi frontend: `npm run build` lulus.
+
+### 2026-07-31 — E06-T14 status rejected approval user
+
+- Menjalankan `graphify query` sebelum menelusuri alur Profile dan membaca scope approval user di `FEATURE_BACKLOG.md`, `TODO.md`, serta open question `docs/PRD.md`.
+- Menambahkan migration baru `schema_041_profile_rejected_role.sql` untuk memperluas check constraint `profiles.role` dengan status `rejected`; migration tidak dijalankan ke Supabase target.
+- Memperbarui `UserRole`, mapper Profile, dan `profileService.reject()` tanpa mengubah layering repository yang sudah menerima domain `UserRole` melalui `updateRole()`.
+- Memperbarui User Management dengan label/filter status Ditolak, aksi Tolak untuk user pending, konfirmasi dan toast, serta opsi approve ulang untuk user rejected. Cabut Akses tetap mengembalikan user approved ke `pending` karena berbeda dari penolakan pendaftaran eksplisit.
+- Verifikasi lulus: `npm run build`, `npm run lint` (7 warning existing di luar scope), dan `git diff --check`. Knowledge graph disinkronkan kembali dengan `graphify update .`.

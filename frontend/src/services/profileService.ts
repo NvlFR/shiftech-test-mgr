@@ -31,6 +31,10 @@ export const profileService = {
     return profileRepository.updateRole(id, 'user');
   },
 
+  reject(id: string) {
+    return profileRepository.updateRole(id, 'rejected');
+  },
+
   // "Revoke access" is the OAuth-world equivalent of amanah-pos's "reset" action:
   // there is no password to reset (login is Google-only), so instead we pull the user
   // back to 'pending' — access is cut immediately and they must be re-approved.

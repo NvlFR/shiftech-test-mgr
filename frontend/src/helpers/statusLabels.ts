@@ -169,12 +169,14 @@ export const ISSUE_TYPE_SEVERITY: Record<IssueType, TagSeverity> = {
 
 export const USER_ROLE_LABEL: Record<UserRole, string> = {
   pending: 'Menunggu',
+  rejected: 'Ditolak',
   user: 'User',
   admin: 'Admin',
 };
 
 export const USER_ROLE_SEVERITY: Record<UserRole, TagSeverity> = {
   pending: 'warning',
+  rejected: 'danger',
   user: 'info',
   admin: 'success',
 };

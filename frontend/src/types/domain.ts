@@ -1,4 +1,4 @@
-export type UserRole = 'pending' | 'user' | 'admin';
+export type UserRole = 'pending' | 'rejected' | 'user' | 'admin';
 
 export interface Profile {
   id: string;

@@ -119,6 +119,7 @@
   "117": "react-dom",
   "118": "schema_027_fix_attachment_helper_grants.sql",
   "119": "zod",
+  "120": "schema_041_profile_rejected_role.sql",
   "121": "react-router-dom",
   "122": "jspdf",
   "123": "useScreenSize.ts",
