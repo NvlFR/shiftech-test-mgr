@@ -1,0 +1,23 @@
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import * as z from "zod/v4";
+import { successResponse, withErrorHandling } from "../helpers/response.js";
+import type { WriteService } from "../services/writeService.js";
+import type { ProjectSession } from "../services/authService.js";
+
+const caseFields = { title: z.string().min(1), module_id: z.string().uuid().nullable().optional(), objective: z.string().nullable().optional(), preconditions: z.string().nullable().optional(), steps: z.string().min(1), expected_result: z.string().min(1), priority: z.enum(["low", "medium", "high", "critical"]).optional(), notes: z.string().nullable().optional() };
+const mapCase = (v: Record<string, unknown>) => Object.fromEntries([
+  ["title", v.title], ["moduleId", v.module_id], ["objective", v.objective], ["preconditions", v.preconditions],
+  ["steps", v.steps], ["expectedResult", v.expected_result], ["priority", v.priority], ["notes", v.notes],
+].filter((entry) => entry[1] !== undefined));
+const annotations = { destructiveHint: false, readOnlyHint: false, idempotentHint: false } as const;
+
+export const createWriteToolRegistrar = (session: ProjectSession, service: WriteService) => (server: McpServer): void => {
+  const run = (args: unknown, action: () => Promise<unknown>) => withErrorHandling(async () => { session.assertToolArguments(args); return successResponse(await action()); });
+  server.registerTool("testmanager.testcase.create_bulk", { description: "Create up to 100 review-only test-case drafts.", inputSchema: { cases: z.array(z.object(caseFields)).min(1).max(100) }, annotations }, async (a) => run(a, () => service.createTestCases(a.cases.map(mapCase))));
+  server.registerTool("testmanager.testcase.update", { description: "Update a test case as a review-only draft change.", inputSchema: { testcase_id: z.string().uuid(), changes: z.object({ title: z.string().min(1).optional(), module_id: z.string().uuid().nullable().optional(), objective: z.string().nullable().optional(), preconditions: z.string().nullable().optional(), steps: z.string().min(1).optional(), expected_result: z.string().min(1).optional(), priority: z.enum(["low", "medium", "high", "critical"]).optional(), notes: z.string().nullable().optional() }) }, annotations }, async (a) => run(a, () => service.updateTestCase(a.testcase_id, mapCase(a.changes))));
+  server.registerTool("testmanager.testcase.duplicate", { description: "Duplicate a test case for human review.", inputSchema: { testcase_id: z.string().uuid(), title: z.string().min(1).optional() }, annotations }, async (a) => run(a, () => service.duplicateTestCase(a.testcase_id, a.title)));
+  server.registerTool("testmanager.testcase.archive", { description: "Archive a test case without deleting it.", inputSchema: { testcase_id: z.string().uuid() }, annotations }, async (a) => run(a, () => service.archiveTestCase(a.testcase_id)));
+  server.registerTool("testmanager.testplan.create", { description: "Create a test plan in draft/review-only state.", inputSchema: { name: z.string().min(1), description: z.string().nullable().optional() }, annotations }, async (a) => run(a, () => service.createTestPlan(a)));
+  server.registerTool("testmanager.testplan.add_cases", { description: "Add project test cases to a draft plan.", inputSchema: { testplan_id: z.string().uuid(), testcase_ids: z.array(z.string().uuid()).min(1).max(100) }, annotations }, async (a) => run(a, () => service.addTestPlanCases(a.testplan_id, a.testcase_ids)));
+  server.registerTool("testmanager.testplan.remove_cases", { description: "Remove cases from a draft plan scope.", inputSchema: { testplan_id: z.string().uuid(), testcase_ids: z.array(z.string().uuid()).min(1).max(100) }, annotations }, async (a) => run(a, () => service.removeTestPlanCases(a.testplan_id, a.testcase_ids)));
+};

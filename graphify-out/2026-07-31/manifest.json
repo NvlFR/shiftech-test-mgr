@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785539133.8122575,
-    "ast_hash": "5f9c40bb0617ea1737a0d4aad735b404",
+    "mtime": 1785539544.887766,
+    "ast_hash": "03951ea3c31b09d8a2fc064edc25edfe",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785539186.2535357,
-    "ast_hash": "59481f38c425d16a4e3970d4f4d610c6",
+    "mtime": 1785539545.0227745,
+    "ast_hash": "a5079bab98fd7edcaecadbbcef4a636e",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1180,9 +1180,9 @@
     "semantic_hash": "7d8748859fdd0231fb7a0a4efc88500b"
   },
   "supabase/functions/automation-artifacts/index.ts": {
-    "mtime": 1785073503.2123742,
-    "ast_hash": "f5eab449e53d5b4925469e81ad6d9dd9",
-    "semantic_hash": "f5eab449e53d5b4925469e81ad6d9dd9"
+    "mtime": 1785539479.2040298,
+    "ast_hash": "76ca0704662e0ee016e39ffc80321a66",
+    "semantic_hash": ""
   },
   "supabase/schema_025_fix_pgcrypto_and_audit.sql": {
     "mtime": 1785071872.2305703,
@@ -2840,8 +2840,8 @@
     "semantic_hash": ""
   },
   "mcp/README.md": {
-    "mtime": 1785539174.003675,
-    "ast_hash": "fb326df2193c700c3748bc875b83e910",
+    "mtime": 1785539544.7547572,
+    "ast_hash": "e22d2ee4dae51b8d38b7541cd39bf172",
     "semantic_hash": ""
   },
   "mcp/src/repositories/authRepository.ts": {
@@ -2885,38 +2885,38 @@
     "semantic_hash": ""
   },
   "mcp/src/helpers/mappers.ts": {
-    "mtime": 1785538954.966524,
-    "ast_hash": "94ab2887f19c48cf6494b760b5fd29ba",
+    "mtime": 1785539420.0435424,
+    "ast_hash": "e0c7bd6fee09ede41df8972d07d86ae5",
     "semantic_hash": ""
   },
   "mcp/src/repositories/readRepository.test.ts": {
-    "mtime": 1785539078.2075956,
-    "ast_hash": "c2922c93aefa587b471065e1b4d2a715",
+    "mtime": 1785539500.7197068,
+    "ast_hash": "dde2618747af329be88c9ec05acf9681",
     "semantic_hash": ""
   },
   "mcp/src/repositories/readRepository.ts": {
-    "mtime": 1785538955.102512,
-    "ast_hash": "cf8ff4409964cd382a95033aa7591050",
+    "mtime": 1785539420.1765563,
+    "ast_hash": "b9725f112115d49c034da55fafa88482",
     "semantic_hash": ""
   },
   "mcp/src/services/readService.test.ts": {
-    "mtime": 1785539095.2028265,
-    "ast_hash": "a996f7aeef29cbf1e1141cb538e477f3",
+    "mtime": 1785539500.5876968,
+    "ast_hash": "4683afa925a992153d188c8de6a1d184",
     "semantic_hash": ""
   },
   "mcp/src/services/readService.ts": {
-    "mtime": 1785538996.1822832,
-    "ast_hash": "01326a67029caa60894cd991dd09a66d",
+    "mtime": 1785539458.4592683,
+    "ast_hash": "550366b824908f3b8fad33f6b030784b",
     "semantic_hash": ""
   },
   "mcp/src/tools/readTools.ts": {
-    "mtime": 1785538996.3122742,
-    "ast_hash": "a134c2bf4c7784b123fc755d1d87b9ce",
+    "mtime": 1785539458.5942802,
+    "ast_hash": "0f06e790edae1f42ff86f45d449771a3",
     "semantic_hash": ""
   },
   "mcp/src/types/domain.ts": {
-    "mtime": 1785538954.8335357,
-    "ast_hash": "02251ab5af974d3271d030baf9ccd1eb",
+    "mtime": 1785539419.9112134,
+    "ast_hash": "f9359ba9f2346817a9fde91c74662426",
     "semantic_hash": ""
   },
   "supabase/schema_048_mcp_read_batch_1.sql": {
@@ -2925,13 +2925,18 @@
     "semantic_hash": ""
   },
   "mcp/src/tools/readTools.test.ts": {
-    "mtime": 1785539105.0674036,
-    "ast_hash": "78055c8088b2100bee1dbd2002fb5ecd",
+    "mtime": 1785539500.4556868,
+    "ast_hash": "09b2db954d077c21ffde152f178a0dfe",
     "semantic_hash": ""
   },
   "supabase/schema_049_mcp_read_batch_2.sql": {
     "mtime": 1785539046.060215,
     "ast_hash": "34882554b75ba9512f916969efd55ad3",
+    "semantic_hash": ""
+  },
+  "supabase/schema_050_mcp_read_batch_3.sql": {
+    "mtime": 1785539371.0066178,
+    "ast_hash": "8bc641d1e5d69b8823af8342d9d4786e",
     "semantic_hash": ""
   }
 }

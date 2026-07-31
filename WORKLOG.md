@@ -1514,3 +1514,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperluas Edge Function `automation-artifacts` dengan aksi signed download yang memvalidasi hash API token aktif, prefix project pada object path, bucket private yang diizinkan, serta TTL 30–3.600 detik; service role tetap hanya berada di environment Edge Function.
 - Menambahkan tipe domain, mapper snake_case ke camelCase, validasi UUID/path/cursor, dokumentasi operasional, status backlog, serta test untuk registrasi tool, mapping uncovered requirement, pagination requirement, project-scoped artifact, dan kontrak signer.
 - Verifikasi lulus: `cd mcp && npm test` (6 suite) dan `git diff --check`. Migration dan Edge Function tidak dijalankan/deploy ke Supabase target; tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+# 2026-07-31 — MCP-08 write test case/test plan tools
+
+- Menambahkan tujuh tool MCP write: `testcase.create_bulk`, `testcase.update`, `testcase.duplicate`, `testcase.archive`, `testplan.create`, `testplan.add_cases`, dan `testplan.remove_cases`.
+- Implementasi mengikuti layering MCP `Tool → Service → Repository → Supabase RPC`, validasi UUID/input/batas bulk 100 item, project scoping, serta registrasi yang otomatis dinonaktifkan oleh `TM_MCP_READONLY=1`.
+- Semua respons mutation ditandai `status: draft` dan `mode: review_only`; test plan disimpan sebagai `draft`, perubahan scope hanya diizinkan pada plan draft, dan archive tidak menghapus test case.
+- Menambahkan `supabase/schema_051_mcp_write_test_cases_plans.sql` (belum dijalankan ke target) dengan RPC security-definer, validasi token/project/scope `write:test-cases` atau `write:test-plans`, serta validasi relasi lintas project.
+- Menambahkan unit test registrar, service marker/validasi, dan repository RPC/credential-safe error.
+- Verifikasi: `cd mcp && npm test` lulus (9 test files), `cd mcp && npm run build` lulus, dan `git diff --check` lulus.

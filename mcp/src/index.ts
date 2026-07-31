@@ -6,13 +6,17 @@ import { AuthRepository } from "./repositories/authRepository.js";
 import { AuthService } from "./services/authService.js";
 import { ReadRepository } from "./repositories/readRepository.js";
 import { ReadService } from "./services/readService.js";
+import { WriteRepository } from "./repositories/writeRepository.js";
+import { WriteService } from "./services/writeService.js";
 import { createReadToolRegistrar } from "./tools/readTools.js";
+import { createWriteToolRegistrar } from "./tools/writeTools.js";
 import { registerTools, toolRegistry } from "./tools/registry.js";
 
 const config = loadConfig();
 const authService = new AuthService(config, new AuthRepository(config));
 const session = await authService.createSession();
 const readService = new ReadService(session, new ReadRepository(config));
+const writeService = new WriteService(new WriteRepository(config));
 
 const server = new McpServer({
   name: "testmanager",
@@ -21,7 +25,7 @@ const server = new McpServer({
 
 registerTools(server, {
   read: [...toolRegistry.read, createReadToolRegistrar(session, readService)],
-  write: toolRegistry.write,
+  write: [...toolRegistry.write, createWriteToolRegistrar(session, writeService)],
 }, config.readonly);
 
 const transport = new StdioServerTransport();
