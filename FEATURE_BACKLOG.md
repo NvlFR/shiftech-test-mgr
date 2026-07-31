@@ -303,7 +303,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   error/toast, validation, export/import, dan URL helper. Mapping snake_case ↔
   camelCase tetap terpusat di `helpers/mappers.ts`.
 
-- [ ] **SRC-08 — `hooks/hooks-new`**
+- [x] **SRC-08 — `hooks/hooks-new`**
   Sinkronkan auth, project context, screen size, breadcrumb, query keys,
   realtime, notifications, activity, dan feature-specific hooks. Jangan
   mengganti hook aktif sebelum lifecycle dan permission behavior terverifikasi.

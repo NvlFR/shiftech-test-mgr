@@ -994,3 +994,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menandai SRC-11 selesai di `FEATURE_BACKLOG.md`.
 - Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm test` lulus (4 test), `npm run lint` lulus dengan 7 warning existing, dan `git diff --check` lulus.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.771 node dan 3.554 edge; Graphify memberi warning 7 file konfigurasi/non-source menghasilkan zero node.
+# 2026-07-31 — SRC-08 sinkronisasi hooks-new
+
+- Mengaudit seluruh kandidat `frontend/src/hooks/hooks-new` terhadap hook aktif, kontrak domain/service lokal, lifecycle cleanup, dan permission behavior.
+- Menambahkan hook aktif `useActivity`, `useNotifications`, dan `useRealtimeSync`; activity/notification sekarang mengikuti alur Component → Hook → Service → Repository → Supabase dan subscription realtime dipusatkan di layout dengan cleanup saat user berubah/unmount.
+- Menambahkan utility hook `useStoredState` dan `useTabQueryParam` dengan validasi storage, penanganan perubahan key, preservasi query parameter lain, serta validasi indeks tab.
+- Memperluas `notificationService` untuk list dan unread count agar hook tidak melewati service layer; `ActivityPanel` dan `AppTopbar` tidak lagi mengakses Supabase/service secara langsung untuk lifecycle data.
+- Mempertahankan hook auth, project context/role, screen size, breadcrumb, theme, dan feature-specific yang aktif: kandidat source-new bergantung pada model `users`, username/public routes, `/app` base path, serta permission matrix yang berbeda. Menggantinya sebelum SRC-12/SRC-13 akan mengubah kontrak login/RBAC. Implementasi aktif yang sudah punya cancellation/request guard juga tidak diturunkan ke varian yang kurang aman.
+- Folder `hooks-new` tetap dikecualikan TypeScript sebagai corpus referensi source-new karena varian yang ditolak masih bergantung pada type/schema/route yang baru diaudit pada SRC-12 dan SRC-13; tidak ada import runtime dari folder tersebut.
+- Verifikasi: `cd frontend && npm run build` lulus; `npm run lint` lulus dengan warning existing dan satu warning hook baru yang kemudian diperbaiki; `git diff --check` lulus. Vite tetap memberi warning ukuran chunk existing (>1500 kB).
+- Verifikasi akhir: 4 test Vitest lulus dan lint lulus dengan 7 warning existing di luar perubahan SRC-08. `graphify update .` sempat gagal karena permission watcher, lalu pembaruan AST-only melalui `graphify . --update --code-only` berhasil menghasilkan 1.780 node dan 3.223 edge; 5 file konfigurasi/hasil test non-source menghasilkan zero node.

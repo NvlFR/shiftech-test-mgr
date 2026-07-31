@@ -8,28 +8,17 @@ import { useBreadcrumbContext } from './BreadcrumbContext';
 import { BreadcrumbTrail } from '../ui/Breadcrumb';
 import { ThemeToggle } from './ThemeToggle';
 import { useProjectContext } from '../../hooks/useProjectContext';
-import { notificationService } from '../../services/notificationService';
 import { NotificationPanel } from '../notifications/NotificationPanel';
-import type { Notification } from '../../types/domain';
-import { useEffect, useState } from 'react';
-import { supabase } from '../../config/supabaseClient';
+import { useState } from 'react';
+import { useNotifications } from '../../hooks/useNotifications';
 
 export function AppTopbar() {
   const { profile, signOut } = useAuthContext();
   const { onMenuToggle } = useLayoutContext();
   const { items } = useBreadcrumbContext();
   const { projects, projectId, setProjectId, loading } = useProjectContext();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
   const [notificationPanelVisible, setNotificationPanelVisible] = useState(false);
-
-  useEffect(() => {
-    if (!profile) return;
-    const load = () => notificationService.listUnread(profile.id).then(setNotifications).catch(() => undefined);
-    void load();
-    const channel = supabase.channel(`notifications:${profile.id}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${profile.id}` }, load).subscribe();
-    const timer = window.setInterval(load, 60000);
-    return () => { window.clearInterval(timer); void supabase.removeChannel(channel); };
-  }, [profile]);
 
   return (
     <div className="layout-topbar">
@@ -65,7 +54,7 @@ export function AppTopbar() {
           icon="pi pi-bell"
           text
           rounded
-          badge={notifications.length ? String(notifications.length) : undefined}
+          badge={unreadCount ? String(unreadCount) : undefined}
           aria-label="Notifikasi"
           onClick={() => setNotificationPanelVisible(true)}
         />
@@ -78,9 +67,9 @@ export function AppTopbar() {
         visible={notificationPanelVisible}
         onHide={() => setNotificationPanelVisible(false)}
         notifications={notifications}
-        unreadCount={notifications.length}
-        onMarkRead={(id) => { void notificationService.markRead(id).then(() => setNotifications((items) => items.filter((item) => item.id !== id))); }}
-        onMarkAllRead={() => { if (profile) void notificationService.markAllRead(profile.id).then(() => setNotifications([])); }}
+        unreadCount={unreadCount}
+        onMarkRead={markRead}
+        onMarkAllRead={markAllRead}
         onNotificationClick={() => setNotificationPanelVisible(false)}
       />
     </div>

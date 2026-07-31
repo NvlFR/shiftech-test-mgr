@@ -5,8 +5,10 @@ import { AppSidebar, AppSidebarMask } from './AppSidebar';
 import { LayoutProvider, useLayoutContext } from './LayoutContext';
 import { BreadcrumbProvider } from './BreadcrumbContext';
 import { ProjectProvider } from '../../hooks/useProjectContext';
+import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 
 function AppLayoutInner() {
+  useRealtimeSync();
   const { menuActive } = useLayoutContext();
 
   const wrapperClass = classNames('layout-wrapper', {
