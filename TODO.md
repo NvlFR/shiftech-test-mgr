@@ -9,11 +9,6 @@ Titik mulai sesi kerja. Update file ini setiap kali mulai/selesai mengerjakan se
 
 ## Siap Dikerjakan (next up)
 
-- [ ] **SRC-EPIC — Integrasi penuh source-new ke aplikasi aktif**
-  Port seluruh komponen, helper, hook, page, repository, service, domain,
-  routing, dan migration `source-new` secara bertahap. Pertahankan fitur lokal;
-  jangan mengaktifkan source-new mentah jika kontraknya berbeda. Detail task
-  SRC-01 sampai SRC-14 dan Definition of Done ada di `FEATURE_BACKLOG.md`.
 - [ ] **Jalankan migrasi SQL yang belum dieksekusi di Supabase SQL Editor, berurutan:**
       (bagian dari daftar "Butuh Manusia" di `scripts/codex-loop/queue.md`)
   1. `supabase/schema_test_management_v2.sql` (jika belum)
@@ -29,10 +24,21 @@ _(kosong)_
 
 ## Diblokir
 
-_(kosong)_
+- [ ] **SRC-ROLLOUT — Verifikasi integrasi source-new pada Supabase target**
+  Butuh manusia dengan akses Supabase untuk menginventarisasi dan menjalankan
+  schema lokal yang belum terpasang (termasuk hasil adaptasi sampai
+  `schema_040`) secara berurutan, lalu memverifikasi table/column/function,
+  trigger, index, RLS, Realtime, dan Storage. Setelah itu lakukan smoke test
+  auth, project, test case/plan/run, issue, suite, notification, profile,
+  import/export, AI, dan attachment. Migration tidak dijalankan oleh task
+  dokumentasi ini.
 
 ## Selesai (recent)
 
+- [x] SRC-EPIC — Integrasi source-new selesai secara selektif: SRC-01–SRC-12
+  di-port ke kontrak aktif, SRC-13 diaudit dan promosi `App-new.tsx` ditolak,
+  SRC-14 mengklasifikasikan seluruh migration tanpa menjalankannya ke target
+  (2026-07-31)
 - [x] Scaffold project + clean architecture layer + dokumentasi awal (2026-07-21)
 - [x] Modul User Management + Google Login + RBAC (pending/user/admin) — kode & RLS lengkap (2026-07-21)
 - [x] Dark/light/system theme toggle + primary color teal muted konsisten kedua tema (2026-07-21)

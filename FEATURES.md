@@ -2,6 +2,26 @@
 
 Ringkasan cepat status fitur per modul. Detail task-level ada di [`docs/TASKS.md`](docs/TASKS.md).
 
+## Integrasi source-new (hasil akhir)
+
+- [x] Port selektif SRC-01–SRC-12 selesai: dialog, Issue editor, layout
+  responsif, notification center, profile lokal, shared UI/helper/hook,
+  halaman utama, repository, service, dan domain telah diadaptasi ke kontrak
+  aktif tanpa menghapus fitur lokal.
+- [x] Audit 59 migration SRC-14 selesai. Bagian yang kompatibel diadaptasi ke
+  rangkaian schema lokal sampai `schema_040`; migration tidak dijalankan ke
+  Supabase target dalam pekerjaan integrasi ini.
+- [x] `App-new.tsx` diaudit dan **ditolak untuk menggantikan** `App.tsx` aktif:
+  route, auth/RBAC, pending approval, halaman lokal, dan kontrak profile belum
+  parity. Route aktif dan model `profiles` lokal tetap menjadi keputusan akhir.
+- [x] Kontrak source-new yang bertentangan ditolak: auto-approval/drop approval
+  gate, pemisahan `public.users` dan `profiles`, username/public profile,
+  entity attachment polymorphic, serta perubahan yang melanggar invariant Test
+  Run/Test Result lokal.
+- [ ] Rollout tersisa: jalankan/verifikasi schema lokal yang belum terpasang di
+  Supabase target, lalu smoke test route dan workflow utama pada environment
+  yang sudah dimigrasikan.
+
 ## Projects
 - [x] List project (DataTable) — search, filter status, sortable
 - [x] Create & Edit project (Dialog form)

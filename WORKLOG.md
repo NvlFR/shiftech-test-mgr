@@ -4,6 +4,23 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### SRC-DOC — Sinkronisasi dokumentasi akhir integrasi source-new
+
+- Menjalankan `graphify query` dan membaca FEATURE_BACKLOG Section 7 serta
+  catatan SRC-01–SRC-14 untuk merekonsiliasi hasil akhir integrasi.
+- Memperbarui `FEATURES.md` dengan ringkasan port selektif SRC-01–SRC-12,
+  klasifikasi migration SRC-14, keputusan menolak promosi `App-new.tsx`, dan
+  kontrak source-new yang sengaja tidak diadopsi.
+- Memperbarui `TODO.md`: epic integrasi kode dipindahkan ke selesai, sedangkan
+  rollout migration dan smoke test environment ditempatkan sebagai pekerjaan
+  terblokir yang membutuhkan akses manusia ke Supabase target.
+- Merekonsiliasi status Section 7 pada tiga dokumen target: pekerjaan port
+  SRC-09/SRC-12 dicatat selesai, audit SRC-13 dicatat selesai dengan promosi
+  ditolak, sedangkan deployment dan smoke test tidak diklaim selesai.
+- Tidak ada kode, migration, data, secret, commit, atau remote yang diubah.
+- Verifikasi: `git diff --check` lulus dan `cd frontend && npm run build` lulus
+  (663 modul); warning ukuran chunk utama yang sudah ada tetap muncul.
+
 ### SRC-14 — Audit lengkap migration `supabase-new`
 
 - Menjalankan `graphify query` sebelum audit dan membaca scope Section 7. Seluruh
