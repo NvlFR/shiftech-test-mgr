@@ -1479,3 +1479,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan envelope error konsisten berisi `code`, `message`, dan `hint`, wrapper handler async, serta redaksi detail error tidak dikenal menjadi `INTERNAL_ERROR` agar respons tidak membocorkan error upstream.
 - Menambahkan contract test untuk validasi limit, cursor/metadata pagination, pembatasan byte tanpa JSON rusak, oversized item, error terstruktur, redaksi error internal, dan response non-pagination.
 - Verifikasi lulus: `cd mcp && npm test` (build TypeScript + seluruh test) dan `git diff --check`. Tidak menjalankan migration atau mengakses Supabase target, tidak mengubah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-04 mode read-only pada registrasi tool
+
+- Menjalankan `graphify query` sebelum menelusuri fondasi MCP dan mengikuti keputusan mode read-only pada Section 8.1 `FEATURE_BACKLOG.md`.
+- Menambahkan registry tool terpusat yang memisahkan registrar `read` dan `write`; startup server meneruskan `config.readonly` ke registry.
+- Saat `TM_MCP_READONLY=1`, registry berhenti setelah mendaftarkan grup baca sehingga registrar tool tulis sama sekali tidak dijalankan dan tool tulis tidak muncul pada discovery MCP. Mode normal tetap mendaftarkan kedua grup.
+- Menambahkan contract test untuk kedua mode dan memperjelas perilaku registrasi pada dokumentasi MCP.
+- Verifikasi lulus: `cd mcp && npm test`, `cd mcp && npm run build`, dan `git diff --check`. Tidak mengakses Supabase target, tidak mengubah dependency, tidak commit, dan tidak push.

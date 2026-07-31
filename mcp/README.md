@@ -31,7 +31,12 @@ Git. Jangan menaruh token pada argumen tool atau menyimpannya di source code.
 | `TM_SUPABASE_ANON_KEY` | Ya | Supabase anon key; RLS tetap berlaku. |
 | `TM_API_TOKEN` | Ya | API token TestManager untuk autentikasi. |
 | `TM_PROJECT_ID` | Ya | Project yang mengikat satu sesi MCP. |
-| `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only; `0` atau kosong menonaktifkannya. |
+| `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only dan membuat tool tulis tidak diregistrasikan; `0` atau kosong menonaktifkannya. |
+
+Tool baru harus dimasukkan ke grup `read` atau `write` di
+`src/tools/registry.ts`. Saat `TM_MCP_READONLY=1`, server hanya menjalankan
+registrar grup `read`, sehingga tool tulis tidak muncul dalam discovery MCP dan
+tidak dapat dipanggil.
 
 ## Menjalankan
 

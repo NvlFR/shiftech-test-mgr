@@ -177,5 +177,7 @@
   "175": "react",
   "176": "TestManager MCP Server",
   "177": "react-markdown",
-  "178": "@tanstack/react-query"
+  "178": "@tanstack/react-query",
+  "179": "react-router-dom",
+  "180": "@supabase/supabase-js"
 }

@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785538208.589248,
-    "ast_hash": "be501f43758b14979bf6642bd35c2772",
+    "mtime": 1785538372.6046076,
+    "ast_hash": "a02462f2c5e007b10beaff6608634059",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2830,8 +2830,8 @@
     "semantic_hash": ""
   },
   "mcp/src/index.ts": {
-    "mtime": 1785537948.9454331,
-    "ast_hash": "9da48d2c34a3085d885c58ec8a0eeabb",
+    "mtime": 1785538350.2975018,
+    "ast_hash": "261b22de8cafa0b21b2e13f96f273448",
     "semantic_hash": ""
   },
   "mcp/tsconfig.json": {
@@ -2840,8 +2840,8 @@
     "semantic_hash": ""
   },
   "mcp/README.md": {
-    "mtime": 1785537983.7854302,
-    "ast_hash": "35d79024da1e5a851e7d7ad2790673c4",
+    "mtime": 1785538350.4274955,
+    "ast_hash": "652019f442f4633158741c689fad63f4",
     "semantic_hash": ""
   },
   "mcp/src/repositories/authRepository.ts": {
@@ -2872,6 +2872,16 @@
   "mcp/src/helpers/response.ts": {
     "mtime": 1785538186.5582616,
     "ast_hash": "60ea6ded59bf6e2cf445305bc762db34",
+    "semantic_hash": ""
+  },
+  "mcp/src/tools/registry.test.ts": {
+    "mtime": 1785538350.1665084,
+    "ast_hash": "4505e293956e4513e606c71073693ede",
+    "semantic_hash": ""
+  },
+  "mcp/src/tools/registry.ts": {
+    "mtime": 1785538350.0275152,
+    "ast_hash": "c8958f9682b2b658c66a7f3377858b2e",
     "semantic_hash": ""
   }
 }

@@ -4,6 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { loadConfig } from "./config.js";
 import { AuthRepository } from "./repositories/authRepository.js";
 import { AuthService } from "./services/authService.js";
+import { registerTools, toolRegistry } from "./tools/registry.js";
 
 const config = loadConfig();
 const authService = new AuthService(config, new AuthRepository(config));
@@ -13,6 +14,8 @@ const server = new McpServer({
   name: "testmanager",
   version: "0.1.0",
 });
+
+registerTools(server, toolRegistry, config.readonly);
 
 const transport = new StdioServerTransport();
 
