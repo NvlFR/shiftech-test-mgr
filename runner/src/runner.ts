@@ -3,7 +3,8 @@ import type { RunnerConfig } from './config.js';
 import { executeJob } from './executor.js';
 import { uploadArtifacts } from './upload.js';
 import { log } from './logger.js';
-import { inspectLocalRepository, type LocalRepositoryMetadata } from './localRepository.js';
+import type { LocalRepositoryMetadata } from './localRepository.js';
+import { prepareJobRepository } from './repositoryWorkspace.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -31,8 +32,7 @@ export class Runner {
   }
 
   async start(): Promise<void> {
-    const repositoryMetadata: LocalRepositoryMetadata = inspectLocalRepository(this.config.projectDir);
-    log.info('Local repository ready', { ...repositoryMetadata });
+    log.info('Runner workspace ready', { repositoryCacheDir: this.config.repositoryCacheDir });
 
     // Fail fast if the token is invalid so operators get a clear error on boot.
     try {
@@ -55,7 +55,18 @@ export class Runner {
           await sleep(this.config.pollIntervalMs);
           continue;
         }
-        const outcome = await executeJob(this.config, job);
+        let workspace: { projectDir: string; metadata: LocalRepositoryMetadata } | null = null;
+        let outcome;
+        try {
+          workspace = await prepareJobRepository(this.config, job.repository);
+          outcome = await executeJob(this.config, job, workspace.projectDir);
+        } catch (error) {
+          outcome = {
+            result: 'blocked' as const,
+            errorMessage: error instanceof Error ? error.message : 'Repository tidak dapat disiapkan',
+            artifacts: [],
+          };
+        }
         const artifacts = await uploadArtifacts(this.config, job.id, outcome.artifacts);
         const report = await this.api.report(job.id, {
           result: outcome.result,
@@ -63,7 +74,7 @@ export class Runner {
           notes: outcome.notes,
           error_message: outcome.errorMessage,
           artifacts,
-          repository: inspectLocalRepository(this.config.projectDir),
+          repository: workspace?.metadata,
         });
         log.info('Reported job', { jobId: job.id, result: outcome.result, serverStatus: report.status, requeued: report.requeued, artifacts: artifacts.length });
       } catch (err) {

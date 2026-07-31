@@ -42,9 +42,17 @@ npm start
 ```
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
-terhadap `TM_PROJECT_DIR`. Nilai ini wajib berupa path absolut, harus terbaca,
-dan harus menunjuk root git repository. Runner berhenti sebelum terhubung ke
-server bila validasi tersebut gagal.
+terhadap repository pada Test Run. Untuk `local_path`, runner menggunakan path
+lokal tersebut. Untuk repository remote, runner melakukan clone atau pull ke
+`TM_REPOSITORY_CACHE_DIR` sebelum menjalankan script. Jika Test Run belum ditautkan
+ke repository, `TM_PROJECT_DIR` menjadi fallback dan wajib berupa path absolut,
+terbaca, serta menunjuk root git repository. Runner yang hanya menangani repository
+remote tidak perlu menyiapkan source code lebih dulu.
+
+Credential private repository diambil bersama job saat runtime. Runner memasangnya
+hanya pada environment proses Git, tidak pada URL/argumen command, konfigurasi Git,
+file cache, artifact, atau log. `script_ref` dan `subdirectory` yang keluar dari
+root repository ditolak.
 
 Runner membaca branch aktif, commit SHA, serta status dirty/clean lewat Git.
 Payload laporan hanya menyertakan path dan metadata tersebut; isi file source
@@ -57,8 +65,9 @@ tidak pernah dibaca untuk dikirim maupun dimasukkan ke payload server pusat.
 2. **Poll** `poll_automation_job`; server mengklaim satu job antre yang
    `required_labels`-nya subset dari label runner (`FOR UPDATE SKIP LOCKED`,
    aman untuk banyak runner).
-3. **Execute**: `npx playwright test <script_ref> --output=artifacts/<jobId> --trace=on`
-   di dalam `TM_PROJECT_DIR`, dengan timeout `TM_JOB_TIMEOUT_SECONDS`.
+3. **Prepare + execute**: clone/pull repository yang ditautkan, lalu jalankan
+   `npx playwright test <script_ref> --output=artifacts/<jobId> --trace=on`
+   dari root/subdirectory repository, dengan timeout `TM_JOB_TIMEOUT_SECONDS`.
 4. **Report** `report_automation_job`: exit code 0 → `pass`, selain itu → `fail`
    (timeout/spawn error → `blocked`). Kalau gagal dan masih ada sisa attempt,
    runner meminta `retry` dan server mengembalikan job ke antrean.

@@ -11,6 +11,16 @@ export interface AutomationJob {
   script_ref: string;
   attempt: number;
   max_attempts: number;
+  repository: JobRepository | null;
+}
+
+export interface JobRepository {
+  id: string;
+  source_type: 'local_path' | 'github_public' | 'github_private' | 'git_url';
+  url_or_path: string;
+  default_branch: string | null;
+  subdirectory: string | null;
+  token: string | null;
 }
 
 export type JobResult = 'pass' | 'fail' | 'blocked' | 'skip';

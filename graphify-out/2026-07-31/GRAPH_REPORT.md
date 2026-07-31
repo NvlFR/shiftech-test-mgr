@@ -1,16 +1,16 @@
 # Graph Report - shiftech-test-mgr  (2026-07-31)
 
 ## Corpus Check
-- 320 files · ~203,298 words
+- 320 files · ~204,345 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1910 nodes · 3778 edges · 176 communities (139 shown, 37 thin omitted)
+- 1915 nodes · 3790 edges · 165 communities (134 shown, 31 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.61)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bce0112c`
+- Built from commit: `af1b9196`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -81,7 +81,6 @@
 - TODO — Sprint Board Aktif
 - schema_issue_attachments.sql
 - extraction-spec.md
-- extraction-spec.md
 - schema_017_p1_rpc_hardening.sql
 - backupRetentionRepository.ts
 - useAuthContext
@@ -103,7 +102,6 @@
 - security.ts
 - csvImport.ts
 - Kontrak Integrasi CI/CD
-- primeicons
 - package.json
 - ProjectsPage.tsx
 - UserManagementPage.tsx
@@ -153,7 +151,6 @@
 - CLAUDE.md
 - extraction-spec.md
 - Breadcrumb.tsx
-- react-markdown
 - .mcp.json
 - schema_035_test_result_snapshot.sql
 - schema_036_test_result_order_snapshot.sql
@@ -162,19 +159,11 @@
 - react-markdown
 - @supabase/supabase-js
 - react-router-dom
-- @supabase/supabase-js
 - ProjectSettingsPage.tsx
-- jspdf
 - 2026-07-31 — SRC-04 penyelesaian notification center
 - UserDetailPage.tsx
-- remark-gfm
-- zod
 - schema_045_test_run_repository_traceability.sql
-- primereact
 - schema_042_issue_attachment_storage_cleanup.sql
-- react-hook-form
-- react-markdown
-- react-router-dom
 
 ## God Nodes (most connected - your core abstractions)
 1. `react` - 83 edges
@@ -183,35 +172,35 @@
 4. `supabase` - 35 edges
 5. `Worklog` - 34 edges
 6. `useProjectRole()` - 26 edges
-7. `formatDateTime()` - 24 edges
+7. `formatDateTime()` - 22 edges
 8. `handleAiGateway()` - 20 edges
-9. `TestCaseWithDetails` - 18 edges
-10. `compilerOptions` - 18 edges
+9. `useScreenSize()` - 19 edges
+10. `TestCaseWithDetails` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `useAiAssistant()` --indirect_call--> `query()`  [INFERRED]
   frontend/src/hooks/useAiAssistant.ts → supabase/functions/ai-gateway/handler.ts
 - `completeWithRetry()` --indirect_call--> `resolve()`  [INFERRED]
   supabase/functions/ai-gateway/handler.ts → frontend/src/hooks/useTheme.tsx
-- `ProjectSettingsPage()` --indirect_call--> `query()`  [INFERRED]
-  frontend/src/pages/projects/ProjectSettingsPage.tsx → supabase/functions/ai-gateway/handler.ts
 - `ProjectTestCaseTab()` --indirect_call--> `query()`  [INFERRED]
   frontend/src/pages/projects/ProjectTestCaseTab.tsx → supabase/functions/ai-gateway/handler.ts
+- `TestRunDetailPage()` --indirect_call--> `query()`  [INFERRED]
+  frontend/src/pages/test-runs/TestRunDetailPage.tsx → supabase/functions/ai-gateway/handler.ts
 - `TestCasesPage()` --indirect_call--> `query()`  [INFERRED]
   frontend/src/pages/test-cases/TestCasesPage.tsx → supabase/functions/ai-gateway/handler.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (176 total, 37 thin omitted)
+## Communities (165 total, 31 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.11
-Nodes (30): ReviewDraft, AiTestCaseResponseSchema, AiTestCaseSchema, AiTestCaseValidationError, AiTestCaseValidationResult, asList(), asSteps(), asText() (+22 more)
+Cohesion: 0.09
+Nodes (39): AiTestCaseGeneratorDialog(), maxCaseOptions, priorityOptions, ReviewDraft, CustomTestRunDialog(), CustomTestRunDialogProps, AiTestCaseResponseSchema, AiTestCaseSchema (+31 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.07
-Nodes (42): AiAssistantPanel(), AiIssueDraftDialog(), priorities, Props, aiIssueDraftSchema, assistantEntityTypeSchema, assistantMatchSchema, assistantResponseSchema (+34 more)
+Cohesion: 0.08
+Nodes (40): AiIssueDraftDialog(), priorities, Props, aiIssueDraftSchema, assistantEntityTypeSchema, assistantMatchSchema, assistantResponseSchema, buildDuplicateReason() (+32 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
@@ -222,8 +211,8 @@ Cohesion: 0.09
 Nodes (30): ApiError, AutomationApi, AutomationJob, JobResult, ReportArtifact, ReportPayload, classify(), collectArtifacts() (+22 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.09
-Nodes (32): jspdf, xlsx, exportDashboardReportToExcel(), exportDashboardReportToPdf(), safeName(), normalizeHeader(), normalizePriority(), parseTestCaseExcel() (+24 more)
+Cohesion: 0.05
+Nodes (50): AppMenu(), AppMenuitem(), AppMenuSeparator(), MenuItemModel, exportDashboardReportToExcel(), exportDashboardReportToPdf(), safeName(), mapDashboardReportRunRow() (+42 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.06
@@ -234,20 +223,24 @@ Cohesion: 0.19
 Nodes (9): DescribableActivityEntry, describeSystemEvent(), EVENT_TYPE_LABEL, STATUS_LABEL_BY_ENTITY, statusLabel(), ACTIVITY_ENTITY_LABEL, ACTIVITY_ENTITY_ROUTE, ActivityEntityType (+1 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.12
-Nodes (16): Uuid, CredentialAction, CredentialRequest, CredentialResponse, maskCredential(), parseCredentialRequest(), projectCredentialResponse(), corsHeaders (+8 more)
+Cohesion: 0.16
+Nodes (11): corsHeaders, createRepoCredentialsHandler(), CredentialDependencies, json(), parseGenericRepositoryUrl(), parseGitHubRepositoryUrl(), parseRepositoryConnection(), RepositoryConnection (+3 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.11
-Nodes (27): TestSuiteDialog(), dataTablePaginatorProps, dataTablePaginatorTemplate, FilterToolbar(), FilterToolbarProps, PageHeader(), PageHeaderProps, SearchInput() (+19 more)
+Cohesion: 0.15
+Nodes (17): TestSuiteDialog(), dataTablePaginatorProps, dataTablePaginatorTemplate, FilterToolbar(), FilterToolbarProps, RowActionsMenu(), RowActionsMenuProps, SearchInput() (+9 more)
+
+### Community 9 - "Community 9"
+Cohesion: 0.31
+Nodes (7): useRequirements(), Option, PRIORITIES, RequirementsPage(), STATUSES, TYPES, requirementService
 
 ### Community 10 - "Community 10"
-Cohesion: 0.10
-Nodes (21): riskLabel, riskSeverity, TestRunAnalysisPanelProps, AiTestRunAnalysisResponseContract, aiTestRunAnalysisResponseSchema, failurePatternSchema, parseAiTestRunAnalysisResponse(), retestRecommendationSchema (+13 more)
+Cohesion: 0.07
+Nodes (34): riskLabel, riskSeverity, TestRunAnalysisPanel(), TestRunAnalysisPanelProps, AiTestRunAnalysisResponseContract, aiTestRunAnalysisResponseSchema, failurePatternSchema, parseAiTestRunAnalysisResponse() (+26 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.21
-Nodes (12): mapIssueRow(), mapModuleRow(), mapTagRow(), mapTestCaseVersionRow(), mapTestPlanCaseRow(), issueRepository, mapIssueDetails(), mapTestCaseSummary() (+4 more)
+Cohesion: 0.13
+Nodes (22): IssueEditor(), IssueFormData, PRIORITY_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS, ISSUE_PRIORITY_LABEL, ISSUE_PRIORITY_SEVERITY, ISSUE_STATUS_LABEL (+14 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.13
@@ -270,12 +263,12 @@ Cohesion: 0.08
 Nodes (25): 1. Latar Belakang & Tujuan, 2. Target Pengguna, 3. Konsep Test Management, 4.1 Projects, 4.2 Modules & Tags, 4.3 Test Cases, 4.4 Test Plans, 4.5 Test Runs & Test Results (+17 more)
 
 ### Community 17 - "What You Must Do When Invoked"
-Cohesion: 0.20
-Nodes (11): CommentsPanel(), supabase, mapNotificationRow(), useComments(), commentRepository, moduleRepository, notificationRepository, tagRepository (+3 more)
+Cohesion: 0.42
+Nodes (6): CommentsPanel(), useComments(), commentRepository, commentService, Comment, CommentTargetType
 
 ### Community 18 - "3. Konsep Test Management"
-Cohesion: 0.43
-Nodes (4): mapEnvironmentRow(), environmentRepository, environmentService, Environment
+Cohesion: 0.24
+Nodes (7): supabase, mapEnvironmentRow(), environmentRepository, profileRepository, tagRepository, Environment, UserRole
 
 ### Community 19 - "2026-07-22"
 Cohesion: 0.18
@@ -286,36 +279,36 @@ Cohesion: 0.33
 Nodes (6): 2.1 Repository (`repositories/*.ts`), 2.2 Service (`services/*.ts`), 2.3 Helper (`src/helpers/*.ts`), 2.4 Hook / Composable (`src/hooks/*.ts`), 2.5 Component & Page (`src/components/`, `src/pages/`), 2. Layer Detail
 
 ### Community 21 - "Feature Backlog — TestManager"
-Cohesion: 0.16
-Nodes (16): mapAutomationJobRow(), mapAutomationRunnerRow(), mapAutomationScriptRow(), useAutomation(), useTestPlans(), AutomationPage(), jobSeverity, runnerOnline() (+8 more)
+Cohesion: 0.10
+Nodes (27): mapAutomationJobRow(), mapAutomationRunnerRow(), mapAutomationScriptRow(), mapCicdPipelineRow(), useAutomation(), useCicdPipelines(), useTestPlans(), AutomationPage() (+19 more)
 
 ### Community 22 - "Architecture"
 Cohesion: 0.10
-Nodes (24): mapActivityEventRow(), mapCommentMentionRow(), mapCommentRow(), mapProfileRow(), mapProjectMemberRow(), mapProjectMemberWithProfileRow(), mapTestCaseStepRow(), mapTestPlanRow() (+16 more)
+Nodes (30): mapCommentMentionRow(), mapCommentRow(), mapIssueRow(), mapModuleRow(), mapProfileRow(), mapProjectMemberRow(), mapProjectMemberWithProfileRow(), mapTagRow() (+22 more)
 
 ### Community 23 - "AttachmentPanel.tsx"
-Cohesion: 0.33
-Nodes (6): mapIssueAttachmentRow(), useIssueAttachments(), issueAttachmentRepository, withSignedUrl(), issueAttachmentService, IssueAttachment
+Cohesion: 0.39
+Nodes (5): mapIssueAttachmentRow(), issueAttachmentRepository, withSignedUrl(), issueAttachmentService, IssueAttachment
 
 ### Community 24 - "testRunService.ts"
-Cohesion: 0.10
-Nodes (20): AnalysisOutputSchema, AnalysisRequest, AssistantOutputSchema, AssistantRequest, DuplicateOutputSchema, DuplicateRequest, ErrorEnvelope, GatewayRequest (+12 more)
+Cohesion: 0.11
+Nodes (19): AnalysisOutputSchema, AnalysisRequest, AssistantOutputSchema, AssistantRequest, computeDuplicateConfidence(), DuplicateOutputSchema, DuplicateRequest, GenerateOutputSchema (+11 more)
 
 ### Community 25 - "ProjectSettingsPage.tsx"
-Cohesion: 0.12
-Nodes (17): dependencies, @hookform/resolvers, jspdf-autotable, primeflex, react, react-dom, remark-gfm, @tanstack/react-query (+9 more)
+Cohesion: 0.07
+Nodes (27): dependencies, @hookform/resolvers, jspdf-autotable, primeflex, primeicons, primereact, react, react-dom (+19 more)
 
 ### Community 26 - "TestCaseDetailPage.tsx"
-Cohesion: 0.11
-Nodes (23): AttachmentPanel(), AttachmentPanelProps, formatFileSize(), CharacterCount(), CharacterCountProps, CommentEditorProps, MarkdownPreview(), MarkdownPreviewProps (+15 more)
+Cohesion: 0.09
+Nodes (27): TestSuiteDialogMode, TestSuiteDialogProps, VISIBILITY_OPTIONS, AttachmentPanel(), AttachmentPanelProps, formatFileSize(), CharacterCount(), CharacterCountProps (+19 more)
 
 ### Community 27 - "statusLabels.ts"
-Cohesion: 0.11
-Nodes (25): TestSuiteDialogMode, TestSuiteDialogProps, VISIBILITY_OPTIONS, mapApiTokenRow(), mapWebhookDeliveryRow(), mapWebhookRow(), integrationRepository, allowedEvents (+17 more)
+Cohesion: 0.20
+Nodes (13): mapApiTokenRow(), mapWebhookDeliveryRow(), mapWebhookRow(), integrationRepository, allowedEvents, integrationService, ApiToken, ApiTokenScope (+5 more)
 
 ### Community 28 - "schema_entity_codes.sql"
-Cohesion: 0.26
-Nodes (6): UserHoverCard(), UserHoverCardProps, queryKeys, useProfile(), activityRepository, activityService
+Cohesion: 0.13
+Nodes (12): UserHoverCard(), UserHoverCardProps, mapActivityEventRow(), mapNotificationRow(), queryKeys, useProfile(), activityRepository, notificationRepository (+4 more)
 
 ### Community 29 - "schema_test_management_v2.sql"
 Cohesion: 0.33
@@ -334,32 +327,32 @@ Cohesion: 0.10
 Nodes (20): bin, tm-runner, description, devDependencies, @types/node, typescript, engines, node (+12 more)
 
 ### Community 33 - "schema_p2_workflow.sql"
-Cohesion: 0.15
-Nodes (12): ActionOutput, ProviderAction, AiProvider, fetchJson(), GeminiProvider, jsonObjectFromPrompt(), MockProvider, OpenAiProvider (+4 more)
+Cohesion: 0.14
+Nodes (13): ActionOutput, ProviderAction, AiProvider, createProvider(), fetchJson(), GeminiProvider, jsonObjectFromPrompt(), MockProvider (+5 more)
 
 ### Community 34 - "graphify reference: extra exports and benchmark"
-Cohesion: 0.23
-Nodes (11): mapCicdPipelineRow(), useCicdPipelines(), CicdIntegrationPage(), providerOptions, cicdRepository, cicdService, CicdIngestPayload, CicdIngestResponse (+3 more)
+Cohesion: 0.13
+Nodes (19): IssueDialog(), IssueDialogProps, PageHeader(), PageHeaderProps, useIntegrations(), useIssuesByTestRun(), useProjectRole(), useTestRunAnalysis() (+11 more)
 
 ### Community 35 - "graphify reference: extra exports and benchmark"
-Cohesion: 0.20
-Nodes (18): canonicalAction, requestInput(), RequestSchema, analysisResponse(), completeWithRetry(), env, errorResponse(), handleAiGateway() (+10 more)
+Cohesion: 0.17
+Nodes (19): canonicalAction, ErrorEnvelope, GatewayRequest, OUTPUT_SCHEMA_HINT, requestInput(), RequestSchema, SuccessEnvelope, analysisResponse() (+11 more)
 
 ### Community 37 - "Coding Conventions"
-Cohesion: 0.27
-Nodes (8): GatewayErrorCode, allowedOrigin(), authenticate(), GatewayHttpError, getBearerToken(), RateLimitState, redactPromptInput(), redactSensitive()
+Cohesion: 0.17
+Nodes (11): GatewayErrorCode, allowedOrigin(), authenticate(), corsHeaders(), envNumber(), GatewayHttpError, getBearerToken(), InMemoryRateLimiter (+3 more)
 
 ### Community 38 - "README.md"
 Cohesion: 0.12
 Nodes (17): devDependencies, oxlint, @types/node, @types/react, @types/react-dom, typescript, vite, @vitejs/plugin-react (+9 more)
 
 ### Community 39 - "schema_auth.sql"
-Cohesion: 0.08
-Nodes (35): AiTestCaseGeneratorDialog(), maxCaseOptions, priorityOptions, Props, CustomTestRunDialog(), CustomTestRunDialogProps, ImportCasesDialog(), ImportCasesDialogProps (+27 more)
+Cohesion: 0.17
+Nodes (12): Props, mapTestCaseStepRow(), PRIORITY_OPTIONS, moduleRepository, testCaseStepRepository, moduleService, tagService, testCaseStepService (+4 more)
 
 ### Community 40 - "graphify reference: query, path, explain"
-Cohesion: 0.11
-Nodes (26): STATUS_OPTIONS, TestPlanDialog(), TestPlanDialogProps, ActivityPanel(), TABLE_LABELS, BulkActionsBar(), BulkActionsBarProps, formatDateTime() (+18 more)
+Cohesion: 0.08
+Nodes (39): STATUS_OPTIONS, TestPlanDialog(), TestPlanDialogProps, ActivityPanel(), TABLE_LABELS, BulkActionsBar(), BulkActionsBarProps, formatDateTime() (+31 more)
 
 ### Community 41 - "graphify reference: query, path, explain"
 Cohesion: 0.18
@@ -370,8 +363,8 @@ Cohesion: 0.22
 Nodes (8): Commands, Database (Supabase), Development, Dokumentasi Tambahan, Project Overview, Struktur repo, Wajib Menggunakan Graphify, Worklog Wajib
 
 ### Community 43 - "TestManager (shiftech-test-mgr)"
-Cohesion: 0.39
-Nodes (6): AppMenu(), AppMenuitem(), AppMenuSeparator(), MenuItemModel, readStoredPins(), useProjectPins()
+Cohesion: 0.18
+Nodes (10): name, private, scripts, build, dev, lint, preview, test (+2 more)
 
 ### Community 44 - "schema_013_p1_collaboration.sql"
 Cohesion: 0.20
@@ -394,20 +387,20 @@ Cohesion: 0.17
 Nodes (12): E01 — Fondasi Arsitektur, E02 — Modul Projects, E03 — Modul Test Cases, E04 — Modul Test Plans, E05 — Polish (opsional, sesuai kebutuhan validasi arsitektur), E06 — Auth & RBAC (Google Login + User Management), E07 — Project Lifecycle (search, filter, sort, status, hapus permanen, detail), E08 — Test Management v2 (Module, Tag, Test Run, Test Result, Issue) (+4 more)
 
 ### Community 49 - "AppTopbar.tsx"
-Cohesion: 0.15
-Nodes (15): mapProjectRepositoryRow(), CreateProjectRepositoryInput, projectRepositoryLinkRepository, UpdateProjectRepositoryInput, repositoryConnectionRepository, RepositoryConnectionResultRow, isAbsolutePath(), projectRepositoryLinkService (+7 more)
+Cohesion: 0.14
+Nodes (12): CredentialAction, repositoryConnectionRepository, RepositoryConnectionResultRow, RepositoryCredentialRow, isAbsolutePath(), projectRepositoryLinkService, ProjectRepositoryMutationActor, RepositoryLocation (+4 more)
 
 ### Community 50 - "schema_project_lifecycle.sql"
 Cohesion: 0.18
 Nodes (9): Artifact, Cara kerja, Docker, Kenapa runner terpisah?, Konfigurasi (`.env`), Label / routing, Prasyarat, Setup (+1 more)
 
 ### Community 51 - "testSuiteRepository.ts"
-Cohesion: 0.20
-Nodes (10): App(), AdminRoute(), ProtectedRoute(), BreadcrumbItem, AuthContext, AuthProvider(), useAuthContext(), useProjectBreadcrumbItems() (+2 more)
+Cohesion: 0.13
+Nodes (22): mapRequirementLinkRow(), mapRequirementRow(), mapLink(), requirementRepository, testResultStepRepository, testResultStepService, ActivityAction, AutomationArtifact (+14 more)
 
 ### Community 52 - "scripts"
-Cohesion: 0.26
-Nodes (11): AppLayout(), AppLayoutInner(), AppSidebar(), AppSidebarMask(), isDesktop(), LayoutContext, LayoutContextValue, LayoutProvider() (+3 more)
+Cohesion: 0.25
+Nodes (5): Uuid, CredentialAction, CredentialRequest, CredentialResponse, parseCredentialRequest()
 
 ### Community 53 - "graphify reference: commit hook and native CLAUDE.md integration"
 Cohesion: 0.20
@@ -416,10 +409,6 @@ Nodes (10): 11.1 Tahap 1 — Requirement → Test Case CSV, 11.2 Tahap 2 — Imp
 ### Community 54 - "graphify reference: incremental update and cluster-only"
 Cohesion: 0.18
 Nodes (11): FEATURES — Status Checklist, Infrastruktur, Integrasi source-new (hasil akhir), Issues, Kode Entity (Module, Test Case, Test Plan, Test Run), Modules & Tags, Projects, Test Cases (+3 more)
-
-### Community 55 - "issueAttachmentRepository.ts"
-Cohesion: 0.15
-Nodes (13): mapDashboardReportRunRow(), mapTestCaseRow(), mapTestResultRow(), mapTestResultStepRow(), DashboardReportIssueRow, DashboardReportResultRow, fetchAllRows(), RangeResult (+5 more)
 
 ### Community 56 - "graphify reference: commit hook and native CLAUDE.md integration"
 Cohesion: 0.29
@@ -446,8 +435,8 @@ Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
 
 ### Community 62 - "graphify reference: GitHub clone and cross-repo merge"
-Cohesion: 0.08
-Nodes (33): mapRequirementLinkRow(), mapRequirementRow(), mapTestRunAssignmentRow(), mapTestRunRow(), useRequirements(), useTestRunDetail(), EMPTY_FILTERS, TestRunWithSummary (+25 more)
+Cohesion: 0.14
+Nodes (15): mapProjectRepositoryRow(), mapTestPlanRow(), mapTestRunAssignmentRow(), mapTestRunRow(), EMPTY_FILTERS, CreateProjectRepositoryInput, projectRepositoryLinkRepository, UpdateProjectRepositoryInput (+7 more)
 
 ### Community 64 - "TODO — Sprint Board Aktif"
 Cohesion: 0.40
@@ -461,10 +450,6 @@ Nodes (8): projects, set_updated_at(), test_cases, test_plan_cases, test_plans, 
 Cohesion: 0.31
 Nodes (6): comment_mentions, comments, set_comment_updated_at(), trg_comments_updated_at, trg_validate_comment_target_project, validate_comment_target_project()
 
-### Community 67 - "extraction-spec.md"
-Cohesion: 0.23
-Nodes (10): AppTopbar(), BreadcrumbContext, BreadcrumbContextValue, BreadcrumbItem, BreadcrumbProvider(), useBreadcrumbContext(), BreadcrumbCollapsed(), BreadcrumbTrail() (+2 more)
-
 ### Community 68 - "schema_017_p1_rpc_hardening.sql"
 Cohesion: 0.22
 Nodes (9): 2026-07-26, 2026-07-26 — Audit fungsional semua fitur FEATURE_BACKLOG, 2026-07-26 — Coordinator: integrasi AI Integration, 2026-07-26 — Final integration verification AI, 2026-07-26 — Fix AI_INVALID_OUTPUT ai-gateway (schema hint untuk provider nyata), 2026-07-26 — Fix CORS ai-gateway (browser blokir POST), 2026-07-26 — Section 3: webhook HTTP delivery (schema_028) — FUNGSIONAL, 2026-07-26 — Section 4: deploy Edge Function ai-gateway — FUNGSIONAL (+1 more)
@@ -474,16 +459,16 @@ Cohesion: 0.25
 Nodes (8): Architecture Pattern (WAJIB diikuti, urutan layer tidak boleh dilompati), Auth & RBAC, Coding Conventions, Data Mapping, Judul Halaman (`PageHeader`), Module Creation Order (fitur/modul baru), Naming, PrimeReact Usage
 
 ### Community 70 - "useAuthContext"
-Cohesion: 0.21
-Nodes (11): CSV_TEMPLATE_SAMPLE_ROWS, EXPECTED_HEADERS, InvalidRow, parseCsvText(), ParsedTestCaseCsv, ParsedTestCaseRow, ParsedTestCaseStep, parseStepsCell() (+3 more)
+Cohesion: 0.53
+Nodes (5): ImportedTestCaseRow, normalizeHeader(), normalizePriority(), parseTestCaseExcel(), valueFrom()
 
 ### Community 71 - "useScreenSize.ts"
-Cohesion: 0.21
-Nodes (16): formatDate(), useDashboard(), useProjectContext(), useScreenSize(), LoginPage(), downloadCsv(), HomePage(), ProjectDetailPage() (+8 more)
+Cohesion: 0.24
+Nodes (15): formatDate(), useDashboard(), useProjectContext(), useScreenSize(), downloadCsv(), HomePage(), ProjectDetailPage(), ProjectsPage() (+7 more)
 
 ### Community 72 - "3. Konsep Test Management"
-Cohesion: 0.08
-Nodes (41): IssueEditor(), IssueFormData, PRIORITY_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS, ProfileViewProps, RowActionsMenu(), RowActionsMenuProps (+33 more)
+Cohesion: 0.14
+Nodes (18): ProfileView(), ProfileViewProps, ISSUE_STATUS_SEVERITY, ISSUE_TYPE_SEVERITY, PROJECT_MEMBER_ROLE_LABEL, PROJECT_MEMBER_ROLE_SEVERITY, PROJECT_MEMBER_STATUS_LABEL, PROJECT_MEMBER_STATUS_SEVERITY (+10 more)
 
 ### Community 73 - "schema_issue_code.sql"
 Cohesion: 0.25
@@ -510,8 +495,8 @@ Cohesion: 0.29
 Nodes (7): 10.1 Model data, 10.2 Mode `local_path`, 10.3 Mode GitHub (public & private), 10.4 Penyimpanan kredensial (kritis), 10.5 Pemanfaatan, 10.6 UI, 10. Link repository (GitHub / local path / private repo)
 
 ### Community 80 - "useStoredState.ts"
-Cohesion: 0.23
-Nodes (11): MODE_ICON, ThemeToggle(), applyTheme(), getSystemPrefersDark(), resolve(), THEME_HREF, ThemeContext, ThemeContextValue (+3 more)
+Cohesion: 0.07
+Nodes (38): App(), AppLayout(), AppLayoutInner(), AppSidebar(), AppSidebarMask(), AppTopbar(), BreadcrumbContext, BreadcrumbContextValue (+30 more)
 
 ### Community 81 - "2026-07-26"
 Cohesion: 0.38
@@ -545,10 +530,6 @@ Nodes (6): 12. Urutan implementasi yang disarankan, 13. Catatan keputusan teknis
 Cohesion: 0.33
 Nodes (6): 9.1 Mode eksekusi interaktif (sisi runner), 9.2 Authoring & codegen, 9.3 Observability saat gagal (paket bukti lengkap), 9.4 Viewer di aplikasi, 9.5 Interaktivitas terarah, 9. Playwright lokal yang lebih interaktif
 
-### Community 89 - "primeicons"
-Cohesion: 0.29
-Nodes (6): iconForKind(), NOTIFICATION_KIND_ICON, NotificationPanel(), NotificationPanelProps, notificationService, Notification
-
 ### Community 91 - "ProjectsPage.tsx"
 Cohesion: 0.33
 Nodes (6): Dokumentasi, Getting Started, Scripts, Stack, Struktur Repo, TestManager (shiftech-test-mgr)
@@ -574,12 +555,12 @@ Cohesion: 0.40
 Nodes (5): 5. Automation dan Playwright, Model arsitektur — Local Runner (WAJIB dibaca dulu), Orkestrasi job (sisi server pusat), Playwright Local Runner (sisi mesin lokal), Skalabilitas & keamanan
 
 ### Community 98 - "@tanstack/react-query"
-Cohesion: 0.33
-Nodes (6): scripts, build, dev, lint, preview, test
+Cohesion: 0.50
+Nodes (4): xlsx, downloadTestCaseImportTemplate(), exportTestCasesToExcel(), xlsx
 
 ### Community 99 - "2026-07-31 — FIX-00b error TypeScript ProjectDetailPage"
-Cohesion: 0.21
-Nodes (15): mapProjectRow(), ProjectContext, ProjectContextValue, STATUS_OPTIONS, ProjectOwnerFilter, ProjectPaginatedQuery, ProjectQuery, projectRepository (+7 more)
+Cohesion: 0.10
+Nodes (23): AiAssistantPanel(), ImportCasesDialog(), ImportCasesDialogProps, exportTestCasesToPdf(), TEST_CASE_PRIORITY_LABEL, TEST_CASE_PRIORITY_SEVERITY, TEST_CASE_STATUS_SEVERITY, useAiAssistant() (+15 more)
 
 ### Community 100 - "DashboardReportPage.tsx"
 Cohesion: 0.40
@@ -665,25 +646,17 @@ Nodes (3): has_project_access(), is_project_manager(), project_members
 Cohesion: 0.22
 Nodes (8): 2026-07-31 — FIX-00a duplikasi domain TestCase, 2026-07-31 — FIX-00b error TypeScript ProjectDetailPage, 2026-07-31 — Integrasi compile-safe dialogs, notifications, dan profile, 2026-07-31 — Membuat task integrasi penuh source-new, 2026-07-31 — SRC-07 port helper source-new, 2026-07-31 — SRC-10 sinkronisasi repository source-new, 2026-07-31 — SRC-11 sinkronisasi business rule service source-new, 2026-07-31 — SRC-12 konsolidasi domain aktif
 
-### Community 139 - "react-markdown"
-Cohesion: 0.33
-Nodes (4): computeDuplicateConfidence(), parseProviderJson(), validateActionOutput(), InMemoryRateLimiter
-
 ### Community 158 - "@supabase/supabase-js"
-Cohesion: 0.39
-Nodes (5): countRows(), countStatuses(), dashboardRepository, dashboardService, DashboardStats
+Cohesion: 0.38
+Nodes (6): jspdf, exportTestRunsToExcel(), exportTestRunsToPdf(), fileName(), TestRunExportRow, jspdf
 
 ### Community 160 - "react-router-dom"
-Cohesion: 0.40
-Nodes (5): 2026-07-31 — REPO-06 Test Connection GitHub, 2026-07-31 — SRC-01 aktivasi dialog source-new, 2026-07-31 — SRC-02 integrasi komponen Issue, 2026-07-31 — SRC-06 audit dan port shared UI, 2026-07-31 — SRC-08 sinkronisasi hooks-new
+Cohesion: 0.33
+Nodes (6): 2026-07-31 — REPO-06 Test Connection GitHub, 2026-07-31 — REPO-09 dukungan `git_url` generik, 2026-07-31 — SRC-01 aktivasi dialog source-new, 2026-07-31 — SRC-02 integrasi komponen Issue, 2026-07-31 — SRC-06 audit dan port shared UI, 2026-07-31 — SRC-08 sinkronisasi hooks-new
 
 ### Community 162 - "ProjectSettingsPage.tsx"
-Cohesion: 0.19
-Nodes (11): IssueEditorProps, mapTestRoleRow(), useIssueEditorOptions(), projectMemberRepository, testRoleRepository, projectMemberService, testRoleService, ProjectMember (+3 more)
-
-### Community 165 - "jspdf"
-Cohesion: 0.21
-Nodes (10): exportTestCasesToExcel(), exportTestCasesToPdf(), TEST_CASE_STATUS_LABEL, TEST_CASE_STATUS_SEVERITY, Option, PRIORITY_OPTIONS, ProjectTestCaseTab(), ProjectTestCaseTabProps (+2 more)
+Cohesion: 0.14
+Nodes (16): IssueEditorProps, mapTestRoleRow(), useProjectRepositories(), MEMBER_ROLE_OPTIONS, ProjectSettingsPage(), REPOSITORY_SOURCE_LABEL, REPOSITORY_SOURCE_OPTIONS, VISIBILITY_OPTIONS (+8 more)
 
 ### Community 166 - "2026-07-31 — SRC-04 penyelesaian notification center"
 Cohesion: 0.20
@@ -691,31 +664,27 @@ Nodes (10): 2026-07-31 — E03-T06 audit filter priority dan status Test Case, 2
 
 ### Community 167 - "UserDetailPage.tsx"
 Cohesion: 0.14
-Nodes (15): ProfileView(), Breadcrumb(), BreadcrumbProps, PROJECT_MEMBER_ROLE_LABEL, PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY, useProfileView(), useProjectRepositories() (+7 more)
-
-### Community 168 - "remark-gfm"
-Cohesion: 0.40
-Nodes (4): name, private, type, version
+Nodes (16): AdminRoute(), ProtectedRoute(), Breadcrumb(), BreadcrumbItem, BreadcrumbProps, AuthContext, AuthContextValue, useAuthContext() (+8 more)
 
 ## Knowledge Gaps
-- **732 isolated node(s):** `2026-07-31 — REPO-08 traceability repository pada Test Run`, `2026-07-31 — REPO-07 mode `local_path` pada runner`, `2026-07-31 — REPO-04 tab Repository di Project Settings`, `2026-07-31 — REPO-02 domain, mapper, dan CRUD project repository links`, `2026-07-31 — REPO-01 project repositories migration` (+727 more)
+- **735 isolated node(s):** `2026-07-31 — REPO-08 traceability repository pada Test Run`, `2026-07-31 — REPO-07 mode `local_path` pada runner`, `2026-07-31 — REPO-04 tab Repository di Project Settings`, `2026-07-31 — REPO-02 domain, mapper, dan CRUD project repository links`, `2026-07-31 — REPO-01 project repositories migration` (+730 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `query()` connect `useScreenSize.ts` to `Community 1`, `graphify reference: extra exports and benchmark`, `jspdf`, `UserDetailPage.tsx`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
-- **Why does `react` connect `Community 8` to `Community 0`, `Community 1`, `Community 4`, `Community 10`, `Community 12`, `What You Must Do When Invoked`, `3. Konsep Test Management`, `Feature Backlog — TestManager`, `AttachmentPanel.tsx`, `TestCaseDetailPage.tsx`, `statusLabels.ts`, `schema_entity_codes.sql`, `@supabase/supabase-js`, `graphify reference: extra exports and benchmark`, `ProjectSettingsPage.tsx`, `jspdf`, `schema_auth.sql`, `graphify reference: query, path, explain`, `UserDetailPage.tsx`, `TestManager (shiftech-test-mgr)`, `schema_project_roles.sql`, `AppTopbar.tsx`, `testSuiteRepository.ts`, `scripts`, `graphify reference: transcribe video and audio`, `graphify reference: GitHub clone and cross-repo merge`, `extraction-spec.md`, `useScreenSize.ts`, `3. Konsep Test Management`, `useStoredState.ts`, `2026-07-31 — FIX-00b error TypeScript ProjectDetailPage`, `zod`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `ProjectSettingsPage.tsx` to `@supabase/supabase-js`, `Community 4`, `remark-gfm`, `zod`, `primereact`, `react-hook-form`, `react-markdown`, `react-router-dom`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
+- **Why does `react` connect `graphify reference: extra exports and benchmark` to `Community 0`, `Community 1`, `Community 4`, `Community 8`, `Community 9`, `Community 10`, `Community 11`, `Community 12`, `What You Must Do When Invoked`, `Feature Backlog — TestManager`, `AttachmentPanel.tsx`, `TestCaseDetailPage.tsx`, `statusLabels.ts`, `schema_entity_codes.sql`, `ProjectSettingsPage.tsx`, `UserDetailPage.tsx`, `graphify reference: query, path, explain`, `schema_auth.sql`, `schema_project_roles.sql`, `AppTopbar.tsx`, `graphify reference: transcribe video and audio`, `graphify reference: GitHub clone and cross-repo merge`, `useScreenSize.ts`, `useStoredState.ts`, `2026-07-31 — FIX-00b error TypeScript ProjectDetailPage`, `zod`?**
+  _High betweenness centrality (0.062) - this node is a cross-community bridge._
+- **Why does `query()` connect `useScreenSize.ts` to `graphify reference: extra exports and benchmark`, `graphify reference: extra exports and benchmark`, `2026-07-31 — FIX-00b error TypeScript ProjectDetailPage`?**
+  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `ProjectSettingsPage.tsx` to `@tanstack/react-query`, `TestManager (shiftech-test-mgr)`, `@supabase/supabase-js`, `issueAttachmentRepository.ts`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **What connects `2026-07-31 — REPO-08 traceability repository pada Test Run`, `2026-07-31 — REPO-07 mode `local_path` pada runner`, `2026-07-31 — REPO-04 tab Repository di Project Settings` to the rest of the system?**
-  _732 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _735 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.11261261261261261 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08865248226950355 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07918552036199095 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.038461538461538464 - nodes in this community are weakly interconnected._

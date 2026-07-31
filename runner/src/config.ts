@@ -6,6 +6,7 @@ export interface RunnerConfig {
   supabaseAnonKey: string;
   runnerToken: string;
   projectDir: string;
+  repositoryCacheDir: string;
   playwrightCmd: string;
   pollIntervalMs: number;
   heartbeatIntervalMs: number;
@@ -49,8 +50,8 @@ function intEnv(name: string, fallback: number): number {
 
 export function loadConfig(envPath = '.env'): RunnerConfig {
   loadDotEnv(resolve(process.cwd(), envPath));
-  const projectDir = required('TM_PROJECT_DIR');
-  if (!isAbsolute(projectDir)) {
+  const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
+  if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
     throw new Error('TM_PROJECT_DIR must be an absolute path');
   }
   return {
@@ -58,6 +59,7 @@ export function loadConfig(envPath = '.env'): RunnerConfig {
     supabaseAnonKey: required('TM_SUPABASE_ANON_KEY'),
     runnerToken: required('TM_RUNNER_TOKEN'),
     projectDir: resolve(projectDir),
+    repositoryCacheDir: resolve(process.cwd(), process.env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
     playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
     pollIntervalMs: intEnv('TM_POLL_INTERVAL_SECONDS', 5) * 1000,
     heartbeatIntervalMs: intEnv('TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,

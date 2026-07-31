@@ -1442,3 +1442,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - UI Project Settings menerima token generik opsional untuk `git_url`, mempertahankan token lama saat edit dikosongkan, menampilkan mask credential aktual, dan mengaktifkan Test connection untuk `git_url`.
 - Contract test ditambah untuk GitHub Enterprise dan GitLab self-hosted. Verifikasi lulus: contract test Edge Function, `npm run build`, `npm run lint` (hanya warning lama di file di luar scope), dan `git diff --check`.
 - Tidak menjalankan migration ke target Supabase, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-07-31 — REPO-10 automation script dari repository
+
+- Menjalankan `graphify query` sebelum menelusuri alur automation runner dan mengikuti keputusan Section 10.5 `FEATURE_BACKLOG.md`.
+- Menambahkan migration `schema_046_runner_repository_scripts.sql` tanpa menjalankannya ke target. `poll_automation_job` kini menyertakan repository aktif yang ditautkan pada Test Run dan membaca credential Vault hanya ketika membentuk respons job untuk runner terautentikasi; credential kedaluwarsa tidak diteruskan.
+- Runner kini mendukung `local_path` serta clone/pull repository HTTP(S) remote ke cache per repository sebelum Playwright berjalan. `script_ref` di-resolve dari root/subdirectory repo, sedangkan Test Run tanpa repository tetap memakai `TM_PROJECT_DIR` sebagai fallback.
+- Token private/generic repository hanya dipasang pada environment proses Git melalui `http.extraHeader`; token tidak dimasukkan ke URL, argumen command, konfigurasi/file cache, artifact, source, dokumentasi, atau log. URL berkredensial, path absolut/traversal pada `script_ref`, dan subdirectory di luar root ditolak.
+- Kegagalan menyiapkan repository dilaporkan sebagai hasil `blocked` agar job tidak tertinggal berstatus running dan tetap mengikuti mekanisme retry yang ada.
+- Menambahkan contract/unit test clone private, pull cache, isolasi token dari argumen, validasi URL, dan proteksi traversal. Verifikasi lulus: `cd runner && npm test`, `cd frontend && npm run build` (warning ukuran chunk existing), pencarian pola secret, dan `git diff --check`.
+- Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

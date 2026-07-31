@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import type { RunnerConfig } from './config.js';
 import type { AutomationJob, JobResult } from './api.js';
 import { collectArtifacts, type CollectedArtifact } from './artifacts.js';
@@ -16,14 +16,23 @@ export interface ExecutionOutcome {
 // Run one Playwright spec in an isolated per-job output directory. We invoke the
 // Playwright CLI (no library import) so this runner has zero runtime deps and
 // works against whatever Playwright version the project under test uses.
-export function executeJob(config: RunnerConfig, job: AutomationJob): Promise<ExecutionOutcome> {
+export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir): Promise<ExecutionOutcome> {
+  if (isAbsolute(job.script_ref)) {
+    return Promise.resolve({ result: 'blocked', errorMessage: 'script_ref harus berupa path relatif di repository', artifacts: [] });
+  }
+  const resolvedScript = resolve(projectDir, job.script_ref);
+  const relativeScript = relative(projectDir, resolvedScript);
+  if (!relativeScript || relativeScript.startsWith('..') || isAbsolute(relativeScript)) {
+    return Promise.resolve({ result: 'blocked', errorMessage: 'script_ref berada di luar root repository', artifacts: [] });
+  }
+
   const jobOutputDir = join(config.artifactDir, job.id);
   mkdirSync(jobOutputDir, { recursive: true });
 
   const [cmd, ...baseArgs] = config.playwrightCmd.split(' ').filter(Boolean);
   const args = [
     ...baseArgs,
-    job.script_ref,
+    relativeScript,
     `--output=${jobOutputDir}`,
     '--trace=on',
     '--reporter=list',
@@ -31,7 +40,7 @@ export function executeJob(config: RunnerConfig, job: AutomationJob): Promise<Ex
 
   return new Promise<ExecutionOutcome>((resolve) => {
     log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt });
-    const child = spawn(cmd ?? 'npx', args, { cwd: config.projectDir, env: process.env });
+    const child = spawn(cmd ?? 'npx', args, { cwd: projectDir, env: process.env });
 
     let stdout = '';
     let stderr = '';
