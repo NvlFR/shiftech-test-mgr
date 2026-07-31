@@ -5,7 +5,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { useAuthContext } from '../../hooks/useAuth';
 import { useLayoutContext } from './LayoutContext';
 import { useBreadcrumbContext } from './BreadcrumbContext';
-import { BreadcrumbTrail } from '../ui/Breadcrumb';
+import { BreadcrumbCollapsed, BreadcrumbTrail } from '../ui/Breadcrumb';
 import { ThemeToggle } from './ThemeToggle';
 import { useProjectContext } from '../../hooks/useProjectContext';
 import { NotificationPanel } from '../notifications/NotificationPanel';
@@ -32,12 +32,14 @@ export function AppTopbar() {
         onClick={onMenuToggle}
       />
       <Link to="/" className="layout-topbar-logo">
-        <span>Testify</span>
+        <i className="pi pi-check-square" aria-hidden="true" />
+        <span>TestManager</span>
       </Link>
       {items.length > 0 && (
         <>
           <i className="pi pi-angle-right text-color-secondary hidden lg:inline" style={{ fontSize: '0.7rem' }} />
           <BreadcrumbTrail items={items} className="hidden lg:flex align-items-center flex-wrap gap-2 text-sm" />
+          <BreadcrumbCollapsed items={items} />
         </>
       )}
       <div className="flex-1" />

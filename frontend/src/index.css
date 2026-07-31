@@ -191,8 +191,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* GitHub-style slide-in panel: covers the full viewport height, including
-   the area behind the topbar, rather than docking below it. */
 .layout-sidebar {
   position: fixed;
   top: 0;
@@ -423,8 +421,6 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
-/* Sidebar is always a slide-in overlay (desktop and mobile alike) — the
-   backdrop mask dims the whole page, topbar included, while it's open. */
 .layout-wrapper.layout-menu-active .layout-mask {
   display: block;
   position: fixed;
@@ -434,4 +430,35 @@ h1, h2, h3, h4, h5, h6 {
   height: 100vh;
   background: rgba(0, 0, 0, 0.4);
   z-index: 1050;
+}
+
+@media (min-width: 992px) {
+  .layout-sidebar {
+    top: var(--topbar-height);
+    height: calc(100vh - var(--topbar-height));
+    z-index: 900;
+    box-shadow: none;
+  }
+
+  .layout-sidebar-header-mobile,
+  .layout-mask,
+  .layout-wrapper.layout-menu-active .layout-mask {
+    display: none;
+  }
+
+  .layout-main-container {
+    margin-left: 0;
+    transition: margin-left 0.2s ease-in-out;
+  }
+
+  .layout-wrapper.layout-menu-active .layout-main-container {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 991px) {
+  .layout-topbar-logo span,
+  .layout-topbar .p-dropdown {
+    display: none;
+  }
 }

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
 interface LayoutContextValue {
   menuActive: boolean;
@@ -8,17 +8,27 @@ interface LayoutContextValue {
 
 const LayoutContext = createContext<LayoutContextValue | undefined>(undefined);
 
-// Sidebar always behaves as a slide-in overlay panel (same on desktop and
-// mobile) — closed by default, opened via the topbar hamburger, closed via
-// its own X button, a nav click, or the backdrop mask.
+const DESKTOP_BREAKPOINT = 992;
+
+function isDesktop() {
+  return typeof window !== 'undefined' && window.innerWidth >= DESKTOP_BREAKPOINT;
+}
+
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [menuActive, setMenuActive] = useState(false);
+  const [menuActive, setMenuActive] = useState(isDesktop);
+
+  useEffect(() => {
+    const handleResize = () => setMenuActive(isDesktop());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   function onMenuToggle() {
     setMenuActive((prev) => !prev);
   }
 
   function closeMenu() {
+    if (isDesktop()) return;
     setMenuActive(false);
   }
 

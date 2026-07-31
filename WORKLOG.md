@@ -4,6 +4,29 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### SRC-03 — Integrasi layout-new ke layout aktif
+
+- Membandingkan seluruh komponen `components/layout-new` dengan layout aktif.
+  Port dilakukan selektif agar route, RBAC, notifikasi, dialog pembuatan project,
+  pin/project shortcut, dan kontrak Profile lokal tidak hilang.
+- Sidebar sekarang statis dan terbuka secara default pada desktop (tetap dapat
+  ditutup lewat toggle), sementara tablet/mobile memakai panel overlay, mask,
+  tombol tutup, dan menutup otomatis setelah navigasi. Perubahan breakpoint
+  ditangani oleh `LayoutContext` dan CSS layout aktif.
+- Breadcrumb detail sekarang selalu berada di topbar: trail lengkap pada desktop
+  dan item terakhir plus menu jalur tersembunyi pada layar kecil. Label panjang
+  dipotong agar topbar tidak overflow.
+- Topbar mempertahankan project context, notification center, profil, sign-out,
+  dan theme toggle aktif. Popup theme dipasang ke `document.body` agar tidak
+  terpotong container. `ProjectProvider` pada `AppLayout` tetap dipertahankan.
+- Menu aktif dipertahankan karena mencakup seluruh route lokal (`/home`, report,
+  suite, project, users, retensi, requirements, CI/CD, dan automation), berbeda
+  dari route source-new yang tidak kompatibel. Branding diseragamkan menjadi
+  TestManager; header duplikat sidebar hanya tampil di mobile.
+- Verifikasi: `cd frontend && npm run build` lulus (TypeScript dan Vite; hanya
+  warning ukuran chunk existing), `npm run lint` lulus, dan `git diff --check`
+  lulus. Knowledge graph diperbarui dengan `graphify update .`.
+
 ### Build hijau kembali + perbaikan desain gate codex-loop
 
 Menjalankan loop pertama kali mengungkap satu cacat desain driver dan 30 error

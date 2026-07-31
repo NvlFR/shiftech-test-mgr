@@ -275,9 +275,9 @@
     "semantic_hash": "078acf57c0b85335157efdcfa54d6ddf"
   },
   "frontend/src/pages/users/UserDetailPage.tsx": {
-    "mtime": 1785524257.1826353,
-    "ast_hash": "7d17de15bd34fed131d8be875058bb09",
-    "semantic_hash": "7d17de15bd34fed131d8be875058bb09"
+    "mtime": 1785532205.2152023,
+    "ast_hash": "ec6c15a002880fe46ec65603535c9f26",
+    "semantic_hash": ""
   },
   "frontend/src/pages/users/UserManagementPage.tsx": {
     "mtime": 1785513713.9082456,
@@ -375,9 +375,9 @@
     "semantic_hash": ""
   },
   "frontend/src/services/profileService.ts": {
-    "mtime": 1784700432.6477952,
-    "ast_hash": "5a244480bb9e4e35a84d8abb182879d9",
-    "semantic_hash": "5a244480bb9e4e35a84d8abb182879d9"
+    "mtime": 1785532204.8132017,
+    "ast_hash": "c703db1538544294b8a64f755f0fcf35",
+    "semantic_hash": ""
   },
   "frontend/src/services/projectMemberService.ts": {
     "mtime": 1785514086.2942362,
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785531907.1588492,
-    "ast_hash": "4d46cf4ee7b18a8b6bb6ab662d93eb43",
+    "mtime": 1785532232.6002355,
+    "ast_hash": "268a07c6108f5d9e8bd36466c46fb5cd",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785531924.341869,
-    "ast_hash": "4a9898af680aefdf9a1ef1f8d805b108",
+    "mtime": 1785532272.1892834,
+    "ast_hash": "7db6b66d7c19ef8ddd86053a47cb2763",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1400,9 +1400,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/profile/ProfileView.tsx": {
-    "mtime": 1785524119.3500261,
-    "ast_hash": "d37b291dfc84f18cc2fc5384cf5eb4a0",
-    "semantic_hash": "d37b291dfc84f18cc2fc5384cf5eb4a0"
+    "mtime": 1785532205.079202,
+    "ast_hash": "0626188970af54e5560b5bb5ee116c80",
+    "semantic_hash": ""
   },
   "frontend/src/components/ui-new/ActivityPanel.tsx": {
     "mtime": 1785517367.045103,
@@ -2702,6 +2702,11 @@
   "supabase/schema_040_notification_delete_policy.sql": {
     "mtime": 1785531838.8057709,
     "ast_hash": "10ac09406101113545e7b84d6b14aa67",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useProfileView.ts": {
+    "mtime": 1785532204.944202,
+    "ast_hash": "7dad59c956a4dbf567f6225969d79dff",
     "semantic_hash": ""
   }
 }

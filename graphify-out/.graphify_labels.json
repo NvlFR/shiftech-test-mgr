@@ -157,9 +157,13 @@
   "155": "schema_037_invited_project_metadata_access.sql",
   "156": "seed.sql",
   "157": "react-dom",
-  "158": "remark-gfm",
+  "158": "package.json",
   "159": "schema_040_notification_delete_policy.sql",
   "160": "useScreenSize.ts",
-  "161": "react",
-  "162": "react-hook-form"
+  "161": "primeicons",
+  "162": "primereact",
+  "163": "react-hook-form",
+  "164": "react-markdown",
+  "165": "react-router-dom",
+  "166": "@supabase/supabase-js"
 }

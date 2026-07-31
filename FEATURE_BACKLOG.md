@@ -278,7 +278,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   external links, comments, attachment, dan status transition tanpa merusak
   flow Issue lokal.
 
-- [ ] **SRC-03 — `components/layout-new`**
+- [x] **SRC-03 — `components/layout-new`**
   Bandingkan layout-new dengan layout aktif. Port sidebar, topbar, breadcrumb,
   responsive behavior, theme, project context, dan menu secara bertahap.
   `AppLayout` aktif hanya boleh diganti setelah seluruh route utama lulus.
