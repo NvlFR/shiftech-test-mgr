@@ -17,10 +17,14 @@ import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
 import { TEST_PLAN_STATUS_LABEL, TEST_PLAN_STATUS_SEVERITY } from '../../helpers/statusLabels';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { FilterToolbar } from '../../components/ui/FilterToolbar';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const TEST_PLAN_STATUS_OPTIONS: TestPlanStatus[] = ['draft', 'active', 'completed', 'archived'];
 
 export function TestPlansPage() {
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const { projects, projectId, setProjectId } = useProjectContext();
@@ -82,12 +86,13 @@ export function TestPlansPage() {
         </FilterToolbar>
       )}
 
-      <DataTable value={filteredPlans} loading={loading} paginator rows={10} emptyMessage="Belum ada test plan" size="small"
+      <DataTable value={filteredPlans} loading={loading} {...dataTablePaginatorProps} rows={10} rowsPerPageOptions={[5, 10, 25, 50]} emptyMessage="Belum ada test plan" size="small"
         selectionMode="single" rowHover onSelectionChange={(e) => navigate(`/test-plans/${(e.value as TestPlan).id}`)}>
-        <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
-        <Column field="name" header="Nama" sortable />
-        <Column field="status" header="Status" body={(row: TestPlan) => <Tag value={TEST_PLAN_STATUS_LABEL[row.status]} severity={TEST_PLAN_STATUS_SEVERITY[row.status]} />} />
-        <Column field="updatedAt" header="Update Terakhir" body={(row: TestPlan) => formatDate(row.updatedAt)} sortable />
+        {isMobile && <Column body={(row: TestPlan) => <div className="flex flex-column gap-2 py-1"><span className="font-bold">{row.code}</span><span>{row.name}</span><span><Tag value={TEST_PLAN_STATUS_LABEL[row.status]} severity={TEST_PLAN_STATUS_SEVERITY[row.status]} /></span><span className="text-sm text-color-secondary">Update {formatDate(row.updatedAt)}</span></div>} />}
+        {!isMobile && <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />}
+        {!isMobile && <Column field="name" header="Nama" sortable />}
+        {!isMobile && <Column field="status" header="Status" body={(row: TestPlan) => <Tag value={TEST_PLAN_STATUS_LABEL[row.status]} severity={TEST_PLAN_STATUS_SEVERITY[row.status]} />} />}
+        {!isMobile && <Column field="updatedAt" header="Update Terakhir" body={(row: TestPlan) => formatDate(row.updatedAt)} sortable />}
         {canEditContent && (
           <Column
             header=""

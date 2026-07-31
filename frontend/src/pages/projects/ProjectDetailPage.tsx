@@ -33,6 +33,7 @@ import { profileService } from '../../services/profileService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
+import { useScreenSize } from '../../hooks/useScreenSize';
 import { parseTestCaseExcel, type ImportedTestCaseRow } from '../../helpers/testCaseExcel';
 import { downloadTestCaseImportTemplate } from '../../helpers/excelExporter';
 import type {
@@ -125,6 +126,9 @@ const TAB_DEPENDENCIES: (keyof ProjectTabData)[][] = [
 ];
 
 export function ProjectDetailPage() {
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
+  const [detailCollapsed, setDetailCollapsed] = useState(false);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
@@ -780,7 +784,7 @@ export function ProjectDetailPage() {
 
       <Card className="mb-3">
         <div className="flex align-items-start justify-content-between flex-wrap gap-2">
-          <div>
+          <div className="min-w-0">
             <div className="flex align-items-center gap-2 mb-1">
               <h2 className="m-0">{project.name}</h2>
               <Tag value={PROJECT_STATUS_LABEL[project.status]} severity={PROJECT_STATUS_SEVERITY[project.status]} />
@@ -789,15 +793,16 @@ export function ProjectDetailPage() {
           </div>
           <div className="flex gap-2">
             <Button icon="pi pi-cog" outlined size="small" onClick={() => navigate(`/projects/${id}/settings`)} />
+            <Button text rounded size="small" severity="secondary" icon={detailCollapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up'} aria-label={detailCollapsed ? 'Tampilkan detail' : 'Sembunyikan detail'} onClick={() => setDetailCollapsed((value) => !value)} />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 mt-3 text-sm">
+        {!detailCollapsed && <div className="flex flex-wrap gap-4 mt-3 text-sm">
           <span className="text-color-secondary">Dibuat: <span className="text-color">{formatDateTime(project.createdAt)}</span></span>
           <span className="text-color-secondary">Update Terakhir: <span className="text-color">{formatDateTime(project.updatedAt)}</span></span>
           <span className="text-color-secondary">Test Plan: <span className="text-color">{testPlans.length}</span></span>
           <span className="text-color-secondary">Test Case: <span className="text-color">{testCases.length}</span></span>
-        </div>
+        </div>}
       </Card>
 
       <Card>
@@ -806,7 +811,7 @@ export function ProjectDetailPage() {
             <ProjectTestPlanTab
               plans={filteredPlans}
               loading={tabLoading[0]}
-              isMobile={false}
+              isMobile={isMobile}
               search={planSearch}
               onSearchChange={setPlanSearch}
               statusFilter={planStatusFilter}

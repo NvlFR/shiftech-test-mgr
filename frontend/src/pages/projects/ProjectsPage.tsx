@@ -21,6 +21,8 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { FilterToolbar } from '../../components/ui/FilterToolbar';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const STATUS_OPTIONS: { label: string; value: ProjectStatus | 'all' }[] = [
   { label: 'Semua Status', value: 'all' },
@@ -33,6 +35,8 @@ export function ProjectsPage() {
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const menuRef = useRef<Menu>(null);
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const [menuRow, setMenuRow] = useState<Project | null>(null);
 
   const [search, setSearch] = useState('');
@@ -170,8 +174,9 @@ export function ProjectsPage() {
       <DataTable
         value={projects}
         loading={loading}
-        paginator
+        {...dataTablePaginatorProps}
         rows={10}
+        rowsPerPageOptions={[5, 10, 25, 50]}
         size="small"
         emptyMessage="Belum ada project"
         sortField={sortField}
@@ -181,14 +186,22 @@ export function ProjectsPage() {
         rowHover
         className="cursor-pointer"
       >
-        <Column field="name" header="Nama" sortable />
-        <Column field="description" header="Deskripsi" />
-        <Column
+        {isMobile && <Column body={(row: Project) => (
+          <div className="flex flex-column gap-2 py-1">
+            <span className="font-bold">{row.name}</span>
+            <span className="text-sm text-color-secondary">{row.description || 'Tidak ada deskripsi'}</span>
+            <span><Tag value={PROJECT_STATUS_LABEL[row.status]} severity={PROJECT_STATUS_SEVERITY[row.status]} /></span>
+            <span className="text-sm text-color-secondary">Dibuat {formatDate(row.createdAt)}</span>
+          </div>
+        )} />}
+        {!isMobile && <Column field="name" header="Nama" sortable />}
+        {!isMobile && <Column field="description" header="Deskripsi" />}
+        {!isMobile && <Column
           field="status"
           header="Status"
           body={(row: Project) => <Tag value={PROJECT_STATUS_LABEL[row.status]} severity={PROJECT_STATUS_SEVERITY[row.status]} />}
-        />
-        <Column field="createdAt" header="Dibuat" body={(row: Project) => formatDate(row.createdAt)} sortable />
+        />}
+        {!isMobile && <Column field="createdAt" header="Dibuat" body={(row: Project) => formatDate(row.createdAt)} sortable />}
         <Column
           header=""
           style={{ width: '4rem' }}

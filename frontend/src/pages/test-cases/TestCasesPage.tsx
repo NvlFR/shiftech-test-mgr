@@ -18,11 +18,15 @@ import { AiTestCaseGeneratorDialog } from '../../components/ai/AiTestCaseGenerat
 import { AiAssistantPanel } from '../../components/ai/AiAssistantPanel';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { FilterToolbar } from '../../components/ui/FilterToolbar';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const priorities: { label: string; value: TestCasePriority }[] = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ label: TEST_CASE_PRIORITY_LABEL[value], value }));
 const statuses: { label: string; value: TestCaseStatus }[] = (['active', 'archived'] as const).map((value) => ({ label: TEST_CASE_STATUS_LABEL[value], value }));
 
 export function TestCasesPage() {
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const { projects, projectId, setProjectId } = useProjectContext();
   const [testCases, setTestCases] = useState<TestCaseWithDetails[]>([]);
   const [selected, setSelected] = useState<TestCaseWithDetails[]>([]);
@@ -70,14 +74,15 @@ export function TestCasesPage() {
       <Dropdown value={filter.assignedTo} options={profiles.map((p) => ({ label: p.fullName ?? p.email, value: p.id }))} onChange={(e) => setFilter({ ...filter, assignedTo: e.value })} placeholder="Semua assignee" showClear className="col-12 md:col-3 lg:col-2" />
       <Button label="Reset" text onClick={() => { setSearch(''); setFilter({ moduleId: null, tagId: null, priority: null, status: null, assignedTo: null }); }} />
     </FilterToolbar>}
-    <DataTable value={visibleTestCases} loading={loading} paginator rows={10} selection={selected} selectionMode="multiple" onSelectionChange={(e) => setSelected(e.value as TestCaseWithDetails[])} dataKey="id" emptyMessage="Belum ada test case" size="small" rowHover>
+    <DataTable value={visibleTestCases} loading={loading} {...dataTablePaginatorProps} rows={10} rowsPerPageOptions={[5, 10, 25, 50]} selection={selected} selectionMode="multiple" onSelectionChange={(e) => setSelected(e.value as TestCaseWithDetails[])} dataKey="id" emptyMessage="Belum ada test case" size="small" rowHover>
       <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
-      <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
-      <Column field="title" header="Judul" sortable />
-      <Column header="Module" body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} sortable />
-      <Column header="Assignee" body={(row: TestCaseWithDetails) => { const p = profiles.find((item) => item.id === row.assignedTo); return p?.fullName ?? p?.email ?? '-'; }} />
-      <Column header="Prioritas" body={(row: TestCaseWithDetails) => <PrimeTag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} />} sortable />
-      <Column header="Status" body={(row: TestCaseWithDetails) => <PrimeTag value={TEST_CASE_STATUS_LABEL[row.status]} severity={TEST_CASE_STATUS_SEVERITY[row.status]} />} sortable />
+      {isMobile && <Column body={(row: TestCaseWithDetails) => <div className="flex flex-column gap-2 py-1"><span className="font-bold">{row.code}</span><span>{row.title}</span><span className="text-sm text-color-secondary">{row.module?.name ?? '-'}</span><div className="flex gap-2"><PrimeTag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} /><PrimeTag value={TEST_CASE_STATUS_LABEL[row.status]} severity={TEST_CASE_STATUS_SEVERITY[row.status]} /></div></div>} />}
+      {!isMobile && <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />}
+      {!isMobile && <Column field="title" header="Judul" sortable />}
+      {!isMobile && <Column header="Module" body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} sortable />}
+      {!isMobile && <Column header="Assignee" body={(row: TestCaseWithDetails) => { const p = profiles.find((item) => item.id === row.assignedTo); return p?.fullName ?? p?.email ?? '-'; }} />}
+      {!isMobile && <Column header="Prioritas" body={(row: TestCaseWithDetails) => <PrimeTag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} />} sortable />}
+      {!isMobile && <Column header="Status" body={(row: TestCaseWithDetails) => <PrimeTag value={TEST_CASE_STATUS_LABEL[row.status]} severity={TEST_CASE_STATUS_SEVERITY[row.status]} />} sortable />}
     </DataTable>
     <Dialog header="Bulk update Test Case" visible={bulkOpen} onHide={() => setBulkOpen(false)} style={{ width: '28rem' }}>
       <div className="flex flex-column gap-3"><small>Field yang dikosongkan tidak diubah.</small><Dropdown value={bulk.priority} options={priorities} onChange={(e) => setBulk({ ...bulk, priority: e.value })} placeholder="Prioritas" showClear /><Dropdown value={bulk.status} options={statuses} onChange={(e) => setBulk({ ...bulk, status: e.value })} placeholder="Status" showClear /><Dropdown value={bulk.moduleId} options={modules.map((m) => ({ label: m.name, value: m.id }))} onChange={(e) => setBulk({ ...bulk, moduleId: e.value })} placeholder="Module" showClear /><Dropdown value={bulk.assignedTo} options={profiles.map((p) => ({ label: p.fullName ?? p.email, value: p.id }))} onChange={(e) => setBulk({ ...bulk, assignedTo: e.value })} placeholder="Assignee" showClear /><MultiSelect value={bulk.tagNames} options={tags.map((t) => ({ label: t.name, value: t.name }))} onChange={(e) => setBulk({ ...bulk, tagNames: e.value })} placeholder="Tag" display="chip" filter showClear /><Button label="Terapkan" onClick={() => void applyBulk()} /></div>

@@ -1086,3 +1086,22 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Route admin `/users/:id` tetap aktif dan sekarang merender shared profile view.
 - Verifikasi: `npm run build` lulus (661 modules), `npm run lint` lulus dengan 7 warning existing di luar scope, dan `git diff --check` lulus; warning ukuran chunk utama tetap existing. Migration tidak dibuat maupun dijalankan ke Supabase target.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.808 node dan 3.611 edge; Graphify memberi warning 7 file konfigurasi/non-source menghasilkan zero node.
+
+### 2026-07-31 — SRC-09a port halaman utama batch 1
+
+- Menjalankan `graphify query` sebelum memetakan halaman aktif dan referensi
+  `pages-new` untuk Projects, Project Detail, Test Cases, dan Test Plans sesuai
+  FEATURE_BACKLOG Section 7.
+- Memport perilaku responsif source-new ke empat halaman aktif: representasi
+  baris ringkas pada layar kecil, paginator/scroll DataTable bersama, pilihan
+  jumlah baris, dan detail Project yang dapat diringkas.
+- Mempertahankan route serta seluruh fitur lokal pada halaman terkait, termasuk
+  filter dan sorting, bulk update, AI test case, import Excel/library, custom
+  test run, activity, penghapusan terkontrol, dan pemeriksaan RBAC. `App.tsx`
+  tidak diganti dan tidak ada migration yang dijalankan.
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run
+  lint` lulus dengan 7 warning existing di luar scope, dan `git diff --check`
+  lulus sebelum sinkronisasi graph akhir.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.813 node
+  dan 3.638 edge; Graphify memberi warning 7 file konfigurasi/non-source
+  menghasilkan zero node.
