@@ -182,5 +182,12 @@
   "180": "NotificationPanel.tsx",
   "181": "react-hook-form",
   "182": "useStoredState.ts",
-  "186": "schema_051_mcp_write_test_cases_plans.sql"
+  "183": "AppTopbar.tsx",
+  "184": "AppMenu.tsx",
+  "185": "repositoryConnectionRepository.ts",
+  "186": "schema_051_mcp_write_test_cases_plans.sql",
+  "187": "AutomationRepository",
+  "188": "contract.test.ts",
+  "189": "config.ts",
+  "190": "schema_056_mcp_rerun_failed.sql"
 }

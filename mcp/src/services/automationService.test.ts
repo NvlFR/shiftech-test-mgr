@@ -24,3 +24,17 @@ test("enqueue forwards normalized label routing", async () => {
   await new AutomationService(repository).enqueue({ testPlanId: id, name: " Run ", runnerLabels: [" VPN ", "vpn"], maxAttempts: 2 });
   assert.deepEqual(received, { testPlanId: id, name: "Run", runnerLabels: ["vpn"], maxAttempts: 2 });
 });
+
+test("rerun failed converts the safety gate into a human confirmation error", async () => {
+  const repository = { rerunFailed: async () => ({ confirmation_required: true, selected_count: 26, selection_limit: 25 }) } as unknown as AutomationRepository;
+  await assert.rejects(
+    new AutomationService(repository).rerunFailed({ issueId: id, runnerLabels: [], maxAttempts: 1, explicitConfirmation: false }),
+    (error: unknown) => error instanceof Error && "code" in error && error.code === "HUMAN_CONFIRMATION_REQUIRED",
+  );
+});
+
+test("rerun failed requires paired explicit confirmation and human profile", () => {
+  const service = new AutomationService({} as AutomationRepository);
+  assert.rejects(service.rerunFailed({ issueId: id, runnerLabels: [], maxAttempts: 1, explicitConfirmation: true }));
+  assert.rejects(service.rerunFailed({ issueId: id, runnerLabels: [], maxAttempts: 1, confirmedBy: id, explicitConfirmation: false }));
+});

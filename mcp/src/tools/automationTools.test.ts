@@ -10,5 +10,5 @@ test("registers automation read and write catalogs separately", () => {
   createAutomationReadToolRegistrar({} as ProjectSession, {} as AutomationService)({ registerTool: (name: string) => read.push(name) } as unknown as McpServer);
   createAutomationWriteToolRegistrar({} as ProjectSession, {} as AutomationService)({ registerTool: (name: string) => write.push(name) } as unknown as McpServer);
   assert.deepEqual(read, ["testmanager.automation.job_status", "testmanager.automation.runner_list"]);
-  assert.deepEqual(write, ["testmanager.automation.map_script", "testmanager.automation.enqueue"]);
+  assert.deepEqual(write, ["testmanager.automation.map_script", "testmanager.automation.enqueue", "testmanager.automation.rerun_failed"]);
 });

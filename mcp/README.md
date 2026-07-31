@@ -32,6 +32,7 @@ Git. Jangan menaruh token pada argumen tool atau menyimpannya di source code.
 | `TM_API_TOKEN` | Ya | API token TestManager untuk autentikasi. |
 | `TM_PROJECT_ID` | Ya | Project yang mengikat satu sesi MCP. |
 | `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only dan membuat tool tulis tidak diregistrasikan; `0` atau kosong menonaktifkannya. |
+| `TM_MCP_RERUN_FAILED_MAX_TESTS` | Tidak | Ambang aman regression selektif; default `25`, rentang `1`–`500`. Di atas ambang, tool meminta konfirmasi manusia. |
 | `TM_SUPABASE_ACCESS_TOKEN` | Khusus AI | JWT user Supabase yang approved untuk memanggil `ai-gateway`; diperlukan oleh `issue.detect_duplicate`, tidak pernah menjadi argumen tool. |
 
 Tool baru harus dimasukkan ke grup `read` atau `write` di
@@ -84,6 +85,14 @@ token `write:automation` untuk `automation.map_script` serta
 `testplan_id`; `runner_labels` tambahan digabung dengan label mapping script.
 `automation.job_status` dan `automation.runner_list` bersifat read-only, dengan
 runner dianggap online bila heartbeat terakhir berada dalam 90 detik.
+
+`automation.rerun_failed` memerlukan migration `schema_056_mcp_rerun_failed.sql`.
+Tool menerima Issue `resolved`, lalu membuat Test Run baru hanya untuk Test Case
+yang gagal serta Test Case aktif yang berbagi module, tag, atau requirement.
+Hanya Test Case yang memiliki mapping automation yang dibuatkan job. Jika jumlah
+test terpilih melampaui `TM_MCP_RERUN_FAILED_MAX_TESTS`, pemanggilan gagal tanpa
+membuat run/job. Setelah anggota project mengonfirmasi, ulangi dengan
+`confirmed_by` dan `explicit_confirmation: true`.
 
 ## Tool read batch 1
 

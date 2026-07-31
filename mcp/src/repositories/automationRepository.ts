@@ -8,6 +8,15 @@ export interface AutomationEnqueueInput {
   maxAttempts: number;
 }
 
+export interface AutomationRerunFailedInput {
+  issueId: string;
+  name?: string;
+  runnerLabels: string[];
+  maxAttempts: number;
+  confirmedBy?: string;
+  explicitConfirmation: boolean;
+}
+
 export class AutomationRepositoryError extends Error {
   constructor() { super("TestManager automation request failed"); this.name = "AutomationRepositoryError"; }
 }
@@ -33,6 +42,17 @@ export class AutomationRepository {
   }
   enqueue(input: AutomationEnqueueInput) {
     return this.rpc("mcp_enqueue_automation", { p_test_case_id: input.testCaseId ?? null, p_test_plan_id: input.testPlanId ?? null, p_name: input.name ?? null, p_runner_labels: input.runnerLabels, p_max_attempts: input.maxAttempts });
+  }
+  rerunFailed(input: AutomationRerunFailedInput) {
+    return this.rpc("mcp_rerun_failed_automation", {
+      p_issue_id: input.issueId,
+      p_name: input.name ?? null,
+      p_runner_labels: input.runnerLabels,
+      p_max_attempts: input.maxAttempts,
+      p_selection_limit: this.config.rerunFailedMaxTests,
+      p_confirmed_by: input.confirmedBy ?? null,
+      p_explicit_confirmation: input.explicitConfirmation,
+    });
   }
   jobStatus(jobId: string) { return this.rpc("mcp_automation_job_status", { p_job_id: jobId }); }
   runnerList() { return this.rpc("mcp_automation_runner_list", {}); }

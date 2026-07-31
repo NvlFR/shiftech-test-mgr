@@ -14,6 +14,7 @@ const config: ServerConfig = {
   apiToken: "test-api-token",
   projectId: PROJECT_ID,
   readonly: false,
+  rerunFailedMaxTests: 25,
 };
 
 test("authenticates from config and binds the session to the token project", async () => {

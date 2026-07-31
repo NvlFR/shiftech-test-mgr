@@ -1556,3 +1556,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_055_mcp_automation.sql` tanpa menjalankannya ke target, validasi ulang token/project pada setiap RPC, dan scope `write:automation` untuk mutation.
 - Menambahkan unit/contract test untuk registrasi read/write, validasi target enqueue, normalisasi label, payload RPC project-scoped, dan redaksi error upstream; dokumentasi MCP serta checklist backlog diperbarui.
 - Verifikasi lulus: `cd mcp && npm test` (12/12 test file) dan `cd mcp && npm run build`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-13 selective rerun failed
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi Automation MCP dan mengikuti keputusan Section 8.2 serta 11.7 `FEATURE_BACKLOG.md`.
+- Menambahkan tool `testmanager.automation.rerun_failed` melalui layering `Tool → AutomationService → AutomationRepository → Supabase RPC` untuk Issue `resolved` yang berasal dari Test Result `fail`.
+- Regression memilih hanya Test Case aktif dan terotomasi yang tertaut langsung ke Issue atau berbagi module, tag, maupun requirement dengan Test Case gagal. Eksekusi selalu membuat Test Run baru dan tidak mengubah run lama.
+- Menambahkan ambang konfigurasi `TM_MCP_RERUN_FAILED_MAX_TESTS` (default 25, rentang 1–500). Jika jumlah terpilih melewati ambang, RPC tidak membuat run/job dan service mengembalikan `HUMAN_CONFIRMATION_REQUIRED`; retry membutuhkan profile anggota project pada `confirmed_by` serta `explicit_confirmation: true`.
+- Menambahkan migration `schema_056_mcp_rerun_failed.sql` tanpa menjalankannya ke target, audit aksi/konfirmasi tanpa payload rahasia, dokumentasi konfigurasi, serta test service/repository/registrar.
+- Verifikasi lulus: `cd mcp && npm test` (12/12 test file; mencakup build TypeScript) dan `git diff --check`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

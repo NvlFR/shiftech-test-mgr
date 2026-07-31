@@ -428,7 +428,7 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 - [x] `automation.enqueue` — enqueue job dari Test Case / Test Plan, dengan label runner.
 - [x] `automation.job_status` — poll status job (`queued`/`running`/`passed`/`failed`).
 - [x] `automation.runner_list` — runner online/offline + kapabilitas.
-- [ ] `automation.rerun_failed` — enqueue ulang **hanya** test yang relevan (regression, §11).
+- [x] `automation.rerun_failed` — enqueue ulang **hanya** test yang relevan (regression, §11).
 
 **Repo / konteks kode** (butuh Section 10)
 
