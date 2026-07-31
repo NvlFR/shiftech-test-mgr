@@ -3,6 +3,7 @@ import type {
   TestCase,
   TestPlanCase,
   Project,
+  ProjectRepository,
   Profile,
   Module,
   Tag,
@@ -55,6 +56,22 @@ export function mapProjectRow(row: any): Project {
     status: row.status,
     ownerId: row.owner_id ?? null,
     visibility: row.visibility ?? 'private',
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function mapProjectRepositoryRow(row: any): ProjectRepository {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    name: row.name,
+    sourceType: row.source_type,
+    urlOrPath: row.url_or_path,
+    defaultBranch: row.default_branch ?? null,
+    credentialId: row.credential_id ?? null,
+    subdirectory: row.subdirectory ?? null,
+    isActive: row.is_active,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

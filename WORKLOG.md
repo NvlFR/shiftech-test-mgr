@@ -1,5 +1,13 @@
 # Worklog
 
+## 2026-07-31 — REPO-02 domain, mapper, dan CRUD project repository links
+
+- Menambahkan domain `ProjectRepository` beserta union `ProjectRepositorySourceType` sesuai Section 10.1 `FEATURE_BACKLOG.md`.
+- Menambahkan `mapProjectRepositoryRow()` sebagai pusat konversi row `project_repositories` dari snake_case ke domain camelCase.
+- Menambahkan `projectRepositoryLinkRepository` dengan operasi create, read, update, dan delete murni melalui Supabase tanpa validasi atau business rule.
+- Tidak menjalankan migration ke Supabase target, tidak menambah secret/token, dan tidak melakukan commit atau push.
+- Verifikasi lulus: `npm run build` (664 modul; warning ukuran chunk existing) dan `git diff --check`. Knowledge graph diperbarui lewat `graphify update .` menjadi 1.842 node/3.713 edge dengan warning 7 file konfigurasi/non-source menghasilkan zero node.
+
 ## 2026-07-31 — REPO-01 project repositories migration
 
 - Menambahkan `supabase/schema_029_project_repositories.sql` untuk tabel tautan repository per project, termasuk tipe sumber, metadata branch/subdirectory, status aktif, dan timestamps.

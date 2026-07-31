@@ -27,6 +27,22 @@ export interface Project {
   updatedAt: string;
 }
 
+export type ProjectRepositorySourceType = 'local_path' | 'github_public' | 'github_private' | 'git_url';
+
+export interface ProjectRepository {
+  id: string;
+  projectId: string;
+  name: string;
+  sourceType: ProjectRepositorySourceType;
+  urlOrPath: string;
+  defaultBranch: string | null;
+  credentialId: string | null;
+  subdirectory: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type TestSuiteVisibility = 'private' | 'unlisted' | 'public';
 
 export interface TestSuite {

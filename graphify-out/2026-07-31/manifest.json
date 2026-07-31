@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785534628.9645798,
-    "ast_hash": "3bb342ab66481292e4b59d5b7a72ddbd",
+    "mtime": 1785534794.8133984,
+    "ast_hash": "97bf928b8c008f53234e5c6359801b7d",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2722,6 +2722,11 @@
   "supabase/schema_042_issue_attachment_storage_cleanup.sql": {
     "mtime": 1785534569.0155833,
     "ast_hash": "898c31a23736b727992133030e174de0",
+    "semantic_hash": ""
+  },
+  "supabase/schema_029_project_repositories.sql": {
+    "mtime": 1785534794.6774151,
+    "ast_hash": "8ad1a517cac2de8efc23237887da9a5a",
     "semantic_hash": ""
   }
 }
