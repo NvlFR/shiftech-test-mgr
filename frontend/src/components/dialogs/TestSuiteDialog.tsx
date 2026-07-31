@@ -68,7 +68,7 @@ export function TestSuiteDialog({ visible, mode, initialData, saving, onHide, on
   const header = mode === 'edit' ? 'Edit Suite' : mode === 'duplicate' ? 'Duplicate Suite' : 'New Suite';
 
   return (
-    <Dialog header={header} visible={visible} onHide={onHide} style={{ width: '30rem' }}>
+    <Dialog header={header} visible={visible} onHide={onHide} closable={!submitting && !saving} style={{ width: '30rem' }}>
       <div className="flex flex-column gap-4">
         <div className="flex flex-column gap-1">
           <FloatLabel className="ifta-field">
@@ -98,7 +98,7 @@ export function TestSuiteDialog({ visible, mode, initialData, saving, onHide, on
             </FloatLabel>
           </div>
         )}
-        <Button label="Save" size="small" onClick={handleSave} loading={submitting || saving} />
+        <Button label="Save" size="small" onClick={handleSave} loading={submitting || saving} disabled={!name.trim()} />
       </div>
     </Dialog>
   );

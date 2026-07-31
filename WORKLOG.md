@@ -1021,3 +1021,14 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
   di luar scope; `git diff --check` lulus. Instalasi npm melaporkan 3 high severity
   vulnerability existing/transitif untuk ditinjau terpisah; tidak menjalankan
   `npm audit fix --force` karena berisiko breaking change dan di luar scope.
+
+## 2026-07-31 — SRC-01 aktivasi dialog source-new
+
+- Menjalankan `graphify query` sebelum memetakan dialog source-new, service lokal, dan halaman aktif sesuai FEATURE_BACKLOG Section 7.
+- Mengaktifkan `TestPlanDialog` pada halaman detail Project dan Test Plan, serta menambahkan loading, validasi nama, error service, dan callback terkontrol yang konsisten.
+- Menyelaraskan `TestSuiteDialog`, `CustomTestRunDialog`, dan `ImportCasesDialog`: aksi async memiliki loading state, dialog tidak dapat ditutup saat submit, error pemuatan/import ditampilkan, dan validasi tetap melalui service lokal.
+- Menambahkan `IssueDialog` reusable untuk flow pembuatan issue dari hasil gagal dan menghubungkannya ke `issueService`; dialog inline sebelumnya dihapus.
+- Mempertahankan attachment aktif melalui `AttachmentPanel` → `useAttachments` → `attachmentService` → repository, termasuk validasi ukuran/file kosong, loading upload/list, error, reload callback, dan konfirmasi delete.
+- Menandai SRC-01 selesai di `FEATURE_BACKLOG.md`; tidak menjalankan migration, commit, push, atau perubahan di luar scope.
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing) dan `git diff --check` lulus sebelum sinkronisasi graph akhir.
+- Verifikasi akhir: `npm run build` lulus, `npm run lint` lulus dengan 7 warning existing, dan `graphify update .` berhasil memperbarui graph menjadi 1.798 node/3.602 edge (warning 7 file konfigurasi/non-source menghasilkan zero node).

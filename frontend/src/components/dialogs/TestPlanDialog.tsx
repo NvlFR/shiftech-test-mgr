@@ -21,6 +21,7 @@ type TestPlanDialogProps = {
   status: TestPlanStatus;
   onStatusChange: (value: TestPlanStatus) => void;
   error: string | null;
+  saving?: boolean;
   onHide: () => void;
   onSave: () => void;
 };
@@ -41,6 +42,7 @@ export function TestPlanDialog({
   status,
   onStatusChange,
   error,
+  saving = false,
   onHide,
   onSave,
 }: TestPlanDialogProps) {
@@ -54,7 +56,7 @@ export function TestPlanDialog({
   }, [error]);
 
   return (
-    <Dialog header={editing ? 'Edit Test Plan' : 'New Test Plan'} visible={visible} onHide={onHide} style={{ width: '30rem' }}>
+    <Dialog header={editing ? 'Edit Test Plan' : 'New Test Plan'} visible={visible} onHide={onHide} closable={!saving} style={{ width: '30rem' }}>
       <div className="flex flex-column gap-2">
         <div className="flex flex-column">
           <FloatLabel className="ifta-field">
@@ -84,7 +86,7 @@ export function TestPlanDialog({
             </FloatLabel>
           </div>
         )}
-        <Button label="Save" size="small" onClick={onSave} />
+        <Button label="Save" size="small" onClick={onSave} loading={saving} disabled={!name.trim()} />
       </div>
     </Dialog>
   );

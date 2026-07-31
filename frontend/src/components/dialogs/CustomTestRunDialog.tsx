@@ -38,7 +38,8 @@ export function CustomTestRunDialog({
     <Dialog
       header="Custom Test Run"
       visible={visible}
-      onHide={onHide}
+      onHide={saving ? () => undefined : onHide}
+      closable={!saving}
       style={{ width: '32rem' }}
       footer={
         <>
@@ -63,6 +64,7 @@ export function CustomTestRunDialog({
             onChange={(event) => onNameChange(event.target.value)}
             autoFocus
             className="w-full"
+            disabled={saving}
           />
         </div>
         <div className="flex flex-column gap-1">
@@ -76,6 +78,7 @@ export function CustomTestRunDialog({
             display="chip"
             placeholder="Pilih test case"
             className="w-full"
+            disabled={saving}
           />
         </div>
         <small className="text-color-secondary">

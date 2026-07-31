@@ -30,6 +30,7 @@ import { AttachmentPanel } from '../../components/ui/AttachmentPanel';
 import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { TestRunAnalysisPanel } from '../../components/test-runs/TestRunAnalysisPanel';
 import { AiIssueDraftDialog } from '../../components/ai/AiIssueDraftDialog';
+import { IssueDialog } from '../../components/dialogs/IssueDialog';
 import {
   TEST_RESULT_STATUS_LABEL,
   TEST_RESULT_STATUS_SEVERITY,
@@ -142,6 +143,7 @@ export function TestRunDetailPage() {
   const [issueActual, setIssueActual] = useState('');
   const [issueExpected, setIssueExpected] = useState('');
   const [issueError, setIssueError] = useState<string | null>(null);
+  const [issueSaving, setIssueSaving] = useState(false);
   const [aiIssueDialogOpen, setAiIssueDialogOpen] = useState(false);
   const [aiIssueResult, setAiIssueResult] = useState<TestResultWithDetails | null>(null);
 
@@ -158,6 +160,7 @@ export function TestRunDetailPage() {
   async function handleCreateIssue() {
     if (!activeResult) return;
     setIssueError(null);
+    setIssueSaving(true);
     try {
       await issueService.create({
         testResultId: activeResult.id,
@@ -171,6 +174,8 @@ export function TestRunDetailPage() {
       navigate(`/test-runs/${id}/issues`);
     } catch (err) {
       setIssueError(err instanceof Error ? err.message : 'Gagal membuat issue');
+    } finally {
+      setIssueSaving(false);
     }
   }
 
@@ -384,29 +389,7 @@ export function TestRunDetailPage() {
         </div>
       </Dialog>
 
-      {/* --- Create Issue Dialog --- */}
-      <Dialog header="Buat Issue" visible={issueDialogOpen} onHide={() => setIssueDialogOpen(false)} style={{ width: '32rem' }}>
-        <div className="flex flex-column gap-3">
-          {issueError && <small className="p-error">{issueError}</small>}
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-title">Judul</label>
-            <InputText id="issue-title" value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} autoFocus />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-description">Deskripsi</label>
-            <InputTextarea id="issue-description" value={issueDescription} onChange={(e) => setIssueDescription(e.target.value)} rows={2} />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-actual">Hasil Aktual</label>
-            <InputTextarea id="issue-actual" value={issueActual} onChange={(e) => setIssueActual(e.target.value)} rows={2} />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-expected">Hasil yang Diharapkan</label>
-            <InputTextarea id="issue-expected" value={issueExpected} onChange={(e) => setIssueExpected(e.target.value)} rows={2} />
-          </div>
-          <Button label="Buat Issue" size="small" onClick={handleCreateIssue} />
-        </div>
-      </Dialog>
+      <IssueDialog visible={issueDialogOpen} title={issueTitle} description={issueDescription} actualResult={issueActual} expectedResult={issueExpected} error={issueError} saving={issueSaving} onTitleChange={setIssueTitle} onDescriptionChange={setIssueDescription} onActualResultChange={setIssueActual} onExpectedResultChange={setIssueExpected} onHide={() => setIssueDialogOpen(false)} onSave={handleCreateIssue} />
 
       {testPlan && <AiIssueDraftDialog visible={aiIssueDialogOpen} projectId={testPlan.projectId} result={aiIssueResult} onHide={() => setAiIssueDialogOpen(false)} onSaved={() => navigate(`/test-runs/${id}/issues`)} />}
 

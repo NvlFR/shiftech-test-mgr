@@ -21,6 +21,7 @@ import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { CustomTestRunDialog } from '../../components/dialogs/CustomTestRunDialog';
 import { ImportCasesDialog } from '../../components/dialogs/ImportCasesDialog';
+import { TestPlanDialog } from '../../components/dialogs/TestPlanDialog';
 import { ProjectTestPlanTab } from './ProjectTestPlanTab';
 import { ProjectTestCaseTab } from './ProjectTestCaseTab';
 import { projectService } from '../../services/projectService';
@@ -145,6 +146,7 @@ export function ProjectDetailPage() {
   const [customRunName, setCustomRunName] = useState('');
   const [customRunCaseIds, setCustomRunCaseIds] = useState<string[]>([]);
   const [customRunError, setCustomRunError] = useState<string | null>(null);
+  const [customRunSaving, setCustomRunSaving] = useState(false);
 
   async function openCustomRunDialog() {
     if (id && testCases.length === 0) {
@@ -158,8 +160,9 @@ export function ProjectDetailPage() {
   }
 
   async function handleCreateCustomRun() {
-    if (!id || !customRunName.trim() || customRunCaseIds.length === 0) return;
+    if (!id) return;
     setCustomRunError(null);
+    setCustomRunSaving(true);
     try {
       const run = await testRunService.startCustom(id, customRunCaseIds, customRunName);
       setCustomRunDialogOpen(false);
@@ -167,6 +170,8 @@ export function ProjectDetailPage() {
       navigate(`/test-runs/${run.id}`);
     } catch (error) {
       setCustomRunError(error instanceof Error ? error.message : 'Gagal membuat custom test run');
+    } finally {
+      setCustomRunSaving(false);
     }
   }
 
@@ -257,6 +262,8 @@ export function ProjectDetailPage() {
   const [planName, setPlanName] = useState('');
   const [planDescription, setPlanDescription] = useState('');
   const [planError, setPlanError] = useState<string | null>(null);
+  const [planSaving, setPlanSaving] = useState(false);
+  const [planStatus, setPlanStatus] = useState<TestPlanStatus>('draft');
 
   // Test Plans: search/filter/sort/selection
   const [planSearch, setPlanSearch] = useState('');
@@ -279,6 +286,7 @@ export function ProjectDetailPage() {
     setPlanCode('');
     setPlanName('');
     setPlanDescription('');
+    setPlanStatus('draft');
     setPlanError(null);
     setPlanDialogOpen(true);
   }
@@ -288,6 +296,7 @@ export function ProjectDetailPage() {
     setPlanCode(row.code);
     setPlanName(row.name);
     setPlanDescription(row.description ?? '');
+    setPlanStatus(row.status);
     setPlanError(null);
     setPlanDialogOpen(true);
   }
@@ -295,9 +304,11 @@ export function ProjectDetailPage() {
   async function handleSavePlan() {
     if (!id) return;
     setPlanError(null);
+    setPlanSaving(true);
     try {
       if (editingPlanId) {
         await testPlanService.update(editingPlanId, { name: planName, description: planDescription, code: planCode });
+        await testPlanService.changeStatus(editingPlanId, planStatus);
       } else {
         await testPlanService.create({ projectId: id, name: planName, description: planDescription, code: planCode });
       }
@@ -306,6 +317,8 @@ export function ProjectDetailPage() {
       toast.current?.show({ severity: 'success', summary: editingPlanId ? 'Test plan diperbarui' : 'Test plan dibuat' });
     } catch (err) {
       setPlanError(err instanceof Error ? err.message : 'Gagal menyimpan test plan');
+    } finally {
+      setPlanSaving(false);
     }
   }
 
@@ -581,6 +594,7 @@ export function ProjectDetailPage() {
       toast.current?.show({ severity: 'success', summary: `${imported} test case berhasil diimport` });
     } catch (error) {
       toast.current?.show({ severity: 'error', summary: 'Import project gagal', detail: error instanceof Error ? error.message : undefined });
+      throw error;
     } finally {
       setLibraryImporting(false);
     }
@@ -1148,30 +1162,7 @@ export function ProjectDetailPage() {
         </TabView>
       </Card>
 
-      {/* --- Test Plan Dialog --- */}
-      <Dialog
-        header={editingPlanId ? 'Edit Test Plan' : 'Test Plan Baru'}
-        visible={planDialogOpen}
-        onHide={() => setPlanDialogOpen(false)}
-        style={{ width: '30rem' }}
-      >
-        <div className="flex flex-column gap-3">
-          {planError && <small className="p-error">{planError}</small>}
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-code">Kode</label>
-            <InputText id="plan-code" value={planCode} onChange={(e) => setPlanCode(e.target.value)} placeholder="Otomatis jika dikosongkan" />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-name">Nama</label>
-            <InputText id="plan-name" value={planName} onChange={(e) => setPlanName(e.target.value)} autoFocus />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-description">Deskripsi</label>
-            <InputTextarea id="plan-description" value={planDescription} onChange={(e) => setPlanDescription(e.target.value)} rows={3} />
-          </div>
-          <Button label="Simpan" size="small" onClick={handleSavePlan} />
-        </div>
-      </Dialog>
+      <TestPlanDialog visible={planDialogOpen} editing={Boolean(editingPlanId)} code={planCode} onCodeChange={setPlanCode} name={planName} onNameChange={setPlanName} description={planDescription} onDescriptionChange={setPlanDescription} status={planStatus} onStatusChange={setPlanStatus} error={planError} saving={planSaving} onHide={() => setPlanDialogOpen(false)} onSave={handleSavePlan} />
 
       {/* --- Module Dialog --- */}
       <Dialog
@@ -1372,6 +1363,7 @@ export function ProjectDetailPage() {
         selectedCaseIds={customRunCaseIds}
         testCases={testCases}
         error={customRunError}
+        saving={customRunSaving}
         onNameChange={setCustomRunName}
         onSelectedCaseIdsChange={setCustomRunCaseIds}
         onHide={() => setCustomRunDialogOpen(false)}

@@ -15,6 +15,7 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { ActivityPanel } from '../../components/ui/ActivityPanel';
+import { TestPlanDialog } from '../../components/dialogs/TestPlanDialog';
 import { useTestPlanDetail } from '../../hooks/useTestPlanDetail';
 import { useTestRuns } from '../../hooks/useTestRuns';
 import { testPlanService } from '../../services/testPlanService';
@@ -75,6 +76,7 @@ export function TestPlanDetailPage() {
   const [planDescription, setPlanDescription] = useState('');
   const [planStatus, setPlanStatus] = useState<TestPlanStatus>('draft');
   const [planError, setPlanError] = useState<string | null>(null);
+  const [planSaving, setPlanSaving] = useState(false);
 
   function openEditPlanDialog() {
     if (!testPlan) return;
@@ -89,6 +91,7 @@ export function TestPlanDetailPage() {
   async function handleSavePlanEdit() {
     if (!testPlan) return;
     setPlanError(null);
+    setPlanSaving(true);
     try {
       const updated = await testPlanService.update(testPlan.id, {
         code: planCode,
@@ -104,6 +107,8 @@ export function TestPlanDetailPage() {
       toast.current?.show({ severity: 'success', summary: 'Test plan diperbarui' });
     } catch (err) {
       setPlanError(err instanceof Error ? err.message : 'Gagal menyimpan test plan');
+    } finally {
+      setPlanSaving(false);
     }
   }
 
@@ -555,28 +560,7 @@ export function TestPlanDetailPage() {
         </div>
       </Dialog>
 
-      <Dialog header="Edit Test Plan" visible={planDialogOpen} onHide={() => setPlanDialogOpen(false)} style={{ width: '32rem' }}>
-        <div className="flex flex-column gap-3">
-          {planError && <small className="p-error">{planError}</small>}
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-edit-code">Kode</label>
-            <InputText id="plan-edit-code" value={planCode} onChange={(e) => setPlanCode(e.target.value)} />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-edit-name">Nama</label>
-            <InputText id="plan-edit-name" value={planName} onChange={(e) => setPlanName(e.target.value)} autoFocus />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-edit-description">Deskripsi</label>
-            <InputText id="plan-edit-description" value={planDescription} onChange={(e) => setPlanDescription(e.target.value)} />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="plan-edit-status">Status</label>
-            <Dropdown id="plan-edit-status" value={planStatus} options={TEST_PLAN_STATUS_OPTIONS} onChange={(e) => setPlanStatus(e.value)} />
-          </div>
-          <Button label="Simpan" size="small" onClick={handleSavePlanEdit} />
-        </div>
-      </Dialog>
+      <TestPlanDialog visible={planDialogOpen} editing code={planCode} onCodeChange={setPlanCode} name={planName} onNameChange={setPlanName} description={planDescription} onDescriptionChange={setPlanDescription} status={planStatus} onStatusChange={setPlanStatus} error={planError} saving={planSaving} onHide={() => setPlanDialogOpen(false)} onSave={handleSavePlanEdit} />
     </div>
   );
 }

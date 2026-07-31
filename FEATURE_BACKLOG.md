@@ -268,7 +268,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
 
 ### Checklist per folder
 
-- [ ] **SRC-01 — `components/dialogs`**
+- [x] **SRC-01 — `components/dialogs`**
   Aktifkan seluruh dialog yang relevan dari source-new. Pastikan dialog Test
   Plan, Test Suite, Custom Test Run, Issue, import, dan attachment memakai
   service lokal, validasi error, loading state, dan callback yang konsisten.
