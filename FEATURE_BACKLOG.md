@@ -415,9 +415,9 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 - [ ] `testplan.create`, `testplan.add_cases`, `testplan.remove_cases`.
 - [x] `testplan.approve` — **gate manusia**; tool ini hanya boleh sukses kalau
       approver adalah user (bukan token agent) atau flag approval eksplisit diberikan.
-- [ ] `testrun.create` — selalu run baru, tidak pernah menimpa run lama.
-- [ ] `testrun.record_result` — tulis satu `test_result`.
-- [ ] `testrun.complete` — set `completed` (tetap aksi eksplisit).
+- [x] `testrun.create` — selalu run baru, tidak pernah menimpa run lama.
+- [x] `testrun.record_result` — tulis satu `test_result`.
+- [x] `testrun.complete` — set `completed` (tetap aksi eksplisit).
 - [ ] `issue.create` — wajib menyertakan `test_result_id` (relasi ke Test Run + Test Case).
 - [ ] `issue.comment`, `issue.update_status`.
 - [ ] `issue.detect_duplicate` — bungkus AI action yang sudah ada (Section 4).

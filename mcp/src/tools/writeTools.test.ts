@@ -13,5 +13,6 @@ test("registers the MCP write tools including the human approval gate", () => {
     "testmanager.testcase.create_bulk", "testmanager.testcase.update", "testmanager.testcase.duplicate",
     "testmanager.testcase.archive", "testmanager.testplan.create", "testmanager.testplan.add_cases",
     "testmanager.testplan.remove_cases", "testmanager.testplan.approve",
+    "testmanager.testrun.create", "testmanager.testrun.record_result", "testmanager.testrun.complete",
   ]);
 });

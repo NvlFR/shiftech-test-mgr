@@ -168,7 +168,7 @@
   "166": "2026-07-31 — SRC-04 penyelesaian notification center",
   "167": "4. Scope — Modul",
   "168": "react-dom",
-  "169": "2026-07-31 — SRC-04 penyelesaian notification center",
+  "169": "react-dom",
   "170": "schema_045_test_run_repository_traceability.sql",
   "171": "schema_047_mcp_auth.sql",
   "172": "schema_042_issue_attachment_storage_cleanup.sql",
@@ -177,14 +177,8 @@
   "175": "react",
   "176": "TestManager MCP Server",
   "177": "4. Scope — Modul",
-  "178": "AppMenu.tsx",
-  "179": "useRealtimeSync.ts",
-  "180": "primereact",
-  "181": "react-router-dom",
+  "178": "@supabase/supabase-js",
   "182": "useStoredState.ts",
-  "183": "@supabase/supabase-js",
   "184": "activityRoutes.ts",
-  "185": "jspdf-autotable",
-  "186": "schema_051_mcp_write_test_cases_plans.sql",
-  "187": "registry.ts"
+  "186": "schema_051_mcp_write_test_cases_plans.sql"
 }

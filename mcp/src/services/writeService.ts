@@ -1,5 +1,5 @@
 import { McpToolError } from "../helpers/response.js";
-import type { TestCaseChanges, TestCaseWriteInput, WriteRepository } from "../repositories/writeRepository.js";
+import type { TestCaseChanges, TestCaseWriteInput, TestResultWriteStatus, WriteRepository } from "../repositories/writeRepository.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const marker = (data: unknown) => ({ status: "draft" as const, mode: "review_only" as const, data });
@@ -26,6 +26,19 @@ export class WriteService {
     this.uuid(id, "testplan_id"); this.uuid(approverId, "approver_id");
     if (explicitApproval !== true) throw invalid("explicit_approval must be true for API-token approval");
     return this.repository.approveTestPlan(id, approverId, explicitApproval);
+  }
+  async createTestRun(input: { testPlanId: string; name: string; notes?: string | null }) {
+    this.uuid(input.testPlanId, "testplan_id"); this.text(input.name, "name");
+    return this.repository.createTestRun({ ...input, name: input.name.trim() });
+  }
+  async recordTestResult(input: { testResultId: string; testerId: string; status: TestResultWriteStatus; notes?: string | null }) {
+    this.uuid(input.testResultId, "testresult_id"); this.uuid(input.testerId, "tester_id");
+    if (!["pass", "fail", "skip", "blocked"].includes(input.status)) throw invalid("status is invalid");
+    return this.repository.recordTestResult(input);
+  }
+  async completeTestRun(id: string, notes?: string | null) {
+    this.uuid(id, "testrun_id");
+    return this.repository.completeTestRun(id, notes);
   }
   private ids(ids: string[]) { if (ids.length < 1 || ids.length > 100) throw invalid("testcase_ids must contain between 1 and 100 IDs"); ids.forEach((id) => this.uuid(id, "testcase_ids")); }
   private validateCase(value: TestCaseChanges, path: string, required = true) {

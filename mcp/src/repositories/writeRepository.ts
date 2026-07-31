@@ -5,6 +5,7 @@ export interface TestCaseWriteInput {
   steps: string; expectedResult: string; priority?: "low" | "medium" | "high" | "critical"; notes?: string | null;
 }
 export interface TestCaseChanges extends Partial<TestCaseWriteInput> {}
+export type TestResultWriteStatus = "pass" | "fail" | "skip" | "blocked";
 
 export class WriteRepositoryError extends Error {
   constructor() { super("TestManager write service request failed"); this.name = "WriteRepositoryError"; }
@@ -35,6 +36,15 @@ export class WriteRepository {
   removeTestPlanCases(id: string, caseIds: string[]) { return this.rpc("mcp_remove_test_plan_cases", { p_test_plan_id: id, p_test_case_ids: caseIds }); }
   approveTestPlan(id: string, approverId: string, explicitApproval: boolean) {
     return this.rpc("mcp_approve_test_plan", { p_test_plan_id: id, p_approver_id: approverId, p_explicit_approval: explicitApproval });
+  }
+  createTestRun(input: { testPlanId: string; name: string; notes?: string | null }) {
+    return this.rpc("mcp_create_test_run", { p_test_plan_id: input.testPlanId, p_name: input.name, p_notes: input.notes ?? null });
+  }
+  recordTestResult(input: { testResultId: string; testerId: string; status: TestResultWriteStatus; notes?: string | null }) {
+    return this.rpc("mcp_record_test_result", { p_test_result_id: input.testResultId, p_tester_id: input.testerId, p_status: input.status, p_notes: input.notes ?? null });
+  }
+  completeTestRun(id: string, notes?: string | null) {
+    return this.rpc("mcp_complete_test_run", { p_test_run_id: id, p_notes: notes ?? null });
   }
 }
 

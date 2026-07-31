@@ -25,4 +25,16 @@ export const createWriteToolRegistrar = (session: ProjectSession, service: Write
     inputSchema: { testplan_id: z.string().uuid(), approver_id: z.string().uuid().describe("Profile ID of the human who explicitly approved the plan."), explicit_approval: z.literal(true).describe("Explicit confirmation that the named human approved this action.") },
     annotations,
   }, async (a) => run(a, () => service.approveTestPlan(a.testplan_id, a.approver_id, a.explicit_approval)));
+  server.registerTool("testmanager.testrun.create", {
+    description: "Create a new test run and seed a fresh not-run result for every case in the plan. This never overwrites an earlier run.",
+    inputSchema: { testplan_id: z.string().uuid(), name: z.string().min(1), notes: z.string().nullable().optional() }, annotations,
+  }, async (a) => run(a, () => service.createTestRun({ testPlanId: a.testplan_id, name: a.name, notes: a.notes })));
+  server.registerTool("testmanager.testrun.record_result", {
+    description: "Record one test result on an in-progress run using a registered tester profile.",
+    inputSchema: { testresult_id: z.string().uuid(), tester_id: z.string().uuid(), status: z.enum(["pass", "fail", "skip", "blocked"]), notes: z.string().nullable().optional() }, annotations,
+  }, async (a) => run(a, () => service.recordTestResult({ testResultId: a.testresult_id, testerId: a.tester_id, status: a.status, notes: a.notes })));
+  server.registerTool("testmanager.testrun.complete", {
+    description: "Explicitly complete an in-progress test run. Completion is never inferred from its results.",
+    inputSchema: { testrun_id: z.string().uuid(), notes: z.string().nullable().optional() }, annotations,
+  }, async (a) => run(a, () => service.completeTestRun(a.testrun_id, a.notes)));
 };

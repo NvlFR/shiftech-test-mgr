@@ -34,3 +34,19 @@ test("requires explicit human approval before approving a test plan", async () =
   assert.deepEqual(received, [id, id, true]);
   assert.deepEqual(result, { id, status: "active", approved_by: id });
 });
+
+test("test run workflow validates IDs and preserves explicit completion", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const calls: string[] = [];
+  const repo = {
+    createTestRun: async () => { calls.push("create"); return { id }; },
+    recordTestResult: async () => { calls.push("record"); return { id }; },
+    completeTestRun: async () => { calls.push("complete"); return { id, status: "completed" }; },
+  } as unknown as WriteRepository;
+  const service = new WriteService(repo);
+  await service.createTestRun({ testPlanId: id, name: " Regression " });
+  await service.recordTestResult({ testResultId: id, testerId: id, status: "fail" });
+  await service.completeTestRun(id);
+  assert.deepEqual(calls, ["create", "record", "complete"]);
+  await assert.rejects(service.recordTestResult({ testResultId: id, testerId: id, status: "not_run" as never }), (error: unknown) => error instanceof McpToolError && error.code === "INVALID_ARGUMENT");
+});

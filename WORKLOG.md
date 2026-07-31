@@ -1,5 +1,12 @@
 # Worklog
 
+## 2026-07-31 — MCP-10 tool workflow Test Run
+
+- Menambahkan tool `testmanager.testrun.create`, `testmanager.testrun.record_result`, dan `testmanager.testrun.complete` melalui alur MCP tool → service → repository → Supabase RPC, termasuk validasi UUID, nama run, status hasil, dan tester terdaftar.
+- Menambahkan migration `schema_053_mcp_test_run_workflow.sql`: create selalu meng-insert Test Run baru dan snapshot result/step, record_result hanya mengubah satu Test Result pada run `in_progress`, dan complete hanya mengubah status melalui aksi eksplisit serta menghitung summary on-the-fly.
+- Seluruh RPC memvalidasi API token dengan scope `write:test-runs` dan project scope. Migration tidak dijalankan ke Supabase target; tidak ada secret/token, data, commit, atau push yang dilakukan.
+- Menambahkan unit test tool registration, validasi service, pemetaan repository/RPC, dan project scoping. Verifikasi lulus: `cd mcp && npm test` (9 suite/subtest entry, seluruhnya lulus).
+
 ## 2026-07-31 — REPO-08 traceability repository pada Test Run
 
 - Menambahkan migration baru `schema_045_test_run_repository_traceability.sql` yang secara idempotent memastikan kolom `branch` dan `commit_sha`, menambahkan `repository_id` dengan foreign key `on delete set null` ke `project_repositories`, serta index repository/commit. Migration tidak dijalankan ke Supabase target.
