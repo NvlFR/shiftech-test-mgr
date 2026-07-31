@@ -1470,3 +1470,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Startup server sekarang wajib mengautentikasi token dan menolak sesi jika project token berbeda dari `TM_PROJECT_ID`. Guard project juga menolak referensi `project_id`/`projectId` lintas project termasuk yang bersarang sebelum handler tool meneruskan operasi ke service/repository.
 - Menambahkan contract test untuk sesi valid, penolakan token lintas project, penolakan argumen tool lintas project, dan redaksi kegagalan autentikasi.
 - Verifikasi lulus: `cd mcp && npm test` (build TypeScript + test), `git diff --check`, dan pemeriksaan source untuk memastikan credential tidak masuk URL/error. Tidak mengakses Supabase target, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-03 helper response bersama
+
+- Menjalankan `graphify query` sebelum menelusuri scaffold MCP dan mengikuti keputusan Section 8.1 serta guardrail Section 8.3 `FEATURE_BACKLOG.md`.
+- Menambahkan helper response bersama untuk seluruh tool MCP berikutnya: default pagination 50 item, maksimum 100 item, cursor halaman berikutnya, dan batas response JSON UTF-8 sebesar 256 KiB.
+- Response pagination menerima maksimal `limit + 1` row dari repository, tidak mengirim row pendeteksi tambahan, dan memperpendek halaman secara aman bila batas byte tercapai. Satu item yang sendiri melampaui batas menghasilkan error recoverable.
+- Menambahkan envelope error konsisten berisi `code`, `message`, dan `hint`, wrapper handler async, serta redaksi detail error tidak dikenal menjadi `INTERNAL_ERROR` agar respons tidak membocorkan error upstream.
+- Menambahkan contract test untuk validasi limit, cursor/metadata pagination, pembatasan byte tanpa JSON rusak, oversized item, error terstruktur, redaksi error internal, dan response non-pagination.
+- Verifikasi lulus: `cd mcp && npm test` (build TypeScript + seluruh test) dan `git diff --check`. Tidak menjalankan migration atau mengakses Supabase target, tidak mengubah dependency, tidak commit, dan tidak push.
