@@ -2,15 +2,17 @@ import { supabase } from '../config/supabaseClient';
 import { mapNotificationRow } from '../helpers/mappers';
 import type { Notification } from '../types/domain';
 
+const notificationSelect = '*, comment:comments(target_type, target_id)';
+
 export const notificationRepository = {
   async findAllByUser(userId: string): Promise<Notification[]> {
-    const { data, error } = await supabase.from('notifications').select('*').eq('recipient_id', userId).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('notifications').select(notificationSelect).eq('recipient_id', userId).order('created_at', { ascending: false });
     if (error) throw error;
     return (data ?? []).map(mapNotificationRow);
   },
 
   async findUnread(userId: string): Promise<Notification[]> {
-    const { data, error } = await supabase.from('notifications').select('*').eq('recipient_id', userId).is('read_at', null).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('notifications').select(notificationSelect).eq('recipient_id', userId).is('read_at', null).order('created_at', { ascending: false });
     if (error) throw error;
     return (data ?? []).map(mapNotificationRow);
   },

@@ -31,6 +31,7 @@ import type {
   TestCaseStep,
   TestResultStep,
   ActivityEvent,
+  Notification,
 } from '../types/domain';
 import type { Attachment } from '../types/domain';
 
@@ -204,8 +205,19 @@ export function mapTestCaseVersionRow(row: any) {
   return { id: row.id, testCaseId: row.test_case_id, version: row.version, steps: row.steps, expectedResult: row.expected_result, changedBy: row.changed_by, createdAt: row.created_at };
 }
 
-export function mapNotificationRow(row: any) {
-  return { id: row.id, recipientId: row.recipient_id, issueId: row.issue_id ?? null, commentId: row.comment_id ?? null, kind: row.kind, message: row.message, readAt: row.read_at, createdAt: row.created_at };
+export function mapNotificationRow(row: any): Notification {
+  return {
+    id: row.id,
+    recipientId: row.recipient_id,
+    issueId: row.issue_id ?? null,
+    commentId: row.comment_id ?? null,
+    commentTargetType: row.comment?.target_type ?? null,
+    commentTargetId: row.comment?.target_id ?? null,
+    kind: row.kind,
+    message: row.message,
+    readAt: row.read_at,
+    createdAt: row.created_at,
+  };
 }
 
 export function mapActivityEventRow(row: any): ActivityEvent {

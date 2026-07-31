@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -13,11 +13,12 @@ import { useState } from 'react';
 import { useNotifications } from '../../hooks/useNotifications';
 
 export function AppTopbar() {
+  const navigate = useNavigate();
   const { profile, signOut } = useAuthContext();
   const { onMenuToggle } = useLayoutContext();
   const { items } = useBreadcrumbContext();
   const { projects, projectId, setProjectId, loading } = useProjectContext();
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
+  const { notifications, unreadCount, loading: notificationsLoading, error: notificationsError, markRead, markAllRead, remove, clearAll, getNavigationPath, mutating } = useNotifications();
   const [notificationPanelVisible, setNotificationPanelVisible] = useState(false);
 
   return (
@@ -70,7 +71,16 @@ export function AppTopbar() {
         unreadCount={unreadCount}
         onMarkRead={markRead}
         onMarkAllRead={markAllRead}
-        onNotificationClick={() => setNotificationPanelVisible(false)}
+        onRemove={remove}
+        onClearAll={clearAll}
+        loading={notificationsLoading}
+        error={notificationsError}
+        disabled={mutating}
+        onNotificationClick={(notification) => {
+          setNotificationPanelVisible(false);
+          const path = getNavigationPath(notification);
+          if (path) navigate(path);
+        }}
       />
     </div>
   );

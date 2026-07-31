@@ -1042,3 +1042,14 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menandai SRC-02 selesai di `FEATURE_BACKLOG.md`.
 - Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing di luar scope, `npm test -- --run` lulus (4 test), dan `git diff --check` lulus.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.802 node dan 3.600 edge; Graphify memberi warning 7 file konfigurasi/non-source menghasilkan zero node.
+
+## 2026-07-31 — SRC-04 penyelesaian notification center
+
+- Menjalankan `graphify query` sebelum memetakan NotificationPanel, hook, service, repository, mapper, realtime sync, topbar, route tujuan, dan RLS sesuai FEATURE_BACKLOG Section 7.
+- Menyelesaikan unread count, mark-as-read individual/semua, remove individual, clear all, serta state loading/error/pending melalui alur Component → Hook → Service → Repository → Supabase.
+- Menambahkan navigasi notification: assignment/perubahan status menuju detail Issue, sedangkan mention komentar menuju detail Issue atau Test Case berdasarkan target komentar yang dipetakan repository.
+- Mempertahankan refresh realtime aktif melalui `useRealtimeSync` di `AppLayout`, yang menginvalidasi daftar notification dan unread count untuk perubahan milik recipient saat ini.
+- Menambahkan migration aditif `schema_040_notification_delete_policy.sql` agar SELECT/UPDATE/DELETE hanya berlaku untuk recipient sendiri yang approved; migration tidak dijalankan ke Supabase target.
+- Menandai SRC-04 selesai di `FEATURE_BACKLOG.md`; tidak menjalankan migration, commit, push, atau perubahan di luar scope.
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing di luar scope, dan `git diff --check` lulus sebelum sinkronisasi graph akhir.
+- Verifikasi tambahan: 4 test Vitest lulus; `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.805 node dan 3.607 edge dengan warning 7 file konfigurasi/non-source menghasilkan zero node.

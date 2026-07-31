@@ -118,6 +118,8 @@
   "116": "schema_026_automation_artifacts_storage.sql",
   "117": "jspdf-autotable",
   "118": "schema_027_fix_attachment_helper_grants.sql",
+  "119": "primereact",
+  "120": "react-hook-form",
   "121": "react-router-dom",
   "122": "jspdf",
   "123": "useScreenSize.ts",
@@ -135,6 +137,7 @@
   "135": "schema_issue_attachments.sql",
   "136": "CLAUDE.md",
   "137": "extraction-spec.md",
+  "138": "react-markdown",
   "139": "@supabase/supabase-js",
   "140": ".mcp.json",
   "141": "schema_025_fix_pgcrypto_and_audit.sql",
@@ -152,5 +155,8 @@
   "153": "schema_026_automation_artifacts_storage.sql",
   "154": "schema_027_fix_attachment_helper_grants.sql",
   "155": "schema_037_invited_project_metadata_access.sql",
-  "156": "seed.sql"
+  "156": "seed.sql",
+  "157": "react-dom",
+  "158": "remark-gfm",
+  "159": "schema_040_notification_delete_policy.sql"
 }

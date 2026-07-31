@@ -283,7 +283,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   responsive behavior, theme, project context, dan menu secara bertahap.
   `AppLayout` aktif hanya boleh diganti setelah seluruh route utama lulus.
 
-- [ ] **SRC-04 — `components/notifications`**
+- [x] **SRC-04 — `components/notifications`**
   Selesaikan NotificationPanel, unread count, mark-as-read, clear/remove,
   realtime refresh, dan navigasi notification menggunakan notification service
   lokal serta RLS yang sesuai.

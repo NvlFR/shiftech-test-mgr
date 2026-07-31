@@ -496,6 +496,8 @@ export interface Notification {
   recipientId: string;
   issueId: string | null;
   commentId: string | null;
+  commentTargetType: CommentTargetType | null;
+  commentTargetId: string | null;
   kind: 'issue_assigned' | 'issue_status_changed' | 'comment_mentioned';
   message: string;
   readAt: string | null;

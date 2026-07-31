@@ -55,9 +55,9 @@
     "semantic_hash": "3cdc5bcce0897d0d3577cbe4957f70a6"
   },
   "frontend/src/components/layout/AppTopbar.tsx": {
-    "mtime": 1785530560.515931,
-    "ast_hash": "83e2c269e51d616d8198976350477b90",
-    "semantic_hash": "83e2c269e51d616d8198976350477b90"
+    "mtime": 1785531829.25776,
+    "ast_hash": "08ab98b2ce6b16d5c90c26917042609f",
+    "semantic_hash": ""
   },
   "frontend/src/components/layout/BreadcrumbContext.tsx": {
     "mtime": 1784700432.643921,
@@ -110,9 +110,9 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785529098.0582366,
-    "ast_hash": "18dde5f0e5edc116e2a956a4e2a60ae1",
-    "semantic_hash": "18dde5f0e5edc116e2a956a4e2a60ae1"
+    "mtime": 1785531860.9437962,
+    "ast_hash": "b761f853fe5ca145ba86af817fcd5d2a",
+    "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
     "mtime": 1784733133.49772,
@@ -305,9 +305,9 @@
     "semantic_hash": "6300d9e510ee5afe0108687ee21d4394"
   },
   "frontend/src/repositories/notificationRepository.ts": {
-    "mtime": 1785530064.9277074,
-    "ast_hash": "097a1e01ee3ec697fdacb7b8cf559345",
-    "semantic_hash": "097a1e01ee3ec697fdacb7b8cf559345"
+    "mtime": 1785531828.7257595,
+    "ast_hash": "2b247450921103ef69177848cf27671a",
+    "semantic_hash": ""
   },
   "frontend/src/repositories/profileRepository.ts": {
     "mtime": 1785530065.064707,
@@ -370,9 +370,9 @@
     "semantic_hash": "60d31ab55863b7ebd91c032f2814cbcf"
   },
   "frontend/src/services/notificationService.ts": {
-    "mtime": 1785530560.249931,
-    "ast_hash": "8378a60f1be5480d03ccfd972ea92b2d",
-    "semantic_hash": "8378a60f1be5480d03ccfd972ea92b2d"
+    "mtime": 1785531828.8567595,
+    "ast_hash": "4980f1151a3c07495da4292f30b34e73",
+    "semantic_hash": ""
   },
   "frontend/src/services/profileService.ts": {
     "mtime": 1784700432.6477952,
@@ -410,9 +410,9 @@
     "semantic_hash": "72c5e4015aac520516c569b6c899cc08"
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785529071.6699986,
-    "ast_hash": "e0423a0ca0a591238b7cf941e9249d56",
-    "semantic_hash": "e0423a0ca0a591238b7cf941e9249d56"
+    "mtime": 1785531828.461759,
+    "ast_hash": "57ace4e5ec66d9ce719fab97f126898c",
+    "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
     "mtime": 1785524120.4060874,
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785531612.788522,
-    "ast_hash": "08acd0aef20b6c6457fc07f7a395f98c",
+    "mtime": 1785531907.1588492,
+    "ast_hash": "4d46cf4ee7b18a8b6bb6ab662d93eb43",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785531612.9245222,
-    "ast_hash": "7cd45b8d7819ae687e7a6c1b28adcc24",
+    "mtime": 1785531924.341869,
+    "ast_hash": "4a9898af680aefdf9a1ef1f8d805b108",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1395,9 +1395,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/notifications/NotificationPanel.tsx": {
-    "mtime": 1785526912.8422754,
-    "ast_hash": "2b414c680b6992253502ec0821c0b242",
-    "semantic_hash": "2b414c680b6992253502ec0821c0b242"
+    "mtime": 1785531943.6408916,
+    "ast_hash": "82a3fa60fbbc87eca58285a1c5030f87",
+    "semantic_hash": ""
   },
   "frontend/src/components/profile/ProfileView.tsx": {
     "mtime": 1785524119.3500261,
@@ -2655,9 +2655,9 @@
     "semantic_hash": "a339a15e76cd826c88d14bf4d34b41af"
   },
   "frontend/src/hooks/useNotifications.ts": {
-    "mtime": 1785530559.7039313,
-    "ast_hash": "665f96e79b293874faa7ffd6128726a7",
-    "semantic_hash": "665f96e79b293874faa7ffd6128726a7"
+    "mtime": 1785531938.104885,
+    "ast_hash": "1dfedda4e2d6a9547d7de23612c8f1b3",
+    "semantic_hash": ""
   },
   "frontend/src/hooks/useRealtimeSync.ts": {
     "mtime": 1785530559.8349311,
@@ -2697,6 +2697,11 @@
   "supabase/schema_039_issue_editor_metadata.sql": {
     "mtime": 1785531509.3264146,
     "ast_hash": "372deba83cf85ca11d6d5f1d7810aa53",
+    "semantic_hash": ""
+  },
+  "supabase/schema_040_notification_delete_policy.sql": {
+    "mtime": 1785531838.8057709,
+    "ast_hash": "10ac09406101113545e7b84d6b14aa67",
     "semantic_hash": ""
   }
 }

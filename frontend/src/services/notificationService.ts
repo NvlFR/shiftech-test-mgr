@@ -1,9 +1,28 @@
 import { notificationRepository } from '../repositories/notificationRepository';
+import type { Notification } from '../types/domain';
+
+function requireId(value: string, label: string): string {
+  const id = value.trim();
+  if (!id) throw new Error(`${label} wajib diisi.`);
+  return id;
+}
 
 export const notificationService = {
-  listAll(userId: string) { return notificationRepository.findAllByUser(userId); },
-  listUnread(userId: string) { return notificationRepository.findUnread(userId); },
-  countUnread(userId: string) { return notificationRepository.findUnreadCount(userId); },
-  markRead(id: string) { return notificationRepository.markRead(id); },
-  markAllRead(userId: string) { return notificationRepository.markAllRead(userId); },
+  listAll(userId: string) { return notificationRepository.findAllByUser(requireId(userId, 'User')); },
+  listUnread(userId: string) { return notificationRepository.findUnread(requireId(userId, 'User')); },
+  countUnread(userId: string) { return notificationRepository.findUnreadCount(requireId(userId, 'User')); },
+  markRead(id: string) { return notificationRepository.markRead(requireId(id, 'Notification')); },
+  markAllRead(userId: string) { return notificationRepository.markAllRead(requireId(userId, 'User')); },
+  remove(id: string) { return notificationRepository.remove(requireId(id, 'Notification')); },
+  clearAll(userId: string) { return notificationRepository.removeAll(requireId(userId, 'User')); },
+  getNavigationPath(notification: Notification): string | null {
+    if (notification.issueId) return `/issues/${notification.issueId}`;
+    if (notification.commentTargetType === 'issue' && notification.commentTargetId) {
+      return `/issues/${notification.commentTargetId}`;
+    }
+    if (notification.commentTargetType === 'test_case' && notification.commentTargetId) {
+      return `/test-cases/${notification.commentTargetId}`;
+    }
+    return null;
+  },
 };

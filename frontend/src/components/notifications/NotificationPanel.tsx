@@ -25,6 +25,9 @@ interface NotificationPanelProps {
   onRemove?: (id: string) => void;
   onClearAll?: () => void;
   onNotificationClick?: (notification: Notification) => void;
+  loading?: boolean;
+  error?: Error | null;
+  disabled?: boolean;
 }
 
 export function NotificationPanel({
@@ -37,6 +40,9 @@ export function NotificationPanel({
   onRemove,
   onClearAll,
   onNotificationClick,
+  loading = false,
+  error = null,
+  disabled = false,
 }: NotificationPanelProps) {
   return (
     <Sidebar
@@ -54,14 +60,21 @@ export function NotificationPanel({
     >
       {notifications.length > 0 && (onClearAll || unreadCount > 0) && (
         <div className="notification-actions-bar flex gap-2">
-          {unreadCount > 0 && <Button label="Mark all as read" icon="pi pi-check" text size="small" onClick={onMarkAllRead} />}
-          {onClearAll && <Button label="Clear all" icon="pi pi-trash" text size="small" severity="danger" onClick={onClearAll} />}
+          {unreadCount > 0 && <Button label="Tandai semua dibaca" icon="pi pi-check" text size="small" disabled={disabled} onClick={onMarkAllRead} />}
+          {onClearAll && <Button label="Hapus semua" icon="pi pi-trash" text size="small" severity="danger" disabled={disabled} onClick={onClearAll} />}
         </div>
       )}
-      {notifications.length === 0 ? (
+      {loading ? (
+        <div className="flex align-items-center justify-content-center gap-2" style={{ height: '200px' }}>
+          <i className="pi pi-spin pi-spinner" />
+          <span className="text-color-secondary">Memuat notifikasi...</span>
+        </div>
+      ) : error ? (
+        <div className="p-3 text-red-500" role="alert">Terjadi kesalahan saat memproses notifikasi.</div>
+      ) : notifications.length === 0 ? (
         <div className="flex flex-column align-items-center justify-content-center" style={{ height: '200px' }}>
           <i className="pi pi-inbox text-color-secondary" style={{ fontSize: '2rem' }} />
-          <p className="text-color-secondary mt-2">No notifications</p>
+          <p className="text-color-secondary mt-2">Belum ada notifikasi</p>
         </div>
       ) : (
         <div className="flex flex-column gap-1 notification-list">
@@ -112,6 +125,7 @@ export function NotificationPanel({
                   e.stopPropagation();
                   onRemove(n.id);
                 }}
+                disabled={disabled}
               />}
             </div>
           ))}
