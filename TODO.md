@@ -2,9 +2,20 @@
 
 Titik mulai sesi kerja. Update file ini setiap kali mulai/selesai mengerjakan sesuatu.
 
+> Eksekusi task didelegasikan ke Codex lewat driver loop lokal di
+> `scripts/codex-loop/` (tidak di-commit, ada di `.gitignore`). Antrean lengkap
+> 96 task hasil breakdown `FEATURE_BACKLOG.md` ada di `scripts/codex-loop/queue.md`.
+> File ini tetap jadi papan status tingkat tinggi.
+
 ## Siap Dikerjakan (next up)
 
+- [ ] **SRC-EPIC — Integrasi penuh source-new ke aplikasi aktif**
+  Port seluruh komponen, helper, hook, page, repository, service, domain,
+  routing, dan migration `source-new` secara bertahap. Pertahankan fitur lokal;
+  jangan mengaktifkan source-new mentah jika kontraknya berbeda. Detail task
+  SRC-01 sampai SRC-14 dan Definition of Done ada di `FEATURE_BACKLOG.md`.
 - [ ] **Jalankan migrasi SQL yang belum dieksekusi di Supabase SQL Editor, berurutan:**
+      (bagian dari daftar "Butuh Manusia" di `scripts/codex-loop/queue.md`)
   1. `supabase/schema_test_management_v2.sql` (jika belum)
   2. `supabase/schema_entity_codes.sql` (kolom `code` auto-generate — baru dibuat sesi ini)
 - [ ] E02-T05 — Project selector/context global

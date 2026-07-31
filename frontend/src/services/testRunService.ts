@@ -11,7 +11,7 @@ export const testRunService = {
   },
 
   listByProject(projectId: string, filters?: TestRunFilters) {
-    return testRunRepository.findAllByProject(projectId, filters);
+    return Promise.all([testRunRepository.findAllByProject(projectId, filters), testRunRepository.findAllCustomByProject(projectId, filters)]).then(([planned, custom]) => [...planned, ...custom].sort((a, b) => b.startedAt.localeCompare(a.startedAt)));
   },
 
   async listByProjectWithSummary(projectId: string, filters?: TestRunFilters) {
@@ -60,6 +60,20 @@ export const testRunService = {
       planCases.map((pc) => pc.testCaseId),
     );
     return run;
+  },
+
+  async startCustom(projectId: string, testCaseIds: string[], name: string, options: { browser?: string; device?: string } = {}) {
+    if (!name.trim()) throw new Error('Nama test run tidak boleh kosong');
+    if (!testCaseIds.length) throw new Error('Pilih minimal satu test case');
+    const run = await testRunRepository.createCustom({ projectId, name: name.trim(), browser: options.browser?.trim(), device: options.device?.trim() });
+    try {
+      await testRunRepository.attachCases(run.id, testCaseIds);
+      await testResultRepository.seedForRun(run.id, testCaseIds);
+      return run;
+    } catch (error) {
+      await testRunRepository.remove(run.id);
+      throw error;
+    }
   },
 
   rename(id: string, input: { name: string; code: string }) {

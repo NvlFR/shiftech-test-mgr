@@ -21,4 +21,8 @@ export const projectMemberService = {
   remove(id: string) {
     return projectMemberRepository.remove(id);
   },
+
+  respondToInvitation(id: string, accept: boolean) {
+    return projectMemberRepository.respondToInvitation(id, accept);
+  },
 };

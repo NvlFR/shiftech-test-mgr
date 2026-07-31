@@ -63,6 +63,7 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
   const mainItems: MenuItemModel[] = [
     { label: 'Home', icon: 'pi pi-home', url: '/home' },
     { label: 'Trend & Reporting', icon: 'pi pi-chart-line', url: '/dashboard' },
+    { label: 'Test Suite Library', icon: 'pi pi-book', url: '/test-suites' },
     { label: 'Projects', icon: 'pi pi-folder', url: '/', end: true },
     ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }, { label: 'Retensi Global', icon: 'pi pi-database', url: '/admin/data-retention' }] : []),
   ];

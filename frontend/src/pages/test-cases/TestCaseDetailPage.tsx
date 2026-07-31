@@ -16,10 +16,11 @@ import { Toast } from 'primereact/toast';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { CommentsPanel } from '../../components/ui/CommentsPanel';
 import { testCaseService } from '../../services/testCaseService';
+import { testCaseStepService } from '../../services/testCaseStepService';
 import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import type { Module, Tag as TagEntity, TestCasePriority, TestCaseVersion, TestCaseWithDetails } from '../../types/domain';
+import type { Module, Tag as TagEntity, TestCasePriority, TestCaseVersion, TestCaseStep, TestCaseWithDetails } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import { AttachmentPanel } from '../../components/ui/AttachmentPanel';
 import {
@@ -49,6 +50,9 @@ export function TestCaseDetailPage() {
   const [modules, setModules] = useState<Module[]>([]);
   const [tags, setTags] = useState<TagEntity[]>([]);
   const [versions, setVersions] = useState<TestCaseVersion[]>([]);
+  const [structuredSteps, setStructuredSteps] = useState<TestCaseStep[]>([]);
+  const [stepAction, setStepAction] = useState('');
+  const [stepExpected, setStepExpected] = useState('');
   const { canEditContent, canDeleteContent } = useProjectRole(testCase?.project.id);
 
   async function reload() {
@@ -56,17 +60,32 @@ export function TestCaseDetailPage() {
     const result = await testCaseService.getByIdWithDetails(id);
     setTestCase(result as TestCaseDetail | null);
     setVersions(await testCaseService.listVersions(id));
+    setStructuredSteps(await testCaseStepService.list(id));
   }
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    Promise.all([testCaseService.getByIdWithDetails(id), testCaseService.listVersions(id)]).then(([result, history]) => {
+    Promise.all([testCaseService.getByIdWithDetails(id), testCaseService.listVersions(id), testCaseStepService.list(id)]).then(([result, history, steps]) => {
       setTestCase(result as TestCaseDetail | null);
       setVersions(history);
+      setStructuredSteps(steps);
       setLoading(false);
     });
   }, [id]);
+
+  async function addStructuredStep() {
+    if (!id || !stepAction.trim()) return;
+    const created = await testCaseStepService.create({ testCaseId: id, stepNumber: Math.max(0, ...structuredSteps.map((step) => step.stepNumber)) + 1, action: stepAction, expectedResult: stepExpected });
+    setStructuredSteps((current) => [...current, created]);
+    setStepAction('');
+    setStepExpected('');
+  }
+
+  async function removeStructuredStep(step: TestCaseStep) {
+    await testCaseStepService.remove(step.id);
+    setStructuredSteps((current) => current.filter((item) => item.id !== step.id));
+  }
 
   useEffect(() => {
     if (testCase?.project.id) {
@@ -253,11 +272,12 @@ export function TestCaseDetailPage() {
         ]}
       />
 
-      <div className="flex justify-content-between align-items-center mb-3">
+      <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-2 mb-3">
         <div>
-          <h2>Test Case Detail</h2>
+          <h2 className="m-0">Test Case Detail</h2>
+          <span className="text-color-secondary text-sm">{testCase.code} · {testCase.title}</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {canEditContent && <Button label="Duplikat" icon="pi pi-copy" size="small" outlined onClick={handleDuplicate} />}
           {canEditContent && <Button label="Edit" icon="pi pi-pencil" size="small" outlined onClick={openEditDialog} />}
           {canDeleteContent && <Button label="Hapus" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleDelete} />}
@@ -265,28 +285,32 @@ export function TestCaseDetailPage() {
       </div>
 
       <Card className="mb-3">
-        <div className="flex align-items-start justify-content-between">
-          <div className="flex align-items-center gap-2 mb-1">
-            <h2 className="m-0">{testCase.code} — {testCase.title}</h2>
-            <Tag value={TEST_CASE_PRIORITY_LABEL[testCase.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[testCase.priority]} />
-            <Tag value={TEST_CASE_STATUS_LABEL[testCase.status]} severity={TEST_CASE_STATUS_SEVERITY[testCase.status]} />
+        <div className="flex flex-column md:flex-row md:align-items-start md:justify-content-between gap-2">
+          <div className="min-w-0">
+            <h2 className="m-0 text-overflow-ellipsis overflow-hidden">{testCase.code} — {testCase.title}</h2>
+            <div className="flex flex-wrap align-items-center gap-2 mt-3">
+              <Tag value={TEST_CASE_PRIORITY_LABEL[testCase.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[testCase.priority]} />
+              <Tag value={TEST_CASE_STATUS_LABEL[testCase.status]} severity={TEST_CASE_STATUS_SEVERITY[testCase.status]} />
+              {testCase.targetRole && <Tag value={`Role: ${testCase.targetRole.name}`} severity="secondary" icon="pi pi-users" />}
+            </div>
           </div>
+          <span className="text-color-secondary text-sm white-space-nowrap">ID: {testCase.id.slice(0, 8)}</span>
         </div>
 
         <div className="grid mt-3">
-          <div className="col-6 md:col-3">
+          <div className="col-12 sm:col-6 md:col-3">
             <label className="block text-color-secondary text-sm mb-1">Project</label>
             <p className="mt-0">{testCase.project.name}</p>
           </div>
-          <div className="col-6 md:col-3">
+          <div className="col-12 sm:col-6 md:col-3">
             <label className="block text-color-secondary text-sm mb-1">Module</label>
             <p className="mt-0">{testCase.module?.name ?? '-'}</p>
           </div>
-          <div className="col-6 md:col-3">
+          <div className="col-12 sm:col-6 md:col-3">
             <label className="block text-color-secondary text-sm mb-1">Dibuat</label>
             <p className="mt-0">{formatDateTime(testCase.createdAt)}</p>
           </div>
-          <div className="col-6 md:col-3">
+          <div className="col-12 sm:col-6 md:col-3">
             <label className="block text-color-secondary text-sm mb-1">Update Terakhir</label>
             <p className="mt-0">{formatDateTime(testCase.updatedAt)}</p>
           </div>
@@ -317,6 +341,21 @@ export function TestCaseDetailPage() {
         <p className="m-0" style={{ whiteSpace: 'pre-wrap' }}>{testCase.steps}</p>
       </Card>
 
+      <Card title="Structured Steps (Checklist Eksekusi)" className="mb-3">
+        <p className="text-color-secondary mt-0">Langkah terstruktur ini akan muncul sebagai checklist saat test run dieksekusi. Steps teks lama tetap dipertahankan.</p>
+        <DataTable value={structuredSteps} size="small" emptyMessage="Belum ada structured step">
+          <Column field="stepNumber" header="#" style={{ width: '4rem' }} />
+          <Column field="action" header="Aksi" />
+          <Column field="expectedResult" header="Expected result" body={(row: TestCaseStep) => row.expectedResult || '-'} />
+          {canEditContent && <Column header="" body={(row: TestCaseStep) => <Button icon="pi pi-trash" text rounded severity="danger" aria-label="Hapus step" onClick={() => removeStructuredStep(row)} />} />}
+        </DataTable>
+        {canEditContent && <div className="grid mt-2">
+          <div className="col-12 md:col-5"><InputText value={stepAction} onChange={(e) => setStepAction(e.target.value)} placeholder="Aksi step" className="w-full" /></div>
+          <div className="col-12 md:col-5"><InputText value={stepExpected} onChange={(e) => setStepExpected(e.target.value)} placeholder="Expected result (opsional)" className="w-full" /></div>
+          <div className="col-12 md:col-2"><Button label="Tambah" icon="pi pi-plus" onClick={addStructuredStep} disabled={!stepAction.trim()} /></div>
+        </div>}
+      </Card>
+
       <Card title="Hasil yang Diharapkan" className="mb-3">
         <p className="m-0" style={{ whiteSpace: 'pre-wrap' }}>{testCase.expectedResult}</p>
       </Card>
@@ -326,6 +365,22 @@ export function TestCaseDetailPage() {
       </Card>
 
       <AttachmentPanel kind="test_case" entityId={testCase.id} canUpload={canEditContent} canDelete={canDeleteContent} />
+
+      <Card title="External Links" className="mb-3">
+        {testCase.externalLinks && testCase.externalLinks.length > 0 ? (
+          <div className="flex flex-column gap-2">
+            {testCase.externalLinks.map((link, index) => (
+              <div key={`${link.url}-${index}`} className="flex align-items-center gap-2 min-w-0">
+                <i className="pi pi-external-link text-primary" />
+                <a href={link.url} target="_blank" rel="noreferrer" className="entity-link overflow-hidden text-overflow-ellipsis white-space-nowrap">
+                  {link.label || link.url}
+                </a>
+                {link.label && <span className="text-color-secondary text-sm hidden md:inline">{link.url}</span>}
+              </div>
+            ))}
+          </div>
+        ) : <span className="text-color-secondary text-sm">Belum ada external link.</span>}
+      </Card>
 
       {testCase.notes && (
         <Card title="Catatan" className="mb-3">

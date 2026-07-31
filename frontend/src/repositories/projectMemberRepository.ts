@@ -19,6 +19,7 @@ export const projectMemberRepository = {
       .select('role')
       .eq('project_id', projectId)
       .eq('user_id', userId)
+      .eq('status', 'accepted')
       .maybeSingle();
     if (error) throw error;
     return data?.role ?? null;
@@ -27,7 +28,7 @@ export const projectMemberRepository = {
   async add(projectId: string, userId: string, role: ProjectMemberRole): Promise<ProjectMemberWithProfile> {
     const { data, error } = await supabase
       .from('project_members')
-      .insert({ project_id: projectId, user_id: userId, role })
+      .insert({ project_id: projectId, user_id: userId, role, status: 'invited' })
       .select('*, profile:profiles(*)')
       .single();
     if (error) throw error;
@@ -41,6 +42,14 @@ export const projectMemberRepository = {
 
   async remove(id: string): Promise<void> {
     const { error } = await supabase.from('project_members').delete().eq('id', id);
+    if (error) throw error;
+  },
+
+  async respondToInvitation(id: string, accept: boolean): Promise<void> {
+    const { error } = await supabase.rpc('respond_to_project_invitation', {
+      p_membership_id: id,
+      p_accept: accept,
+    });
     if (error) throw error;
   },
 };

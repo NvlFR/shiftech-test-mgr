@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag as PrimeTag } from 'primereact/tag';
@@ -16,6 +16,8 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { TEST_CASE_PRIORITY_LABEL, TEST_CASE_PRIORITY_SEVERITY, TEST_CASE_STATUS_LABEL, TEST_CASE_STATUS_SEVERITY } from '../../helpers/statusLabels';
 import { AiTestCaseGeneratorDialog } from '../../components/ai/AiTestCaseGeneratorDialog';
 import { AiAssistantPanel } from '../../components/ai/AiAssistantPanel';
+import { SearchInput } from '../../components/ui/SearchInput';
+import { FilterToolbar } from '../../components/ui/FilterToolbar';
 
 const priorities: { label: string; value: TestCasePriority }[] = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ label: TEST_CASE_PRIORITY_LABEL[value], value }));
 const statuses: { label: string; value: TestCaseStatus }[] = (['active', 'archived'] as const).map((value) => ({ label: TEST_CASE_STATUS_LABEL[value], value }));
@@ -29,6 +31,7 @@ export function TestCasesPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<{ moduleId: string | null; tagId: string | null; priority: TestCasePriority | null; status: TestCaseStatus | null; assignedTo: string | null }>({ moduleId: null, tagId: null, priority: null, status: null, assignedTo: null });
+  const [search, setSearch] = useState('');
   const [bulkOpen, setBulkOpen] = useState(false);
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [bulk, setBulk] = useState<{ priority: TestCasePriority | null; status: TestCaseStatus | null; moduleId: string | null; assignedTo: string | null; tagNames: string[] | null }>({ priority: null, status: null, moduleId: null, assignedTo: null, tagNames: null });
@@ -41,6 +44,12 @@ export function TestCasesPage() {
   }, [projectId, filter]);
   useEffect(() => { setSelected([]); if (projectId) { void reload(); Promise.all([moduleService.listByProject(projectId), tagService.listByProject(projectId), profileService.listAll()]).then(([m, t, p]) => { setModules(m); setTags(t); setProfiles(p); }); } else setTestCases([]); }, [projectId, reload]);
 
+  const visibleTestCases = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return testCases;
+    return testCases.filter((testCase) => testCase.code.toLowerCase().includes(query) || testCase.title.toLowerCase().includes(query));
+  }, [search, testCases]);
+
   async function applyBulk() {
     const { tagNames, ...fieldChanges } = bulk;
     const changes = Object.fromEntries(Object.entries(fieldChanges).filter(([, value]) => value !== null));
@@ -52,15 +61,16 @@ export function TestCasesPage() {
     <PageHeader title="Test Cases" actions={<div className="flex gap-2"><Button label="Generate dengan AI" icon="pi pi-sparkles" size="small" outlined disabled={!projectId} onClick={() => setAiDialogOpen(true)} /><Button label={`Bulk update (${selected.length})`} icon="pi pi-pencil" size="small" disabled={!selected.length} onClick={() => setBulkOpen(true)} /><Dropdown value={projectId} options={projects.map((p) => ({ label: p.name, value: p.id }))} onChange={(e) => setProjectId(e.value)} placeholder="Pilih project" className="w-15rem" showClear /></div>} />
     {!projectId && <p className="text-color-secondary">Pilih project untuk melihat test case.</p>}
     {projectId && <AiAssistantPanel />}
-    {projectId && <div className="flex flex-wrap gap-2 mb-3">
-      <Dropdown value={filter.moduleId} options={modules.map((m) => ({ label: m.name, value: m.id }))} onChange={(e) => setFilter({ ...filter, moduleId: e.value })} placeholder="Semua module" showClear />
-      <Dropdown value={filter.tagId} options={tags.map((t) => ({ label: t.name, value: t.id }))} onChange={(e) => setFilter({ ...filter, tagId: e.value })} placeholder="Semua tag" showClear />
-      <Dropdown value={filter.priority} options={priorities} onChange={(e) => setFilter({ ...filter, priority: e.value })} placeholder="Semua prioritas" showClear />
-      <Dropdown value={filter.status} options={statuses} onChange={(e) => setFilter({ ...filter, status: e.value })} placeholder="Semua status" showClear />
-      <Dropdown value={filter.assignedTo} options={profiles.map((p) => ({ label: p.fullName ?? p.email, value: p.id }))} onChange={(e) => setFilter({ ...filter, assignedTo: e.value })} placeholder="Semua assignee" showClear />
-      <Button label="Reset" text onClick={() => setFilter({ moduleId: null, tagId: null, priority: null, status: null, assignedTo: null })} />
-    </div>}
-    <DataTable value={testCases} loading={loading} paginator rows={10} selection={selected} selectionMode="multiple" onSelectionChange={(e) => setSelected(e.value as TestCaseWithDetails[])} dataKey="id" emptyMessage="Belum ada test case" size="small">
+    {projectId && <FilterToolbar>
+      <SearchInput value={search} onChange={setSearch} placeholder="Cari kode atau judul test case..." className="col-12 md:col-6 lg:col-4" />
+      <Dropdown value={filter.moduleId} options={modules.map((m) => ({ label: m.name, value: m.id }))} onChange={(e) => setFilter({ ...filter, moduleId: e.value })} placeholder="Semua module" showClear className="col-12 md:col-3 lg:col-2" />
+      <Dropdown value={filter.tagId} options={tags.map((t) => ({ label: t.name, value: t.id }))} onChange={(e) => setFilter({ ...filter, tagId: e.value })} placeholder="Semua tag" showClear className="col-12 md:col-3 lg:col-2" />
+      <Dropdown value={filter.priority} options={priorities} onChange={(e) => setFilter({ ...filter, priority: e.value })} placeholder="Semua prioritas" showClear className="col-12 md:col-3 lg:col-2" />
+      <Dropdown value={filter.status} options={statuses} onChange={(e) => setFilter({ ...filter, status: e.value })} placeholder="Semua status" showClear className="col-12 md:col-3 lg:col-2" />
+      <Dropdown value={filter.assignedTo} options={profiles.map((p) => ({ label: p.fullName ?? p.email, value: p.id }))} onChange={(e) => setFilter({ ...filter, assignedTo: e.value })} placeholder="Semua assignee" showClear className="col-12 md:col-3 lg:col-2" />
+      <Button label="Reset" text onClick={() => { setSearch(''); setFilter({ moduleId: null, tagId: null, priority: null, status: null, assignedTo: null }); }} />
+    </FilterToolbar>}
+    <DataTable value={visibleTestCases} loading={loading} paginator rows={10} selection={selected} selectionMode="multiple" onSelectionChange={(e) => setSelected(e.value as TestCaseWithDetails[])} dataKey="id" emptyMessage="Belum ada test case" size="small" rowHover>
       <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
       <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
       <Column field="title" header="Judul" sortable />

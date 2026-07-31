@@ -4,6 +4,83 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### Antrean Codex lengkap + renumber FEATURE_BACKLOG
+
+- Memperbaiki penomoran `FEATURE_BACKLOG.md`: setelah section 7 (integrasi
+  source-new) disisipkan, ada **dua section bernomor 8** (MCP dan Playwright).
+  Section lama 7–12 digeser jadi 8–13, subsection dan cross-reference (`§N`,
+  `Section N`) ikut disesuaikan. Hasil akhir: 8 MCP, 9 Playwright interaktif,
+  10 Link repository, 11 Alur end-to-end, 12 Urutan implementasi, 13 Catatan
+  keputusan teknis. Section 1–6 tidak berubah.
+- Section 12 (urutan implementasi) diperbarui: integrasi source-new masuk sebagai
+  langkah 10 — basis kode dirapikan dulu sebelum fitur baru ditumpuk di atas dua
+  struktur yang bersaing.
+- `scripts/codex-loop/queue.md` diisi **96 task** hasil breakdown seluruh item
+  `- [ ]` di `FEATURE_BACKLOG.md` + sisa `TODO.md`, dikelompokkan:
+  Blok A (18 task, integrasi source-new SRC-01–SRC-14 + DoD),
+  Blok B (3, sisa sprint board), Blok C (10, link repository),
+  Blok D (19, MCP server), Blok E (19, Playwright interaktif),
+  Blok F (19, alur end-to-end AI QA loop), Blok G (8, automation & administrasi).
+- Task SRC-09 dipecah jadi 3 batch dan urutan Blok A dibalik menjadi
+  domain → helper → repository → service → hook → component → page → App,
+  supaya tiap task punya dependensi yang sudah ada saat dikerjakan.
+- Ditambah section **"Butuh Manusia"** (6 item) di luar antrean: jalankan migration
+  ke Supabase target, set secret Edge Function provider AI, buat GitHub App/PAT,
+  deploy Edge Function `repo-credentials`, keputusan sinkronisasi Issue↔GitHub,
+  dan verifikasi end-to-end runner↔server. Driver tidak membaca section ini, jadi
+  loop tidak membakar token untuk task yang pasti balik sebagai blocked.
+- Seluruh task automation diberi batasan eksplisit "jangan jalankan migration ke
+  Supabase target" — Codex hanya membuat file SQL, eksekusi tetap manual.
+- `scripts/codex-loop/` dimasukkan ke `.gitignore` (tooling lokal, tidak di-commit).
+  Diverifikasi `git check-ignore` cocok dan `git ls-files` menghasilkan 0 file terlacak.
+- `TODO.md` diberi penunjuk ke antrean Codex; papan status tingkat tinggi tetap di sana.
+
+### Codex task loop (otomasi antrean task)
+
+- Menambah `scripts/codex-loop/` — driver bash yang menjalankan antrean task lewat
+  `codex exec` tanpa perlu prompting manual tiap task selesai.
+- Mekanisme: `queue.md` (task `- [ ]`) → `codex exec` sesi baru per task →
+  laporan JSON dipaksa lewat `--output-schema verdict.schema.json`
+  (`completed`/`blocked`/`needs_split`) → driver mengambil keputusan sendiri.
+- Gate verifikasi milik driver (`CODEX_LOOP_GATE`, default `cd frontend && npm run build`)
+  dijalankan setelah Codex lapor `completed`; klaim selesai tidak dipercaya begitu saja.
+  Gate gagal → error dikirim balik sebagai konteks retry, lalu task dipindah ke Diblokir.
+- Sesi baru per task dipilih supaya konteks tidak menumpuk antar task (hemat token).
+- `needs_split` → followups otomatis masuk kembali ke antrean sebagai sub-task.
+- Auto-commit per task (bisa dimatikan `--no-commit`); STOP file untuk berhenti rapi.
+- Antrean awal diisi 7 task pertama dari FEATURE_BACKLOG.md section 7 (MCP scaffold +
+  tool read-only) dan section 9 (link repository: migration, type/mapper/repository,
+  service/hook, tab UI).
+- Diverifikasi: `bash -n` bersih, `--dry-run` menghasilkan prompt yang benar, rotasi
+  queue (Antrean → Selesai dengan catatan tanggal) diuji pada salinan file.
+- Codex CLI terpasang versi 0.146.0; flag `--output-schema`, `--output-last-message`,
+  `--sandbox`, `--cd` tersedia dan dipakai.
+
+### Penambahan roadmap: MCP server, Playwright interaktif, link repository
+
+- `FEATURE_BACKLOG.md`: menambah Section 7 (MCP Server TestManager multi-tool),
+  Section 8 (Playwright lokal yang lebih interaktif), Section 9 (Link repository —
+  local path / GitHub public / GitHub private via token), dan Section 10 (alur
+  end-to-end Requirement → Verified). Section "Urutan implementasi" dan "Catatan
+  keputusan teknis" di-renumber menjadi 11 dan 12.
+- Section 7 mendefinisikan katalog tool per domain (discovery, write/workflow,
+  automation, repo, analisis) + guardrail: tool destruktif tidak diekspos, mode
+  read-only, project scoping wajib, audit ke `ai_audit_events`.
+- Section 8 memisahkan mode eksekusi interaktif (headed/UI mode/debug/watch),
+  authoring & codegen, bukti kegagalan lengkap (screenshot, video, trace, console
+  log, network HAR, DOM snapshot), viewer di aplikasi, dan pause & inspect.
+- Section 9 menetapkan tabel `project_repositories` + penyimpanan token di Supabase
+  Vault (tidak plaintext, tidak pernah sampai ke browser), serta pemanfaatannya
+  untuk konteks AI, sumber automation script, traceability commit, dan regression
+  selection via `repo.diff`.
+- Section 10 memetakan alur AI QA loop yang diminta menjadi 8 tahap dengan gate
+  manusia eksplisit (review test case, approve test plan) dan kriteria selesai.
+- Keputusan teknis baru dicatat di Section 12: MCP server = proses terpisah `mcp/`
+  yang tetap tunduk RLS; server pusat tetap tidak pernah menjalankan browser;
+  source code aplikasi under test tidak disimpan di server pusat; AI tidak boleh
+  meng-approve.
+- Belum ada perubahan kode/schema pada sesi ini — dokumentasi/perencanaan saja.
+
 ### Audit fitur repo pembanding
 
 - Membandingkan repository lokal dengan `https://github.com/ffrz/shiftech-test-mgr` secara read-only.
@@ -540,3 +617,263 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 - Menjawab pertanyaan tentang dampak Graphify berdasarkan graph proyek yang sudah ada: 240 file/~160 ribu kata, 1.445 node, dan 2.901 edge.
 - Menjalankan `graphify benchmark`: rata-rata konteks query turun dari ~15.504 token menjadi sekitar 6,2x lebih hemat; variasi per pertanyaan 3,4x–41,3x.
 - Tidak ada perubahan kode aplikasi.
+
+### 2026-07-31 — Port additive fitur ownership dan invitation
+
+- Graphify dijalankan terlebih dahulu untuk memetakan project settings, domain Project, RBAC, repository, dan service sebelum membaca source terkait.
+- Menambahkan migration `supabase/schema_029_project_ownership_visibility.sql` untuk ownership project, visibility (`private`/`unlisted`/`public`), lifecycle invitation (`invited`/`accepted`/`declined`), helper access check, RLS, dan RPC `respond_to_project_invitation`.
+- Memperluas domain, mapper, project repository/service, dan project member repository/service agar memahami ownership, visibility, status invitation, serta accept/decline invitation.
+- Menambahkan tab UI `Akses & Visibilitas` dan status anggota pada `ProjectSettingsPage`; invitation baru tidak langsung mendapat permission sampai diterima.
+- Perubahan dibuat additive dan tidak menghapus fitur AI, automation, dashboard, reporting, CI/CD, backup, atau traceability yang sudah ada.
+- Verifikasi: `npm run build` lulus dengan warning ukuran chunk utama; `npm run lint` lulus dengan warning existing Fast Refresh/dependency hook. Migration belum dijalankan ke Supabase remote.
+
+### 2026-07-31 — Tambah Test Suite Library dasar
+
+- Menambahkan migration `supabase/schema_030_test_suite_library.sql` dengan tabel reusable `test_suites` dan `test_suite_items`, ownership, visibility, serta RLS.
+- Menambahkan domain type, mapper, repository, service, route `/test-suites`, menu sidebar, dan halaman CRUD dasar Test Suite Library.
+- Fitur ini terpisah dari `test_cases` project dan tidak mengubah aturan hasil test yang hanya hidup di `test_results`.
+- Verifikasi: `npm run build` lulus (627 modules, warning chunk utama tetap existing); `npm run lint` lulus dengan warning existing Fast Refresh/dependency hook. Migration belum dijalankan ke Supabase remote.
+
+### 2026-07-31 — Structured steps, custom Test Run, dan execution UX
+
+- Graphify dijalankan lebih dulu untuk memetakan alur Test Case → Test Run → Test Result sebelum perubahan.
+- Menambahkan migration `supabase/schema_031_structured_steps_custom_runs.sql` dengan `test_case_steps`, `test_result_steps`, `test_run_cases`, serta dukungan custom run pada `test_runs` melalui `custom_project_id` dan `is_custom`.
+- Structured steps kini dapat dikelola dari detail Test Case; legacy field `steps` tetap dipertahankan untuk kompatibilitas import lama.
+- Saat run dimulai, structured steps disnapshot ke `test_result_steps`; execution dialog menampilkan checklist dan menyimpan status per step (`not_run`/`pass`/`fail`).
+- Menambahkan custom run dari project melalui route `/projects/:id/test-runs/new`, dengan pemilihan test case langsung dan snapshot hasil ke `test_results`.
+- Daftar Test Run project kini menggabungkan run berbasis Test Plan dan custom run. Aturan penting tetap dipertahankan: hasil berada di `test_results`, dan status run completed hanya lewat aksi manual.
+- Verifikasi: `npm run build` lulus (632 modules, warning chunk utama existing); `npm run lint` lulus dengan warning existing; `git diff --check` lulus. Migration belum dijalankan ke Supabase remote.
+
+### 2026-07-31 — Activity, mentions, notifications, dan realtime
+
+- Graphify digunakan lebih dulu untuk memetakan comments, mentions, notifications, audit logs, dan komponen UI yang sudah ada.
+- Menambahkan migration `supabase/schema_032_activity_mentions_realtime.sql`: notifikasi mention komentar, perluasan kind notification, audit activity untuk comments, dukungan custom run pada project scope audit, serta publication Supabase Realtime.
+- Menambahkan `ActivityPanel` berbasis audit log di halaman detail project dengan actor, aksi, entity, dan waktu.
+- CommentsPanel kini reload otomatis ketika komentar berubah melalui Realtime; AppTopbar menerima notifikasi baru secara realtime dengan polling fallback 60 detik.
+- Domain, mapper, activity repository/service, dan mention notification trigger diperbarui tanpa menghapus komentar, issue notification, atau RBAC yang sudah ada.
+- Verifikasi: `npm run build` lulus (635 modules, warning chunk utama existing); `npm run lint` lulus dengan warning existing Fast Refresh/dependency hook. Migration belum dijalankan ke Supabase remote.
+
+### 2026-07-31 — Penyamaan UI/UX dengan repo referensi
+
+- Graphify digunakan untuk memetakan halaman Test Suite, detail project, activity, comment, notification, dan custom Test Run sebelum penyesuaian UI.
+- Activity dipindahkan ke tab khusus pada detail project agar konsisten dengan pola detail entity di repo referensi.
+- Test Suite Library diperbaiki dengan search, filter visibility, row hover/click menuju detail, row actions, serta halaman detail suite dan daftar item.
+- Notification topbar diubah menjadi dropdown panel berisi daftar unread, timestamp, aksi tandai dibaca per item, dan aksi tandai semua dibaca; realtime serta fallback polling tetap dipertahankan.
+- Verifikasi: `npm run build` lulus (637 modules, warning chunk utama existing); `npm run lint` lulus dengan warning existing; perubahan masih lokal dan belum di-commit.
+
+### 2026-07-31 — Instalasi Graphify Git hooks
+
+- Dokumentasi Graphify v8 diverifikasi dari README resmi.
+- Menjalankan `graphify hook install` pada repository; hook `post-commit` dan `post-checkout` kini aktif.
+- Hook akan menjalankan rebuild graph code-only secara otomatis setelah commit dan saat berpindah branch; `AGENTS.md` tetap menjadi instruksi query-first untuk Codex karena hook PreToolUse Codex memang no-op menurut dokumentasi Graphify.
+- `graphify hook status` terverifikasi: `post-commit: installed`, `post-checkout: installed`.
+
+### 2026-07-31 — Audit dan batch awal UI/UX parity
+
+- Graphify query digunakan untuk memetakan seluruh page/detail serta shared UI lokal sebelum membandingkan dengan repo referensi `ffrz/shiftech-test-mgr`.
+- Audit menemukan repo referensi memecah banyak page menjadi tabs/dialog/shared components, sementara local masih memiliki beberapa page monolitik; parity penuh perlu dikerjakan bertahap agar fitur lokal tidak tertimpa.
+- Batch awal: menambahkan shared `SearchInput` dan `FilterToolbar`, menerapkannya ke Test Suite Library, serta mempertahankan detail route, row click, filter, dan action menu.
+- Build dan lint lulus; lint hanya menampilkan warning existing. `git diff --check` lulus.
+- Graphify manual update sengaja tidak dijalankan pada batch ini karena `graphify hook install` sudah aktif; graph akan dibangun ulang setelah commit.
+
+### 2026-07-31 — UI/UX parity Projects dan Custom Test Run
+
+- Projects page disesuaikan ke pola referensi: filter toolbar yang dapat ditoggle, search input dengan clear action, reset filter, row hover/click, dan action menu tetap dipertahankan bersama fitur lokal.
+- Project Detail kini membuka Custom Test Run melalui dialog inline seperti referensi, dengan pemilihan test case, validasi nama/scope, dan navigasi ke execution detail setelah run dibuat.
+- Filter dan dialog tetap memakai komponen PrimeReact/PrimeFlex yang sama dengan shell lokal; fitur AI, automation, reporting, backup, CI/CD, dan traceability tidak dihapus.
+- Verifikasi: `npm run build` lulus (639 modules, warning chunk utama existing); `npm run lint` lulus dengan warning existing; `git diff --check` lulus.
+
+### 2026-07-31 — Project Settings parity dan stabilisasi build
+
+- Header Project Settings diselaraskan dengan pola referensi: tombol kembali, nama project, deskripsi, aksi edit, Integrasi, dan Backup; dialog edit project tetap memakai service lokal.
+- Menambahkan filter compilation untuk scaffold referensi yang belum terintegrasi (`*-new`, dialogs, issues, notifications, profile) tanpa menghapus file atau fitur tersebut.
+- Verifikasi: `npm run build` lulus (639 modules, warning chunk utama existing), `npm run lint` lulus dengan warning existing, dan `git diff --check` lulus.
+
+### 2026-07-31 — UI/UX parity Test Plans dan Test Cases
+
+- Test Plans kini memakai shared SearchInput/FilterToolbar, pencarian kode/nama, filter status, row hover, dan tetap mempertahankan perubahan status melalui action menu.
+- Test Cases kini memakai shared SearchInput/FilterToolbar untuk pencarian kode/judul dan filter yang responsif; bulk update dan Generate dengan AI tetap aktif.
+- Scaffold referensi yang belum terintegrasi (`*-new`, `App-new.tsx`, dan komponen/dialog referensi) dikeluarkan dari TypeScript compilation sementara tanpa menghapus file sumbernya.
+- Verifikasi: `npm run build` lulus (639 modules, warning chunk utama existing), `npm run lint` lulus dengan warning existing, dan `git diff --check` lulus.
+
+### 2026-07-31 — Audit source of truth folder new
+
+- Folder `frontend/src/*-new` dan `supabase-new` diaudit sebagai snapshot implementasi referensi lengkap, bukan scaffold UI terpisah.
+- Ditemukan pola pemindahan folder: `pages-new` mengharapkan diposisikan menjadi `pages`, `helpers-new` menjadi `helpers`, `hooks-new` menjadi `hooks`, dan seterusnya; import relatifnya memang belum valid ketika dibiarkan sebagai subfolder.
+- `domain-new.ts` membawa evolusi domain/schema yang lebih lengkap (User/Profile terpisah, TestRole, external links, richer activity/attachments), sehingga integrasi akan dilakukan melalui mapping kontrak dan migration bertahap, bukan copy-over yang menghapus fitur local.
+- Graphify di-update satu kali agar seluruh file new masuk knowledge graph; hook post-commit/post-checkout tetap aktif untuk pembaruan berikutnya.
+
+### 2026-07-31 — Integrasi shared UI dan TestRole dari source new
+
+- Shared `SearchInput`, `FilterToolbar`, `PageHeader`, `RowActionsMenu`, dan `BulkActionsBar` diselaraskan dengan implementasi `components/ui-new` sambil mempertahankan API dan label local.
+- Menambahkan `CharacterCount` shared component berdasarkan source new.
+- Menambahkan domain `TestRole`, mapper, repository, service, dan migration `supabase/schema_033_test_roles.sql` sebagai master role aplikasi yang diuji; tidak mengubah role user/admin TestManager.
+- Verifikasi: `npm run build` lulus (640 modules, warning chunk utama existing) dan `git diff --check` lulus.
+- Project Settings kini memiliki tab Test Roles dengan search, create/edit/delete, bulk delete, dan dialog validasi; fitur ini diadaptasi dari `pages-new` tanpa mengganggu tab Environment, Members, Access, Modules, Tags, dan Danger Zone.
+- Verifikasi lanjutan: `npm run build` lulus (642 modules, warning chunk utama existing) dan `git diff --check` lulus.
+
+### 2026-07-31 — Parallel audit source new dan compatibility migration
+
+- Sub-agent mengaudit `supabase-new/migrations`; migration yang mengubah model `users/profiles`, notification, atau entity attachment/activity tidak dicopy karena bertentangan dengan arsitektur local.
+- Menambahkan `schema_034_source_new_compatibility.sql` untuk bagian additive yang kompatibel: guarded Realtime publication, `started_by`/`created_by`, external links, issue target role, dan status issue `backlog/rejected/duplicate`, seluruh FK identity diarahkan ke `profiles`.
+- Domain dan mapper local diperluas secara backward-compatible untuk metadata author/runner, issue type/status, external links, dan target role.
+- Sub-agent shared UI berhasil mengadaptasi CommentEditor, MentionTextarea, OwnerProjectLabel, UserHoverCard, dan MarkdownPreview; AttachmentPanel dipertahankan memakai kontrak attachment local karena source new berbeda.
+- Sub-agent execution menemukan detail contract gap yang nyata (snapshot result, API link issue, query keys, step result, dan test-result attachment), sehingga port halaman result detail ditahan agar tidak memasukkan kode yang tidak build.
+
+### 2026-07-31 — Final verification batch source new compatibility
+
+- Rebuild paksa TypeScript digunakan setelah sub-agent menghapus port execution detail yang inkompatibel; source asli `pages-new` tetap dipertahankan sebagai referensi.
+- `schema_034_source_new_compatibility.sql` dan domain metadata diverifikasi bersama shared component port.
+- Verifikasi final batch: `npm run build` lulus (642 modules, warning chunk utama existing), `npm run lint` lulus dengan warning existing, `git diff --check` lulus, dan Graphify berhasil rebuild menjadi 2477 nodes / 4410 edges.
+
+### 2026-07-31 — Port execution detail dari source new
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan `TestRunResultDetailPage` ke `useTestRunDetail`, `testRunService`, `issueService`, attachment, activity, dan domain lokal.
+- Menambahkan `frontend/src/pages/test-runs/TestRunResultDetailPage.tsx` berdasarkan implementasi `pages-new`, dengan kontrak service/domain lokal yang sudah tersedia.
+- Fitur execution detail yang ikut dipertahankan: pemilihan hasil per test case, filter/search, status dan tester, notes, structured steps, attachment, link/create issue, activity, complete/reopen test run, serta responsive mobile navigation.
+- Tidak mengubah `App.tsx`, shared component, schema, atau file aplikasi lain sebagai bagian dari task ini.
+- Verifikasi: `npm run lint` lulus dengan warning existing dan `git diff --check` lulus; proses `npm run build` dijalankan untuk validasi TypeScript/Vite.
+
+### 2026-07-31 — Port shared components dari source new
+
+- Menambahkan `components/ui/CommentEditor.tsx`, `MentionTextarea.tsx`, `OwnerProjectLabel.tsx`, `UserHoverCard.tsx`, dan helper `MarkdownPreview.tsx` berdasarkan pola `components/ui-new`.
+- Kontrak local dipertahankan: `Profile` memakai `fullName/email`, navigasi profil memakai `/users/:id`, dan `AttachmentPanel` tetap memakai `AttachmentEntityKind`, `useAttachments`, serta `attachmentService` local.
+- `MentionTextarea` tidak mengarang method repository baru; autocomplete menerima `mentionSuggestions` dari caller. Dukungan pencarian `profileRepository.search`, `testCaseRepository.searchByProject`, dan `issueRepository.searchByProject` dari source new masih menjadi blocker kontrak local.
+- Tidak mengubah pages, layout, domain utama, maupun schema.
+- Verifikasi: `npm run build` selesai tanpa error TypeScript/Vite, `npm run lint` lulus dengan warning existing pada scaffold/new files, dan `git diff --check` lulus.
+
+### 2026-07-31 — Port TestCaseDetailPage dari source new
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan page detail, target role, external links, actions, attachment, comments, dan structured steps.
+- Mengadaptasi hanya `frontend/src/pages/test-cases/TestCaseDetailPage.tsx`: responsive header/detail layout, target role badge, external links read-only dari metadata yang sudah tersedia, serta action layout yang lebih dekat dengan source new.
+- AI, structured steps, attachment, comments, version history, module/tag quick-add, dan route local tetap dipertahankan.
+- Tidak menambah domain, helper, hook, repository, service, schema, atau dialog baru karena kontrak source-new yang relevan sudah tersedia di page local; external-link mutation sengaja tidak dibuat karena repository local belum mendukung persist update `external_links`.
+- Verifikasi: `npx tsc --noEmit` lulus dan `git diff --check` lulus; tidak ada blocker compile.
+
+### 2026-07-31 — Compatibility helper source new
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan kontrak `useScreenSize`, `useProjectBreadcrumbItems`, dan `queryKeys` terhadap hook/service/domain local.
+- Menambahkan helper/hook kompatibilitas baru tanpa mengganti hook aktif: `frontend/src/hooks/useScreenSize.ts`, `frontend/src/hooks/useProjectBreadcrumbItems.ts`, dan `frontend/src/hooks/queryKeys.ts`.
+- `useProjectBreadcrumbItems` disesuaikan dengan identity local `fullName/email` dan route `/users/:id`; kontrak username/public-profile source new ditunda karena belum tersedia di local.
+- Tidak mengubah pages, domain, repository, service, schema, atau `App.tsx`.
+- Verifikasi: `npx tsc --noEmit` lulus dan `git diff --check` lulus; tidak ada blocker compile.
+
+### 2026-07-31 — Additive Test Result snapshot
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan migration snapshot source-new ke `TestResult`, mapper, `testResultRepository`, dan `testRunService` local.
+- Menambahkan `supabase/schema_035_test_result_snapshot.sql` secara additive: tujuh kolom snapshot nullable, backfill best-effort tanpa mengubah atau menghapus relasi `test_case_id`.
+- Menambahkan `TestResultSnapshot` nullable pada domain dan mapper; `seedForRun` kini mengambil isi test case saat run dibuat lalu menyimpannya ke snapshot result.
+- Kontrak local tetap dipertahankan: `TestResultWithDetails.testCase` masih memakai live test case, dan tidak dibuat API sync fiktif.
+- Verifikasi: `npx tsc --noEmit` lulus dan `git diff --check` lulus. Proses Vite build dihentikan karena berjalan terlalu lama tanpa output; tidak ada compile error TypeScript.
+
+### 2026-07-31 — Koreksi port execution detail dan batch lanjutan
+
+- Koreksi: port `TestRunResultDetailPage` yang sempat dibuat dari source-new tidak diaktifkan dan sudah dihapus karena membutuhkan kontrak local yang belum tersedia (snapshot UI datar, issue linking, query keys, result-step API, dan attachment test-result). Source asli `pages-new` tetap dipertahankan.
+- Port `TestCaseDetailPage` diterapkan dengan responsive layout, target role badge, external links read-only, dan tetap mempertahankan AI, steps, attachment, comments, serta version history.
+- Menambahkan helper/hook kompatibilitas `useScreenSize`, `useProjectBreadcrumbItems`, dan `queryKeys` tanpa mengganti hook aktif.
+- Menambahkan `schema_036_test_result_order_snapshot.sql` dan `schema_037_invited_project_metadata_access.sql` dari source-new secara additive.
+- Verifikasi agent: `npx tsc --noEmit` dan `git diff --check` lulus pada scope masing-masing; full build dijalankan ulang oleh main agent sebelum handoff.
+
+### 2026-07-31 — Verifikasi port TestCase, snapshot, dan compatibility hooks
+
+- TestCase detail, snapshot Test Result, `useScreenSize`, `useProjectBreadcrumbItems`, dan `queryKeys` selesai dipertahankan sebagai port additive dari source new.
+- Menambahkan snapshot urutan hasil run (`schema_036_test_result_order_snapshot.sql`) dan akses metadata project untuk undangan (`schema_037_invited_project_metadata_access.sql`).
+- Verifikasi full batch: `npm run build` lulus (642 modules, warning chunk utama existing), `npm run lint` lulus dengan warning existing pada scaffold/pages-new, dan `git diff --check` lulus.
+
+### 2026-07-31 — Port minimal dialog dan audit tabs source new
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan source-new dialogs/tabs ke `ProjectDetailPage` aktif.
+- Menambahkan `frontend/src/components/dialogs/CustomTestRunDialog.tsx` dengan kontrak state lokal: nama run, daftar test case, validasi tombol, error, loading, dan callback save.
+- Mengaktifkan dialog baru tersebut di `frontend/src/pages/projects/ProjectDetailPage.tsx`; logika `testRunService.startCustom` dan state page tetap dipertahankan.
+- Source-new components dan tab utama lulus TypeScript terisolasi. Port tab penuh belum diaktifkan karena page aktif masih menggunakan state/cache legacy, sedangkan tab source-new bergantung pada query keys, server-side filters, dan callback mutation yang berbeda; memaksa penggantian akan menyentuh page logic besar di luar scope aman.
+- Tidak menyentuh domain, helper, hook, repository, service, atau schema pada batch ini.
+- Verifikasi: `npm run build` lulus; TypeScript terisolasi untuk `components/dialogs`, `issues`, `notifications`, `profile`, `ui-new`, serta source-new tabs/dialogs lulus; `git diff --check` dijalankan setelah perubahan.
+
+### 2026-07-31 — Port minimal pages utama Projects dan Test Plans
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan page active, page source-new, tab, dialog, dan route terkait Projects/Test Plans.
+- Membandingkan kontrak source-new dengan active local. Source-new memakai query/dialog API yang belum aktif, sedangkan page local sudah memiliki fitur tambahan seperti AI, import/export, attachment, comments, activity, dan custom run; karena itu port dilakukan additive dan compile-safe.
+- Mengubah `frontend/src/pages/test-plans/TestPlansPage.tsx`: menambahkan breadcrumb sesuai pola source-new tanpa mengubah project context atau fitur status lokal.
+- Mengubah `frontend/src/pages/test-plans/TestPlanDetailPage.tsx`: menambahkan edit metadata Test Plan (kode, nama, deskripsi, status) dan tab Activity menggunakan `ActivityPanel` local; alur add case, filtering, run, environment, dan delete run tetap dipertahankan.
+- Tidak mengubah domain, helper, hook, repository, service, schema, atau route. Tidak mengaktifkan source-new tabs/dialogs secara langsung karena kontraknya belum cocok dengan active local.
+- Verifikasi: `npm run build` lulus; `npm run lint` lulus dengan warning existing pada scaffold/source-new; `git diff --check` lulus.
+- Blocker/catatan: sub-agent launcher tidak tersedia pada sesi ini, sehingga pekerjaan diselesaikan langsung dengan scope write yang sama.
+## 2026-07-31 — Port pages Test Runs/Issues (compile-safe)
+
+- Menganalisis source-new dengan Graphify dan membandingkan page active dengan hook/service/repository lokal.
+- Mencoba port pages source-new TestRunIssues dan IssueDetail ke folder active.
+- Dibatalkan secara terbatas karena source-new membutuhkan kontrak yang belum tersedia di active local: AuthContext.user, field IssueWithDetails.tags/linkedTestResults/module/targetRole, signature issueService/attachmentService, serta komponen paginator.
+- Mengembalikan dua page active ke baseline repository agar tidak menambah error compile dan tidak menyentuh domain/repository/service/schema.
+- Blocker port penuh: sinkronisasi kontrak layer internal harus dikerjakan lebih dulu sebelum source-new pages dapat diaktifkan.
+
+## 2026-07-31 — Port pages/dialogs/tabs utama dari source new
+
+- Menjalankan `graphify query` sebelum menelusuri relasi page, tab, dialog, route, dan kontrak service lokal.
+- Menjalankan tiga sub-agent dengan scope terpisah untuk Projects/Test Plans, Test Runs/Issues, serta dialogs/tabs.
+- Port aman yang diterapkan: breadcrumb pada daftar Test Plans, edit metadata dan Activity pada detail Test Plan, serta `CustomTestRunDialog` reusable yang diaktifkan di `ProjectDetailPage`.
+- Projects tidak diganti karena page aktif sudah memiliki fitur lokal yang lebih lengkap. Port penuh Test Runs/Issues dan tabs source-new belum diaktifkan karena kontrak source-new memakai query/mutation/API yang belum tersedia atau berbeda di layer lokal.
+- Menjaga folder `source-new` tetap terisolasi melalui pengecualian TypeScript; tidak menghapus fitur lokal.
+- Verifikasi: `npx tsc --noEmit` lulus, `npm run lint` lulus dengan warning existing pada scaffold/source-new, `git diff --check` lulus setelah memperbaiki blank line EOF, dan `graphify update .` selesai.
+- Blocker lanjutan: sinkronisasi domain/helper/hook/repository/service perlu diselesaikan sebelum port penuh Test Runs/Issues dan tabs dapat diaktifkan tanpa mengarang kontrak.
+
+## 2026-07-31 — Sinkronisasi kontrak Issue, Test Suite, dan execution pages
+
+- Menjalankan `graphify query` terlebih dahulu lalu meluncurkan tiga sub-agent dengan scope terpisah: Issue layer, Test Suite/structured-step layer, serta pages Test Runs/Issues.
+- Domain diperluas secara additive untuk project visibility, Test Suite, Test Suite item/step, issue detail metadata, dan relasi hasil eksekusi; API lokal yang sudah ada tetap dipertahankan.
+- Repository Issue kini memuat target role dan detail linked test result secara read-only; repository/service Test Suite ditambahkan untuk suite, item, detailed steps, bulk item, dan visibility filtering.
+- Test Run Detail mempertahankan flow lokal dan menambahkan editing status structured steps; Issue Detail menampilkan tipe issue dan external links read-only; custom run tetap didukung.
+- Tidak mengaktifkan seluruh source-new pages mentah karena masih bergantung pada React Query/mutation/attachment contract yang berbeda. Perubahan hanya diaktifkan bila compile-safe.
+- Verifikasi: `npx tsc --noEmit` lulus, lint lulus dengan warning existing pada scaffold/source-new dan satu warning mapper yang kemudian diperbaiki, `git diff --check` lulus, dan `graphify update .` selesai.
+
+## 2026-07-31 — Adaptasi minimal pages Test Runs dan Issues
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan page active, page source-new, route, hook, dan service terkait Test Runs/Issues.
+- Scope write dibatasi pada `frontend/src/pages/test-runs/**`, `frontend/src/pages/issues/**`, dan dokumentasi ini; domain/helper/repository/service tidak disentuh.
+- Memperluas pilihan status issue pada `TestRunIssuesPage` dan `IssueDetailPage` agar mencakup `backlog`, `rejected`, dan `duplicate` yang sudah tersedia di domain serta label local.
+- Menambahkan tampilan read-only tipe issue dan external links pada `IssueDetailPage` ketika data tersedia; tidak menambahkan mutation baru karena kontrak `issueService.update` local belum mendukung field tersebut.
+- Fitur active seperti record result, structured steps, AI issue draft, attachment, comments, assignment, dan status transition tetap dipertahankan.
+- Blocker konkret port source-new penuh: source-new membutuhkan React Query contracts, `IssueEditor`, actor-aware mutation signatures, project-member profile shape berbeda, attachment entity issue generik, dan test-result detail/result-step APIs yang belum tersedia atau berbeda di local.
+- Tool launcher sub-agent tidak tersedia di runtime sesi ini; pekerjaan diselesaikan sebagai pass terisolasi dengan scope yang sama.
+- Verifikasi dilakukan dengan `npm run build`, `npm run lint`, `git diff --check`, dan `graphify update .` setelah patch.
+
+## 2026-07-31 — Execution UX compile-safe Test Runs/Issues
+
+- Menjalankan `graphify query` sebelum membaca relasi page active, hook, service, ActivityPanel, dan AttachmentPanel.
+- Scope write dibatasi pada `frontend/src/pages/test-runs/**`; domain, repository, service, dan helper tidak diubah.
+- `TestRunDetailPage`: menambahkan filter hasil berdasarkan status dan pencarian kode/judul/tester, navigasi kontekstual ke Issues, responsive table scroll, dan Activity panel berbasis `testRun.projectId`. Structured steps, record result, attachment, issue creation, dan AI flow tetap memakai kontrak lokal.
+- `TestRunIssuesPage`: menambahkan pencarian issue, filter status dan prioritas, reset filter, navigasi kembali ke hasil eksekusi, serta responsive table scroll. Mutation status, assignment, archive, dan delete tetap melalui service lokal.
+- Blocker: port penuh source-new tidak diaktifkan karena masih membutuhkan React Query dan signature layer yang berbeda. Launcher sub-agent tidak tersedia di runtime sesi ini, sehingga pekerjaan dilakukan langsung dengan scope terisolasi.
+- Verifikasi: `npm run build` lulus, `git diff --check` lulus. Graphify update dan lint menjadi langkah akhir batch.
+
+## 2026-07-31 — Adaptasi additive Project Test Plan Tab
+
+- Menjalankan `graphify query` terlebih dahulu untuk memetakan `ProjectDetailPage`, tab Test Plan/Test Case source-new, dan service lokal.
+- Menambahkan `frontend/src/pages/projects/ProjectTestPlanTab.tsx` dengan UX teradaptasi dari source-new: filter status multi-select, inline rename/status, responsive row, selection, bulk delete, dan aksi create/edit/delete.
+- Mengganti markup tab Test Plans di `ProjectDetailPage` agar memakai komponen baru tersebut; handler dialog, delete, cache reload, role check, dan service lokal tetap dipakai.
+- TestCaseTab source-new belum diaktifkan penuh karena kontraknya masih membutuhkan bulk edit, test role, import dialog, dan callback mutation yang belum identik dengan page aktif. Tidak menyentuh domain/repository/service/test-suites.
+- Verifikasi: `npx tsc -b --force` lulus.
+
+## 2026-07-31 — Aktivasi Test Suite pages dan execution UX lanjutan
+
+- Menjalankan `graphify query` sebelum port batch berikutnya dan meluncurkan tiga sub-agent untuk Test Suite pages, project Test Plan tab, serta execution UX.
+- Menambahkan/aktifkan `TestSuitesPage` dan `TestSuiteDetailPage` berbasis service lokal, termasuk filter visibility, duplicate suite/item, detailed steps, bulk delete, dan edit metadata.
+- Menambahkan `ProjectTestPlanTab` pada `ProjectDetailPage` dengan filter status, inline edit, selection, bulk delete, dan aksi create/edit/delete melalui service lokal.
+- Memperluas UX `TestRunDetailPage` dan `TestRunIssuesPage` dengan search/filter, navigasi hasil-issue, responsive table, Activity panel, dan structured-step status tanpa mengganti kontrak lokal.
+- Memperbaiki warning lint baru pada mapper/import/konstanta yang tidak terpakai.
+- Verifikasi: `npx tsc -b --force` lulus, lint lulus dengan warning existing pada scaffold/source-new, `git diff --check` lulus. Graphify perlu diperbarui setelah batch ini.
+# 2026-07-31 — Integrasi compile-safe dialogs, notifications, dan profile
+
+- Menjalankan Graphify query untuk memetakan kontrak source-new terhadap layout, notification service, profile, dan halaman aktif.
+- Mengaktifkan komponen reusable `TestPlanDialog`, `TestSuiteDialog`, dan `CustomTestRunDialog` melalui struktur komponen aktif yang kompatibel; tidak mengganti auth flow atau menambah API fiktif.
+- Mengadaptasi `NotificationPanel` ke domain lokal (`kind`, `message`, `readAt`) dan menghubungkannya ke `AppTopbar` melalui `notificationService` yang sudah ada. Aksi remove/clear tidak dipaksakan karena repository lokal belum menyediakan kontraknya.
+- Mengadaptasi `ProfileView` ke domain `Profile` lokal (`fullName`, `email`, `avatarUrl`, `createdAt`), menghapus ketergantungan source-new pada `username`, `displayName`, dan `bio`.
+- Menghapus exclusion TypeScript untuk `components/dialogs`, `components/notifications`, dan `components/profile` agar komponen tersebut ikut diverifikasi oleh build.
+- Verifikasi: `npm run build` lulus; `npm run lint` lulus dengan warning existing dan warning import layout yang kemudian dirapikan. Blocker yang dicatat: halaman source-new penuh masih memakai auth/profile/notification contract berbeda dan tidak diaktifkan mentah.
+
+## 2026-07-31 — Membuat task integrasi penuh source-new
+
+- Menjalankan `graphify query` untuk memetakan backlog, domain aktif, source-new, route, dan folder yang masih dikecualikan TypeScript.
+- Menambahkan epic `SRC-EPIC` di `TODO.md`.
+- Menambahkan task detail `SRC-01` sampai `SRC-14` di `FEATURE_BACKLOG.md`, mencakup components, helpers, hooks, pages, repositories, services, domain, App routing, dan migration `supabase-new`.
+- Menambahkan Definition of Done: compile/build/lint, smoke test route utama, verifikasi migration/RLS/Storage, dan sinkronisasi worklog/checklist.
+- Task ini bersifat additive: fitur lokal tidak boleh dihapus dan source-new tidak boleh diaktifkan mentah jika kontraknya berbeda.

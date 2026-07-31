@@ -14,6 +14,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
+import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { useTestPlanDetail } from '../../hooks/useTestPlanDetail';
 import { useTestRuns } from '../../hooks/useTestRuns';
 import { testPlanService } from '../../services/testPlanService';
@@ -65,6 +66,46 @@ export function TestPlanDetailPage() {
   const { testRuns, loading: runsLoading, reload: reloadRuns } = useTestRuns(id ?? null);
   const { canEditContent, canDeleteContent, canRunTests } = useProjectRole(testPlan?.projectId);
   const { environments } = useEnvironments(testPlan?.projectId ?? null);
+
+  // Source-new exposes plan metadata editing from the detail header. Keep the
+  // existing local status action and add the same additive edit flow here.
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
+  const [planCode, setPlanCode] = useState('');
+  const [planName, setPlanName] = useState('');
+  const [planDescription, setPlanDescription] = useState('');
+  const [planStatus, setPlanStatus] = useState<TestPlanStatus>('draft');
+  const [planError, setPlanError] = useState<string | null>(null);
+
+  function openEditPlanDialog() {
+    if (!testPlan) return;
+    setPlanCode(testPlan.code);
+    setPlanName(testPlan.name);
+    setPlanDescription(testPlan.description ?? '');
+    setPlanStatus(testPlan.status);
+    setPlanError(null);
+    setPlanDialogOpen(true);
+  }
+
+  async function handleSavePlanEdit() {
+    if (!testPlan) return;
+    setPlanError(null);
+    try {
+      const updated = await testPlanService.update(testPlan.id, {
+        code: planCode,
+        name: planName,
+        description: planDescription,
+      });
+      setTestPlan({ ...updated, status: planStatus });
+      if (planStatus !== updated.status) {
+        await testPlanService.changeStatus(updated.id, planStatus);
+        setTestPlan((current) => current ? { ...current, status: planStatus } : current);
+      }
+      setPlanDialogOpen(false);
+      toast.current?.show({ severity: 'success', summary: 'Test plan diperbarui' });
+    } catch (err) {
+      setPlanError(err instanceof Error ? err.message : 'Gagal menyimpan test plan');
+    }
+  }
 
   // --- Test Cases: search/filter ---
   const [caseSearch, setCaseSearch] = useState('');
@@ -256,6 +297,7 @@ export function TestPlanDetailPage() {
           testPlan && (
             canEditContent ? (
               <div className="flex align-items-center gap-2 flex-wrap">
+                <Button icon="pi pi-pencil" text rounded severity="secondary" size="small" onClick={openEditPlanDialog} aria-label="Edit test plan" />
                 <Dropdown
                   value={testPlan.status}
                   options={TEST_PLAN_STATUS_OPTIONS}
@@ -463,6 +505,10 @@ export function TestPlanDetailPage() {
             )}
           </DataTable>
         </TabPanel>
+
+        <TabPanel header="Activity">
+          {testPlan && <ActivityPanel projectId={testPlan.projectId} />}
+        </TabPanel>
       </TabView>
 
       {/* --- Add Test Case Dialog --- */}
@@ -506,6 +552,29 @@ export function TestPlanDetailPage() {
             <div className="flex flex-column gap-1 flex-1"><label htmlFor="run-release">Release</label><InputText id="run-release" value={runRelease} onChange={(e) => setRunRelease(e.target.value)} /></div>
           </div>
           <Button label="Mulai" size="small" onClick={handleStartRun} />
+        </div>
+      </Dialog>
+
+      <Dialog header="Edit Test Plan" visible={planDialogOpen} onHide={() => setPlanDialogOpen(false)} style={{ width: '32rem' }}>
+        <div className="flex flex-column gap-3">
+          {planError && <small className="p-error">{planError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="plan-edit-code">Kode</label>
+            <InputText id="plan-edit-code" value={planCode} onChange={(e) => setPlanCode(e.target.value)} />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="plan-edit-name">Nama</label>
+            <InputText id="plan-edit-name" value={planName} onChange={(e) => setPlanName(e.target.value)} autoFocus />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="plan-edit-description">Deskripsi</label>
+            <InputText id="plan-edit-description" value={planDescription} onChange={(e) => setPlanDescription(e.target.value)} />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="plan-edit-status">Status</label>
+            <Dropdown id="plan-edit-status" value={planStatus} options={TEST_PLAN_STATUS_OPTIONS} onChange={(e) => setPlanStatus(e.value)} />
+          </div>
+          <Button label="Simpan" size="small" onClick={handleSavePlanEdit} />
         </div>
       </Dialog>
     </div>

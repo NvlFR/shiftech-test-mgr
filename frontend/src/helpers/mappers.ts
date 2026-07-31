@@ -6,6 +6,7 @@ import type {
   Profile,
   Module,
   Tag,
+  TestRole,
   TestRun,
   TestResult,
   Issue,
@@ -24,6 +25,12 @@ import type {
   AutomationRunner,
   AutomationScript,
   AutomationJob,
+  TestSuite,
+  TestSuiteItem,
+  TestSuiteItemStep,
+  TestCaseStep,
+  TestResultStep,
+  ActivityEvent,
 } from '../types/domain';
 import type { Attachment } from '../types/domain';
 
@@ -44,8 +51,52 @@ export function mapProjectRow(row: any): Project {
     name: row.name,
     description: row.description,
     status: row.status,
+    ownerId: row.owner_id ?? null,
+    visibility: row.visibility ?? 'private',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export function mapTestSuiteRow(row: any): TestSuite {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    name: row.name,
+    description: row.description ?? null,
+    visibility: row.visibility ?? 'private',
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function mapTestSuiteItemRow(row: any): TestSuiteItem {
+  return {
+    id: row.id,
+    suiteId: row.suite_id,
+    moduleName: row.module_name ?? null,
+    title: row.title,
+    objective: row.objective ?? null,
+    preconditions: row.preconditions ?? null,
+    steps: row.steps,
+    expectedResult: row.expected_result,
+    priority: row.priority,
+    stepType: row.step_type ?? 'simple',
+    targetRole: row.target_role ?? null,
+    tagNames: Array.isArray(row.tag_names) ? row.tag_names : [],
+    orderIndex: row.order_index,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function mapTestSuiteItemStepRow(row: any): TestSuiteItemStep {
+  return {
+    id: row.id,
+    suiteItemId: row.suite_item_id,
+    stepNumber: row.step_number,
+    action: row.action,
+    expectedResult: row.expected_result ?? null,
   };
 }
 
@@ -55,6 +106,10 @@ export function mapProjectMemberRow(row: any): ProjectMember {
     projectId: row.project_id,
     userId: row.user_id,
     role: row.role,
+    status: row.status ?? 'accepted',
+    invitedBy: row.invited_by ?? null,
+    invitedAt: row.invited_at ?? null,
+    acceptedAt: row.accepted_at ?? null,
     createdAt: row.created_at,
   };
 }
@@ -86,6 +141,16 @@ export function mapTagRow(row: any): Tag {
   };
 }
 
+export function mapTestRoleRow(row: any): TestRole {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    name: row.name,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export function mapTestPlanRow(row: any): TestPlan {
   return {
     id: row.id,
@@ -94,6 +159,7 @@ export function mapTestPlanRow(row: any): TestPlan {
     name: row.name,
     description: row.description,
     status: row.status,
+    createdBy: row.created_by ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -125,6 +191,9 @@ export function mapTestCaseRow(row: any): TestCase {
     status: row.status,
     notes: row.notes,
     assignedTo: row.assigned_to ?? null,
+    targetRoleId: row.target_role_id ?? null,
+    createdBy: row.created_by ?? null,
+    externalLinks: row.external_links ?? [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -135,7 +204,11 @@ export function mapTestCaseVersionRow(row: any) {
 }
 
 export function mapNotificationRow(row: any) {
-  return { id: row.id, recipientId: row.recipient_id, issueId: row.issue_id, kind: row.kind, message: row.message, readAt: row.read_at, createdAt: row.created_at };
+  return { id: row.id, recipientId: row.recipient_id, issueId: row.issue_id ?? null, commentId: row.comment_id ?? null, kind: row.kind, message: row.message, readAt: row.read_at, createdAt: row.created_at };
+}
+
+export function mapActivityEventRow(row: any): ActivityEvent {
+  return { id: row.id, projectId: row.project_id, tableName: row.table_name, recordId: row.record_id ?? null, action: row.action, changedBy: row.changed_by ?? null, actor: row.actor ? mapProfileRow(row.actor) : null, createdAt: row.created_at };
 }
 
 export function mapTestPlanCaseRow(row: any): TestPlanCase {
@@ -151,9 +224,12 @@ export function mapTestRunRow(row: any): TestRun {
   return {
     id: row.id,
     testPlanId: row.test_plan_id,
+    projectId: row.project_id ?? row.custom_project_id ?? null,
+    isCustom: row.is_custom ?? false,
     code: row.code,
     name: row.name,
     status: row.status,
+    startedBy: row.started_by ?? null,
     startedAt: row.started_at,
     completedAt: row.completed_at,
     notes: row.notes,
@@ -173,15 +249,42 @@ export function mapTestRunRow(row: any): TestRun {
   };
 }
 
+export function mapTestCaseStepRow(row: any): TestCaseStep {
+  return { id: row.id, testCaseId: row.test_case_id, stepNumber: row.step_number, action: row.action, expectedResult: row.expected_result ?? null, createdAt: row.created_at, updatedAt: row.updated_at };
+}
+
+export function mapTestResultStepRow(row: any): TestResultStep {
+  return { id: row.id, testResultId: row.test_result_id, testCaseStepId: row.test_case_step_id, stepNumber: row.step_number, action: row.action, expectedResult: row.expected_result ?? null, status: row.status ?? 'not_run', notes: row.notes ?? null, updatedAt: row.updated_at };
+}
+
 export function mapTestRunAssignmentRow(row: any) {
   return { id: row.id, testRunId: row.test_run_id, testCaseId: row.test_case_id, testerId: row.tester_id, createdAt: row.created_at, updatedAt: row.updated_at };
 }
 
 export function mapTestResultRow(row: any): TestResult {
+  const hasSnapshot = [
+    row.test_case_code,
+    row.test_case_title,
+    row.test_case_objective,
+    row.test_case_preconditions,
+    row.test_case_steps,
+    row.test_case_expected_result,
+    row.test_case_priority,
+  ].some((value) => value !== null && value !== undefined);
+
   return {
     id: row.id,
     testRunId: row.test_run_id,
     testCaseId: row.test_case_id,
+    testCaseSnapshot: hasSnapshot ? {
+      code: row.test_case_code ?? null,
+      title: row.test_case_title ?? null,
+      objective: row.test_case_objective ?? null,
+      preconditions: row.test_case_preconditions ?? null,
+      steps: row.test_case_steps ?? null,
+      expectedResult: row.test_case_expected_result ?? null,
+      priority: row.test_case_priority ?? null,
+    } : null,
     testerId: row.tester_id,
     status: row.status,
     executedAt: row.executed_at,
@@ -203,6 +306,10 @@ export function mapIssueRow(row: any): Issue {
     priority: row.priority,
     status: row.status,
     assignedTo: row.assigned_to,
+    type: row.type ?? undefined,
+    createdBy: row.created_by ?? null,
+    targetRoleId: row.target_role_id ?? null,
+    externalLinks: row.external_links ?? [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

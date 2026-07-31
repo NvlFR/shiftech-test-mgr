@@ -14,12 +14,27 @@ function mapTestCaseSummary(testCase: any) {
   };
 }
 
+function mapIssueDetails(row: any): IssueWithDetails {
+  const result = row.test_result;
+  const testRun = result?.test_run ?? null;
+  const projectId = testRun?.test_plan?.project_id ?? testRun?.custom_project_id ?? null;
+  return {
+    ...mapIssueRow({ ...row, project_id: projectId }),
+    assignee: row.assignee ? mapProfileRow(row.assignee) : null,
+    testCase: mapTestCaseSummary(result?.test_case),
+    testRun,
+    targetRole: row.target_role ?? null,
+    tags: [],
+    linkedTestResults: result ? [{ id: result.id, testRunId: result.test_run_id, testCaseCode: result.test_case?.code ?? null, testCaseTitle: result.test_case?.title ?? '', testRun }] : [],
+  };
+}
+
 export const issueRepository = {
   async findById(id: string): Promise<(IssueWithDetails & { projectId: string | null }) | null> {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, test_plan:test_plans(project_id)))',
+        '*, assignee:profiles(*), target_role:test_roles(*), test_result:test_results!inner(id, test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, custom_project_id, test_plan:test_plans(project_id)))',
       )
       .eq('id', id)
       .maybeSingle();
@@ -27,13 +42,7 @@ export const issueRepository = {
     if (error) throw error;
     if (!data) return null;
 
-    return {
-      ...mapIssueRow(data),
-      assignee: data.assignee ? mapProfileRow(data.assignee) : null,
-      testCase: mapTestCaseSummary(data.test_result?.test_case),
-      testRun: data.test_result?.test_run ?? null,
-      projectId: data.test_result?.test_run?.test_plan?.project_id ?? null,
-    };
+    return { ...mapIssueDetails(data), projectId: data.test_result?.test_run?.test_plan?.project_id ?? data.test_result?.test_run?.custom_project_id ?? null };
   },
 
   async update(
@@ -55,7 +64,7 @@ export const issueRepository = {
   async findAllByTestResult(testResultId: string): Promise<IssueWithDetails[]> {
     const { data, error } = await supabase
       .from('issues')
-      .select('*, assignee:profiles(*)')
+      .select('*, assignee:profiles(*), target_role:test_roles(*)')
       .eq('test_result_id', testResultId)
       .order('created_at', { ascending: false });
 
@@ -65,6 +74,9 @@ export const issueRepository = {
       assignee: row.assignee ? mapProfileRow(row.assignee) : null,
       testCase: null,
       testRun: null,
+      targetRole: row.target_role ?? null,
+      tags: [],
+      linkedTestResults: [],
     }));
   },
 

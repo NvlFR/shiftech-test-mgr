@@ -1,6 +1,7 @@
 import type {
   IssuePriority,
   IssueStatus,
+  IssueType,
   ProjectMemberRole,
   ProjectStatus,
   TestCasePriority,
@@ -104,19 +105,39 @@ export const ISSUE_PRIORITY_SEVERITY: Record<IssuePriority, TagSeverity> = {
 };
 
 export const ISSUE_STATUS_LABEL: Record<IssueStatus, string> = {
+  backlog: 'Backlog',
   open: 'Terbuka',
   in_progress: 'Dikerjakan',
   resolved: 'Terselesaikan',
   verified: 'Terverifikasi',
   closed: 'Ditutup',
+  rejected: 'Ditolak',
+  duplicate: 'Duplikat',
 };
 
 export const ISSUE_STATUS_SEVERITY: Record<IssueStatus, TagSeverity> = {
+  backlog: 'secondary',
   open: 'danger',
   in_progress: 'warning',
   resolved: 'info',
   verified: 'success',
   closed: 'secondary',
+  rejected: 'secondary',
+  duplicate: 'secondary',
+};
+
+export const ISSUE_TYPE_LABEL: Record<IssueType, string> = {
+  bug: 'Bug',
+  feature: 'Fitur',
+  improvement: 'Peningkatan',
+  task: 'Task',
+};
+
+export const ISSUE_TYPE_SEVERITY: Record<IssueType, TagSeverity> = {
+  bug: 'danger',
+  feature: 'info',
+  improvement: 'success',
+  task: 'secondary',
 };
 
 export const USER_ROLE_LABEL: Record<UserRole, string> = {

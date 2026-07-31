@@ -1,0 +1,1 @@
+{"nodes": [{"id": "mnt_data_work_2026_07_juli_22_shiftech_test_mgr_supabase_new_migrations_20260725000011_prevent_self_role_change_sql", "label": "20260725000011_prevent_self_role_change.sql", "file_type": "code", "source_file": "supabase-new/migrations/20260725000011_prevent_self_role_change.sql", "source_location": null}], "edges": []}

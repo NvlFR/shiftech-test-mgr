@@ -29,3 +29,15 @@ frontend/.vite/
 
 # Playwright MCP browser artifacts
 .playwright-mcp/
+.archive/
+
+# Codex task loop — tooling lokal, jangan di-commit
+scripts/codex-loop/
+
+# Aset "source-new" — bahan referensi untuk porting (FEATURE_BACKLOG.md Section 7).
+# Tetap ada di disk supaya bisa dibaca saat porting, tapi tidak pernah di-commit.
+*-new/
+*-new.ts
+*-new.tsx
+
+

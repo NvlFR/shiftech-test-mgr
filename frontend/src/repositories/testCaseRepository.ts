@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabaseClient';
-import { mapModuleRow, mapTagRow, mapTestCaseRow, mapTestCaseVersionRow, mapTestPlanCaseRow } from '../helpers/mappers';
+import { mapModuleRow, mapTagRow, mapTestCaseRow, mapTestCaseVersionRow, mapTestPlanCaseRow, mapTestRoleRow } from '../helpers/mappers';
 import type { TestCase, TestCaseVersion, TestCaseWithDetails, TestPlanCase, TestPlanCaseWithDetails } from '../types/domain';
 
 export const testCaseRepository = {
@@ -19,7 +19,7 @@ export const testCaseRepository = {
   async findAllByProjectWithDetails(projectId: string): Promise<TestCaseWithDetails[]> {
     const { data, error } = await supabase
       .from('test_cases')
-      .select('*, module:modules(*), test_case_tags(tag:tags(*))')
+      .select('*, module:modules(*), test_case_tags(tag:tags(*)), target_role:test_roles(*)')
       .eq('project_id', projectId)
       .order('code');
 
@@ -28,6 +28,7 @@ export const testCaseRepository = {
       ...mapTestCaseRow(row),
       module: row.module ? mapModuleRow(row.module) : null,
       tags: (row.test_case_tags ?? []).map((t: any) => mapTagRow(t.tag)),
+      targetRole: row.target_role ? mapTestRoleRow(row.target_role) : null,
     }));
   },
 
@@ -40,7 +41,7 @@ export const testCaseRepository = {
   async findByIdWithDetails(id: string): Promise<(TestCaseWithDetails & { project: { id: string; name: string } }) | null> {
     const { data, error } = await supabase
       .from('test_cases')
-      .select('*, module:modules(*), test_case_tags(tag:tags(*)), project:projects(id, name)')
+      .select('*, module:modules(*), test_case_tags(tag:tags(*)), target_role:test_roles(*), project:projects(id, name)')
       .eq('id', id)
       .maybeSingle();
 
@@ -51,6 +52,7 @@ export const testCaseRepository = {
       ...mapTestCaseRow(data),
       module: data.module ? mapModuleRow(data.module) : null,
       tags: (data.test_case_tags ?? []).map((t: any) => mapTagRow(t.tag)),
+      targetRole: data.target_role ? mapTestRoleRow(data.target_role) : null,
       project: data.project,
     };
   },
@@ -72,6 +74,7 @@ export const testCaseRepository = {
         status: input.status,
         notes: input.notes,
         assigned_to: input.assignedTo ?? null,
+        target_role_id: input.targetRoleId ?? null,
       })
       .select('*')
       .single();
@@ -93,6 +96,7 @@ export const testCaseRepository = {
     if (changes.status !== undefined) payload.status = changes.status;
     if (changes.notes !== undefined) payload.notes = changes.notes;
     if (changes.assignedTo !== undefined) payload.assigned_to = changes.assignedTo;
+    if (changes.targetRoleId !== undefined) payload.target_role_id = changes.targetRoleId;
 
     const { data, error } = await supabase
       .from('test_cases')

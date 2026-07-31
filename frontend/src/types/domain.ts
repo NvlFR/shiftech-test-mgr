@@ -12,6 +12,7 @@ export interface Profile {
 }
 
 export type ProjectStatus = 'active' | 'inactive' | 'archived';
+export type ProjectVisibility = 'private' | 'unlisted' | 'public';
 export type ProjectSortField = 'name' | 'createdAt' | 'updatedAt';
 export type SortDirection = 'asc' | 'desc';
 
@@ -20,11 +21,58 @@ export interface Project {
   name: string;
   description: string | null;
   status: ProjectStatus;
+  ownerId: string | null;
+  visibility: ProjectVisibility;
   createdAt: string;
   updatedAt: string;
 }
 
+export type TestSuiteVisibility = 'private' | 'unlisted' | 'public';
+
+export interface TestSuite {
+  id: string;
+  ownerId: string;
+  name: string;
+  description: string | null;
+  visibility: TestSuiteVisibility;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TestSuiteItem {
+  id: string;
+  suiteId: string;
+  moduleName: string | null;
+  title: string;
+  objective: string | null;
+  preconditions: string | null;
+  steps: string;
+  expectedResult: string;
+  priority: TestCasePriority;
+  stepType: TestCaseStepType;
+  targetRole: string | null;
+  tagNames: string[];
+  orderIndex: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TestCaseStepType = 'simple' | 'detailed';
+
+export interface TestSuiteItemStep {
+  id: string;
+  suiteItemId: string;
+  stepNumber: number;
+  action: string;
+  expectedResult: string | null;
+}
+
+export interface TestSuiteItemWithSteps extends TestSuiteItem {
+  detailedSteps: TestSuiteItemStep[];
+}
+
 export type ProjectMemberRole = 'manager' | 'supervisor' | 'tester' | 'member';
+export type ProjectMemberStatus = 'invited' | 'accepted' | 'declined';
 
 export type ApiTokenScope = 'read:project' | 'write:test-runs' | 'write:test-results' | 'write:issues';
 export interface ApiToken { id: string; projectId: string; name: string; tokenPrefix: string; scopes: ApiTokenScope[]; revokedAt: string | null; createdAt: string; updatedAt: string; }
@@ -40,6 +88,10 @@ export interface ProjectMember {
   projectId: string;
   userId: string;
   role: ProjectMemberRole;
+  status: ProjectMemberStatus;
+  invitedBy: string | null;
+  invitedAt: string | null;
+  acceptedAt: string | null;
   createdAt: string;
 }
 
@@ -63,6 +115,16 @@ export interface Tag {
   createdAt: string;
 }
 
+// Role inside the application under test (for example Admin, Manager, or Member).
+// This is intentionally separate from the TestManager project/user roles.
+export interface TestRole {
+  id: string;
+  projectId: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type TestPlanStatus = 'draft' | 'active' | 'completed' | 'archived';
 
 export interface TestPlan {
@@ -72,6 +134,7 @@ export interface TestPlan {
   name: string;
   description: string | null;
   status: TestPlanStatus;
+  createdBy?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -100,10 +163,17 @@ export interface TestCase {
   preconditions: string | null;
   steps: string;
   expectedResult: string;
+  stepType?: TestCaseStepType;
   priority: TestCasePriority;
   status: TestCaseStatus;
   notes: string | null;
   assignedTo: string | null;
+  targetRoleId?: string | null;
+  createdBy?: string | null;
+  externalLinks?: ExternalLink[];
+  /** Derived from the owning test run; issues are not project-owned in the local schema. */
+  projectId?: string | null;
+  moduleId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -118,6 +188,16 @@ export interface TestCaseVersion {
   createdAt: string;
 }
 
+export interface TestCaseStep {
+  id: string;
+  testCaseId: string;
+  stepNumber: number;
+  action: string;
+  expectedResult: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type TestCaseFilters = {
   moduleId?: string | null;
   tagId?: string | null;
@@ -129,6 +209,7 @@ export type TestCaseFilters = {
 export interface TestCaseWithDetails extends TestCase {
   module: Module | null;
   tags: Tag[];
+  targetRole?: TestRole | null;
 }
 
 export type CommentTargetType = 'test_case' | 'issue';
@@ -169,10 +250,13 @@ export type TestRunStatus = 'in_progress' | 'completed';
 
 export interface TestRun {
   id: string;
-  testPlanId: string;
+  testPlanId: string | null;
+  projectId: string | null;
+  isCustom: boolean;
   code: string;
   name: string;
   status: TestRunStatus;
+  startedBy?: string | null;
   startedAt: string;
   completedAt: string | null;
   notes: string | null;
@@ -285,11 +369,36 @@ export interface TestResult {
   id: string;
   testRunId: string;
   testCaseId: string;
+  /** Immutable test-case content captured when this result was seeded. */
+  testCaseSnapshot: TestResultSnapshot | null;
   testerId: string | null;
   status: TestResultStatus;
   executedAt: string | null;
   notes: string | null;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface TestResultSnapshot {
+  code: string | null;
+  title: string | null;
+  objective: string | null;
+  preconditions: string | null;
+  steps: string | null;
+  expectedResult: string | null;
+  priority: string | null;
+}
+
+export type TestResultStepStatus = 'pass' | 'fail' | 'not_run';
+export interface TestResultStep {
+  id: string;
+  testResultId: string;
+  testCaseStepId: string;
+  stepNumber: number;
+  action: string;
+  expectedResult: string | null;
+  status: TestResultStepStatus;
+  notes: string | null;
   updatedAt: string;
 }
 
@@ -308,7 +417,9 @@ export interface TestResultWithDetails extends TestResult {
 }
 
 export type IssuePriority = 'low' | 'medium' | 'high' | 'critical';
-export type IssueStatus = 'open' | 'in_progress' | 'resolved' | 'verified' | 'closed';
+export type IssueStatus = 'backlog' | 'open' | 'in_progress' | 'resolved' | 'verified' | 'closed' | 'rejected' | 'duplicate';
+export type IssueType = 'bug' | 'feature' | 'improvement' | 'task';
+export interface ExternalLink { label: string; url: string; }
 
 export interface Issue {
   id: string;
@@ -320,6 +431,10 @@ export interface Issue {
   expectedResult: string | null;
   priority: IssuePriority;
   status: IssueStatus;
+  type?: IssueType;
+  createdBy?: string | null;
+  targetRoleId?: string | null;
+  externalLinks?: ExternalLink[];
   assignedTo: string | null;
   createdAt: string;
   updatedAt: string;
@@ -327,6 +442,17 @@ export interface Issue {
 
 export interface IssueWithDetails extends Issue {
   assignee: Profile | null;
+  module?: Module | null;
+  targetRole?: TestRole | null;
+  tags?: Tag[];
+  /** Local schema has one direct test_result_id, unlike source-new's junction table. */
+  linkedTestResults?: {
+    id: string;
+    testRunId: string;
+    testCaseCode: string | null;
+    testCaseTitle: string;
+    testRun: { id: string; code: string; name: string } | null;
+  }[];
   testCase:
     | {
         id: string;
@@ -372,9 +498,22 @@ export interface Notification {
   id: string;
   recipientId: string;
   issueId: string | null;
-  kind: 'issue_assigned' | 'issue_status_changed';
+  commentId: string | null;
+  kind: 'issue_assigned' | 'issue_status_changed' | 'comment_mentioned';
   message: string;
   readAt: string | null;
+  createdAt: string;
+}
+
+export type ActivityAction = 'created' | 'updated' | 'deleted';
+export interface ActivityEvent {
+  id: string;
+  projectId: string;
+  tableName: string;
+  recordId: string | null;
+  action: ActivityAction;
+  changedBy: string | null;
+  actor: Profile | null;
   createdAt: string;
 }
 

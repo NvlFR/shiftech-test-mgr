@@ -15,17 +15,20 @@ export function UserDetailPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    profileService.getById(id).then((result) => {
-      setProfile(result);
-      setLoading(false);
-    });
+    setLoading(true);
+    setError(null);
+    profileService.getById(id).then(setProfile).catch((reason: unknown) => {
+      setProfile(null);
+      setError(reason instanceof Error ? reason.message : 'Gagal memuat user.');
+    }).finally(() => setLoading(false));
   }, [id]);
 
   if (loading) return <p>Memuat...</p>;
-  if (!profile) return <p>User tidak ditemukan.</p>;
+  if (!profile) return <div className="flex flex-column gap-3"><p className="m-0">{error ?? 'User tidak ditemukan.'}</p><Button label="Kembali" icon="pi pi-arrow-left" text onClick={() => navigate('/users')} /></div>;
 
   return (
     <div>
@@ -39,7 +42,7 @@ export function UserDetailPage() {
       <Button label="Kembali" icon="pi pi-arrow-left" text onClick={() => navigate('/users')} className="mb-3" />
 
       <Card>
-        <div className="flex align-items-center gap-3 mb-4">
+        <div className="flex align-items-center gap-3 mb-4 flex-wrap">
           <Avatar image={profile.avatarUrl ?? undefined} icon={profile.avatarUrl ? undefined : 'pi pi-user'} shape="circle" size="xlarge" />
           <div>
             <h2 className="m-0">{profile.fullName ?? profile.email}</h2>

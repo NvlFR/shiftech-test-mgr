@@ -13,19 +13,21 @@ export function RowActionsMenu({ items }: RowActionsMenuProps) {
   const menuRef = useRef<Menu>(null);
 
   return (
-    <>
+    <div className="flex align-items-start">
       <Button
         icon="pi pi-ellipsis-v"
         text
         rounded
+        plain
         size="small"
+        className="text-color-secondary"
         aria-label=""
         onClick={(e) => {
           e.stopPropagation();
           menuRef.current?.toggle(e);
         }}
       />
-      <Menu ref={menuRef} model={items} popup />
-    </>
+      <Menu ref={menuRef} model={items} popup appendTo={document.body} />
+    </div>
   );
 }

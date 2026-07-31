@@ -8,10 +8,55 @@ export const testResultRepository = {
   // this is what lets the run screen show every case up front, not just the ones touched so far.
   async seedForRun(testRunId: string, testCaseIds: string[]): Promise<void> {
     if (testCaseIds.length === 0) return;
+
+    const { data: testCases, error: testCasesError } = await supabase
+      .from('test_cases')
+      .select('id, code, title, objective, preconditions, steps, expected_result, priority')
+      .in('id', testCaseIds);
+    if (testCasesError) throw testCasesError;
+
+    const testCasesById = new Map((testCases ?? []).map((testCase: any) => [testCase.id, testCase]));
+    const missingTestCaseIds = testCaseIds.filter((testCaseId) => !testCasesById.has(testCaseId));
+    if (missingTestCaseIds.length > 0) {
+      throw new Error(`Test case tidak ditemukan: ${missingTestCaseIds.join(', ')}`);
+    }
+
     const { error } = await supabase
       .from('test_results')
-      .insert(testCaseIds.map((testCaseId) => ({ test_run_id: testRunId, test_case_id: testCaseId })));
+      .insert(testCaseIds.map((testCaseId) => {
+        const testCase = testCasesById.get(testCaseId);
+        return {
+          test_run_id: testRunId,
+          test_case_id: testCaseId,
+          test_case_code: testCase.code,
+          test_case_title: testCase.title,
+          test_case_objective: testCase.objective,
+          test_case_preconditions: testCase.preconditions,
+          test_case_steps: testCase.steps,
+          test_case_expected_result: testCase.expected_result,
+          test_case_priority: testCase.priority,
+        };
+      }));
     if (error) throw error;
+
+    const { data: steps, error: stepsError } = await supabase
+      .from('test_case_steps')
+      .select('id, test_case_id, step_number, action, expected_result')
+      .in('test_case_id', testCaseIds);
+    if (stepsError) throw stepsError;
+    if (steps?.length) {
+      const resultRows = await supabase.from('test_results').select('id, test_case_id').eq('test_run_id', testRunId).in('test_case_id', testCaseIds);
+      if (resultRows.error) throw resultRows.error;
+      const resultByCase = new Map((resultRows.data ?? []).map((row: any) => [row.test_case_id, row.id]));
+      const stepRows = steps.flatMap((step: any) => {
+        const resultId = resultByCase.get(step.test_case_id);
+        return resultId ? [{ test_result_id: resultId, test_case_step_id: step.id, step_number: step.step_number, action: step.action, expected_result: step.expected_result }] : [];
+      });
+      if (stepRows.length) {
+        const { error: stepInsertError } = await supabase.from('test_result_steps').insert(stepRows);
+        if (stepInsertError) throw stepInsertError;
+      }
+    }
   },
 
   async findAllByRun(testRunId: string): Promise<TestResultWithDetails[]> {

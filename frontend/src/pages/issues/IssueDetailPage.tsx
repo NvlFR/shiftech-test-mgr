@@ -25,12 +25,14 @@ import {
   ISSUE_PRIORITY_LABEL,
   ISSUE_PRIORITY_SEVERITY,
   ISSUE_STATUS_LABEL,
+  ISSUE_TYPE_LABEL,
+  ISSUE_TYPE_SEVERITY,
   TEST_CASE_PRIORITY_LABEL,
   TEST_CASE_PRIORITY_SEVERITY,
 } from '../../helpers/statusLabels';
 
 const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
-  ['open', 'in_progress', 'resolved', 'verified', 'closed'] as const
+  ['backlog', 'open', 'in_progress', 'resolved', 'verified', 'closed', 'rejected', 'duplicate'] as const
 ).map((v) => ({ label: ISSUE_STATUS_LABEL[v], value: v }));
 
 const PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (
@@ -276,6 +278,7 @@ export function IssueDetailPage() {
       <Card className="mb-3">
         <div className="flex align-items-center gap-2 mb-1">
           <h2 className="m-0">{issue.code} — {issue.title}</h2>
+          {issue.type && <Tag value={ISSUE_TYPE_LABEL[issue.type]} severity={ISSUE_TYPE_SEVERITY[issue.type]} />}
           <Tag value={ISSUE_PRIORITY_LABEL[issue.priority]} severity={ISSUE_PRIORITY_SEVERITY[issue.priority]} />
         </div>
 
@@ -370,6 +373,19 @@ export function IssueDetailPage() {
       {issue.expectedResult && (
         <Card title="Hasil yang Diharapkan" className="mb-3">
           <p className="m-0" style={{ whiteSpace: 'pre-wrap' }}>{issue.expectedResult}</p>
+        </Card>
+      )}
+
+      {issue.externalLinks && issue.externalLinks.length > 0 && (
+        <Card title="External Links" className="mb-3">
+          <div className="flex flex-column gap-2">
+            {issue.externalLinks.map((link, index) => (
+              <a key={`${link.url}-${index}`} href={link.url} target="_blank" rel="noreferrer" className="entity-link">
+                <i className="pi pi-external-link mr-2" />
+                {link.label || link.url}
+              </a>
+            ))}
+          </div>
         </Card>
       )}
 

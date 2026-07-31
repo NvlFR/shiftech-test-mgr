@@ -22,5 +22,16 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/components/issues",
+    "src/components/layout-new",
+    "src/components/ui-new",
+    "src/helpers/helpers-new",
+    "src/hooks/hooks-new",
+    "src/pages/pages-new",
+    "src/repositories/repositories-new",
+    "src/services/services-new",
+    "src/App-new.tsx"
+  ]
 }

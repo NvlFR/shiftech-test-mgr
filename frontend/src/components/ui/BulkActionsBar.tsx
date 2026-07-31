@@ -13,11 +13,13 @@ export function BulkActionsBar({ selectedCount, onClear, actions }: BulkActionsB
   if (selectedCount === 0) return null;
 
   return (
-    <div className="flex align-items-center justify-content-between surface-100 border-round px-3 py-2 mb-2">
-      <span className="text-sm">{selectedCount} dipilih</span>
-      <div className="flex align-items-center gap-2">
+    <div className="flex align-items-center justify-content-between flex-wrap gap-2 surface-100 border-round py-2 mb-2">
+      <div className="flex align-items-center gap-2 flex-wrap">
         {actions}
-        <Button label="Batal" text size="small" onClick={onClear} />
+        <Button label="Batal" size="small" severity="secondary" text onClick={onClear} />
+      </div>
+      <div className="flex align-items-center gap-2 flex-shrink-0">
+        <span className="text-sm text-color-secondary">{selectedCount} dipilih</span>
       </div>
     </div>
   );

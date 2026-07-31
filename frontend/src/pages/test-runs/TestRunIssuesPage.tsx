@@ -19,10 +19,12 @@ import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import type { TestPlan, TestRun } from '../../types/domain';
 import { ISSUE_PRIORITY_LABEL, ISSUE_PRIORITY_SEVERITY, ISSUE_STATUS_LABEL } from '../../helpers/statusLabels';
+import type { IssuePriority } from '../../types/domain';
 
 const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
-  ['open', 'in_progress', 'resolved', 'verified', 'closed'] as const
+  ['backlog', 'open', 'in_progress', 'resolved', 'verified', 'closed', 'rejected', 'duplicate'] as const
 ).map((value) => ({ label: ISSUE_STATUS_LABEL[value], value }));
+const PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (['critical', 'high', 'medium', 'low'] as const).map((value) => ({ label: ISSUE_PRIORITY_LABEL[value], value }));
 
 export function TestRunIssuesPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,9 +32,19 @@ export function TestRunIssuesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const testResultId = searchParams.get('testResultId');
   const { issues: allIssues, loading, reload } = useIssuesByTestRun(id ?? null);
+  const [statusFilter, setStatusFilter] = useState<'all' | IssueStatus>('all');
+  const [priorityFilter, setPriorityFilter] = useState<'all' | IssuePriority>('all');
+  const [search, setSearch] = useState('');
   const issues = useMemo(
-    () => (testResultId ? allIssues.filter((i) => i.testResultId === testResultId) : allIssues),
-    [allIssues, testResultId],
+    () => allIssues.filter((issue) => {
+      const matchesResult = testResultId ? issue.testResultId === testResultId : true;
+      const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
+      const matchesPriority = priorityFilter === 'all' || issue.priority === priorityFilter;
+      const query = search.trim().toLowerCase();
+      const matchesSearch = !query || [issue.code, issue.title, issue.description].filter(Boolean).some((value) => value?.toLowerCase().includes(query));
+      return matchesResult && matchesStatus && matchesPriority && matchesSearch;
+    }),
+    [allIssues, testResultId, statusFilter, priorityFilter, search],
   );
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [testRun, setTestRun] = useState<TestRun | null>(null);
@@ -49,7 +61,7 @@ export function TestRunIssuesPage() {
   }, [id]);
 
   useEffect(() => {
-    if (testRun) testPlanService.getById(testRun.testPlanId).then(setTestPlan);
+    if (testRun?.testPlanId) testPlanService.getById(testRun.testPlanId).then(setTestPlan);
   }, [testRun]);
 
   useEffect(() => {
@@ -121,6 +133,18 @@ export function TestRunIssuesPage() {
         }
       />
 
+      <div className="flex align-items-center gap-2 flex-wrap mb-3">
+        <Button label="Issues" icon="pi pi-flag" size="small" outlined />
+        <Button label="Kembali ke Hasil" icon="pi pi-list" size="small" text onClick={() => navigate(`/test-runs/${id}`)} />
+      </div>
+
+      <div className="flex align-items-center gap-2 flex-wrap mb-2">
+        <input aria-label="Cari issue" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari kode, judul, deskripsi..." className="p-inputtext p-component w-full md:w-20rem" />
+        <Dropdown value={statusFilter} options={[{ label: 'Semua status', value: 'all' }, ...STATUS_OPTIONS]} onChange={(e) => setStatusFilter(e.value)} className="w-full md:w-14rem" />
+        <Dropdown value={priorityFilter} options={[{ label: 'Semua prioritas', value: 'all' }, ...PRIORITY_OPTIONS]} onChange={(e) => setPriorityFilter(e.value)} className="w-full md:w-14rem" />
+        {(statusFilter !== 'all' || priorityFilter !== 'all' || search) && <Button label="Reset" icon="pi pi-times" size="small" text onClick={() => { setStatusFilter('all'); setPriorityFilter('all'); setSearch(''); }} />}
+      </div>
+
       <DataTable
         value={issues}
         loading={loading}
@@ -128,6 +152,7 @@ export function TestRunIssuesPage() {
         rows={10}
         emptyMessage="Belum ada issue"
         size="small"
+        responsiveLayout="scroll"
         onRowClick={(e) => navigate(`/issues/${(e.data as IssueWithDetails).id}?testRunId=${id}`)}
         rowHover
         className="cursor-pointer"

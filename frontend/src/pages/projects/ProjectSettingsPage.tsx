@@ -7,6 +7,7 @@ import { Column } from 'primereact/column';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
@@ -21,9 +22,10 @@ import { tagService } from '../../services/tagService';
 import { profileService } from '../../services/profileService';
 import { projectMemberService } from '../../services/projectMemberService';
 import { environmentService } from '../../services/environmentService';
+import { testRoleService } from '../../services/testRoleService';
 import { useEnvironments } from '../../hooks/useEnvironments';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import type { Project, Module, Tag as TagEntity, Profile, ProjectMemberWithProfile, ProjectMemberRole, Environment } from '../../types/domain';
+import type { Project, Module, Tag as TagEntity, TestRole, Profile, ProjectMemberWithProfile, ProjectMemberRole, ProjectVisibility, Environment } from '../../types/domain';
 import { PROJECT_MEMBER_ROLE_LABEL } from '../../helpers/statusLabels';
 import { Tag } from 'primereact/tag';
 import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
@@ -35,6 +37,12 @@ const MEMBER_ROLE_OPTIONS: { label: string; value: ProjectMemberRole }[] = [
   { label: PROJECT_MEMBER_ROLE_LABEL.manager, value: 'manager' },
 ];
 
+const VISIBILITY_OPTIONS: { label: string; value: ProjectVisibility }[] = [
+  { label: 'Private — anggota saja', value: 'private' },
+  { label: 'Unlisted — siapa pun yang punya akses', value: 'unlisted' },
+  { label: 'Public — dapat dilihat publik', value: 'public' },
+];
+
 export function ProjectSettingsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -43,8 +51,14 @@ export function ProjectSettingsPage() {
   const { environments, loading: environmentsLoading, reload: reloadEnvironments } = useEnvironments(id ?? null);
 
   const [project, setProject] = useState<Project | null>(null);
+  const [editProjectDialogOpen, setEditProjectDialogOpen] = useState(false);
+  const [editProjectName, setEditProjectName] = useState('');
+  const [editProjectDescription, setEditProjectDescription] = useState('');
+  const [editProjectError, setEditProjectError] = useState<string | null>(null);
+  const [visibility, setVisibility] = useState<ProjectVisibility>('private');
   const [modules, setModules] = useState<Module[]>([]);
   const [tags, setTags] = useState<TagEntity[]>([]);
+  const [testRoles, setTestRoles] = useState<TestRole[]>([]);
   const [members, setMembers] = useState<ProjectMemberWithProfile[]>([]);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,16 +66,19 @@ export function ProjectSettingsPage() {
   async function loadAll(showLoading = true) {
     if (!id) return;
     if (showLoading) setLoading(true);
-    const [projectResult, modulesResult, tagsResult, membersResult, usersResult] = await Promise.all([
+    const [projectResult, modulesResult, tagsResult, testRolesResult, membersResult, usersResult] = await Promise.all([
       projectService.getById(id),
       moduleService.listByProject(id),
       tagService.listByProject(id),
+      testRoleService.listByProject(id),
       projectMemberService.listByProject(id),
       profileService.listAll(),
     ]);
     setProject(projectResult);
+    if (projectResult) setVisibility(projectResult.visibility);
     setModules(modulesResult);
     setTags(tagsResult);
+    setTestRoles(testRolesResult);
     setMembers(membersResult);
     setApprovedUsers(usersResult.filter((p: Profile) => p.role === 'user' || p.role === 'admin'));
     if (showLoading) setLoading(false);
@@ -71,6 +88,27 @@ export function ProjectSettingsPage() {
     loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  function openEditProjectDialog() {
+    if (!project) return;
+    setEditProjectName(project.name);
+    setEditProjectDescription(project.description ?? '');
+    setEditProjectError(null);
+    setEditProjectDialogOpen(true);
+  }
+
+  async function handleSaveProjectProfile() {
+    if (!project) return;
+    setEditProjectError(null);
+    try {
+      const updated = await projectService.update(project.id, { name: editProjectName, description: editProjectDescription, visibility: project.visibility });
+      setProject(updated);
+      setEditProjectDialogOpen(false);
+      toast.current?.show({ severity: 'success', summary: 'Project diperbarui' });
+    } catch (error) {
+      setEditProjectError(error instanceof Error ? error.message : 'Gagal memperbarui project');
+    }
+  }
 
   // --- Module dialog ---
   const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
@@ -90,6 +128,79 @@ export function ProjectSettingsPage() {
     if (!q) return modules;
     return modules.filter((m) => m.name.toLowerCase().includes(q) || m.code.toLowerCase().includes(q));
   }, [modules, moduleSearch]);
+
+  const [testRoleSearch, setTestRoleSearch] = useState('');
+  const [selectedTestRoles, setSelectedTestRoles] = useState<TestRole[]>([]);
+  const [testRoleDialogOpen, setTestRoleDialogOpen] = useState(false);
+  const [editingTestRoleId, setEditingTestRoleId] = useState<string | null>(null);
+  const [testRoleName, setTestRoleName] = useState('');
+  const [testRoleError, setTestRoleError] = useState<string | null>(null);
+  const filteredTestRoles = useMemo(() => {
+    const query = testRoleSearch.trim().toLowerCase();
+    return query ? testRoles.filter((role) => role.name.toLowerCase().includes(query)) : testRoles;
+  }, [testRoleSearch, testRoles]);
+
+  function openCreateTestRoleDialog() {
+    setEditingTestRoleId(null);
+    setTestRoleName('');
+    setTestRoleError(null);
+    setTestRoleDialogOpen(true);
+  }
+
+  function openEditTestRoleDialog(role: TestRole) {
+    setEditingTestRoleId(role.id);
+    setTestRoleName(role.name);
+    setTestRoleError(null);
+    setTestRoleDialogOpen(true);
+  }
+
+  async function handleSaveTestRole() {
+    if (!id) return;
+    try {
+      setTestRoleError(null);
+      if (editingTestRoleId) await testRoleService.update(editingTestRoleId, { name: testRoleName });
+      else await testRoleService.create({ projectId: id, name: testRoleName });
+      setTestRoleDialogOpen(false);
+      setTestRoles(await testRoleService.listByProject(id));
+      toast.current?.show({ severity: 'success', summary: editingTestRoleId ? 'Test role diperbarui' : 'Test role dibuat' });
+    } catch (error) {
+      setTestRoleError(error instanceof Error ? error.message : 'Gagal menyimpan test role');
+    }
+  }
+
+  function handleDeleteTestRole(role: TestRole) {
+    confirmDialog({
+      header: 'Hapus Test Role',
+      message: `Test role "${role.name}" akan dihapus. Test case yang menggunakannya menjadi tanpa target role. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        if (!id) return;
+        await testRoleService.remove(role.id);
+        setTestRoles(await testRoleService.listByProject(id));
+      },
+    });
+  }
+
+  function handleBulkDeleteTestRoles() {
+    if (!selectedTestRoles.length) return;
+    confirmDialog({
+      header: 'Hapus Test Role Terpilih',
+      message: `${selectedTestRoles.length} test role akan dihapus. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        if (!id) return;
+        await Promise.all(selectedTestRoles.map((role) => testRoleService.remove(role.id)));
+        setSelectedTestRoles([]);
+        setTestRoles(await testRoleService.listByProject(id));
+      },
+    });
+  }
 
   function openCreateModuleDialog() {
     setEditingModuleId(null);
@@ -327,6 +438,21 @@ export function ProjectSettingsPage() {
     }
   }
 
+  async function handleSaveVisibility() {
+    if (!project) return;
+    try {
+      const updated = await projectService.update(project.id, {
+        name: project.name,
+        description: project.description ?? '',
+        visibility,
+      });
+      setProject(updated);
+      toast.current?.show({ severity: 'success', summary: 'Visibilitas project diperbarui' });
+    } catch (err) {
+      toast.current?.show({ severity: 'error', summary: 'Gagal memperbarui visibilitas', detail: err instanceof Error ? err.message : undefined });
+    }
+  }
+
   async function handleChangeMemberRole(row: ProjectMemberWithProfile, role: ProjectMemberRole) {
     await projectMemberService.changeRole(row.id, role);
     setMembers((prev) => prev.map((m) => (m.id === row.id ? { ...m, role } : m)));
@@ -421,16 +547,42 @@ export function ProjectSettingsPage() {
       />
 
       <Card className="mb-3">
-        <div className="flex align-items-center gap-2">
-          <Button icon="pi pi-arrow-left" text rounded aria-label="Kembali" onClick={() => navigate(`/projects/${id}`)} />
-          <h2 className="m-0">Pengaturan Project — {project.name}</h2>
-          <Button label="Integrasi" icon="pi pi-share-alt" size="small" outlined className="ml-auto" onClick={() => navigate(`/projects/${id}/integrations`)} />
-          <Button label="Backup & Retensi" icon="pi pi-database" size="small" outlined className="ml-auto" onClick={() => navigate(`/projects/${id}/data-management`)} />
+        <div className="flex align-items-start justify-content-between gap-2">
+          <div className="flex align-items-start gap-2 min-w-0">
+            <Button icon="pi pi-arrow-left" text rounded severity="secondary" aria-label="Kembali" onClick={() => navigate(`/projects/${id}`)} />
+            <div className="min-w-0">
+              <h2 className="m-0 text-overflow-ellipsis overflow-hidden white-space-nowrap">Pengaturan — {project.name}</h2>
+              {project.description && <p className="m-0 mt-1 text-color-secondary text-sm">{project.description}</p>}
+            </div>
+          </div>
+          <div className="flex align-items-center gap-2 flex-shrink-0">
+            <Button icon="pi pi-pencil" text rounded severity="secondary" aria-label="Edit project" onClick={openEditProjectDialog} />
+            <Button label="Integrasi" icon="pi pi-share-alt" size="small" outlined onClick={() => navigate(`/projects/${id}/integrations`)} />
+            <Button label="Backup & Retensi" icon="pi pi-database" size="small" outlined onClick={() => navigate(`/projects/${id}/data-management`)} />
+          </div>
         </div>
       </Card>
 
       <Card>
         <TabView>
+          <TabPanel header="Akses & Visibilitas">
+            <div className="flex flex-column gap-2" style={{ maxWidth: '34rem' }}>
+              <label htmlFor="project-visibility" className="font-medium">Visibilitas project</label>
+              <small className="text-color-secondary">
+                Atur apakah project hanya untuk anggota, tidak terdaftar tetapi bisa dibuka lewat akses, atau dapat dilihat publik.
+              </small>
+              <div className="flex gap-2 align-items-center mt-2">
+                <Dropdown
+                  inputId="project-visibility"
+                  value={visibility}
+                  options={VISIBILITY_OPTIONS}
+                  onChange={(e) => setVisibility(e.value)}
+                  className="flex-1"
+                />
+                <Button label="Simpan" icon="pi pi-save" onClick={handleSaveVisibility} />
+              </div>
+            </div>
+          </TabPanel>
           <TabPanel header="Modules">
             <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
               <IconField iconPosition="left">
@@ -529,6 +681,29 @@ export function ProjectSettingsPage() {
             </DataTable>
           </TabPanel>
 
+          <TabPanel header="Test Roles">
+            <p className="text-color-secondary text-sm mb-3">
+              Role di dalam aplikasi yang diuji, misalnya Admin, Manager, atau Member. Ini berbeda dari peran anggota project.
+            </p>
+            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+              <IconField iconPosition="left">
+                <InputIcon className="pi pi-search" />
+                <InputText value={testRoleSearch} onChange={(event) => setTestRoleSearch(event.target.value)} placeholder="Cari nama role..." />
+              </IconField>
+              <Button label="Test Role Baru" icon="pi pi-plus" size="small" onClick={openCreateTestRoleDialog} />
+            </div>
+            <BulkActionsBar
+              selectedCount={selectedTestRoles.length}
+              onClear={() => setSelectedTestRoles([])}
+              actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteTestRoles} />}
+            />
+            <DataTable value={filteredTestRoles} emptyMessage="Belum ada test role" paginator rows={10} selection={selectedTestRoles} onSelectionChange={(event) => setSelectedTestRoles(event.value as TestRole[])} dataKey="id" selectionMode="checkbox" size="small">
+              <Column selectionMode="multiple" style={{ width: '3rem' }} />
+              <Column field="name" header="Nama" sortable />
+              <Column header="" style={{ width: '3.5rem' }} body={(row: TestRole) => <RowActionsMenu items={[{ label: 'Edit', icon: 'pi pi-pencil', command: () => openEditTestRoleDialog(row) }, { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteTestRole(row) }]} />} />
+            </DataTable>
+          </TabPanel>
+
           <TabPanel header="Environment">
             <div className="flex justify-content-between align-items-center mb-2">
               <span className="text-color-secondary text-sm">Environment yang tersedia saat memulai test run.</span>
@@ -573,6 +748,15 @@ export function ProjectSettingsPage() {
               <Column selectionMode="multiple" style={{ width: '3rem' }} />
               <Column header="Nama" body={(row: ProjectMemberWithProfile) => row.profile.fullName ?? '-'} />
               <Column header="Email" body={(row: ProjectMemberWithProfile) => row.profile.email} />
+              <Column
+                header="Status"
+                body={(row: ProjectMemberWithProfile) => (
+                  <Tag
+                    value={row.status === 'accepted' ? 'Aktif' : row.status === 'invited' ? 'Menunggu' : 'Ditolak'}
+                    severity={row.status === 'accepted' ? 'success' : row.status === 'invited' ? 'warning' : 'danger'}
+                  />
+                )}
+              />
               <Column
                 header="Peran"
                 body={(row: ProjectMemberWithProfile) => (
@@ -737,6 +921,25 @@ export function ProjectSettingsPage() {
             />
           </div>
           <Button label="Tambah" size="small" onClick={handleAddMember} />
+        </div>
+      </Dialog>
+
+      <Dialog header="Edit Project" visible={editProjectDialogOpen} onHide={() => setEditProjectDialogOpen(false)} style={{ width: '30rem' }} footer={<><Button label="Batal" text onClick={() => setEditProjectDialogOpen(false)} /><Button label="Simpan" onClick={handleSaveProjectProfile} /></>}>
+        <div className="flex flex-column gap-3">
+          {editProjectError && <small className="p-error">{editProjectError}</small>}
+          <div className="flex flex-column gap-1"><label htmlFor="settings-project-name">Nama Project</label><InputText id="settings-project-name" value={editProjectName} onChange={(event) => setEditProjectName(event.target.value)} autoFocus /></div>
+          <div className="flex flex-column gap-1"><label htmlFor="settings-project-description">Deskripsi</label><InputTextarea id="settings-project-description" value={editProjectDescription} onChange={(event) => setEditProjectDescription(event.target.value)} rows={4} /></div>
+        </div>
+      </Dialog>
+
+      <Dialog header={editingTestRoleId ? 'Edit Test Role' : 'Test Role Baru'} visible={testRoleDialogOpen} onHide={() => setTestRoleDialogOpen(false)} style={{ width: '25rem' }}>
+        <div className="flex flex-column gap-3">
+          {testRoleError && <small className="p-error">{testRoleError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="test-role-name">Nama Test Role</label>
+            <InputText id="test-role-name" value={testRoleName} onChange={(event) => setTestRoleName(event.target.value)} autoFocus />
+          </div>
+          <Button label="Simpan" size="small" onClick={() => void handleSaveTestRole()} />
         </div>
       </Dialog>
     </div>

@@ -6,8 +6,6 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
 import { Dropdown } from 'primereact/dropdown';
 import { Tag } from 'primereact/tag';
 import { Menu } from 'primereact/menu';
@@ -21,6 +19,8 @@ import type { ProjectQuery } from '../../repositories/projectRepository';
 import { formatDate } from '../../helpers/dateFormatter';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
+import { SearchInput } from '../../components/ui/SearchInput';
+import { FilterToolbar } from '../../components/ui/FilterToolbar';
 
 const STATUS_OPTIONS: { label: string; value: ProjectStatus | 'all' }[] = [
   { label: 'Semua Status', value: 'all' },
@@ -45,6 +45,12 @@ export function ProjectsPage() {
     [search, statusFilter, sortField, sortDirection],
   );
   const { projects, loading, reload } = useProjects(query);
+  const hasActiveFilters = Boolean(search.trim()) || statusFilter !== 'all';
+
+  function resetFilters() {
+    setSearch('');
+    setStatusFilter('all');
+  }
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -156,23 +162,10 @@ export function ProjectsPage() {
 
       <PageHeader title="Projects" actions={<Button label="Project Baru" icon="pi pi-plus" size="small" onClick={openCreateDialog} />} />
 
-      <div className="flex gap-2 mb-3">
-        <IconField iconPosition="left" className="flex-1">
-          <InputIcon className="pi pi-search" />
-          <InputText
-            className="w-full"
-            placeholder="Cari project..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </IconField>
-        <Dropdown
-          value={statusFilter}
-          options={STATUS_OPTIONS}
-          onChange={(e) => setStatusFilter(e.value)}
-          className="w-14rem"
-        />
-      </div>
+      <FilterToolbar defaultVisible>
+        <div className="col-12 md:col-2 p-1"><Dropdown value={statusFilter} options={STATUS_OPTIONS} onChange={(e) => setStatusFilter(e.value)} className="w-full" /></div>
+        <div className="col-12 md:col p-1"><div className="flex gap-2"><SearchInput value={search} onChange={setSearch} placeholder="Cari project..." className="flex-1" /><Button icon="pi pi-refresh" outlined severity="secondary" disabled={!hasActiveFilters} onClick={resetFilters} tooltip="Reset filter" /></div></div>
+      </FilterToolbar>
 
       <DataTable
         value={projects}

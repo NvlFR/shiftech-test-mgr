@@ -125,7 +125,8 @@ export function AutomationPage() {
 
   return <div>
     <Toast ref={toast} />
-    <PageHeader title="Automation (Playwright)" actions={<div className="flex gap-2">
+    <PageHeader title="Automation (Playwright)" actions={<div className="flex gap-2 flex-wrap">
+      <Button label="Refresh" icon="pi pi-refresh" outlined onClick={() => void reload()} loading={loading} />
       <Button label="Enqueue Automation" icon="pi pi-play" onClick={() => setEnqueueDialog(true)} />
       {canManageSettings && <Button label="Runner Baru" icon="pi pi-plus" outlined onClick={() => setRunnerDialog(true)} />}
     </div>} />

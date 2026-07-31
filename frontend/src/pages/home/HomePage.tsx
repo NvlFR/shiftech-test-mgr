@@ -9,6 +9,7 @@ import { useProjectContext } from '../../hooks/useProjectContext';
 import { testRunService } from '../../services/testRunService';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import { exportTestRunsToExcel, exportTestRunsToPdf, type TestRunExportRow } from '../../helpers/testRunExporter';
+import { PageHeader } from '../../components/ui/PageHeader';
 
 function StatCard({ icon, label, value, detail }: { icon: string; label: string; value: number; detail: string }) {
   return (
@@ -104,16 +105,11 @@ export function HomePage() {
 
   return (
     <div className="flex flex-column gap-4">
-      <div className="flex justify-content-between align-items-center gap-3 flex-wrap">
-        <div>
-          <h1 className="mt-0 mb-2">Dashboard QA</h1>
-          <p className="text-color-secondary m-0">Ringkasan aktivitas testing seluruh project.</p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader title="Dashboard QA" actions={<div className="flex gap-2 flex-wrap">
           <Button label="Refresh" icon="pi pi-refresh" outlined onClick={() => void reload()} loading={loading} />
           <Button label="Export CSV" icon="pi pi-download" onClick={() => downloadCsv(stats)} />
-        </div>
-      </div>
+      </div>} />
+      <p className="text-color-secondary mt-0">Ringkasan aktivitas testing seluruh project.</p>
 
       {error && <Message severity="warn" text={error} />}
       {exportError && <Message severity="error" text={exportError} />}

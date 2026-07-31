@@ -18,6 +18,11 @@ import { InputIcon } from 'primereact/inputicon';
 import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
+import { ActivityPanel } from '../../components/ui/ActivityPanel';
+import { CustomTestRunDialog } from '../../components/dialogs/CustomTestRunDialog';
+import { ImportCasesDialog } from '../../components/dialogs/ImportCasesDialog';
+import { ProjectTestPlanTab } from './ProjectTestPlanTab';
+import { ProjectTestCaseTab } from './ProjectTestCaseTab';
 import { projectService } from '../../services/projectService';
 import { testPlanService } from '../../services/testPlanService';
 import { testCaseService } from '../../services/testCaseService';
@@ -56,7 +61,6 @@ import {
   TEST_CASE_STATUS_LABEL,
   TEST_CASE_STATUS_SEVERITY,
   TEST_PLAN_STATUS_LABEL,
-  TEST_PLAN_STATUS_SEVERITY,
   TEST_RUN_STATUS_LABEL,
   TEST_RUN_STATUS_SEVERITY,
   TEST_RESULT_STATUS_SEVERITY,
@@ -71,10 +75,6 @@ const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
   { label: TEST_CASE_PRIORITY_LABEL.high, value: 'high' },
   { label: TEST_CASE_PRIORITY_LABEL.critical, value: 'critical' },
 ];
-
-const TEST_PLAN_STATUS_OPTIONS: { label: string; value: TestPlanStatus }[] = (
-  ['draft', 'active', 'completed', 'archived'] as const
-).map((v) => ({ label: TEST_PLAN_STATUS_LABEL[v], value: v }));
 
 const TEST_CASE_STATUS_OPTIONS: { label: string; value: TestCaseStatus }[] = (
   ['active', 'archived'] as const
@@ -137,7 +137,7 @@ export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
-  const { canEditContent, canDeleteContent, canManageIssues } = useProjectRole(id);
+  const { canEditContent, canDeleteContent, canManageIssues, canRunTests } = useProjectRole(id);
 
   const [project, setProject] = useState<Project | null>(id ? projectCache.get(id) ?? null : null);
   const [projectLoading, setProjectLoading] = useState(!project);
@@ -151,6 +151,34 @@ export function ProjectDetailPage() {
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [tabLoading, setTabLoading] = useState<Record<number, boolean>>({});
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [customRunDialogOpen, setCustomRunDialogOpen] = useState(false);
+  const [customRunName, setCustomRunName] = useState('');
+  const [customRunCaseIds, setCustomRunCaseIds] = useState<string[]>([]);
+  const [customRunError, setCustomRunError] = useState<string | null>(null);
+
+  async function openCustomRunDialog() {
+    if (id && testCases.length === 0) {
+      const rows = await testCaseService.listByProjectWithDetails(id);
+      setTestCases(rows);
+    }
+    setCustomRunName(`Run ${new Date().toLocaleDateString('id-ID')}`);
+    setCustomRunCaseIds([]);
+    setCustomRunError(null);
+    setCustomRunDialogOpen(true);
+  }
+
+  async function handleCreateCustomRun() {
+    if (!id || !customRunName.trim() || customRunCaseIds.length === 0) return;
+    setCustomRunError(null);
+    try {
+      const run = await testRunService.startCustom(id, customRunCaseIds, customRunName);
+      setCustomRunDialogOpen(false);
+      await loadAll();
+      navigate(`/test-runs/${run.id}`);
+    } catch (error) {
+      setCustomRunError(error instanceof Error ? error.message : 'Gagal membuat custom test run');
+    }
+  }
 
   function applyTabData(data: Partial<ProjectTabData>) {
     if (data.testPlans) setTestPlans(data.testPlans);
@@ -397,6 +425,8 @@ export function ProjectDetailPage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const importFileRef = useRef<HTMLInputElement>(null);
+  const [libraryImportOpen, setLibraryImportOpen] = useState(false);
+  const [libraryImporting, setLibraryImporting] = useState(false);
 
   // Test Cases: search/filter/sort/selection
   const [caseSearch, setCaseSearch] = useState('');
@@ -536,6 +566,52 @@ export function ProjectDetailPage() {
       setImportError(err instanceof Error ? err.message : 'Gagal mengimport test case');
     } finally {
       setImporting(false);
+    }
+  }
+
+  async function handleImportFromProject(sourceProjectId: string, sourceCaseIds: string[]) {
+    if (!id || sourceProjectId === id) return;
+    setLibraryImporting(true);
+    try {
+      const targetModules = await moduleService.listByProject(id);
+      const moduleByName = new Map(targetModules.map((module) => [module.name.toLowerCase(), module]));
+      let imported = 0;
+      for (const sourceCaseId of sourceCaseIds) {
+        const source = await testCaseService.getByIdWithDetails(sourceCaseId);
+        if (!source) continue;
+        let moduleId: string | null = null;
+        if (source.module?.name) {
+          const key = source.module.name.toLowerCase();
+          const existing = moduleByName.get(key);
+          if (existing) moduleId = existing.id;
+          else {
+            const createdModule = await moduleService.create({ projectId: id, name: source.module.name });
+            moduleByName.set(key, createdModule);
+            moduleId = createdModule.id;
+          }
+        }
+        const created = await testCaseService.create({
+          projectId: id,
+          moduleId,
+          title: `${source.title} (Imported)`,
+          objective: source.objective ?? undefined,
+          preconditions: source.preconditions ?? undefined,
+          steps: source.steps,
+          expectedResult: source.expectedResult,
+          priority: source.priority,
+          notes: source.notes ?? undefined,
+          tagNames: source.tags.map((tag) => tag.name),
+        });
+        if (source.targetRoleId) await testCaseService.update(created.id, id, { targetRoleId: source.targetRoleId });
+        imported += 1;
+      }
+      setLibraryImportOpen(false);
+      await loadAll();
+      toast.current?.show({ severity: 'success', summary: `${imported} test case berhasil diimport` });
+    } catch (error) {
+      toast.current?.show({ severity: 'error', summary: 'Import project gagal', detail: error instanceof Error ? error.message : undefined });
+    } finally {
+      setLibraryImporting(false);
     }
   }
 
@@ -742,206 +818,49 @@ export function ProjectDetailPage() {
       <Card>
         <TabView activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
           <TabPanel header="Test Plans">
-            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-              <div className="flex align-items-center gap-2 flex-wrap">
-                <IconField iconPosition="left">
-                  <InputIcon className="pi pi-search" />
-                  <InputText value={planSearch} onChange={(e) => setPlanSearch(e.target.value)} placeholder="Cari nama/kode..." />
-                </IconField>
-                <Dropdown
-                  value={planStatusFilter}
-                  options={TEST_PLAN_STATUS_OPTIONS}
-                  onChange={(e) => setPlanStatusFilter(e.value)}
-                  placeholder="Semua Status"
-                  showClear
-                  className="w-12rem"
-                />
-              </div>
-              {canEditContent && <Button label="Test Plan Baru" icon="pi pi-plus" size="small" onClick={openCreatePlanDialog} />}
-            </div>
-            {canDeleteContent && (
-              <BulkActionsBar
-                selectedCount={selectedPlans.length}
-                onClear={() => setSelectedPlans([])}
-                actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeletePlans} />}
-              />
-            )}
-            <DataTable
-              value={filteredPlans}
+            <ProjectTestPlanTab
+              plans={filteredPlans}
               loading={tabLoading[0]}
-              size="small"
-              emptyMessage="Belum ada test plan"
-              onRowClick={(e) => navigate(`/test-plans/${(e.data as TestPlan).id}`)}
-              rowHover
-              className="cursor-pointer"
-              paginator
-              rows={10}
+              projectId={id}
+              isMobile={false}
+              search={planSearch}
+              onSearchChange={setPlanSearch}
+              statusFilter={planStatusFilter}
+              onStatusFilterChange={setPlanStatusFilter}
               sortField={planSortField}
               sortOrder={planSortOrder}
               onSort={sortHandler(setPlanSortField, setPlanSortOrder)}
-              selection={selectedPlans}
-              onSelectionChange={(e) => setSelectedPlans(e.value as TestPlan[])}
-              dataKey="id"
-              selectionMode="checkbox"
-            >
-              <Column selectionMode="multiple" style={{ width: '3rem' }} />
-              <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
-              <Column field="name" header="Nama" sortable />
-              <Column
-                field="status"
-                header="Status"
-                sortable
-                body={(row: TestPlan) => <Tag value={TEST_PLAN_STATUS_LABEL[row.status]} severity={TEST_PLAN_STATUS_SEVERITY[row.status]} />}
-              />
-              <Column field="updatedAt" header="Update Terakhir" sortable body={(row: TestPlan) => formatDateTime(row.updatedAt)} />
-              <Column
-                header=""
-                style={{ width: '3.5rem' }}
-                body={(row: TestPlan) => (
-                  <RowActionsMenu
-                    items={[
-                      ...(canEditContent ? [{ label: 'Edit', icon: 'pi pi-pencil', command: () => openEditPlanDialog(row) }] : []),
-                      ...(canDeleteContent
-                        ? [{ label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeletePlan(row) }]
-                        : []),
-                    ]}
-                  />
-                )}
-              />
-            </DataTable>
+              selected={selectedPlans}
+              onSelectedChange={setSelectedPlans}
+              canEditContent={canEditContent}
+              canDeleteContent={canDeleteContent}
+              onCreate={openCreatePlanDialog}
+              onEdit={openEditPlanDialog}
+              onDelete={handleDeletePlan}
+              onBulkDelete={handleBulkDeletePlans}
+              onRefresh={loadAll}
+            />
           </TabPanel>
 
           <TabPanel header="Test Cases">
-            <div className="flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-              <div className="flex align-items-center gap-2 flex-wrap">
-                <IconField iconPosition="left">
-                  <InputIcon className="pi pi-search" />
-                  <InputText value={caseSearch} onChange={(e) => setCaseSearch(e.target.value)} placeholder="Cari judul/kode..." />
-                </IconField>
-                <Dropdown
-                  value={caseStatusFilter}
-                  options={TEST_CASE_STATUS_OPTIONS}
-                  onChange={(e) => setCaseStatusFilter(e.value)}
-                  placeholder="Semua Status"
-                  showClear
-                  className="w-10rem"
-                />
-                <Dropdown
-                  value={casePriorityFilter}
-                  options={PRIORITY_OPTIONS}
-                  onChange={(e) => setCasePriorityFilter(e.value)}
-                  placeholder="Semua Prioritas"
-                  showClear
-                  className="w-10rem"
-                />
-                <Dropdown
-                  value={caseModuleFilter}
-                  options={moduleOptions}
-                  onChange={(e) => setCaseModuleFilter(e.value)}
-                  placeholder="Semua Module"
-                  showClear
-                  className="w-10rem"
-                />
-                <Dropdown
-                  value={caseTagFilter}
-                  options={tagOptions}
-                  onChange={(e) => setCaseTagFilter(e.value)}
-                  placeholder="Semua Tag"
-                  showClear
-                  className="w-10rem"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button label="Export Excel" icon="pi pi-download" size="small" outlined onClick={() => exportTestCasesToExcel(project, filteredCases)} disabled={!filteredCases.length} />
-                <Button label="Export PDF" icon="pi pi-file-pdf" size="small" outlined onClick={() => exportTestCasesToPdf(project, filteredCases)} disabled={!filteredCases.length} />
-                {canEditContent && (
-                  <>
-                    <input ref={importFileRef} type="file" accept=".xlsx,.xls" onChange={handleImportFile} hidden />
-                    <Button label="Template" icon="pi pi-file" size="small" text onClick={downloadTestCaseImportTemplate} />
-                    <Button label="Import Excel" icon="pi pi-file-excel" size="small" outlined onClick={() => importFileRef.current?.click()} />
-                    <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={openCreateCaseDialog} />
-                  </>
-                )}
-              </div>
-            </div>
-            {canDeleteContent && (
-              <BulkActionsBar
-                selectedCount={selectedCases.length}
-                onClear={() => setSelectedCases([])}
-                actions={<Button label="Hapus Terpilih" icon="pi pi-trash" size="small" severity="danger" outlined onClick={handleBulkDeleteCases} />}
-              />
-            )}
-            <DataTable
-              value={filteredCases}
+            <input ref={importFileRef} type="file" accept=".xlsx,.xls" onChange={handleImportFile} hidden />
+            <ProjectTestCaseTab
+              project={project}
+              cases={filteredCases}
               loading={tabLoading[1]}
-              size="small"
-              emptyMessage="Belum ada test case"
-              onRowClick={(e) => navigate(`/test-cases/${(e.data as TestCaseWithDetails).id}?projectId=${id}`)}
-              rowHover
-              className="cursor-pointer"
-              paginator
-              rows={10}
-              sortField={caseSortField}
-              sortOrder={caseSortOrder}
-              onSort={sortHandler(setCaseSortField, setCaseSortOrder)}
-              selection={selectedCases}
-              onSelectionChange={(e) => setSelectedCases(e.value as TestCaseWithDetails[])}
-              dataKey="id"
-              selectionMode="checkbox"
-            >
-              <Column selectionMode="multiple" style={{ width: '3rem' }} />
-              <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
-              <Column field="title" header="Judul" sortable />
-              <Column field="module.name" header="Module" sortable body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} />
-              <Column
-                field="priority"
-                header="Prioritas"
-                sortable
-                body={(row: TestCaseWithDetails) => <Tag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} />}
-              />
-              <Column
-                field="status"
-                header="Status"
-                sortable
-                body={(row: TestCaseWithDetails) => (
-                  <Tag value={TEST_CASE_STATUS_LABEL[row.status]} severity={TEST_CASE_STATUS_SEVERITY[row.status]} />
-                )}
-              />
-              <Column
-                field="tags"
-                header="Tag"
-                body={(row: TestCaseWithDetails) => (
-                  <div className="flex flex-wrap gap-1">
-                    {row.tags.map((t) => (
-                      <Tag key={t.id} value={t.name} severity="info" />
-                    ))}
-                  </div>
-                )}
-              />
-              <Column
-                header=""
-                style={{ width: '3.5rem' }}
-                body={(row: TestCaseWithDetails) => (
-                  <RowActionsMenu
-                    items={[
-                      ...(canEditContent
-                        ? [
-                          { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditCaseDialog(row) },
-                          {
-                            label: row.status === 'active' ? 'Arsipkan' : 'Aktifkan',
-                            icon: row.status === 'active' ? 'pi pi-inbox' : 'pi pi-refresh',
-                            command: () => handleArchiveCase(row),
-                          },
-                        ]
-                        : []),
-                      ...(canDeleteContent
-                        ? [{ label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteCase(row) }]
-                        : []),
-                    ]}
-                  />
-                )}
-              />
-            </DataTable>
+              canEditContent={canEditContent}
+              canDeleteContent={canDeleteContent}
+              moduleOptions={moduleOptions}
+              tagOptions={tagOptions}
+              onCreate={openCreateCaseDialog}
+              onEdit={openEditCaseDialog}
+              onArchive={handleArchiveCase}
+              onDelete={handleDeleteCase}
+              onBulkDelete={() => handleBulkDeleteCases()}
+              onImportExcel={() => importFileRef.current?.click()}
+              onImportLibrary={() => setLibraryImportOpen(true)}
+              onRowClick={(row) => navigate(`/test-cases/${row.id}?projectId=${id}`)}
+            />
           </TabPanel>
 
           <TabPanel header="Test Runs">
@@ -960,6 +879,7 @@ export function ProjectDetailPage() {
                   className="w-12rem"
                 />
               </div>
+              {canRunTests && <Button label="Custom Test Run" icon="pi pi-play" size="small" outlined onClick={openCustomRunDialog} />}
             </div>
             {canDeleteContent && (
               <BulkActionsBar
@@ -1252,6 +1172,9 @@ export function ProjectDetailPage() {
               />
             </DataTable>
           </TabPanel>
+          {project && <TabPanel header="Activity">
+            <ActivityPanel projectId={project.id} />
+          </TabPanel>}
         </TabView>
       </Card>
 
@@ -1472,6 +1395,26 @@ export function ProjectDetailPage() {
           </div>
         </div>
       </Dialog>
+
+      <CustomTestRunDialog
+        visible={customRunDialogOpen}
+        name={customRunName}
+        selectedCaseIds={customRunCaseIds}
+        testCases={testCases}
+        error={customRunError}
+        onNameChange={setCustomRunName}
+        onSelectedCaseIdsChange={setCustomRunCaseIds}
+        onHide={() => setCustomRunDialogOpen(false)}
+        onSave={handleCreateCustomRun}
+      />
+
+      <ImportCasesDialog
+        visible={libraryImportOpen}
+        loading={libraryImporting}
+        excludeProjectId={id}
+        onHide={() => setLibraryImportOpen(false)}
+        onImport={handleImportFromProject}
+      />
 
     </div>
   );

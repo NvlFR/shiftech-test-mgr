@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -17,7 +17,8 @@ import { useAuthContext } from '../../hooks/useAuth';
 import { testRunService } from '../../services/testRunService';
 import { profileService } from '../../services/profileService';
 import { issueService } from '../../services/issueService';
-import type { Profile, TestResultStatus, TestResultWithDetails } from '../../types/domain';
+import { testResultStepService } from '../../services/testResultStepService';
+import type { Profile, TestResultStep, TestResultStepStatus, TestResultStatus, TestResultWithDetails } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { testPlanService } from '../../services/testPlanService';
@@ -26,6 +27,7 @@ import { useProjectRole } from '../../hooks/useProjectRole';
 import { useTestRunAnalysis } from '../../hooks/useTestRunAnalysis';
 import type { TestPlan } from '../../types/domain';
 import { AttachmentPanel } from '../../components/ui/AttachmentPanel';
+import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { TestRunAnalysisPanel } from '../../components/test-runs/TestRunAnalysisPanel';
 import { AiIssueDraftDialog } from '../../components/ai/AiIssueDraftDialog';
 import {
@@ -43,6 +45,12 @@ const RESULT_OPTIONS: { label: string; value: TestResultStatus }[] = [
   { label: 'Skip', value: 'skip' },
   { label: 'Blocked', value: 'blocked' },
 ];
+const STEP_RESULT_OPTIONS: { label: string; value: TestResultStepStatus }[] = [
+  { label: 'Belum diuji', value: 'not_run' },
+  { label: 'Pass', value: 'pass' },
+  { label: 'Fail', value: 'fail' },
+];
+const RESULT_FILTER_OPTIONS = [{ label: 'Semua hasil', value: 'all' as const }, ...RESULT_OPTIONS, { label: 'Belum dites', value: 'not_run' as const }];
 
 export function TestRunDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +63,7 @@ export function TestRunDetailPage() {
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [testPlan, setTestPlan] = useState<TestPlan | null>(null);
   const [projectName, setProjectName] = useState<string | null>(null);
-  const { canRunTests, canManageIssues, canDeleteContent } = useProjectRole(testPlan?.projectId);
+  const { canRunTests, canManageIssues, canDeleteContent } = useProjectRole(testPlan?.projectId ?? testRun?.projectId ?? undefined);
   const { analysis, loading: analysisLoading, error: analysisError, analyze: analyzeTestRun } = useTestRunAnalysis(testPlan?.projectId ?? null, id ?? null);
 
   const issueCountByResult = runIssues.reduce<Record<string, number>>((acc, issue) => {
@@ -68,12 +76,15 @@ export function TestRunDetailPage() {
   }, []);
 
   useEffect(() => {
-    if (testRun) testPlanService.getById(testRun.testPlanId).then(setTestPlan);
+    if (!testRun) return;
+    if (testRun.testPlanId) testPlanService.getById(testRun.testPlanId).then(setTestPlan);
+    else setTestPlan(null);
   }, [testRun]);
 
   useEffect(() => {
-    if (testPlan) projectService.getById(testPlan.projectId).then((p) => setProjectName(p?.name ?? null));
-  }, [testPlan]);
+    const projectId = testPlan?.projectId ?? testRun?.projectId;
+    if (projectId) projectService.getById(projectId).then((p) => setProjectName(p?.name ?? null));
+  }, [testPlan, testRun]);
 
   // --- Record result dialog ---
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
@@ -81,8 +92,22 @@ export function TestRunDetailPage() {
   const [resultStatus, setResultStatus] = useState<TestResultStatus>('pass');
   const [resultTesterId, setResultTesterId] = useState<string | null>(null);
   const [resultNotes, setResultNotes] = useState('');
+  const [resultSteps, setResultSteps] = useState<TestResultStep[]>([]);
   const [selectedResults, setSelectedResults] = useState<TestResultWithDetails[]>([]);
   const [assignmentTesterId, setAssignmentTesterId] = useState<string | null>(null);
+  const [resultFilter, setResultFilter] = useState<'all' | TestResultStatus>('all');
+  const [resultSearch, setResultSearch] = useState('');
+
+  const visibleResults = useMemo(() => {
+    const query = resultSearch.trim().toLowerCase();
+    return results.filter((result) => {
+      const matchesStatus = resultFilter === 'all' || result.status === resultFilter;
+      const matchesSearch = !query || [result.testCase.code, result.testCase.title, result.tester?.fullName, result.tester?.email]
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query));
+      return matchesStatus && matchesSearch;
+    });
+  }, [results, resultFilter, resultSearch]);
 
   async function handleAssignSelected() {
     if (!id || !assignmentTesterId || selectedResults.length === 0) return;
@@ -92,17 +117,19 @@ export function TestRunDetailPage() {
     toast.current?.show({ severity: 'success', summary: 'Pembagian eksekusi diperbarui' });
   }
 
-  function openResultDialog(row: TestResultWithDetails) {
+  async function openResultDialog(row: TestResultWithDetails) {
     setActiveResult(row);
     setResultStatus(row.status === 'not_run' ? 'pass' : row.status);
     setResultTesterId(row.testerId ?? currentProfile?.id ?? null);
     setResultNotes(row.notes ?? '');
+    setResultSteps(await testResultStepService.list(row.id));
     setResultDialogOpen(true);
   }
 
   async function handleSaveResult() {
     if (!activeResult || !resultTesterId) return;
     await testRunService.recordResult(activeResult.id, resultTesterId, resultStatus, resultNotes.trim() || null);
+    await Promise.all(resultSteps.map((step) => testResultStepService.update(step.id, step.status, step.notes)));
     setResultDialogOpen(false);
     await reload();
     toast.current?.show({ severity: 'success', summary: 'Hasil tersimpan' });
@@ -179,7 +206,7 @@ export function TestRunDetailPage() {
         items={[
           { label: 'Projects', path: '/' },
           { label: testPlan ? (projectName ?? '…') : '…', path: testPlan ? `/projects/${testPlan.projectId}` : undefined },
-          { label: testPlan ? testPlan.code : '…', path: testPlan ? `/test-plans/${testPlan.id}` : undefined },
+          { label: testPlan ? testPlan.code : (testRun?.isCustom ? 'Custom Run' : '…'), path: testPlan ? `/test-plans/${testPlan.id}` : undefined },
           { label: testRun ? testRun.code : '…', path: testRun ? `/test-runs/${testRun.id}` : undefined },
         ]}
       />
@@ -244,6 +271,19 @@ export function TestRunDetailPage() {
 
       {testRun && <AttachmentPanel kind="test_run" entityId={testRun.id} canUpload={canRunTests} canDelete={canDeleteContent} />}
 
+      {testRun?.projectId && <ActivityPanel projectId={testRun.projectId} />}
+
+      <div className="flex align-items-center gap-2 flex-wrap mb-3">
+        <Button label="Hasil Eksekusi" icon="pi pi-list" size="small" outlined />
+        <Button label={`Issues (${runIssues.length})`} icon="pi pi-flag" size="small" text onClick={() => navigate(`/test-runs/${id}/issues`)} />
+      </div>
+
+      <div className="flex align-items-center gap-2 flex-wrap mb-2">
+        <InputText value={resultSearch} onChange={(e) => setResultSearch(e.target.value)} placeholder="Cari kode atau test case..." className="w-full md:w-20rem" />
+        <Dropdown value={resultFilter} options={RESULT_FILTER_OPTIONS} onChange={(e) => setResultFilter(e.value)} className="w-full md:w-14rem" />
+        {(resultFilter !== 'all' || resultSearch) && <Button label="Reset" icon="pi pi-times" size="small" text onClick={() => { setResultFilter('all'); setResultSearch(''); }} />}
+      </div>
+
       {canRunTests && (
         <div className="flex align-items-center gap-2 flex-wrap mb-2">
           <span className="text-sm text-color-secondary">Bagi test case terpilih:</span>
@@ -252,7 +292,7 @@ export function TestRunDetailPage() {
         </div>
       )}
 
-      <DataTable value={results} selection={selectedResults} onSelectionChange={(e) => setSelectedResults(e.value as TestResultWithDetails[])} selectionMode="multiple" loading={loading} paginator rows={10} emptyMessage="Belum ada test case" size="small">
+      <DataTable value={visibleResults} selection={selectedResults} onSelectionChange={(e) => setSelectedResults(e.value as TestResultWithDetails[])} selectionMode="multiple" loading={loading} paginator rows={10} emptyMessage="Tidak ada hasil yang sesuai filter" size="small" responsiveLayout="scroll">
         {canRunTests && <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />}
         <Column field="testCase.code" header="Kode" sortable style={{ width: '7rem' }} />
         <Column field="testCase.title" header="Test Case" sortable />
@@ -329,6 +369,16 @@ export function TestRunDetailPage() {
             <label htmlFor="result-notes">Catatan</label>
             <InputTextarea id="result-notes" value={resultNotes} onChange={(e) => setResultNotes(e.target.value)} rows={3} />
           </div>
+
+          {resultSteps.length > 0 && <div className="flex flex-column gap-2">
+            <label>Checklist Structured Steps</label>
+            {resultSteps.map((step) => <div key={step.id} className="border-1 surface-border border-round p-2">
+              <div className="flex align-items-start justify-content-between gap-2">
+                <div className="flex-1"><span className="font-medium">{step.stepNumber}. {step.action}</span>{step.expectedResult && <small className="block text-color-secondary mt-1">Expected: {step.expectedResult}</small>}</div>
+                <Dropdown value={step.status} options={STEP_RESULT_OPTIONS} onChange={(e) => setResultSteps((current) => current.map((item) => item.id === step.id ? { ...item, status: e.value } : item))} className="w-9rem" />
+              </div>
+            </div>)}
+          </div>}
 
           <Button label="Simpan" size="small" onClick={handleSaveResult} disabled={!resultTesterId} />
         </div>

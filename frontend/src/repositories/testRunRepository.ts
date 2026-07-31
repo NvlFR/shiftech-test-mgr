@@ -52,6 +52,16 @@ export const testRunRepository = {
     }));
   },
 
+  async findAllCustomByProject(projectId: string, filters: TestRunFilters = {}): Promise<(TestRun & { testPlanId: string | null; testPlanName: string })[]> {
+    let query = supabase.from('test_runs').select('*').eq('custom_project_id', projectId).eq('is_custom', true);
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.browser?.trim()) query = query.ilike('browser', `%${filters.browser.trim()}%`);
+    if (filters.device?.trim()) query = query.ilike('device', `%${filters.device.trim()}%`);
+    const { data, error } = await query.order('started_at', { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map((row: any) => ({ ...mapTestRunRow(row), testPlanId: null, testPlanName: 'Custom Run' }));
+  },
+
   async findById(id: string): Promise<TestRun | null> {
     const { data, error } = await supabase.from('test_runs').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
@@ -59,15 +69,25 @@ export const testRunRepository = {
   },
 
   // `code` optional — omit/empty lets the `set_test_run_code` DB trigger auto-generate TR-####.
-  async create(input: { testPlanId: string; name: string; code?: string | null; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null }): Promise<TestRun> {
+  async create(input: { testPlanId: string | null; customProjectId?: string | null; isCustom?: boolean; name: string; code?: string | null; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null }): Promise<TestRun> {
     const { data, error } = await supabase
       .from('test_runs')
-      .insert({ test_plan_id: input.testPlanId, name: input.name, code: input.code || undefined, environment_id: input.environmentId || null, browser: input.browser || null, device: input.device || null, build_version: input.buildVersion || null, release: input.release || null })
+      .insert({ test_plan_id: input.testPlanId, custom_project_id: input.customProjectId ?? null, is_custom: input.isCustom ?? false, name: input.name, code: input.code || undefined, environment_id: input.environmentId || null, browser: input.browser || null, device: input.device || null, build_version: input.buildVersion || null, release: input.release || null })
       .select('*')
       .single();
 
     if (error) throw error;
     return mapTestRunRow(data);
+  },
+
+  async createCustom(input: { projectId: string; name: string; code?: string | null; browser?: string | null; device?: string | null }): Promise<TestRun> {
+    return this.create({ testPlanId: null, customProjectId: input.projectId, isCustom: true, name: input.name, code: input.code, browser: input.browser, device: input.device });
+  },
+
+  async attachCases(testRunId: string, testCaseIds: string[]): Promise<void> {
+    if (!testCaseIds.length) return;
+    const { error } = await supabase.from('test_run_cases').insert(testCaseIds.map((testCaseId, index) => ({ test_run_id: testRunId, test_case_id: testCaseId, order_index: index })));
+    if (error) throw error;
   },
 
   async update(id: string, changes: { name?: string; code?: string; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null }): Promise<TestRun> {
