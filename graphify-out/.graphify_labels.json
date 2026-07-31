@@ -69,7 +69,6 @@
   "67": "extraction-spec.md",
   "68": "schema_017_p1_rpc_hardening.sql",
   "69": "backupRetentionRepository.ts",
-  "70": "Breadcrumb.tsx",
   "71": "useScreenSize.ts",
   "72": "3. Konsep Test Management",
   "73": "schema_issue_code.sql",
@@ -161,6 +160,5 @@
   "166": "2026-07-31 — SRC-04 penyelesaian notification center",
   "168": "2. Layer Detail",
   "169": "6. Cross-Cutting Concerns",
-  "170": "2026-07-31 — FIX-00b error TypeScript ProjectDetailPage",
   "172": "schema_042_issue_attachment_storage_cleanup.sql"
 }

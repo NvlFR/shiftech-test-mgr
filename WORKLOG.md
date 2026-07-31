@@ -1,5 +1,14 @@
 # Worklog
 
+## 2026-07-31 — REPO-04 tab Repository di Project Settings
+
+- Menambahkan tab Repository pada `ProjectSettingsPage` dengan daftar repository, dialog tambah/edit, konfirmasi hapus, status aktif, dan aksi Test Connection berupa stub notifikasi.
+- Seluruh lifecycle dan mutasi memakai `useProjectRepositories` → `projectRepositoryLinkService` → `projectRepositoryLinkRepository` → Supabase; halaman tidak mengakses repository atau Supabase langsung.
+- Kredensial hanya ditampilkan sebagai mask tanpa nilai token penuh. UI menampilkan waktu referensi kredensial dibuat dari timestamp repository dan tanggal kedaluwarsa sebagai `-` karena metadata expiry belum tersedia pada model REPO-01; form tidak menerima atau membaca ulang secret dari browser.
+- Menambahkan peringatan scope minimum untuk repository private/generic Git dan menegaskan bahwa kredensial dikelola oleh layanan server/Vault.
+- Tidak menjalankan migration ke Supabase target, tidak menambah secret/token, serta tidak melakukan commit atau push.
+- Verifikasi lulus: `npm run build` (667 modul; warning ukuran chunk existing) dan `git diff --check`. `graphify update .` sudah dijalankan, tetapi rebuild watch melaporkan `Operation not permitted`; artefak graph yang sebelumnya sudah dirty tidak dihapus atau dipulihkan.
+
 ## 2026-07-31 — REPO-02 domain, mapper, dan CRUD project repository links
 
 - Menambahkan domain `ProjectRepository` beserta union `ProjectRepositorySourceType` sesuai Section 10.1 `FEATURE_BACKLOG.md`.

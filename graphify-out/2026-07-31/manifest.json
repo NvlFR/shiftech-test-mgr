@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785535015.9012244,
-    "ast_hash": "c5ee514eac66356b45d6cc4ab43dcba5",
+    "mtime": 1785535261.0264058,
+    "ast_hash": "4406d0608fda0d473a2c0ca88044b4b9",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2732,6 +2732,16 @@
   "frontend/src/repositories/projectRepositoryLinkRepository.ts": {
     "mtime": 1785534972.2972403,
     "ast_hash": "8bb2b281b0bac6989a958b7c74223fad",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useProjectRepositories.ts": {
+    "mtime": 1785535215.9824567,
+    "ast_hash": "dbff100261e656df2f5a5758b5192e69",
+    "semantic_hash": ""
+  },
+  "frontend/src/services/projectRepositoryLinkService.ts": {
+    "mtime": 1785535215.8514657,
+    "ast_hash": "587ba563ad2caab70734638e667146a4",
     "semantic_hash": ""
   }
 }

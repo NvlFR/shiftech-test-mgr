@@ -13,6 +13,7 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { InputSwitch } from 'primereact/inputswitch';
 import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
@@ -25,10 +26,12 @@ import { environmentService } from '../../services/environmentService';
 import { testRoleService } from '../../services/testRoleService';
 import { useEnvironments } from '../../hooks/useEnvironments';
 import { useProjectRole } from '../../hooks/useProjectRole';
-import type { Project, Module, Tag as TagEntity, TestRole, Profile, ProjectMemberWithProfile, ProjectMemberRole, ProjectVisibility, Environment } from '../../types/domain';
+import { useProjectRepositories } from '../../hooks/useProjectRepositories';
+import type { Project, Module, Tag as TagEntity, TestRole, Profile, ProjectMemberWithProfile, ProjectMemberRole, ProjectVisibility, Environment, ProjectRepository, ProjectRepositorySourceType } from '../../types/domain';
 import { PROJECT_MEMBER_ROLE_LABEL } from '../../helpers/statusLabels';
 import { Tag } from 'primereact/tag';
 import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
+import { formatDateTime } from '../../helpers/dateFormatter';
 
 const MEMBER_ROLE_OPTIONS: { label: string; value: ProjectMemberRole }[] = [
   { label: PROJECT_MEMBER_ROLE_LABEL.member, value: 'member' },
@@ -43,12 +46,30 @@ const VISIBILITY_OPTIONS: { label: string; value: ProjectVisibility }[] = [
   { label: 'Public — dapat dilihat publik', value: 'public' },
 ];
 
+const REPOSITORY_SOURCE_OPTIONS: { label: string; value: ProjectRepositorySourceType }[] = [
+  { label: 'Local path', value: 'local_path' },
+  { label: 'GitHub public', value: 'github_public' },
+  { label: 'GitHub private', value: 'github_private' },
+  { label: 'Git URL', value: 'git_url' },
+];
+
+const REPOSITORY_SOURCE_LABEL: Record<ProjectRepositorySourceType, string> = Object.fromEntries(
+  REPOSITORY_SOURCE_OPTIONS.map((option) => [option.value, option.label]),
+) as Record<ProjectRepositorySourceType, string>;
+
 export function ProjectSettingsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const { loading: roleLoading, canManageSettings, canArchiveProject, canDeleteProject } = useProjectRole(id);
   const { environments, loading: environmentsLoading, reload: reloadEnvironments } = useEnvironments(id ?? null);
+  const {
+    repositories,
+    loading: repositoriesLoading,
+    create: createRepository,
+    update: updateRepository,
+    remove: removeRepository,
+  } = useProjectRepositories(id);
 
   const [project, setProject] = useState<Project | null>(null);
   const [editProjectDialogOpen, setEditProjectDialogOpen] = useState(false);
@@ -62,6 +83,89 @@ export function ProjectSettingsPage() {
   const [members, setMembers] = useState<ProjectMemberWithProfile[]>([]);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // --- Repositories ---
+  const [repositoryDialogOpen, setRepositoryDialogOpen] = useState(false);
+  const [editingRepositoryId, setEditingRepositoryId] = useState<string | null>(null);
+  const [repositoryName, setRepositoryName] = useState('');
+  const [repositorySourceType, setRepositorySourceType] = useState<ProjectRepositorySourceType>('github_public');
+  const [repositoryLocation, setRepositoryLocation] = useState('');
+  const [repositoryDefaultBranch, setRepositoryDefaultBranch] = useState('');
+  const [repositorySubdirectory, setRepositorySubdirectory] = useState('');
+  const [repositoryIsActive, setRepositoryIsActive] = useState(true);
+  const [repositoryError, setRepositoryError] = useState<string | null>(null);
+
+  function openCreateRepositoryDialog() {
+    setEditingRepositoryId(null);
+    setRepositoryName('');
+    setRepositorySourceType('github_public');
+    setRepositoryLocation('');
+    setRepositoryDefaultBranch('');
+    setRepositorySubdirectory('');
+    setRepositoryIsActive(true);
+    setRepositoryError(null);
+    setRepositoryDialogOpen(true);
+  }
+
+  function openEditRepositoryDialog(repository: ProjectRepository) {
+    setEditingRepositoryId(repository.id);
+    setRepositoryName(repository.name);
+    setRepositorySourceType(repository.sourceType);
+    setRepositoryLocation(repository.urlOrPath);
+    setRepositoryDefaultBranch(repository.defaultBranch ?? '');
+    setRepositorySubdirectory(repository.subdirectory ?? '');
+    setRepositoryIsActive(repository.isActive);
+    setRepositoryError(null);
+    setRepositoryDialogOpen(true);
+  }
+
+  async function handleSaveRepository() {
+    setRepositoryError(null);
+    const input = {
+      name: repositoryName,
+      sourceType: repositorySourceType,
+      urlOrPath: repositoryLocation,
+      defaultBranch: repositoryDefaultBranch || null,
+      subdirectory: repositorySubdirectory || null,
+      isActive: repositoryIsActive,
+    };
+
+    try {
+      if (editingRepositoryId) await updateRepository(editingRepositoryId, input);
+      else await createRepository(input);
+      setRepositoryDialogOpen(false);
+      toast.current?.show({ severity: 'success', summary: editingRepositoryId ? 'Repository diperbarui' : 'Repository ditambahkan' });
+    } catch (error) {
+      setRepositoryError(error instanceof Error ? error.message : 'Gagal menyimpan repository');
+    }
+  }
+
+  function handleDeleteRepository(repository: ProjectRepository) {
+    confirmDialog({
+      header: 'Hapus Repository',
+      message: `Repository "${repository.name}" akan dilepas dari project. Lanjutkan?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hapus',
+      rejectLabel: 'Batal',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        try {
+          await removeRepository(repository.id);
+          toast.current?.show({ severity: 'success', summary: 'Repository dihapus' });
+        } catch (error) {
+          toast.current?.show({ severity: 'error', summary: 'Gagal menghapus repository', detail: error instanceof Error ? error.message : undefined });
+        }
+      },
+    });
+  }
+
+  function handleTestRepositoryConnection(repository: ProjectRepository) {
+    toast.current?.show({
+      severity: 'info',
+      summary: 'Test Connection',
+      detail: `Pengujian koneksi ${repository.name} belum tersedia.`,
+    });
+  }
 
   async function loadAll(showLoading = true) {
     if (!id) return;
@@ -721,6 +825,48 @@ export function ProjectSettingsPage() {
             </DataTable>
           </TabPanel>
 
+          <TabPanel header="Repository">
+            <div className="flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+              <div>
+                <div className="font-medium">Repository source code</div>
+                <div className="text-color-secondary text-sm mt-1">
+                  Token disimpan di Vault dan nilainya tidak dapat dibaca ulang dari browser.
+                </div>
+              </div>
+              <Button label="Tambah Repository" icon="pi pi-plus" size="small" onClick={openCreateRepositoryDialog} />
+            </div>
+            <DataTable value={repositories} loading={repositoriesLoading} emptyMessage="Belum ada repository" size="small" paginator rows={10}>
+              <Column field="name" header="Nama" sortable />
+              <Column header="Sumber" body={(row: ProjectRepository) => REPOSITORY_SOURCE_LABEL[row.sourceType]} />
+              <Column field="urlOrPath" header="URL / Path" />
+              <Column header="Branch" body={(row: ProjectRepository) => row.defaultBranch ?? '-'} />
+              <Column
+                header="Kredensial"
+                body={(row: ProjectRepository) => row.credentialId ? (
+                  <div className="flex flex-column gap-1">
+                    <span className="font-monospace">ghp_••••••••</span>
+                    <small className="text-color-secondary">Dibuat: {formatDateTime(row.createdAt)}</small>
+                    <small className="text-color-secondary">Kedaluwarsa: -</small>
+                  </div>
+                ) : <span className="text-color-secondary">Tanpa token</span>}
+              />
+              <Column header="Status" body={(row: ProjectRepository) => <Tag value={row.isActive ? 'Aktif' : 'Nonaktif'} severity={row.isActive ? 'success' : 'secondary'} />} />
+              <Column
+                header=""
+                style={{ width: '12rem' }}
+                body={(row: ProjectRepository) => (
+                  <div className="flex gap-1 justify-content-end">
+                    <Button label="Test" icon="pi pi-bolt" text size="small" onClick={() => handleTestRepositoryConnection(row)} />
+                    <RowActionsMenu items={[
+                      { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditRepositoryDialog(row) },
+                      { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteRepository(row) },
+                    ]} />
+                  </div>
+                )}
+              />
+            </DataTable>
+          </TabPanel>
+
           <TabPanel header="Anggota Project">
             <p className="text-color-secondary text-sm mb-3">
               Hanya user yang terdaftar di sini (atau admin) yang bisa mengakses project ini. Manager bisa mengelola anggota lain.
@@ -860,6 +1006,47 @@ export function ProjectSettingsPage() {
             <InputText id="environment-base-url" value={environmentBaseUrl} onChange={(e) => setEnvironmentBaseUrl(e.target.value)} placeholder="https://staging.example.com" />
           </div>
           <Button label="Simpan" size="small" onClick={handleSaveEnvironment} />
+        </div>
+      </Dialog>
+
+      <Dialog
+        header={editingRepositoryId ? 'Edit Repository' : 'Tambah Repository'}
+        visible={repositoryDialogOpen}
+        onHide={() => setRepositoryDialogOpen(false)}
+        style={{ width: '34rem' }}
+      >
+        <div className="flex flex-column gap-3">
+          {repositoryError && <small className="p-error">{repositoryError}</small>}
+          <div className="flex flex-column gap-1">
+            <label htmlFor="repository-name">Nama</label>
+            <InputText id="repository-name" value={repositoryName} onChange={(event) => setRepositoryName(event.target.value)} autoFocus placeholder="Frontend, Backend, E2E" />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="repository-source">Tipe sumber</label>
+            <Dropdown inputId="repository-source" value={repositorySourceType} options={REPOSITORY_SOURCE_OPTIONS} onChange={(event) => setRepositorySourceType(event.value)} className="w-full" />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="repository-location">{repositorySourceType === 'local_path' ? 'Path absolut' : 'URL repository'}</label>
+            <InputText id="repository-location" value={repositoryLocation} onChange={(event) => setRepositoryLocation(event.target.value)} placeholder={repositorySourceType === 'local_path' ? '/home/tester/app' : 'https://github.com/org/repository'} />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="repository-branch">Default branch (opsional)</label>
+            <InputText id="repository-branch" value={repositoryDefaultBranch} onChange={(event) => setRepositoryDefaultBranch(event.target.value)} placeholder="main" />
+          </div>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="repository-subdirectory">Subdirectory (opsional)</label>
+            <InputText id="repository-subdirectory" value={repositorySubdirectory} onChange={(event) => setRepositorySubdirectory(event.target.value)} placeholder="frontend" />
+          </div>
+          <div className="flex align-items-center gap-2">
+            <InputSwitch inputId="repository-active" checked={repositoryIsActive} onChange={(event) => setRepositoryIsActive(Boolean(event.value))} />
+            <label htmlFor="repository-active">Repository aktif</label>
+          </div>
+          {(repositorySourceType === 'github_private' || repositorySourceType === 'git_url') && (
+            <small className="text-color-secondary">
+              Kredensial dikelola oleh layanan server dan tidak pernah dikirim kembali ke browser. Gunakan token dengan scope minimum.
+            </small>
+          )}
+          <Button label="Simpan" icon="pi pi-save" size="small" onClick={() => void handleSaveRepository()} />
         </div>
       </Dialog>
 
