@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785537374.240175,
-    "ast_hash": "eb61800211a79221ad24a4ad76ab6c96",
+    "mtime": 1785537736.5117807,
+    "ast_hash": "040f08233188433d5ed2affbe96ec049",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2817,6 +2817,31 @@
   "supabase/schema_046_runner_repository_scripts.sql": {
     "mtime": 1785537353.986754,
     "ast_hash": "9224efbc6c3ee539fb9777ad7e7c0863",
+    "semantic_hash": ""
+  },
+  "mcp/package.json": {
+    "mtime": 1785537535.6205785,
+    "ast_hash": "c18c600ca06817545cfd300ba95ce632",
+    "semantic_hash": ""
+  },
+  "mcp/src/config.ts": {
+    "mtime": 1785537535.9695685,
+    "ast_hash": "d46b764088ddde3fe40f9aeff8e73f58",
+    "semantic_hash": ""
+  },
+  "mcp/src/index.ts": {
+    "mtime": 1785537690.4333398,
+    "ast_hash": "c8d45ad606a59c603292b81940d31bf6",
+    "semantic_hash": ""
+  },
+  "mcp/tsconfig.json": {
+    "mtime": 1785537535.7525747,
+    "ast_hash": "974369eb2cfb0a6f23c8b0de6f0c2a84",
+    "semantic_hash": ""
+  },
+  "mcp/README.md": {
+    "mtime": 1785537536.6145504,
+    "ast_hash": "ec064bba1fe648f2682f44c37cfb1991",
     "semantic_hash": ""
   }
 }

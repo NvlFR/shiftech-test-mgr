@@ -2,8 +2,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { loadConfig } from "./config.js";
+import { AuthRepository } from "./repositories/authRepository.js";
+import { AuthService } from "./services/authService.js";
 
 const config = loadConfig();
+const authService = new AuthService(config, new AuthRepository(config));
+const session = await authService.createSession();
 
 const server = new McpServer({
   name: "testmanager",
@@ -20,7 +24,8 @@ const shutdown = async (): Promise<void> => {
 process.once("SIGINT", () => void shutdown());
 process.once("SIGTERM", () => void shutdown());
 
-// Config is loaded at startup so future tools share one project-scoped session.
-void config;
+// Future tools must receive this single authenticated, project-scoped session
+// and call assertToolArguments before invoking their service layer.
+void session;
 
 await server.connect(transport);

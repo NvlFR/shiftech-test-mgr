@@ -168,13 +168,10 @@
   "166": "2026-07-31 — SRC-04 penyelesaian notification center",
   "167": "UserDetailPage.tsx",
   "168": "react-dom",
-  "169": "react-hook-form",
+  "169": "NotificationPanel.tsx",
   "170": "schema_045_test_run_repository_traceability.sql",
-  "171": "react-router-dom",
+  "171": "schema_047_mcp_auth.sql",
   "172": "schema_042_issue_attachment_storage_cleanup.sql",
-  "173": "@supabase/supabase-js",
   "174": "schema_046_runner_repository_scripts.sql",
-  "175": "AppMenu.tsx",
-  "176": "TestManager MCP Server",
-  "177": "primereact"
+  "176": "TestManager MCP Server"
 }

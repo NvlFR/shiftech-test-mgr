@@ -1461,3 +1461,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan `.env.example`, proteksi ignore untuk file env/build/dependency, dan README setup/operasional tanpa menyimpan secret nyata.
 - Verifikasi lulus: `cd mcp && npm run build`, smoke test handshake JSON-RPC melalui stdio, audit otomatis saat `npm install` (0 vulnerability), dan `git diff --check`. Percobaan ulang `npm audit` setelahnya tidak mendapat respons registry karena DNS sementara (`EAI_AGAIN`); tidak memengaruhi hasil audit instalasi awal.
 - Tidak menjalankan migration atau mengakses Supabase target, tidak menambah tool MCP, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-02 autentikasi dan project scoping MCP
+
+- Menjalankan `graphify query` sebelum menelusuri Section 8.1, scaffold MCP, dan skema API token P2.
+- Menambahkan RPC `authenticate_mcp_api_token` pada migration baru `schema_047_mcp_auth.sql`; RPC security-definer mencocokkan SHA-256 token aktif dan hanya mengembalikan ID token, `project_id`, serta scopes. Migration tidak dijalankan ke target Supabase.
+- Menambahkan lapisan MCP `AuthRepository → AuthService → ProjectSession`: token hanya dibaca dari `TM_API_TOKEN`, dikirim di body autentikasi internal, tidak menjadi argumen tool/URL/log, dan error upstream tidak diteruskan.
+- Startup server sekarang wajib mengautentikasi token dan menolak sesi jika project token berbeda dari `TM_PROJECT_ID`. Guard project juga menolak referensi `project_id`/`projectId` lintas project termasuk yang bersarang sebelum handler tool meneruskan operasi ke service/repository.
+- Menambahkan contract test untuk sesi valid, penolakan token lintas project, penolakan argumen tool lintas project, dan redaksi kegagalan autentikasi.
+- Verifikasi lulus: `cd mcp && npm test` (build TypeScript + test), `git diff --check`, dan pemeriksaan source untuk memastikan credential tidak masuk URL/error. Tidak mengakses Supabase target, tidak commit, dan tidak push.

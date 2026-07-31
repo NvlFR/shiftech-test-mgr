@@ -1,7 +1,8 @@
 # TestManager MCP Server
 
 Fondasi MCP server TestManager berbasis Node.js 20+, TypeScript, dan transport
-stdio. Versi ini hanya menyediakan handshake MCP dan belum mendaftarkan tool.
+stdio. Server mengautentikasi API token saat startup dan hanya membuka sesi jika
+token aktif terikat ke `TM_PROJECT_ID`. Versi ini belum mendaftarkan tool.
 
 ## Persyaratan
 
@@ -42,3 +43,10 @@ node --env-file=.env dist/index.js
 
 Server berkomunikasi melalui stdin/stdout. Jangan menulis log biasa ke stdout
 karena dapat merusak frame protokol MCP.
+
+Token hanya dibaca dari `TM_API_TOKEN`, tidak menjadi argumen tool. Setiap tool
+yang ditambahkan wajib memakai `ProjectSession.assertToolArguments()` dan query
+repository yang dibatasi `ProjectSession.projectId`; RLS tetap menjadi batas
+keamanan terakhir. Jalankan `supabase/schema_047_mcp_auth.sql` setelah
+`supabase/schema_025_fix_pgcrypto_and_audit.sql` melalui proses
+migration proyek sebelum mengoperasikan server (jangan memasukkan token ke SQL).

@@ -32,7 +32,7 @@ const parseReadonly = (value: string | undefined): boolean => {
 };
 
 export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ServerConfig => ({
-  supabaseUrl: requiredEnv(env, "TM_SUPABASE_URL"),
+  supabaseUrl: requiredEnv(env, "TM_SUPABASE_URL").replace(/\/+$/, ""),
   supabaseAnonKey: requiredEnv(env, "TM_SUPABASE_ANON_KEY"),
   apiToken: requiredEnv(env, "TM_API_TOKEN"),
   projectId: requiredEnv(env, "TM_PROJECT_ID"),
