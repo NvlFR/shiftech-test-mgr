@@ -1032,3 +1032,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menandai SRC-01 selesai di `FEATURE_BACKLOG.md`; tidak menjalankan migration, commit, push, atau perubahan di luar scope.
 - Verifikasi: `npm run build` lulus (warning ukuran chunk existing) dan `git diff --check` lulus sebelum sinkronisasi graph akhir.
 - Verifikasi akhir: `npm run build` lulus, `npm run lint` lulus dengan 7 warning existing, dan `graphify update .` berhasil memperbarui graph menjadi 1.798 node/3.602 edge (warning 7 file konfigurasi/non-source menghasilkan zero node).
+
+## 2026-07-31 — SRC-02 integrasi komponen Issue
+
+- Menjalankan `graphify query` sebelum memetakan `IssueEditor`, halaman detail, domain, mapper, issue service/repository, comments, attachment, dan relasi Test Result sesuai FEATURE_BACKLOG Section 7.
+- Mengaktifkan `IssueEditor` sebagai editor metadata pada `IssueDetailPage` untuk tipe, prioritas, status, assignee, target role, deskripsi, actual/expected result, dan external links. Komponen dibuat presentational; pemuatan test role dan project member berjalan melalui `useIssueEditorOptions` → service → repository.
+- Mempertahankan model lokal Issue yang terhubung langsung ke satu `test_result_id`; Test Case dan Test Run tertaut tetap ditampilkan pada detail tanpa memperkenalkan junction source-new. Flow pembuatan Issue dari hasil FAIL, comments, attachment lokal, archive/delete, dan transisi status tetap dipertahankan.
+- Menambahkan migration aditif `schema_039_issue_editor_metadata.sql` untuk kolom `issues.type` dan `issues.external_links`; migration tidak dijalankan ke Supabase target. Repository dan service diperluas untuk menyimpan metadata tersebut serta `target_role_id` melalui mapper aktif.
+- Menandai SRC-02 selesai di `FEATURE_BACKLOG.md`.
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing di luar scope, `npm test -- --run` lulus (4 test), dan `git diff --check` lulus.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.802 node dan 3.600 edge; Graphify memberi warning 7 file konfigurasi/non-source menghasilkan zero node.

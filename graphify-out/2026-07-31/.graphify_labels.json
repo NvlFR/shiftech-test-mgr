@@ -137,7 +137,6 @@
   "135": "schema_issue_attachments.sql",
   "136": "CLAUDE.md",
   "137": "extraction-spec.md",
-  "138": "remark-gfm",
   "139": "@supabase/supabase-js",
   "140": ".mcp.json",
   "141": "schema_025_fix_pgcrypto_and_audit.sql",
@@ -155,6 +154,5 @@
   "153": "schema_026_automation_artifacts_storage.sql",
   "154": "schema_027_fix_attachment_helper_grants.sql",
   "155": "schema_037_invited_project_metadata_access.sql",
-  "156": "seed.sql",
-  "157": "@tanstack/react-query"
+  "156": "seed.sql"
 }

@@ -1,6 +1,6 @@
 import { issueRepository } from '../repositories/issueRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
-import type { Issue, IssuePriority } from '../types/domain';
+import type { ExternalLink, Issue, IssuePriority, IssueType } from '../types/domain';
 
 export const issueService = {
   getById(id: string) {
@@ -47,7 +47,7 @@ export const issueService = {
 
   update(
     id: string,
-    input: { title: string; description?: string; actualResult?: string; expectedResult?: string; priority: IssuePriority },
+    input: { title: string; description?: string; actualResult?: string; expectedResult?: string; priority: IssuePriority; type?: IssueType; targetRoleId?: string | null; externalLinks?: ExternalLink[] },
   ) {
     if (!input.title.trim()) throw new Error('Judul issue tidak boleh kosong');
     return issueRepository.update(id, {
@@ -56,6 +56,9 @@ export const issueService = {
       actualResult: input.actualResult?.trim() || null,
       expectedResult: input.expectedResult?.trim() || null,
       priority: input.priority,
+      type: input.type,
+      targetRoleId: input.targetRoleId,
+      externalLinks: input.externalLinks?.filter((link) => link.url.trim()).map((link) => ({ label: link.label.trim(), url: link.url.trim() })),
     } satisfies Partial<Issue>);
   },
 

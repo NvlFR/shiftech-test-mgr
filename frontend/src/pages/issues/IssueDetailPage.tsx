@@ -4,9 +4,6 @@ import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { issueService } from '../../services/issueService';
@@ -18,8 +15,10 @@ import { useProjectRole } from '../../hooks/useProjectRole';
 import { useAuthContext } from '../../hooks/useAuth';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { CommentsPanel } from '../../components/ui/CommentsPanel';
+import { IssueEditor, type IssueFormData } from '../../components/issues/IssueEditor';
+import { useIssueEditorOptions } from '../../hooks/useIssueEditorOptions';
 import type { BreadcrumbItem } from '../../components/ui/Breadcrumb';
-import type { IssuePriority, IssueStatus, IssueWithDetails, Profile } from '../../types/domain';
+import type { IssueStatus, IssueWithDetails, Profile } from '../../types/domain';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
   ISSUE_PRIORITY_LABEL,
@@ -34,10 +33,6 @@ import {
 const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
   ['backlog', 'open', 'in_progress', 'resolved', 'verified', 'closed', 'rejected', 'duplicate'] as const
 ).map((v) => ({ label: ISSUE_STATUS_LABEL[v], value: v }));
-
-const PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (
-  ['low', 'medium', 'high', 'critical'] as const
-).map((v) => ({ label: ISSUE_PRIORITY_LABEL[v], value: v }));
 
 type IssueDetail = IssueWithDetails & { projectId: string | null };
 
@@ -58,6 +53,7 @@ export function IssueDetailPage() {
   const [attachmentsLoading, setAttachmentsLoading] = useState(false);
   const [attachmentUploading, setAttachmentUploading] = useState(false);
   const { canManageIssues, canDeleteContent } = useProjectRole(issue?.projectId ?? undefined);
+  const { testRoles, projectMembers } = useIssueEditorOptions(issue?.projectId ?? null);
 
   async function reload() {
     if (!id) return;
@@ -106,41 +102,20 @@ export function IssueDetailPage() {
 
   // --- Edit dialog ---
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editActual, setEditActual] = useState('');
-  const [editExpected, setEditExpected] = useState('');
-  const [editPriority, setEditPriority] = useState<IssuePriority>('medium');
-  const [editError, setEditError] = useState<string | null>(null);
 
   function openEditDialog() {
     if (!issue) return;
-    setEditTitle(issue.title);
-    setEditDescription(issue.description ?? '');
-    setEditActual(issue.actualResult ?? '');
-    setEditExpected(issue.expectedResult ?? '');
-    setEditPriority(issue.priority);
-    setEditError(null);
     setEditDialogOpen(true);
   }
 
-  async function handleSaveEdit() {
+  async function handleSaveEdit(data: IssueFormData) {
     if (!issue) return;
-    setEditError(null);
-    try {
-      await issueService.update(issue.id, {
-        title: editTitle,
-        description: editDescription,
-        actualResult: editActual,
-        expectedResult: editExpected,
-        priority: editPriority,
-      });
-      setEditDialogOpen(false);
-      await reload();
-      toast.current?.show({ severity: 'success', summary: 'Issue diperbarui' });
-    } catch (err) {
-      setEditError(err instanceof Error ? err.message : 'Gagal menyimpan issue');
-    }
+    await issueService.update(issue.id, data);
+    if (data.status !== issue.status) await issueService.changeStatus(issue.id, data.status);
+    if (data.assignedTo !== issue.assignedTo) await issueService.assign(issue.id, data.assignedTo);
+    setEditDialogOpen(false);
+    await reload();
+    toast.current?.show({ severity: 'success', summary: 'Issue diperbarui' });
   }
 
   async function handleChangeStatus(status: IssueStatus) {
@@ -309,6 +284,9 @@ export function IssueDetailPage() {
               <span className="text-color">-</span>
             )}
           </span>
+          <span className="text-color-secondary">
+            Target Role: <span className="text-color">{issue.targetRole?.name ?? '-'}</span>
+          </span>
           <span className="text-color-secondary">Dibuat: <span className="text-color">{formatDateTime(issue.createdAt)}</span></span>
           <span className="text-color-secondary">Update Terakhir: <span className="text-color">{formatDateTime(issue.updatedAt)}</span></span>
         </div>
@@ -427,33 +405,25 @@ export function IssueDetailPage() {
         )}
       </Card>
 
-      {/* --- Edit Dialog --- */}
-      <Dialog header="Edit Issue" visible={editDialogOpen} onHide={() => setEditDialogOpen(false)} style={{ width: '32rem' }}>
-        <div className="flex flex-column gap-3">
-          {editError && <small className="p-error">{editError}</small>}
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-edit-title">Judul</label>
-            <InputText id="issue-edit-title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} autoFocus />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-edit-priority">Prioritas</label>
-            <Dropdown id="issue-edit-priority" value={editPriority} options={PRIORITY_OPTIONS} onChange={(e) => setEditPriority(e.value)} className="w-full" />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-edit-description">Deskripsi</label>
-            <InputTextarea id="issue-edit-description" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} rows={2} />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-edit-actual">Hasil Aktual</label>
-            <InputTextarea id="issue-edit-actual" value={editActual} onChange={(e) => setEditActual(e.target.value)} rows={2} />
-          </div>
-          <div className="flex flex-column gap-1">
-            <label htmlFor="issue-edit-expected">Hasil yang Diharapkan</label>
-            <InputTextarea id="issue-edit-expected" value={editExpected} onChange={(e) => setEditExpected(e.target.value)} rows={2} />
-          </div>
-          <Button label="Simpan" size="small" onClick={handleSaveEdit} />
-        </div>
-      </Dialog>
+      <IssueEditor
+        visible={editDialogOpen}
+        onHide={() => setEditDialogOpen(false)}
+        onSave={handleSaveEdit}
+        testRoles={testRoles}
+        projectMembers={projectMembers}
+        initialData={{
+          title: issue.title,
+          type: issue.type ?? 'bug',
+          priority: issue.priority,
+          status: issue.status,
+          assignedTo: issue.assignedTo,
+          targetRoleId: issue.targetRoleId ?? null,
+          description: issue.description ?? '',
+          actualResult: issue.actualResult ?? '',
+          expectedResult: issue.expectedResult ?? '',
+          externalLinks: issue.externalLinks ?? [],
+        }}
+      />
     </div>
   );
 }

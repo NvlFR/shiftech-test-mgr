@@ -230,9 +230,9 @@
     "semantic_hash": "255422a622173686dec41fab59f56102"
   },
   "frontend/src/pages/projects/ProjectDetailPage.tsx": {
-    "mtime": 1785527099.085705,
-    "ast_hash": "d4152765b76f473449b731752a63ac47",
-    "semantic_hash": "d4152765b76f473449b731752a63ac47"
+    "mtime": 1785531226.188153,
+    "ast_hash": "eb41e416178fb7c1ae3e548eeef23594",
+    "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectSettingsPage.tsx": {
     "mtime": 1785518642.1829817,
@@ -255,9 +255,9 @@
     "semantic_hash": "048771d2eb4690363900642704a91ff9"
   },
   "frontend/src/pages/test-plans/TestPlanDetailPage.tsx": {
-    "mtime": 1785521379.236871,
-    "ast_hash": "0741a0e94e3cd4846f0413ef2f873288",
-    "semantic_hash": "0741a0e94e3cd4846f0413ef2f873288"
+    "mtime": 1785531226.3201532,
+    "ast_hash": "89e38030752461d27d082491a62d7e00",
+    "semantic_hash": ""
   },
   "frontend/src/pages/test-plans/TestPlansPage.tsx": {
     "mtime": 1785521377.066891,
@@ -265,9 +265,9 @@
     "semantic_hash": "1d3d6735070cc76495f721ffb4bbbc61"
   },
   "frontend/src/pages/test-runs/TestRunDetailPage.tsx": {
-    "mtime": 1785523502.0429213,
-    "ast_hash": "ed2ad46aa8d5fa589a3953361fe5ab92",
-    "semantic_hash": "ed2ad46aa8d5fa589a3953361fe5ab92"
+    "mtime": 1785531235.1231604,
+    "ast_hash": "99d4af2fafd82c65d8f5277e0d97e57a",
+    "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestRunIssuesPage.tsx": {
     "mtime": 1785523566.812747,
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785530840.957925,
-    "ast_hash": "785ac42a02f3755bb7c797a2d62bb463",
+    "mtime": 1785531249.9281726,
+    "ast_hash": "7627ed7c9e5616f9e9e6da9bbdb3ddac",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785530881.1479387,
-    "ast_hash": "4261f03939725a90bceeb8ffacce6679",
+    "mtime": 1785531281.9842,
+    "ast_hash": "003147b731ee74a81a92c1aada027f85",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1340,14 +1340,14 @@
     "semantic_hash": ""
   },
   "frontend/src/components/dialogs/TestPlanDialog.tsx": {
-    "mtime": 1785517255.659984,
-    "ast_hash": "23ea68347aaaa4e8b0ded98f3057ee6d",
-    "semantic_hash": "23ea68347aaaa4e8b0ded98f3057ee6d"
+    "mtime": 1785531069.7470374,
+    "ast_hash": "4c373ab57a798d75c701f8d3abb001e5",
+    "semantic_hash": ""
   },
   "frontend/src/components/dialogs/TestSuiteDialog.tsx": {
-    "mtime": 1785517255.662487,
-    "ast_hash": "00052e994b47b8cb2a0bb9a6bdd42078",
-    "semantic_hash": "00052e994b47b8cb2a0bb9a6bdd42078"
+    "mtime": 1785531069.8780375,
+    "ast_hash": "2ff41383a314578ce5f0f87a96b19d2a",
+    "semantic_hash": ""
   },
   "frontend/src/components/issues/IssueEditor.tsx": {
     "mtime": 1785517276.060906,
@@ -2585,9 +2585,9 @@
     "semantic_hash": "35fa6ccaf2275ae9e5d5e75507ec30f5"
   },
   "frontend/src/components/dialogs/CustomTestRunDialog.tsx": {
-    "mtime": 1785521494.122917,
-    "ast_hash": "5665e86020899e4460c3a0d35a7be820",
-    "semantic_hash": "5665e86020899e4460c3a0d35a7be820"
+    "mtime": 1785531070.0080376,
+    "ast_hash": "1c0884629164be18ab076c9bde6d959c",
+    "semantic_hash": ""
   },
   "supabase/schema_038_test_suite_structured_metadata.sql": {
     "mtime": 1785522665.6870778,
@@ -2600,9 +2600,9 @@
     "semantic_hash": "c15b3742e7075506be504424adfee88f"
   },
   "frontend/src/components/dialogs/ImportCasesDialog.tsx": {
-    "mtime": 1785526877.7921925,
-    "ast_hash": "1be65ce2cb02d5881c7196579c67e746",
-    "semantic_hash": "1be65ce2cb02d5881c7196579c67e746"
+    "mtime": 1785531208.761139,
+    "ast_hash": "40658551ad01e4fd77e4b3e7c7d50035",
+    "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectTestCaseTab.tsx": {
     "mtime": 1785527024.5845244,
@@ -2682,6 +2682,11 @@
   "frontend/src/hooks/useProfile.ts": {
     "mtime": 1785530840.551925,
     "ast_hash": "647faf1fbdf8d56122bf5a0fa8118fee",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/dialogs/IssueDialog.tsx": {
+    "mtime": 1785531184.2591195,
+    "ast_hash": "fd24e05874c904c90ea4a48aca785f73",
     "semantic_hash": ""
   }
 }

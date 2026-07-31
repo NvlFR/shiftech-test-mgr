@@ -273,7 +273,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   Plan, Test Suite, Custom Test Run, Issue, import, dan attachment memakai
   service lokal, validasi error, loading state, dan callback yang konsisten.
 
-- [ ] **SRC-02 — `components/issues`**
+- [x] **SRC-02 — `components/issues`**
   Integrasikan IssueEditor, issue metadata, linked test result, target role,
   external links, comments, attachment, dan status transition tanpa merusak
   flow Issue lokal.

@@ -61,7 +61,7 @@ export const issueRepository = {
 
   async update(
     id: string,
-    changes: Partial<Pick<Issue, 'title' | 'description' | 'actualResult' | 'expectedResult' | 'priority'>>,
+    changes: Partial<Pick<Issue, 'title' | 'description' | 'actualResult' | 'expectedResult' | 'priority' | 'type' | 'targetRoleId' | 'externalLinks'>>,
   ): Promise<Issue> {
     const payload: Record<string, unknown> = {};
     if (changes.title !== undefined) payload.title = changes.title;
@@ -69,6 +69,9 @@ export const issueRepository = {
     if (changes.actualResult !== undefined) payload.actual_result = changes.actualResult;
     if (changes.expectedResult !== undefined) payload.expected_result = changes.expectedResult;
     if (changes.priority !== undefined) payload.priority = changes.priority;
+    if (changes.type !== undefined) payload.type = changes.type;
+    if (changes.targetRoleId !== undefined) payload.target_role_id = changes.targetRoleId;
+    if (changes.externalLinks !== undefined) payload.external_links = changes.externalLinks;
 
     const { data, error } = await supabase.from('issues').update(payload).eq('id', id).select('*').single();
     if (error) throw error;
