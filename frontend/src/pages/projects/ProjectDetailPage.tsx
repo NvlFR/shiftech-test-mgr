@@ -33,8 +33,7 @@ import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { parseTestCaseExcel, type ImportedTestCaseRow } from '../../helpers/testCaseExcel';
-import { downloadTestCaseImportTemplate, exportTestCasesToExcel } from '../../helpers/excelExporter';
-import { exportTestCasesToPdf } from '../../helpers/pdfExporter';
+import { downloadTestCaseImportTemplate } from '../../helpers/excelExporter';
 import type {
   Project,
   TestPlan,
@@ -42,7 +41,6 @@ import type {
   TestCase,
   TestCaseWithDetails,
   TestCasePriority,
-  TestCaseStatus,
   TestRun,
   TestRunStatus,
   IssueWithDetails,
@@ -57,10 +55,6 @@ import {
   PROJECT_STATUS_LABEL,
   PROJECT_STATUS_SEVERITY,
   TEST_CASE_PRIORITY_LABEL,
-  TEST_CASE_PRIORITY_SEVERITY,
-  TEST_CASE_STATUS_LABEL,
-  TEST_CASE_STATUS_SEVERITY,
-  TEST_PLAN_STATUS_LABEL,
   TEST_RUN_STATUS_LABEL,
   TEST_RUN_STATUS_SEVERITY,
   TEST_RESULT_STATUS_SEVERITY,
@@ -75,10 +69,6 @@ const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
   { label: TEST_CASE_PRIORITY_LABEL.high, value: 'high' },
   { label: TEST_CASE_PRIORITY_LABEL.critical, value: 'critical' },
 ];
-
-const TEST_CASE_STATUS_OPTIONS: { label: string; value: TestCaseStatus }[] = (
-  ['active', 'archived'] as const
-).map((v) => ({ label: TEST_CASE_STATUS_LABEL[v], value: v }));
 
 const TEST_RUN_STATUS_OPTIONS: { label: string; value: TestRunStatus }[] = (
   ['in_progress', 'completed'] as const
@@ -428,27 +418,8 @@ export function ProjectDetailPage() {
   const [libraryImportOpen, setLibraryImportOpen] = useState(false);
   const [libraryImporting, setLibraryImporting] = useState(false);
 
-  // Test Cases: search/filter/sort/selection
-  const [caseSearch, setCaseSearch] = useState('');
-  const [caseStatusFilter, setCaseStatusFilter] = useState<TestCaseStatus | null>(null);
-  const [casePriorityFilter, setCasePriorityFilter] = useState<TestCasePriority | null>(null);
-  const [caseModuleFilter, setCaseModuleFilter] = useState<string | null>(null);
-  const [caseTagFilter, setCaseTagFilter] = useState<string | null>(null);
-  const [caseSortField, setCaseSortField] = useState('code');
-  const [caseSortOrder, setCaseSortOrder] = useState<1 | -1>(1);
+  // Test Cases: selection
   const [selectedCases, setSelectedCases] = useState<TestCaseWithDetails[]>([]);
-
-  const filteredCases = useMemo(() => {
-    const q = caseSearch.trim().toLowerCase();
-    return testCases.filter((c) => {
-      if (caseStatusFilter && c.status !== caseStatusFilter) return false;
-      if (casePriorityFilter && c.priority !== casePriorityFilter) return false;
-      if (caseModuleFilter && c.moduleId !== caseModuleFilter) return false;
-      if (caseTagFilter && !c.tags.some((t) => t.id === caseTagFilter)) return false;
-      if (q && !c.title.toLowerCase().includes(q) && !c.code.toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [testCases, caseSearch, caseStatusFilter, casePriorityFilter, caseModuleFilter, caseTagFilter]);
 
   function openCreateCaseDialog() {
     setEditingCaseId(null);
@@ -821,7 +792,6 @@ export function ProjectDetailPage() {
             <ProjectTestPlanTab
               plans={filteredPlans}
               loading={tabLoading[0]}
-              projectId={id}
               isMobile={false}
               search={planSearch}
               onSearchChange={setPlanSearch}
@@ -846,7 +816,7 @@ export function ProjectDetailPage() {
             <input ref={importFileRef} type="file" accept=".xlsx,.xls" onChange={handleImportFile} hidden />
             <ProjectTestCaseTab
               project={project}
-              cases={filteredCases}
+              cases={testCases}
               loading={tabLoading[1]}
               canEditContent={canEditContent}
               canDeleteContent={canDeleteContent}

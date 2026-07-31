@@ -71,7 +71,7 @@ export function NotificationPanel({
               className={classNames(
                 'flex align-items-start gap-2 p-2 border-round transition-colors',
                 {
-                  'surface-ground': !n.isRead,
+                  'surface-ground': !n.readAt,
                   'hover:surface-hover': true,
                 }
               )}
@@ -80,7 +80,7 @@ export function NotificationPanel({
                 className="flex align-items-start gap-2 flex-1 cursor-pointer"
                 style={{ minWidth: 0 }}
                 onClick={() => {
-                  if (!n.isRead) onMarkRead(n.id);
+                  if (!n.readAt) onMarkRead(n.id);
                   onNotificationClick?.(n);
                 }}
               >

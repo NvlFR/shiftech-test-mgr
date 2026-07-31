@@ -5,7 +5,6 @@ import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
-import { MultiSelect } from 'primereact/multiselect';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { RowActionsMenu } from '../../components/ui/RowActionsMenu';

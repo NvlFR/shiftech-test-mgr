@@ -5,8 +5,8 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import { useAuthContext } from '../../hooks/useAuth';
-import { projectRepository } from '../../repositories/projectRepository';
-import { testCaseRepository } from '../../repositories/testCaseRepository';
+import { projectService } from '../../services/projectService';
+import { testCaseService } from '../../services/testCaseService';
 import type { Project, TestCase } from '../../types/domain';
 
 type ImportCasesDialogProps = {
@@ -18,7 +18,7 @@ type ImportCasesDialogProps = {
 };
 
 export function ImportCasesDialog({ visible, onHide, loading = false, excludeProjectId, onImport }: ImportCasesDialogProps) {
-  const { user } = useAuthContext();
+  const { profile } = useAuthContext();
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [cases, setCases] = useState<TestCase[]>([]);
@@ -27,12 +27,13 @@ export function ImportCasesDialog({ visible, onHide, loading = false, excludePro
   const [loadingCases, setLoadingCases] = useState(false);
 
   useEffect(() => {
-    if (!visible || !user) return;
+    if (!visible || !profile) return;
     setLoadingProjects(true);
-    projectRepository.findByOwner(user.id)
-      .then((rows) => setProjects(rows.filter((project) => project.id !== excludeProjectId)))
+    // RLS sudah membatasi project yang boleh diakses user ini.
+    projectService.list({ status: 'active' })
+      .then((rows: Project[]) => setProjects(rows.filter((project) => project.id !== excludeProjectId)))
       .finally(() => setLoadingProjects(false));
-  }, [visible, user, excludeProjectId]);
+  }, [visible, profile, excludeProjectId]);
 
   async function selectProject(value: string | null) {
     setProjectId(value);
@@ -40,8 +41,8 @@ export function ImportCasesDialog({ visible, onHide, loading = false, excludePro
     if (!value) { setCases([]); return; }
     setLoadingCases(true);
     try {
-      const rows = await testCaseRepository.findAllByProject(value);
-      setCases(rows.filter((testCase) => testCase.status === 'active'));
+      const rows = await testCaseService.listFiltered(value, { status: 'active' });
+      setCases(rows);
     } finally {
       setLoadingCases(false);
     }

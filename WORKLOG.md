@@ -4,6 +4,49 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### Build hijau kembali + perbaikan desain gate codex-loop
+
+Menjalankan loop pertama kali mengungkap satu cacat desain driver dan 30 error
+TypeScript sisa porting source-new. Keduanya diperbaiki.
+
+**30 error TypeScript diperbaiki (tsc nol error, `npm run build` hijau):**
+
+- `components/dialogs/ImportCasesDialog.tsx` — memakai `useAuthContext().user`
+  yang tidak ada (kontrak lokal: `profile`), dan `projectRepository.findByOwner`
+  yang tidak pernah ada. Diganti ke `profile` + `projectService.list()` dan
+  `testCaseService.listFiltered()`. Sekaligus memperbaiki pelanggaran layering:
+  component sebelumnya memanggil repository langsung, sekarang lewat service.
+- `components/notifications/NotificationPanel.tsx` — memakai `n.isRead`; domain
+  lokal memakai `readAt: string | null`. Diganti ke `n.readAt`.
+- `helpers/statusLabels.ts` — menambah `PROJECT_VISIBILITY_LABEL/SEVERITY` dan
+  `TEST_SUITE_VISIBILITY_LABEL/SEVERITY` yang diimpor `ProfileView` tapi belum ada.
+- `pages/projects/ProjectTestPlanTab.tsx` — `changeStatus` dipanggil 3 argumen
+  (service hanya menerima 2); `selectionMode` bertipe `undefined` padahal
+  PrimeReact menuntut `null`; event `onSelectionChange` implicit any. Prop
+  `projectId` yang jadi tidak terpakai dihapus dari interface dan call site.
+- `pages/projects/ProjectTestCaseTab.tsx` — import `MultiSelect` tidak terpakai.
+- `pages/projects/ProjectDetailPage.tsx` — state filter duplikat dan import tidak
+  terpakai; sudah dibereskan Codex pada task #2 sebelum loop dihentikan.
+  Filter memang milik `ProjectTestCaseTab` yang punya state sendiri, jadi
+  penghapusan di parent benar, bukan kehilangan fitur.
+
+**Cacat desain gate driver:**
+
+- Gejala: task `FIX-00a` menyelesaikan pekerjaannya dengan benar (duplicate
+  identifier di `domain.ts` hilang) tapi dilabeli `blocked`, karena gate lama
+  `npm run build` menilai SELURUH repo sementara scope task cuma satu file.
+  30 error di file lain membuat build tetap merah. Task benar, gate salah nilai.
+- Perbaikan: gate sekarang menilai **pergerakan** jumlah error TypeScript, dengan
+  baseline diukur SEBELUM Codex jalan. Error naik → regresi, ditolak. Error jadi
+  nol → dikonfirmasi `npm run build`. Error berkurang/tetap → diterima, sisa
+  error dilaporkan. Env: `CODEX_LOOP_GATE_TSC`, `CODEX_LOOP_GATE_BUILD`.
+- Konsekuensi yang diterima: gate ini menangkap regresi, tapi tidak menangkap
+  task yang lapor `completed` tanpa mengubah apa pun. Itu dicek lewat `summary`
+  di `logs/*.verdict.json`.
+- Blok 0 (FIX-00a–FIX-00d) dihapus dari antrean karena sudah selesai manual.
+  Antrean kembali ke 96 task, dimulai dari SRC-12.
+- Driver dan proses `codex exec` yang masih berjalan dihentikan sebelum perbaikan.
+
 ### Commit porting source-new + ignore aset *-new
 
 - `.gitignore`: pola `*-new/`, `*-new.ts`, `*-new.tsx` — seluruh aset source-new
@@ -900,3 +943,19 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 - Menambahkan task detail `SRC-01` sampai `SRC-14` di `FEATURE_BACKLOG.md`, mencakup components, helpers, hooks, pages, repositories, services, domain, App routing, dan migration `supabase-new`.
 - Menambahkan Definition of Done: compile/build/lint, smoke test route utama, verifikasi migration/RLS/Storage, dan sinkronisasi worklog/checklist.
 - Task ini bersifat additive: fitur lokal tidak boleh dihapus dan source-new tidak boleh diaktifkan mentah jika kontraknya berbeda.
+
+## 2026-07-31 — FIX-00a duplikasi domain TestCase
+
+- Menjalankan `graphify query` sebelum menelusuri deklarasi dan pemakaian `projectId`/`moduleId`.
+- Menghapus deklarasi duplikat opsional hasil merge pada interface `TestCase`; kontrak lokal dipertahankan sebagai `projectId: string` dan `moduleId: string | null`.
+- `npx tsc -b --force` dan `npm run build` tidak lagi melaporkan TS2300/TS2687/TS2717 dari `types/domain.ts`, tetapi masih gagal karena error TypeScript di luar scope FIX-00a pada ImportCasesDialog, NotificationPanel, ProfileView, ProjectDetailPage, ProjectTestCaseTab, dan ProjectTestPlanTab.
+- `graphify update .` dijalankan, tetapi Graphify menolak overwrite karena graph baru hanya memiliki 1721 node dibanding graph existing 2595 node; opsi destruktif `--force` tidak dijalankan.
+
+## 2026-07-31 — FIX-00b error TypeScript ProjectDetailPage
+
+- Menjalankan `graphify query` untuk menelusuri `ProjectDetailPage`, komponen tab Test Case, dan kontrak tipe terkait sebelum membaca source.
+- Menghapus import, opsi status, serta state/filter/sort Test Case lama yang sudah dipindahkan ke `ProjectTestCaseTab`; halaman kini meneruskan data Test Case mentah agar filtering tetap dimiliki komponen tab.
+- Mengganti `projectId` opsional dari parameter route dengan `project.id` yang sudah terjamin setelah guard project.
+- `npx tsc -b --force` tidak lagi melaporkan error pada `ProjectDetailPage.tsx` (16 error FIX-00b selesai). Command masih exit non-zero karena 14 error di file lain yang berada di luar scope task ini.
+- `npm run build` mencapai tahap TypeScript dan tidak melaporkan error pada `ProjectDetailPage.tsx`, tetapi belum dapat melanjutkan ke Vite karena 14 error TypeScript di file task lain.
+- `graphify update .` dijalankan; Graphify menolak overwrite karena hasil baru 1721 node lebih kecil daripada graph existing 2595 node. Opsi destruktif `--force` tidak dijalankan.

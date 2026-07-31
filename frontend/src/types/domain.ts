@@ -171,9 +171,6 @@ export interface TestCase {
   targetRoleId?: string | null;
   createdBy?: string | null;
   externalLinks?: ExternalLink[];
-  /** Derived from the owning test run; issues are not project-owned in the local schema. */
-  projectId?: string | null;
-  moduleId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

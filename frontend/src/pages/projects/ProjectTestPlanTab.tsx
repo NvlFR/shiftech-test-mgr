@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
-import { DataTable, type DataTableStateEvent } from 'primereact/datatable';
+import {
+  DataTable,
+  type DataTableSelectionMultipleChangeEvent,
+  type DataTableStateEvent,
+} from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -16,7 +20,6 @@ import { TEST_PLAN_STATUS_LABEL, TEST_PLAN_STATUS_SEVERITY } from '../../helpers
 type ProjectTestPlanTabProps = {
   plans: TestPlan[];
   loading: boolean;
-  projectId: string;
   isMobile: boolean;
   search: string;
   onSearchChange: (value: string) => void;
@@ -40,7 +43,7 @@ const STATUS_OPTIONS = (['draft', 'active', 'completed', 'archived'] as const)
   .map((value) => ({ label: TEST_PLAN_STATUS_LABEL[value], value }));
 
 export function ProjectTestPlanTab({
-  plans, loading, projectId, isMobile, search, onSearchChange, statusFilter,
+  plans, loading, isMobile, search, onSearchChange, statusFilter,
   onStatusFilterChange, sortField, sortOrder, onSort, selected, onSelectedChange,
   canEditContent, canDeleteContent, onCreate, onEdit, onDelete, onBulkDelete, onRefresh,
 }: ProjectTestPlanTabProps) {
@@ -55,7 +58,7 @@ export function ProjectTestPlanTab({
       if (!name || name === plan.name) return;
       await testPlanService.rename(plan.id, name);
     } else if (value !== plan.status) {
-      await testPlanService.changeStatus(plan.id, value as TestPlanStatus, { projectId });
+      await testPlanService.changeStatus(plan.id, value as TestPlanStatus);
     }
     await onRefresh();
   }
@@ -108,9 +111,11 @@ export function ProjectTestPlanTab({
         sortOrder={isMobile ? undefined : sortOrder}
         onSort={isMobile ? undefined : onSort}
         selection={selected}
-        onSelectionChange={(event) => onSelectedChange(event.value as TestPlan[])}
+        onSelectionChange={(event: DataTableSelectionMultipleChangeEvent<TestPlan[]>) =>
+          onSelectedChange(event.value)
+        }
         dataKey="id"
-        selectionMode={isMobile ? undefined : 'checkbox'}
+        selectionMode={isMobile ? null : 'checkbox'}
       >
         <Column selectionMode="multiple" style={{ width: '3rem' }} hidden={isMobile} />
         <Column field="code" header="Kode" sortable={!isMobile} style={{ width: '7rem' }} hidden={isMobile}
