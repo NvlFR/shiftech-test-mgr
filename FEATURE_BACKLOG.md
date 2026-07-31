@@ -438,9 +438,9 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 
 **Analisis**
 
-- [ ] `analysis.run_summary` — ringkasan regression satu run.
-- [ ] `analysis.flaky_candidates` — test yang hasilnya tidak stabil antar run.
-- [ ] `analysis.suggest_retest` — rekomendasi test case yang perlu diretest.
+- [x] `analysis.run_summary` — ringkasan regression satu run.
+- [x] `analysis.flaky_candidates` — test yang hasilnya tidak stabil antar run.
+- [x] `analysis.suggest_retest` — rekomendasi test case yang perlu diretest.
 
 ### 8.3 Guardrail
 

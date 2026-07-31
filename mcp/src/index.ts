@@ -12,10 +12,13 @@ import { AutomationRepository } from "./repositories/automationRepository.js";
 import { AutomationService } from "./services/automationService.js";
 import { RepoRepository } from "./repositories/repoRepository.js";
 import { RepoService } from "./services/repoService.js";
+import { AnalysisRepository } from "./repositories/analysisRepository.js";
+import { AnalysisService } from "./services/analysisService.js";
 import { createAutomationReadToolRegistrar, createAutomationWriteToolRegistrar } from "./tools/automationTools.js";
 import { createReadToolRegistrar } from "./tools/readTools.js";
 import { createWriteToolRegistrar } from "./tools/writeTools.js";
 import { createRepoToolRegistrar } from "./tools/repoTools.js";
+import { createAnalysisToolRegistrar } from "./tools/analysisTools.js";
 import { registerTools, toolRegistry } from "./tools/registry.js";
 
 const config = loadConfig();
@@ -25,6 +28,7 @@ const readService = new ReadService(session, new ReadRepository(config));
 const writeService = new WriteService(new WriteRepository(config));
 const automationService = new AutomationService(new AutomationRepository(config));
 const repoService = new RepoService(new RepoRepository(config));
+const analysisService = new AnalysisService(new AnalysisRepository(config));
 
 const server = new McpServer({
   name: "testmanager",
@@ -32,7 +36,7 @@ const server = new McpServer({
 });
 
 registerTools(server, {
-  read: [...toolRegistry.read, createReadToolRegistrar(session, readService), createAutomationReadToolRegistrar(session, automationService), createRepoToolRegistrar(session, repoService)],
+  read: [...toolRegistry.read, createReadToolRegistrar(session, readService), createAutomationReadToolRegistrar(session, automationService), createRepoToolRegistrar(session, repoService), createAnalysisToolRegistrar(session, analysisService)],
   write: [...toolRegistry.write, createWriteToolRegistrar(session, writeService), createAutomationWriteToolRegistrar(session, automationService)],
 }, config.readonly);
 

@@ -1582,3 +1582,10 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan ambang konfigurasi `TM_MCP_RERUN_FAILED_MAX_TESTS` (default 25, rentang 1–500). Jika jumlah terpilih melewati ambang, RPC tidak membuat run/job dan service mengembalikan `HUMAN_CONFIRMATION_REQUIRED`; retry membutuhkan profile anggota project pada `confirmed_by` serta `explicit_confirmation: true`.
 - Menambahkan migration `schema_056_mcp_rerun_failed.sql` tanpa menjalankannya ke target, audit aksi/konfirmasi tanpa payload rahasia, dokumentasi konfigurasi, serta test service/repository/registrar.
 - Verifikasi lulus: `cd mcp && npm test` (12/12 test file; mencakup build TypeScript) dan `git diff --check`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+## 2026-07-31 — MCP-15 tool analisis
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi MCP dan mengikuti katalog Analisis Section 8.2 `FEATURE_BACKLOG.md`.
+- Menambahkan tool read-only `testmanager.analysis.run_summary`, `analysis.flaky_candidates`, dan `analysis.suggest_retest` melalui layering `Tool → AnalysisService → AnalysisRepository → Supabase RPC`.
+- Menambahkan migration `schema_058_mcp_analysis.sql` tanpa menjalankannya ke target. Seluruh metrik dihitung on-the-fly; flaky ditentukan dari transisi pass/fail pada jendela run, sedangkan rekomendasi retest diranking dari status, priority, issue aktif, dan instabilitas historis.
+- Menambahkan batas jendela 2–50 run, batas respons 1–100 kandidat, validasi UUID/project scope, mapper snake_case ke camelCase, dokumentasi, dan unit/contract test.
+- Verifikasi lulus: `cd mcp && npm test` (17/17), `cd mcp && npm run build`, `git diff --check`, dan `graphify update .` (2.373 node/4.913 edge). Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak mengubah dependency, tidak commit, dan tidak push.

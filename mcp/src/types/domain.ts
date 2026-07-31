@@ -98,3 +98,25 @@ export interface RequirementLink { id: string; type: "test_case" | "test_plan" |
 export interface RequirementDetail extends RequirementSummary { links: RequirementLink[] }
 export interface RequirementCoverage { total: number; covered: number; uncovered: number; percentage: number }
 export interface ArtifactUrl { bucket: string; path: string; url: string; expiresIn: number }
+
+export interface AnalysisRunSummary {
+  run: TestRunDetail;
+  passRate: number;
+  failureRate: number;
+  problematicResults: Array<{
+    testResultId: string; testCaseId: string; code: string | null; title: string | null;
+    priority: TestCasePriority | null; status: TestResultStatus;
+  }>;
+}
+
+export interface FlakyCandidate {
+  testCaseId: string; code: string; title: string; priority: TestCasePriority;
+  executions: number; passCount: number; failCount: number; transitions: number;
+  flakinessScore: number; latestStatus: "pass" | "fail"; latestExecutedAt: string;
+}
+
+export interface RetestSuggestion {
+  testCaseId: string; code: string; title: string; priority: TestCasePriority;
+  latestStatus: TestResultStatus; score: number; reasons: string[];
+  openIssueCount: number; flakinessScore: number;
+}

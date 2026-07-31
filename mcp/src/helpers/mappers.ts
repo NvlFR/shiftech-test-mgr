@@ -1,4 +1,4 @@
-import type { IssueDetail, IssueSummary, Project, RequirementCoverage, RequirementDetail, RequirementSummary, TestCaseDetail, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultSummary, TestRunDetail, TestRunSummary, TestRunSummaryCounts } from "../types/domain.js";
+import type { AnalysisRunSummary, FlakyCandidate, IssueDetail, IssueSummary, Project, RequirementCoverage, RequirementDetail, RequirementSummary, RetestSuggestion, TestCaseDetail, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultSummary, TestRunDetail, TestRunSummary, TestRunSummaryCounts } from "../types/domain.js";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -139,3 +139,25 @@ export const mapRequirementDetailRow = (value: unknown): RequirementDetail => { 
   links: Array.isArray(row.links) ? row.links.map((item) => { const link = record(item); return { id: stringValue(link.id), type: link.type as RequirementDetail["links"][number]["type"], targetId: stringValue(link.target_id) }; }) : [] }; };
 export const mapRequirementCoverageRow = (value: unknown): RequirementCoverage => { const row = record(value); return {
   total: numberValue(row.total), covered: numberValue(row.covered), uncovered: numberValue(row.uncovered), percentage: numberValue(row.percentage) }; };
+
+export const mapAnalysisRunSummaryRow = (value: unknown): AnalysisRunSummary => { const row = record(value); return {
+  run: mapTestRunDetailRow(row.run), passRate: numberValue(row.pass_rate), failureRate: numberValue(row.failure_rate),
+  problematicResults: Array.isArray(row.problematic_results) ? row.problematic_results.map((item) => { const result = record(item); return {
+    testResultId: stringValue(result.test_result_id), testCaseId: stringValue(result.test_case_id), code: nullableString(result.code),
+    title: nullableString(result.title), priority: nullableString(result.priority) as AnalysisRunSummary["problematicResults"][number]["priority"],
+    status: result.status as AnalysisRunSummary["problematicResults"][number]["status"],
+  }; }) : [],
+}; };
+
+export const mapFlakyCandidateRow = (value: unknown): FlakyCandidate => { const row = record(value); return {
+  testCaseId: stringValue(row.test_case_id), code: stringValue(row.code), title: stringValue(row.title), priority: row.priority as FlakyCandidate["priority"],
+  executions: numberValue(row.executions), passCount: numberValue(row.pass_count), failCount: numberValue(row.fail_count), transitions: numberValue(row.transitions),
+  flakinessScore: numberValue(row.flakiness_score), latestStatus: row.latest_status as FlakyCandidate["latestStatus"], latestExecutedAt: stringValue(row.latest_executed_at),
+}; };
+
+export const mapRetestSuggestionRow = (value: unknown): RetestSuggestion => { const row = record(value); return {
+  testCaseId: stringValue(row.test_case_id), code: stringValue(row.code), title: stringValue(row.title), priority: row.priority as RetestSuggestion["priority"],
+  latestStatus: row.latest_status as RetestSuggestion["latestStatus"], score: numberValue(row.score),
+  reasons: Array.isArray(row.reasons) ? row.reasons.filter((reason): reason is string => typeof reason === "string") : [],
+  openIssueCount: numberValue(row.open_issue_count), flakinessScore: numberValue(row.flakiness_score),
+}; };

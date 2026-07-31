@@ -95,6 +95,13 @@ test terpilih melampaui `TM_MCP_RERUN_FAILED_MAX_TESTS`, pemanggilan gagal tanpa
 membuat run/job. Setelah anggota project mengonfirmasi, ulangi dengan
 `confirmed_by` dan `explicit_confirmation: true`.
 
+Tool analisis memerlukan migration `schema_058_mcp_analysis.sql`. Ketiganya
+read-only dan menghitung data saat dipanggil: `analysis.run_summary` merangkum
+satu run, `analysis.flaky_candidates` mencari pergantian hasil pass/fail pada
+run terbaru, dan `analysis.suggest_retest` memeringkat hasil run berdasarkan
+status, priority, issue aktif, serta instabilitas pass/fail. Jendela analisis
+dibatasi maksimal 50 run dan output maksimal 100 kandidat.
+
 ## Tool read batch 1
 
 - `testmanager.project.list` dan `testmanager.project.get`
