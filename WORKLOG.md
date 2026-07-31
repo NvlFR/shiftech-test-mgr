@@ -1004,3 +1004,20 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Folder `hooks-new` tetap dikecualikan TypeScript sebagai corpus referensi source-new karena varian yang ditolak masih bergantung pada type/schema/route yang baru diaudit pada SRC-12 dan SRC-13; tidak ada import runtime dari folder tersebut.
 - Verifikasi: `cd frontend && npm run build` lulus; `npm run lint` lulus dengan warning existing dan satu warning hook baru yang kemudian diperbaiki; `git diff --check` lulus. Vite tetap memberi warning ukuran chunk existing (>1500 kB).
 - Verifikasi akhir: 4 test Vitest lulus dan lint lulus dengan 7 warning existing di luar perubahan SRC-08. `graphify update .` sempat gagal karena permission watcher, lalu pembaruan AST-only melalui `graphify . --update --code-only` berhasil menghasilkan 1.780 node dan 3.223 edge; 5 file konfigurasi/hasil test non-source menghasilkan zero node.
+## 2026-07-31 — SRC-06 audit dan port shared UI
+
+- Mengaudit komponen `components/ui-new` untuk search, filter, markdown, mention,
+  activity, owner label, hover card, attachment, pagination, dan bulk action serta
+  seluruh pemakai aktifnya. Kontrak props versi aktif tetap kompatibel dan lolos
+  type-check.
+- Memport paginator DataTable bersama ke `components/ui/dataTablePaginator.tsx`
+  dengan label Indonesia dan konstanta scroll height yang dapat dipakai ulang.
+- Mengaktifkan GitHub-flavored Markdown pada `MarkdownPreview` melalui
+  `react-markdown` dan `remark-gfm`; tautan eksternal dibuka aman di tab baru.
+- Memperbaiki layering `UserHoverCard`: pengambilan profil sekarang melalui hook
+  `useProfile` dan `profileService`, bukan mengimpor repository langsung.
+- Menandai checklist FEATURE_BACKLOG SRC-06 selesai.
+- Verifikasi: `npm run build` lulus; `npm run lint` lulus dengan 7 warning existing
+  di luar scope; `git diff --check` lulus. Instalasi npm melaporkan 3 high severity
+  vulnerability existing/transitif untuk ditinjau terpisah; tidak menjalankan
+  `npm audit fix --force` karena berisiko breaking change dan di luar scope.

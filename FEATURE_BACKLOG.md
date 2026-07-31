@@ -293,7 +293,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   `avatarUrl`, role, approval status, dan route `/users/:id`. Jangan
   mengaktifkan kontrak `username`/`bio` source-new tanpa migration pendukung.
 
-- [ ] **SRC-06 — `components/ui-new`**
+- [x] **SRC-06 — `components/ui-new`**
   Audit dan port komponen shared seperti search, filter, markdown, mention,
   activity, owner label, hover card, attachment, pagination, dan bulk action.
   Setiap komponen harus punya kontrak props yang kompatibel dengan pemakai aktif.

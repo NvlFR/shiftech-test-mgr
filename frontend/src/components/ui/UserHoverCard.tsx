@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Skeleton } from 'primereact/skeleton';
 import { Tag } from 'primereact/tag';
 import { useNavigate } from 'react-router-dom';
-import { profileRepository } from '../../repositories/profileRepository';
+import { useProfile } from '../../hooks/useProfile';
 
 interface UserHoverCardProps {
   userId: string;
@@ -24,11 +23,7 @@ export function UserHoverCard({ userId, isOwner, children }: UserHoverCardProps)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [enabled, setEnabled] = useState(false);
   const navigate = useNavigate();
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: () => profileRepository.findById(userId),
-    enabled,
-  });
+  const { profile, loading } = useProfile(userId, enabled);
 
   function scheduleOpen(target: HTMLElement) {
     clearTimeout(closeTimer.current);
@@ -50,7 +45,7 @@ export function UserHoverCard({ userId, isOwner, children }: UserHoverCardProps)
         {children}
       </span>
       <OverlayPanel ref={overlayRef} showCloseIcon={false} className="user-hover-card" onMouseEnter={() => clearTimeout(closeTimer.current)} onMouseLeave={scheduleClose}>
-        {isLoading ? (
+        {loading ? (
           <div className="flex align-items-center gap-3" style={{ width: '260px' }}>
             <Skeleton shape="circle" size="3rem" />
             <div className="flex-1"><Skeleton width="8rem" className="mb-2" /><Skeleton width="10rem" /></div>

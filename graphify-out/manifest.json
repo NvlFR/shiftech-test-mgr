@@ -15,9 +15,9 @@
     "semantic_hash": "029f4905006c1fffd96bc863e2d98d3e"
   },
   "frontend/package.json": {
-    "mtime": 1785029873.492487,
-    "ast_hash": "7d50861c68d583d15590f960e1db4e2e",
-    "semantic_hash": "7d50861c68d583d15590f960e1db4e2e"
+    "mtime": 1785530812.065917,
+    "ast_hash": "c78839da982dba962c1c3a01bd29c1c8",
+    "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
     "mtime": 1785515718.0524564,
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785530305.780162,
-    "ast_hash": "50cf1e2eea65ef5f110690cf5ba5e35c",
+    "mtime": 1785530840.957925,
+    "ast_hash": "785ac42a02f3755bb7c797a2d62bb463",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785530360.0010886,
-    "ast_hash": "f0808ccc5a26a93c38e77de61ee5b601",
+    "mtime": 1785530881.1479387,
+    "ast_hash": "4261f03939725a90bceeb8ffacce6679",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2525,9 +2525,9 @@
     "semantic_hash": "0ba311c2ff95e64d457a0d1225712788"
   },
   "frontend/src/components/ui/MarkdownPreview.tsx": {
-    "mtime": 1785519490.2698727,
-    "ast_hash": "2d1f86334c6876b270d4447491ce4b67",
-    "semantic_hash": "2d1f86334c6876b270d4447491ce4b67"
+    "mtime": 1785530840.4199247,
+    "ast_hash": "297c3696c30453ccbac63dc251f867c7",
+    "semantic_hash": ""
   },
   "frontend/src/components/ui/MentionTextarea.tsx": {
     "mtime": 1785519185.499435,
@@ -2540,9 +2540,9 @@
     "semantic_hash": "93c23ce07a8fc04ce77a5f7b91a0fe60"
   },
   "frontend/src/components/ui/UserHoverCard.tsx": {
-    "mtime": 1785519507.2384882,
-    "ast_hash": "3555a290e9187d7cdaea9b24253991c5",
-    "semantic_hash": "3555a290e9187d7cdaea9b24253991c5"
+    "mtime": 1785530840.688925,
+    "ast_hash": "6345fa9728650b78bdc049d026b1b1ba",
+    "semantic_hash": ""
   },
   "frontend/src/helpers/toast.ts": {
     "mtime": 1785519486.6673892,
@@ -2673,5 +2673,15 @@
     "mtime": 1785530613.8319137,
     "ast_hash": "9daa796ae3960fa84a9e0aeb5da4c104",
     "semantic_hash": "9daa796ae3960fa84a9e0aeb5da4c104"
+  },
+  "frontend/src/components/ui/dataTablePaginator.tsx": {
+    "mtime": 1785530840.817925,
+    "ast_hash": "eaed13179ca56d32f24eec29ee973182",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useProfile.ts": {
+    "mtime": 1785530840.551925,
+    "ast_hash": "647faf1fbdf8d56122bf5a0fa8118fee",
+    "semantic_hash": ""
   }
 }
