@@ -983,3 +983,14 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak mengubah service/hook/page, tidak menjalankan migration, dan tidak memasukkan business rule baru ke repository; perubahan bersifat query Supabase serta pemetaan lewat mapper aktif.
 - Menandai SRC-10 selesai di `FEATURE_BACKLOG.md`.
 - Verifikasi: `npm run build` lulus (warning ukuran chunk existing) dan `git diff --check` lulus sebelum pembaruan graph akhir.
+
+### 2026-07-31 — SRC-11 sinkronisasi business rule service source-new
+
+- Menjalankan `graphify query` sebelum membandingkan service aktif dengan `frontend/src/services/services-new` dan membaca scope FEATURE_BACKLOG Section 7.
+- Menyelaraskan validasi Test Case berdasarkan `stepType`: tipe `simple` tetap mewajibkan steps dan expected result, sedangkan tipe `detailed` mewajibkan minimal satu action yang tidak kosong dan menyimpan detail step melalui service aktif.
+- Menambahkan orkestrasi summary Test Run terpagination yang tetap menghitung agregat dari `test_results` saat dibaca, tanpa kolom cache, serta sinkronisasi snapshot Test Result yang ditolak bila run sudah `completed`.
+- Mempertahankan invariant lokal yang lebih ketat: `start`/`startCustom` selalu membuat Test Run baru, completion hanya melalui aksi manual `complete()`, hasil pada run completed tidak dapat diubah sebelum reopen, dan `issueService.create()` memverifikasi Test Result berstatus `fail`.
+- Kontrak source-new yang bergantung pada schema/profile/notification berbeda tidak diaktifkan mentah; repository tetap bebas business rule dan tidak ada migration atau akses Supabase target.
+- Menandai SRC-11 selesai di `FEATURE_BACKLOG.md`.
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm test` lulus (4 test), `npm run lint` lulus dengan 7 warning existing, dan `git diff --check` lulus.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.771 node dan 3.554 edge; Graphify memberi warning 7 file konfigurasi/non-source menghasilkan zero node.

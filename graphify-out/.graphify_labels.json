@@ -128,7 +128,15 @@
   "126": "testCaseStepRepository.ts",
   "127": "notificationRepository.ts",
   "128": "primereact",
+  "129": "react-hook-form",
+  "130": "@supabase/supabase-js",
+  "131": "package.json",
+  "132": "useProjectContext.tsx",
+  "133": "primeicons",
+  "134": "primereact",
+  "135": "react-router-dom",
   "136": "CLAUDE.md",
+  "137": "@tanstack/react-query",
   "147": "scripts",
   "156": "package.json",
   "169": "xlsx",
@@ -146,6 +154,5 @@
   "288": "2. Prioritas P1 — Workflow inti",
   "289": "3. Prioritas P2 — Reporting dan integrasi",
   "290": "5. Automation dan Playwright",
-  "292": "7. MCP Server TestManager (multi-tool)",
-  "295": "primeicons"
+  "292": "7. MCP Server TestManager (multi-tool)"
 }

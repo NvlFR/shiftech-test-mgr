@@ -319,7 +319,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   result, issue, suite, activity, notification, profile, attachment, dan
   integration. Repository hanya boleh berisi query Supabase dan mapper.
 
-- [ ] **SRC-11 — `services/services-new`**
+- [x] **SRC-11 — `services/services-new`**
   Sinkronkan validasi dan business rule service. Pastikan invariant tetap
   berlaku: run baru untuk re-run, status completed manual, summary dihitung
   on-the-fly, dan Issue hanya dibuat dari Test Result FAIL.

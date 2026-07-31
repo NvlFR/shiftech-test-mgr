@@ -1,6 +1,7 @@
 import { testCaseRepository } from '../repositories/testCaseRepository';
 import { tagService } from './tagService';
 import { moduleService } from './moduleService';
+import { testCaseStepService } from './testCaseStepService';
 import type { ImportedTestCaseRow } from '../helpers/testCaseExcel';
 import type { TestCase, TestCaseFilters, TestCaseWithDetails } from '../types/domain';
 
@@ -74,10 +75,16 @@ export const testCaseService = {
     priority?: TestCase['priority'];
     notes?: string;
     tagNames?: string[];
+    detailedSteps?: { action: string; expectedResult?: string }[];
   }): Promise<TestCase> {
     if (!input.title.trim()) throw new Error('Judul test case tidak boleh kosong');
-    if (!input.steps.trim()) throw new Error('Langkah pengujian tidak boleh kosong');
-    if (!input.expectedResult.trim()) throw new Error('Hasil yang diharapkan tidak boleh kosong');
+    const stepType = input.stepType ?? 'simple';
+    if (stepType === 'simple') {
+      if (!input.steps.trim()) throw new Error('Langkah pengujian tidak boleh kosong');
+      if (!input.expectedResult.trim()) throw new Error('Hasil yang diharapkan tidak boleh kosong');
+    } else if (!input.detailedSteps?.some((step) => step.action.trim())) {
+      throw new Error('Test case detail wajib punya minimal satu step');
+    }
 
     const testCase = await testCaseRepository.create({
       projectId: input.projectId,
@@ -88,7 +95,7 @@ export const testCaseService = {
       preconditions: input.preconditions?.trim() || null,
       steps: input.steps.trim(),
       expectedResult: input.expectedResult.trim(),
-      stepType: input.stepType ?? 'simple',
+      stepType,
       priority: input.priority ?? 'medium',
       status: 'active',
       notes: input.notes?.trim() || null,
@@ -100,6 +107,16 @@ export const testCaseService = {
 
     if (input.tagNames?.length) {
       await tagService.saveTagsForTestCase(input.projectId, testCase.id, input.tagNames);
+    }
+
+    if (stepType === 'detailed' && input.detailedSteps) {
+      const validSteps = input.detailedSteps.filter((step) => step.action.trim());
+      await Promise.all(validSteps.map((step, index) => testCaseStepService.create({
+        testCaseId: testCase.id,
+        stepNumber: index + 1,
+        action: step.action.trim(),
+        expectedResult: step.expectedResult?.trim() || undefined,
+      })));
     }
 
     return testCase;

@@ -2,7 +2,7 @@ import { testRunRepository } from '../repositories/testRunRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
 import { testCaseRepository } from '../repositories/testCaseRepository';
 import { calculateTestRunSummary } from '../helpers/testRunSummary';
-import type { TestResultStatus } from '../types/domain';
+import type { TestResultStatus, TestRunStatus } from '../types/domain';
 import type { TestRunFilters } from '../repositories/testRunRepository';
 
 export const testRunService = {
@@ -32,6 +32,26 @@ export const testRunService = {
       testResultRepository.getDistinctTestersByRunIds(runIds),
     ]);
     return runs.map((r) => ({ ...r, ...summary[r.id] ?? { total: 0, pass: 0, fail: 0 }, testers: testers[r.id] ?? [] })).filter((run) => !filters?.testerId || run.testers.some((tester) => tester.id === filters.testerId));
+  },
+
+  async listByPlanWithSummaryPaginated(
+    testPlanId: string,
+    options: { search?: string; statuses?: TestRunStatus[]; page: number; rowsPerPage: number },
+  ) {
+    const { data, total } = await testRunRepository.findAllByPlanPaginated(testPlanId, options);
+    const runIds = data.map((run) => run.id);
+    const [summary, testers] = await Promise.all([
+      testResultRepository.getSummaryByRunIds(runIds),
+      testResultRepository.getDistinctTestersByRunIds(runIds),
+    ]);
+    return {
+      data: data.map((run) => ({
+        ...run,
+        ...summary[run.id] ?? { total: 0, pass: 0, fail: 0, skip: 0, blocked: 0, notRun: 0 },
+        testers: testers[run.id] ?? [],
+      })),
+      total,
+    };
   },
 
   getById(id: string) {
@@ -113,6 +133,15 @@ export const testRunService = {
       throw new Error('Test run sudah selesai — buka kembali (reopen) untuk mencatat hasil');
     }
     return testResultRepository.recordResult(id, { status, testerId, notes });
+  },
+
+  async syncResultWithTestCase(testRunId: string, testResultId: string) {
+    const run = await testRunRepository.findById(testRunId);
+    if (!run) throw new Error('Test run tidak ditemukan');
+    if (run.status === 'completed') {
+      throw new Error('Test run sudah selesai — buka kembali (reopen) untuk sinkronisasi');
+    }
+    return testResultRepository.syncWithTestCase(testResultId);
   },
 
   assign(testRunId: string, testCaseIds: string[], testerId: string) {
