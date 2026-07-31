@@ -1452,3 +1452,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Kegagalan menyiapkan repository dilaporkan sebagai hasil `blocked` agar job tidak tertinggal berstatus running dan tetap mengikuti mekanisme retry yang ada.
 - Menambahkan contract/unit test clone private, pull cache, isolasi token dari argumen, validasi URL, dan proteksi traversal. Verifikasi lulus: `cd runner && npm test`, `cd frontend && npm run build` (warning ukuran chunk existing), pencarian pola secret, dan `git diff --check`.
 - Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-01 fondasi MCP server stdio
+
+- Menjalankan `graphify query` sebelum menelusuri Section 8.1 `FEATURE_BACKLOG.md` dan membatasi scope pada scaffold serta transport stdio tanpa tool.
+- Menambahkan workspace mandiri `mcp/` berbasis Node.js 20+, TypeScript strict, dan `@modelcontextprotocol/sdk`, lengkap dengan lockfile npm.
+- Menambahkan server MCP stdio yang dapat melakukan handshake, belum mendaftarkan tool, dan memuat konfigurasi project-scoped dari `TM_SUPABASE_URL`, `TM_SUPABASE_ANON_KEY`, `TM_API_TOKEN`, `TM_PROJECT_ID`, serta flag `TM_MCP_READONLY` (`0`/`1`).
+- Menambahkan `.env.example`, proteksi ignore untuk file env/build/dependency, dan README setup/operasional tanpa menyimpan secret nyata.
+- Verifikasi lulus: `cd mcp && npm run build`, smoke test handshake JSON-RPC melalui stdio, audit otomatis saat `npm install` (0 vulnerability), dan `git diff --check`. Percobaan ulang `npm audit` setelahnya tidak mendapat respons registry karena DNS sementara (`EAI_AGAIN`); tidak memengaruhi hasil audit instalasi awal.
+- Tidak menjalankan migration atau mengakses Supabase target, tidak menambah tool MCP, tidak commit, dan tidak push.

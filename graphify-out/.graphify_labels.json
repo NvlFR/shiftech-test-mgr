@@ -173,5 +173,8 @@
   "171": "react-router-dom",
   "172": "schema_042_issue_attachment_storage_cleanup.sql",
   "173": "@supabase/supabase-js",
-  "174": "schema_046_runner_repository_scripts.sql"
+  "174": "schema_046_runner_repository_scripts.sql",
+  "175": "AppMenu.tsx",
+  "176": "TestManager MCP Server",
+  "177": "primereact"
 }
