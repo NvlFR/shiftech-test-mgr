@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { isAbsolute, resolve } from 'node:path';
 
 export interface RunnerConfig {
   supabaseUrl: string;
@@ -49,11 +49,15 @@ function intEnv(name: string, fallback: number): number {
 
 export function loadConfig(envPath = '.env'): RunnerConfig {
   loadDotEnv(resolve(process.cwd(), envPath));
+  const projectDir = required('TM_PROJECT_DIR');
+  if (!isAbsolute(projectDir)) {
+    throw new Error('TM_PROJECT_DIR must be an absolute path');
+  }
   return {
     supabaseUrl: required('TM_SUPABASE_URL').replace(/\/+$/, ''),
     supabaseAnonKey: required('TM_SUPABASE_ANON_KEY'),
     runnerToken: required('TM_RUNNER_TOKEN'),
-    projectDir: resolve(process.cwd(), process.env.TM_PROJECT_DIR?.trim() || '.'),
+    projectDir: resolve(projectDir),
     playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
     pollIntervalMs: intEnv('TM_POLL_INTERVAL_SECONDS', 5) * 1000,
     heartbeatIntervalMs: intEnv('TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,

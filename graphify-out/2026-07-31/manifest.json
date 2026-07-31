@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectSettingsPage.tsx": {
-    "mtime": 1785535463.1004047,
-    "ast_hash": "77d4199ef1da8848a24f05f651bc1a94",
+    "mtime": 1785536079.0670056,
+    "ast_hash": "5a0c6ff3e5746fa0d3c6e1bfc5f725d1",
     "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectsPage.tsx": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785535863.409097,
-    "ast_hash": "6f5e281ac7b7db3005e096cd8517a6fc",
+    "mtime": 1785536127.1573083,
+    "ast_hash": "ec7330f67735db89e4e0388393558a56",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2735,8 +2735,8 @@
     "semantic_hash": ""
   },
   "frontend/src/hooks/useProjectRepositories.ts": {
-    "mtime": 1785535215.9824567,
-    "ast_hash": "dbff100261e656df2f5a5758b5192e69",
+    "mtime": 1785536078.9240108,
+    "ast_hash": "0dd0d0e8d655ede2c9ed994ebe0c3183",
     "semantic_hash": ""
   },
   "frontend/src/services/projectRepositoryLinkService.ts": {
@@ -2745,23 +2745,23 @@
     "semantic_hash": ""
   },
   "supabase/functions/repo-credentials/contract.test.ts": {
-    "mtime": 1785535837.5391312,
-    "ast_hash": "05505998951f7a68036f51849a94d4eb",
+    "mtime": 1785536078.5340245,
+    "ast_hash": "e8bae820166ac8f7cc34d67c209f8327",
     "semantic_hash": ""
   },
   "supabase/functions/repo-credentials/contract.ts": {
-    "mtime": 1785535837.4081366,
-    "ast_hash": "8e55b36c35c607446ff37fa21f5de5ad",
+    "mtime": 1785536036.9505205,
+    "ast_hash": "28c048c33d8b6678f476e6fa947b354c",
     "semantic_hash": ""
   },
   "supabase/functions/repo-credentials/handler.ts": {
-    "mtime": 1785535756.1464944,
-    "ast_hash": "aac92635402ec1c4f325a28514ac82e5",
+    "mtime": 1785536037.0815158,
+    "ast_hash": "3caae5ecd8e6439a65b9a7777e444e0e",
     "semantic_hash": ""
   },
   "supabase/functions/repo-credentials/index.ts": {
-    "mtime": 1785535756.2814887,
-    "ast_hash": "fd67caf82f11546db2beb0525a136b0e",
+    "mtime": 1785536037.2165108,
+    "ast_hash": "65c02cf0dd175f6c9edaec1175a6596d",
     "semantic_hash": ""
   },
   "supabase/schema_043_repository_credentials_vault.sql": {
@@ -2772,6 +2772,21 @@
   "supabase/functions/repo-credentials/README.md": {
     "mtime": 1785535837.670126,
     "ast_hash": "f3038a1473e397417376484c289db6de",
+    "semantic_hash": ""
+  },
+  "frontend/src/repositories/repositoryConnectionRepository.ts": {
+    "mtime": 1785536078.66502,
+    "ast_hash": "c79006abcd1e18491d28c6c19a057a6b",
+    "semantic_hash": ""
+  },
+  "frontend/src/services/repositoryConnectionService.ts": {
+    "mtime": 1785536078.7960153,
+    "ast_hash": "9f5205b8f38b2872d243c1745104a008",
+    "semantic_hash": ""
+  },
+  "supabase/schema_044_repository_connection_test.sql": {
+    "mtime": 1785536037.351506,
+    "ast_hash": "d4f53836e6804ce63268e388c0294309",
     "semantic_hash": ""
   }
 }

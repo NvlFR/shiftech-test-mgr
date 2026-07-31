@@ -42,7 +42,13 @@ npm start
 ```
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
-terhadap `TM_PROJECT_DIR`.
+terhadap `TM_PROJECT_DIR`. Nilai ini wajib berupa path absolut, harus terbaca,
+dan harus menunjuk root git repository. Runner berhenti sebelum terhubung ke
+server bila validasi tersebut gagal.
+
+Runner membaca branch aktif, commit SHA, serta status dirty/clean lewat Git.
+Payload laporan hanya menyertakan path dan metadata tersebut; isi file source
+tidak pernah dibaca untuk dikirim maupun dimasukkan ke payload server pusat.
 
 ## Cara kerja
 

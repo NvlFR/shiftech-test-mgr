@@ -1,5 +1,14 @@
 # Worklog
 
+## 2026-07-31 — REPO-07 mode `local_path` pada runner
+
+- Menambahkan inspeksi repository lokal pada runner dengan validasi fail-fast: `TM_PROJECT_DIR` wajib absolut, path harus ada, berupa direktori yang terbaca, memiliki `.git`, dan dikenali Git sebagai root repository.
+- Runner membaca metadata Git lokal melalui argumen `git -C` tanpa shell: branch aktif (nullable saat detached HEAD), commit SHA, serta status dirty/clean. Inspeksi dijalankan saat startup dan kembali sebelum laporan job agar metadata sesuai commit yang benar-benar diuji.
+- Payload laporan ke server pusat hanya menambahkan object `repository` berisi `path`, `branch`, `commitSha`, dan boolean `dirty`; tidak ada pembacaan atau pengiriman isi file source.
+- Memperketat konfigurasi/contoh environment dan mendokumentasikan kontrak path absolut serta batas privasi source code.
+- Menambahkan pengujian Node bawaan untuk bentuk metadata, perintah Git yang dibatasi, pencegahan field isi file, serta penolakan path relatif/hilang/non-git. Tidak ada migration yang dijalankan, secret dicatat, data dihapus, commit, atau push.
+- Verifikasi lulus: `cd runner && npm test`, `npm run typecheck`, dan build TypeScript runner (dijalankan oleh script test).
+
 ## 2026-07-31 — REPO-04 tab Repository di Project Settings
 
 - Menambahkan tab Repository pada `ProjectSettingsPage` dengan daftar repository, dialog tambah/edit, konfirmasi hapus, status aktif, dan aksi Test Connection berupa stub notifikasi.

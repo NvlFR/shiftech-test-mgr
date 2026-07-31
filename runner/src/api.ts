@@ -1,4 +1,5 @@
 import type { RunnerConfig } from './config.js';
+import type { LocalRepositoryMetadata } from './localRepository.js';
 
 // Shapes returned by the server RPCs in supabase/schema_024_p3_automation.sql.
 export interface AutomationJob {
@@ -30,6 +31,7 @@ export interface ReportPayload {
   notes?: string;
   error_message?: string;
   artifacts?: ReportArtifact[];
+  repository?: LocalRepositoryMetadata;
 }
 
 export class ApiError extends Error {

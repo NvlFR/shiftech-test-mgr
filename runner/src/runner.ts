@@ -3,6 +3,7 @@ import type { RunnerConfig } from './config.js';
 import { executeJob } from './executor.js';
 import { uploadArtifacts } from './upload.js';
 import { log } from './logger.js';
+import { inspectLocalRepository, type LocalRepositoryMetadata } from './localRepository.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -30,6 +31,9 @@ export class Runner {
   }
 
   async start(): Promise<void> {
+    const repositoryMetadata: LocalRepositoryMetadata = inspectLocalRepository(this.config.projectDir);
+    log.info('Local repository ready', { ...repositoryMetadata });
+
     // Fail fast if the token is invalid so operators get a clear error on boot.
     try {
       const hb = await this.api.heartbeat();
@@ -59,6 +63,7 @@ export class Runner {
           notes: outcome.notes,
           error_message: outcome.errorMessage,
           artifacts,
+          repository: inspectLocalRepository(this.config.projectDir),
         });
         log.info('Reported job', { jobId: job.id, result: outcome.result, serverStatus: report.status, requeued: report.requeued, artifacts: artifacts.length });
       } catch (err) {
