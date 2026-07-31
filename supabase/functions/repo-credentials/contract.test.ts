@@ -33,6 +33,8 @@ test("handler tidak pernah mengembalikan token atau error database ke browser", 
         error: null,
       };
     },
+    getRepositoryConnection: async () => ({ data: null, error: null }),
+    fetchGitHub: fetch,
   });
   const response = await handler(new Request("http://localhost/repo-credentials", {
     method: "POST",
@@ -58,6 +60,8 @@ test("handler meredam pesan error upstream yang mungkin mengandung token", async
   const handler = createRepoCredentialsHandler({
     authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
     manageCredential: async () => ({ data: null, error: { message: `failed for ${token}` } }),
+    getRepositoryConnection: async () => ({ data: null, error: null }),
+    fetchGitHub: fetch,
   });
   const response = await handler(new Request("http://localhost/repo-credentials", {
     method: "POST",
@@ -68,4 +72,56 @@ test("handler meredam pesan error upstream yang mungkin mengandung token", async
   assert.equal(response.status, 403);
   assert.doesNotMatch(body, new RegExp(token));
   assert.deepEqual(JSON.parse(body), { error: "credential_operation_failed" });
+});
+
+test("test connection mengembalikan metadata aman dan warning untuk scope berlebih", async () => {
+  const handler = createRepoCredentialsHandler({
+    authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
+    manageCredential: async () => ({ data: null, error: null }),
+    getRepositoryConnection: async () => ({
+      data: { source_type: "github_private", url_or_path: "https://github.com/acme/app.git", token: "private-test-token" },
+      error: null,
+    }),
+    fetchGitHub: async (_input, init) => {
+      assert.equal((init?.headers as Record<string, string>).Authorization, "Bearer private-test-token");
+      return new Response(JSON.stringify({ full_name: "acme/app", default_branch: "main", permissions: { pull: true, push: true } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", "X-OAuth-Scopes": "repo" },
+      });
+    },
+  });
+  const response = await handler(new Request("http://localhost/repo-credentials", {
+    method: "POST",
+    headers: { Authorization: "Bearer user-session", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "test", project_id: projectId, repository_id: repositoryId }),
+  }));
+  const body = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(body, /private-test-token/);
+  assert.deepEqual(JSON.parse(body), { data: {
+    name: "acme/app",
+    default_branch: "main",
+    permissions: ["contents: read", "repository: push", "token: repo"],
+    warning: "Token memiliki permission lebih luas dari contents: read. Gunakan fine-grained token dengan permission minimum.",
+  } });
+});
+
+test("GitHub public diuji tanpa authorization token", async () => {
+  const handler = createRepoCredentialsHandler({
+    authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
+    manageCredential: async () => ({ data: null, error: null }),
+    getRepositoryConnection: async () => ({ data: { source_type: "github_public", url_or_path: "https://github.com/acme/public", token: null }, error: null }),
+    fetchGitHub: async (_input, init) => {
+      assert.equal((init?.headers as Record<string, string>).Authorization, undefined);
+      return new Response(JSON.stringify({ full_name: "acme/public", default_branch: "trunk" }), { status: 200 });
+    },
+  });
+  const response = await handler(new Request("http://localhost/repo-credentials", {
+    method: "POST",
+    headers: { Authorization: "Bearer user-session", "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "test", project_id: projectId, repository_id: repositoryId }),
+  }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { data: { name: "acme/public", default_branch: "trunk", permissions: ["contents: read"], warning: null } });
 });

@@ -16,5 +16,10 @@ Deno.serve(createRepoCredentialsHandler({
   manageCredential(args) {
     return admin.rpc("manage_repository_credential", args);
   },
+  getRepositoryConnection(args) {
+    return admin.rpc("get_repository_connection", args);
+  },
+  fetchGitHub(input, init) {
+    return fetch(input, init);
+  },
 }));
-

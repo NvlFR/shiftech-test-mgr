@@ -6,11 +6,13 @@ import type {
 } from '../repositories/projectRepositoryLinkRepository';
 import type { ProjectRepository } from '../types/domain';
 import { useAuthContext } from './useAuth';
+import { repositoryConnectionService } from '../services/repositoryConnectionService';
 
 export function useProjectRepositories(projectId: string | undefined) {
   const { isAdmin, session } = useAuthContext();
   const [repositories, setRepositories] = useState<ProjectRepository[]>([]);
   const [loading, setLoading] = useState(false);
+  const [testingRepositoryId, setTestingRepositoryId] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     if (!projectId) {
@@ -63,5 +65,14 @@ export function useProjectRepositories(projectId: string | undefined) {
     [getActor, reload],
   );
 
-  return { repositories, loading, reload, create, update, remove };
+  const testConnection = useCallback(async (repository: ProjectRepository) => {
+    setTestingRepositoryId(repository.id);
+    try {
+      return await repositoryConnectionService.test(repository);
+    } finally {
+      setTestingRepositoryId(null);
+    }
+  }, []);
+
+  return { repositories, loading, testingRepositoryId, reload, create, update, remove, testConnection };
 }

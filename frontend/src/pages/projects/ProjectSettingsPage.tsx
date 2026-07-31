@@ -69,6 +69,8 @@ export function ProjectSettingsPage() {
     create: createRepository,
     update: updateRepository,
     remove: removeRepository,
+    testConnection: testRepositoryConnection,
+    testingRepositoryId,
   } = useProjectRepositories(id);
 
   const [project, setProject] = useState<Project | null>(null);
@@ -159,12 +161,18 @@ export function ProjectSettingsPage() {
     });
   }
 
-  function handleTestRepositoryConnection(repository: ProjectRepository) {
-    toast.current?.show({
-      severity: 'info',
-      summary: 'Test Connection',
-      detail: `Pengujian koneksi ${repository.name} belum tersedia.`,
-    });
+  async function handleTestRepositoryConnection(repository: ProjectRepository) {
+    try {
+      const result = await testRepositoryConnection(repository);
+      toast.current?.show({
+        severity: result.warning ? 'warn' : 'success',
+        summary: result.warning ? 'Koneksi berhasil dengan peringatan' : 'Koneksi berhasil',
+        detail: `${result.name} · branch ${result.defaultBranch ?? '-'} · permission: ${result.permissions.join(', ') || 'tidak terdeteksi'}${result.warning ? `. ${result.warning}` : ''}`,
+        life: result.warning ? 10000 : 5000,
+      });
+    } catch (error) {
+      toast.current?.show({ severity: 'error', summary: 'Test connection gagal', detail: error instanceof Error ? error.message : undefined });
+    }
   }
 
   async function loadAll(showLoading = true) {
@@ -856,7 +864,7 @@ export function ProjectSettingsPage() {
                 style={{ width: '12rem' }}
                 body={(row: ProjectRepository) => (
                   <div className="flex gap-1 justify-content-end">
-                    <Button label="Test" icon="pi pi-bolt" text size="small" onClick={() => handleTestRepositoryConnection(row)} />
+                    <Button label="Test" icon="pi pi-bolt" text size="small" loading={testingRepositoryId === row.id} disabled={row.sourceType !== 'github_public' && row.sourceType !== 'github_private'} onClick={() => void handleTestRepositoryConnection(row)} />
                     <RowActionsMenu items={[
                       { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditRepositoryDialog(row) },
                       { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteRepository(row) },

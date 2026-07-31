@@ -1,4 +1,4 @@
-export type CredentialAction = "store" | "rotate" | "revoke";
+export type CredentialAction = "store" | "rotate" | "revoke" | "test";
 
 export interface CredentialRequest {
   action: CredentialAction;
@@ -20,11 +20,11 @@ export function parseCredentialRequest(value: unknown): CredentialRequest {
   const input = value as Record<string, unknown>;
   const allowed = new Set(["action", "project_id", "repository_id", "token", "expires_at"]);
   if (Object.keys(input).some((key) => !allowed.has(key))) throw new Error("invalid_request");
-  if (input.action !== "store" && input.action !== "rotate" && input.action !== "revoke") throw new Error("invalid_request");
+  if (input.action !== "store" && input.action !== "rotate" && input.action !== "revoke" && input.action !== "test") throw new Error("invalid_request");
   if (typeof input.project_id !== "string" || !UUID.test(input.project_id)) throw new Error("invalid_request");
   if (typeof input.repository_id !== "string" || !UUID.test(input.repository_id)) throw new Error("invalid_request");
 
-  if (input.action === "revoke") {
+  if (input.action === "revoke" || input.action === "test") {
     if (input.token !== undefined || input.expires_at !== undefined) throw new Error("invalid_request");
     return { action: input.action, project_id: input.project_id, repository_id: input.repository_id };
   }

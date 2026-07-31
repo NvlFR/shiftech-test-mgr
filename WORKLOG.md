@@ -1409,3 +1409,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Audit event store/rotate/revoke dicatat tanpa nilai credential. Tidak ada migration target, dependency, commit, push, atau perubahan frontend.
 - Verifikasi lulus: `node --experimental-strip-types --test supabase/functions/repo-credentials/contract.test.ts`, `npm run build` (667 modul; warning ukuran chunk existing), dan `git diff --check`.
 - `graphify update .` pertama berhasil menyinkronkan graph menjadi 1.881 node dan 3.790 edge. Pemanggilan ulang setelah penyempitan tipe respons mendeteksi tidak ada AST yang perlu diperbarui, lalu watcher melaporkan `Operation not permitted`; graph hasil pembaruan pertama tetap tersedia dan perubahan terakhir hanya menghapus field respons dari interface/fixture.
+## 2026-07-31 — REPO-06 Test Connection GitHub
+
+- Menambahkan aksi `test` pada Edge Function `repo-credentials` untuk menguji repository `github_public` tanpa token dan `github_private` memakai token yang hanya dibaca di service context.
+- Menambahkan pemanggilan GitHub Repository API yang mengembalikan nama repo, default branch, permission terdeteksi, serta warning eksplisit ketika scope/capability yang terdeteksi lebih luas dari `contents: read`; respons dan error tidak mengekspos token.
+- Menambahkan `schema_044_repository_connection_test.sql` berupa RPC service-role-only yang memverifikasi actor admin/owner/manager sebelum membaca credential dari Vault. Migration tidak dijalankan ke target Supabase.
+- Menyambungkan tombol Test di Project Settings melalui alur `Page → Hook → Service → Repository → Supabase Edge Function`, termasuk loading per-row, hasil metadata, warning scope, error, dan pembatasan UI untuk GitHub public/private.
+- Menambahkan tes kontrak Edge Function untuk GitHub private (warning scope berlebih dan token tidak bocor) serta GitHub public (tanpa Authorization).
+- Verifikasi: `node --experimental-strip-types --test supabase/functions/repo-credentials/contract.test.ts` lulus; `cd frontend && npm run build` lulus; `cd frontend && npm run lint` lulus dengan 7 warning lama yang tidak terkait; `git diff --check` lulus.
