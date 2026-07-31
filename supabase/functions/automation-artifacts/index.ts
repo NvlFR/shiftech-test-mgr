@@ -6,7 +6,9 @@
 // token (same token used for poll/report); the service role key stays here,
 // server-side, exactly like the ai-gateway pattern.
 //
-// Request (POST): { "token": "tm_...", "job_id": "uuid", "files": ["a.png", "d/b.zip"] }
+// Upload request: { "token": "tm_...", "job_id": "uuid", "files": ["a.png", "d/b.zip"] }
+// Download request: { "token": "tm_...", "action": "download", "bucket":
+//                     "automation-artifacts", "path": "<project>/<job>/<file>", "expires_in": 120 }
 // Response:       { "bucket": "automation-artifacts",
 //                   "uploads": [{ "name": "a.png", "path": "<proj>/<job>/a.png", "uploadUrl": "https://..." }] }
 
@@ -51,7 +53,7 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !serviceKey) return json({ error: "server_misconfigured" }, 500);
 
-  let payload: { token?: string; job_id?: string; files?: unknown };
+  let payload: { token?: string; action?: string; bucket?: string; path?: string; expires_in?: number; job_id?: string; files?: unknown };
   try {
     payload = await req.json();
   } catch {
@@ -59,14 +61,29 @@ Deno.serve(async (req) => {
   }
 
   const token = typeof payload.token === "string" ? payload.token : "";
-  const jobId = typeof payload.job_id === "string" ? payload.job_id : "";
-  const files = Array.isArray(payload.files) ? payload.files.filter((f): f is string => typeof f === "string") : [];
-  if (token.length < 32 || !jobId) return json({ error: "invalid_request" }, 400);
-  if (files.length === 0) return json({ bucket: BUCKET, uploads: [] });
-  if (files.length > MAX_FILES) return json({ error: "too_many_files" }, 400);
+  if (token.length < 32) return json({ error: "invalid_request" }, 400);
 
   const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   const tokenHash = await sha256Hex(token);
+
+  if (payload.action === "download") {
+    const bucket = payload.bucket ?? BUCKET;
+    const path = typeof payload.path === "string" ? payload.path.replace(/^\/+/, "") : "";
+    const expiresIn = Math.min(Math.max(Number(payload.expires_in) || 120, 30), 3600);
+    if (bucket !== BUCKET || !path || path.includes("..")) return json({ error: "invalid_artifact" }, 400);
+    const { data: apiToken } = await admin.from("api_tokens").select("project_id").eq("token_hash", tokenHash).is("revoked_at", null).maybeSingle();
+    if (!apiToken) return json({ error: "invalid_api_token" }, 401);
+    if (!path.startsWith(`${apiToken.project_id}/`)) return json({ error: "cross_project_artifact" }, 403);
+    const { data, error } = await admin.storage.from(bucket).createSignedUrl(path, expiresIn, { download: false });
+    if (error || !data) return json({ error: "sign_failed" }, 404);
+    return json({ bucket, path, url: data.signedUrl, expiresIn });
+  }
+
+  const jobId = typeof payload.job_id === "string" ? payload.job_id : "";
+  const files = Array.isArray(payload.files) ? payload.files.filter((f): f is string => typeof f === "string") : [];
+  if (!jobId) return json({ error: "invalid_request" }, 400);
+  if (files.length === 0) return json({ bucket: BUCKET, uploads: [] });
+  if (files.length > MAX_FILES) return json({ error: "too_many_files" }, 400);
 
   // Authenticate the runner by its token, then confirm the job belongs to it.
   const { data: runner } = await admin

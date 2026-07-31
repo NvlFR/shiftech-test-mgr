@@ -77,3 +77,24 @@ export interface TestResultSummary {
   status: TestResultStatus; executedAt: string | null; notes: string | null;
   createdAt: string; updatedAt: string;
 }
+
+export type IssuePriority = "low" | "medium" | "high" | "critical";
+export type IssueStatus = "backlog" | "open" | "in_progress" | "resolved" | "verified" | "closed" | "rejected" | "duplicate";
+export interface IssueSummary {
+  id: string; projectId: string; code: string; title: string; priority: IssuePriority; status: IssueStatus;
+  assignee: { id: string; email: string; fullName: string | null } | null; testResultId: string;
+  testRun: { id: string; code: string; name: string }; testCase: { id: string; code: string; title: string };
+  createdAt: string; updatedAt: string;
+}
+export interface IssueDetail extends IssueSummary { description: string | null; actualResult: string | null; expectedResult: string | null }
+
+export type RequirementStatus = "draft" | "approved" | "deprecated";
+export type RequirementPriority = "low" | "medium" | "high" | "critical";
+export interface RequirementSummary {
+  id: string; projectId: string; key: string; title: string; description: string | null; status: RequirementStatus;
+  priority: RequirementPriority; testCaseCount: number; covered: boolean; createdAt: string; updatedAt: string;
+}
+export interface RequirementLink { id: string; type: "test_case" | "test_plan" | "test_result" | "issue"; targetId: string }
+export interface RequirementDetail extends RequirementSummary { links: RequirementLink[] }
+export interface RequirementCoverage { total: number; covered: number; uncovered: number; percentage: number }
+export interface ArtifactUrl { bucket: string; path: string; url: string; expiresIn: number }

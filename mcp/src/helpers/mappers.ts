@@ -1,4 +1,4 @@
-import type { Project, TestCaseDetail, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultSummary, TestRunDetail, TestRunSummary, TestRunSummaryCounts } from "../types/domain.js";
+import type { IssueDetail, IssueSummary, Project, RequirementCoverage, RequirementDetail, RequirementSummary, TestCaseDetail, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultSummary, TestRunDetail, TestRunSummary, TestRunSummaryCounts } from "../types/domain.js";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -118,3 +118,24 @@ export const mapTestResultSummaryRow = (value: unknown): TestResultSummary => {
     status: row.status as TestResultSummary["status"], executedAt: nullableString(row.executed_at), notes: nullableString(row.notes),
     createdAt: stringValue(row.created_at), updatedAt: stringValue(row.updated_at) };
 };
+
+export const mapIssueSummaryRow = (value: unknown): IssueSummary => {
+  const row = record(value); const assignee = record(row.assigned_to); const run = record(row.test_run); const testCase = record(row.test_case);
+  return { id: stringValue(row.id), projectId: stringValue(row.project_id), code: stringValue(row.code), title: stringValue(row.title),
+    priority: row.priority as IssueSummary["priority"], status: row.status as IssueSummary["status"],
+    assignee: row.assigned_to ? { id: stringValue(assignee.id), email: stringValue(assignee.email), fullName: nullableString(assignee.full_name) } : null,
+    testResultId: stringValue(row.test_result_id), testRun: { id: stringValue(run.id), code: stringValue(run.code), name: stringValue(run.name) },
+    testCase: { id: stringValue(testCase.id), code: stringValue(testCase.code), title: stringValue(testCase.title) },
+    createdAt: stringValue(row.created_at), updatedAt: stringValue(row.updated_at) };
+};
+export const mapIssueDetailRow = (value: unknown): IssueDetail => { const row = record(value); return { ...mapIssueSummaryRow(row),
+  description: nullableString(row.description), actualResult: nullableString(row.actual_result), expectedResult: nullableString(row.expected_result) }; };
+
+export const mapRequirementSummaryRow = (value: unknown): RequirementSummary => { const row = record(value); return {
+  id: stringValue(row.id), projectId: stringValue(row.project_id), key: stringValue(row.key), title: stringValue(row.title),
+  description: nullableString(row.description), status: row.status as RequirementSummary["status"], priority: row.priority as RequirementSummary["priority"],
+  testCaseCount: numberValue(row.test_case_count), covered: row.covered === true, createdAt: stringValue(row.created_at), updatedAt: stringValue(row.updated_at) }; };
+export const mapRequirementDetailRow = (value: unknown): RequirementDetail => { const row = record(value); return { ...mapRequirementSummaryRow(row),
+  links: Array.isArray(row.links) ? row.links.map((item) => { const link = record(item); return { id: stringValue(link.id), type: link.type as RequirementDetail["links"][number]["type"], targetId: stringValue(link.target_id) }; }) : [] }; };
+export const mapRequirementCoverageRow = (value: unknown): RequirementCoverage => { const row = record(value); return {
+  total: numberValue(row.total), covered: numberValue(row.covered), uncovered: numberValue(row.uncovered), percentage: numberValue(row.percentage) }; };

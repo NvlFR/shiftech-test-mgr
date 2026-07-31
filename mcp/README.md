@@ -57,8 +57,11 @@ keamanan terakhir. Jalankan `supabase/schema_047_mcp_auth.sql` setelah
 migration proyek sebelum mengoperasikan server (jangan memasukkan token ke SQL).
 Migration read tools `supabase/schema_048_mcp_read_batch_1.sql` juga harus
 dijalankan sesudahnya, lalu `supabase/schema_049_mcp_read_batch_2.sql` untuk
-tool Test Plan, Test Run, dan Test Result. Ikuti proses migration proyek; server
-tidak menjalankan migration otomatis.
+tool Test Plan, Test Run, dan Test Result, serta
+`supabase/schema_050_mcp_read_batch_3.sql` untuk Issue dan Requirement. Deploy
+ulang Edge Function `automation-artifacts` agar `artifact.get_url` dapat membuat
+signed download URL. Ikuti proses migration/deploy proyek; server tidak
+menjalankannya otomatis.
 
 ## Tool read batch 1
 
@@ -82,3 +85,15 @@ token aktif dan project scope; hasil dari project lain tidak dapat dikembalikan.
 Tool list memakai pagination cursor yang sama dengan batch 1. Nilai status hasil
 di argumen tool menggunakan bentuk lowercase: `pass`, `fail`, `skip`, `blocked`,
 atau `not_run`.
+
+## Tool read batch 3
+
+- `testmanager.issue.search` dan `testmanager.issue.get`: filter status,
+  priority, assignee, test run, test case, dan free-text; hasil menyertakan
+  relasi run/case.
+- `testmanager.requirement.list` dan `testmanager.requirement.get`: daftar dan
+  detail traceability, termasuk requirement tanpa test case.
+- `testmanager.requirement.coverage`: total coverage direct link ke test case,
+  termasuk jumlah requirement uncovered.
+- `testmanager.artifact.get_url`: signed URL maksimal satu jam untuk path pada
+  bucket private `automation-artifacts` yang berada di project sesi.

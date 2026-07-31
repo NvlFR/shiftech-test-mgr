@@ -1505,3 +1505,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_049_mcp_read_batch_2.sql` tanpa menjalankannya ke target. Setiap RPC memvalidasi ulang token/project, mendukung standard maupun custom run, dan menghitung summary Test Run on-the-fly dari `test_results` tanpa kolom hasil atau cache summary.
 - Menambahkan tipe domain, mapper snake_case ke camelCase, validasi UUID/cursor, dokumentasi setup/tool batch 2, serta test untuk registrasi kelima tool, payload/filter repository, nested mapping, cursor result, dan summary hasil per status.
 - Verifikasi lulus: `cd mcp && npm test` (6 suite), `git diff --check`, dan `graphify update .` (2.130 node/4.280 edge). Tidak mengakses atau menjalankan migration ke Supabase target, tidak menghapus data, tidak mengubah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-07 tool read batch 3
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi MCP, skema Requirement/Issue/Artifact, dan keputusan katalog Discovery/read Section 8.2 `FEATURE_BACKLOG.md`.
+- Menambahkan tool read-only `testmanager.issue.search/get`, `testmanager.requirement.list/get/coverage`, dan `testmanager.artifact.get_url` melalui layering `Tool → ReadService → ReadRepository → Supabase RPC/Edge Function`.
+- Menambahkan migration `schema_050_mcp_read_batch_3.sql` tanpa menjalankannya ke target. RPC memvalidasi ulang token/project; pencarian issue mendukung status, priority, assignee, run, case, dan free-text; query requirement dimulai dari tabel `requirements` dengan left join sehingga requirement tanpa test tetap muncul dan terhitung uncovered.
+- Memperluas Edge Function `automation-artifacts` dengan aksi signed download yang memvalidasi hash API token aktif, prefix project pada object path, bucket private yang diizinkan, serta TTL 30–3.600 detik; service role tetap hanya berada di environment Edge Function.
+- Menambahkan tipe domain, mapper snake_case ke camelCase, validasi UUID/path/cursor, dokumentasi operasional, status backlog, serta test untuk registrasi tool, mapping uncovered requirement, pagination requirement, project-scoped artifact, dan kontrak signer.
+- Verifikasi lulus: `cd mcp && npm test` (6 suite) dan `git diff --check`. Migration dan Edge Function tidak dijalankan/deploy ke Supabase target; tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

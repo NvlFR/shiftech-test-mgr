@@ -72,3 +72,21 @@ test("test run summaries are mapped from on-the-fly RPC output", async () => {
   const rows = await repository.listTestRuns({ limit: 2 });
   assert.deepEqual(rows[0]?.summary, { total: 4, executed: 3, progressPercent: 75, pass: 1, fail: 1, skip: 1, blocked: 0, notRun: 1 });
 });
+
+test("requirement listing maps uncovered requirements", async () => {
+  const repository = new ReadRepository(config, async () => new Response(JSON.stringify([{ id: "22222222-2222-4222-8222-222222222222",
+    project_id: config.projectId, key: "REQ-1", title: "Login", description: null, status: "approved", priority: "high",
+    test_case_count: 0, covered: false, created_at: "2026-07-31T00:00:00Z", updated_at: "2026-07-31T00:00:00Z" }]),
+    { status: 200, headers: { "Content-Type": "application/json" } }));
+  const rows = await repository.listRequirements({ covered: false, limit: 2 });
+  assert.equal(rows[0]?.covered, false); assert.equal(rows[0]?.testCaseCount, 0);
+});
+
+test("artifact signing calls the server-side signer without exposing credentials", async () => {
+  let body: Record<string, unknown> = {};
+  const repository = new ReadRepository(config, async (_input, init) => { body = JSON.parse(String(init?.body));
+    return new Response(JSON.stringify({ bucket: "automation-artifacts", path: `${config.projectId}/job/a.png`, url: "https://signed.example/a", expiresIn: 120 }),
+      { status: 200, headers: { "Content-Type": "application/json" } }); });
+  const result = await repository.getArtifactUrl("automation-artifacts", `${config.projectId}/job/a.png`, 120);
+  assert.equal(body.action, "download"); assert.equal(result.url, "https://signed.example/a");
+});

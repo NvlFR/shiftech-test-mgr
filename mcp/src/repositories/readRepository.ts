@@ -1,6 +1,6 @@
 import type { ServerConfig } from "../config.js";
-import { mapProjectRow, mapTestCaseDetailRow, mapTestCaseSummaryRow, mapTestPlanDetailRow, mapTestPlanSummaryRow, mapTestResultSummaryRow, mapTestRunDetailRow, mapTestRunSummaryRow } from "../helpers/mappers.js";
-import type { Project, TestCaseDetail, TestCasePriority, TestCaseStatus, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultStatus, TestResultSummary, TestRunDetail, TestRunSummary } from "../types/domain.js";
+import { mapIssueDetailRow, mapIssueSummaryRow, mapProjectRow, mapRequirementCoverageRow, mapRequirementDetailRow, mapRequirementSummaryRow, mapTestCaseDetailRow, mapTestCaseSummaryRow, mapTestPlanDetailRow, mapTestPlanSummaryRow, mapTestResultSummaryRow, mapTestRunDetailRow, mapTestRunSummaryRow } from "../helpers/mappers.js";
+import type { ArtifactUrl, IssueDetail, IssuePriority, IssueStatus, IssueSummary, Project, RequirementCoverage, RequirementDetail, RequirementPriority, RequirementStatus, RequirementSummary, TestCaseDetail, TestCasePriority, TestCaseStatus, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultStatus, TestResultSummary, TestRunDetail, TestRunSummary } from "../types/domain.js";
 
 export interface TestCaseSearchQuery {
   moduleId?: string;
@@ -16,6 +16,8 @@ export interface TestCaseSearchQuery {
 export interface CodeCursorQuery { afterCode?: string; afterId?: string; limit: number }
 export interface TestRunListQuery extends CodeCursorQuery { testPlanId?: string; status?: "in_progress" | "completed" }
 export interface TestResultListQuery { status?: TestResultStatus; testerId?: string; testRunId?: string; afterCreatedAt?: string; afterId?: string; limit: number }
+export interface IssueSearchQuery extends CodeCursorQuery { status?: IssueStatus; priority?: IssuePriority; assigneeId?: string; testRunId?: string; testCaseId?: string; text?: string }
+export interface RequirementListQuery { status?: RequirementStatus; priority?: RequirementPriority; covered?: boolean; afterKey?: string; afterId?: string; limit: number }
 
 export class ReadRepositoryError extends Error {
   constructor() {
@@ -97,5 +99,27 @@ export class ReadRepository {
     const rows = await this.rpc("mcp_list_test_results", { p_status: query.status ?? null, p_tester_id: query.testerId ?? null,
       p_test_run_id: query.testRunId ?? null, p_after_created_at: query.afterCreatedAt ?? null, p_after_id: query.afterId ?? null, p_limit: query.limit }) as unknown[];
     return rows.map(mapTestResultSummaryRow);
+  }
+  async searchIssues(query: IssueSearchQuery): Promise<IssueSummary[]> {
+    const rows = await this.rpc("mcp_search_issues", { p_status: query.status ?? null, p_priority: query.priority ?? null,
+      p_assignee_id: query.assigneeId ?? null, p_test_run_id: query.testRunId ?? null, p_test_case_id: query.testCaseId ?? null,
+      p_text: query.text ?? null, p_after_code: query.afterCode ?? null, p_after_id: query.afterId ?? null, p_limit: query.limit }) as unknown[];
+    return rows.map(mapIssueSummaryRow);
+  }
+  async getIssue(id: string): Promise<IssueDetail | null> { const rows = await this.rpc("mcp_get_issue", { p_issue_id: id }) as unknown[]; return rows[0] ? mapIssueDetailRow(rows[0]) : null; }
+  async listRequirements(query: RequirementListQuery): Promise<RequirementSummary[]> {
+    const rows = await this.rpc("mcp_list_requirements", { p_status: query.status ?? null, p_priority: query.priority ?? null, p_covered: query.covered ?? null,
+      p_after_key: query.afterKey ?? null, p_after_id: query.afterId ?? null, p_limit: query.limit }) as unknown[];
+    return rows.map(mapRequirementSummaryRow);
+  }
+  async getRequirement(id: string): Promise<RequirementDetail | null> { const rows = await this.rpc("mcp_get_requirement", { p_requirement_id: id }) as unknown[]; return rows[0] ? mapRequirementDetailRow(rows[0]) : null; }
+  async getRequirementCoverage(): Promise<RequirementCoverage> { const rows = await this.rpc("mcp_requirement_coverage", {}) as unknown[]; return mapRequirementCoverageRow(rows[0]); }
+  async getArtifactUrl(bucket: string, path: string, expiresIn: number): Promise<ArtifactUrl> {
+    let response: Response;
+    try { response = await this.fetchImpl(`${this.config.supabaseUrl}/functions/v1/automation-artifacts`, { method: "POST", headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey },
+      body: JSON.stringify({ token: this.config.apiToken, action: "download", bucket, path, expires_in: expiresIn }) }); } catch { throw new ReadRepositoryError(); }
+    if (!response.ok) throw new ReadRepositoryError();
+    const value = await response.json() as { bucket: string; path: string; url: string; expiresIn: number };
+    return value;
   }
 }

@@ -177,5 +177,10 @@
   "175": "react",
   "176": "TestManager MCP Server",
   "177": "react-markdown",
-  "182": "useStoredState.ts"
+  "178": "AiTestCaseGeneratorDialog.tsx",
+  "179": "jspdf-autotable",
+  "180": "primereact",
+  "181": "react-router-dom",
+  "182": "useStoredState.ts",
+  "183": "@supabase/supabase-js"
 }

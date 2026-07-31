@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785538759.0218859,
-    "ast_hash": "aa6be7e856ed334ec0fe14ef4cdf2d64",
+    "mtime": 1785539133.8122575,
+    "ast_hash": "5f9c40bb0617ea1737a0d4aad735b404",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785538759.156841,
-    "ast_hash": "23e36774399869333a1357f4c7b9ba42",
+    "mtime": 1785539186.2535357,
+    "ast_hash": "59481f38c425d16a4e3970d4f4d610c6",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2840,8 +2840,8 @@
     "semantic_hash": ""
   },
   "mcp/README.md": {
-    "mtime": 1785538619.2283337,
-    "ast_hash": "83088bcb8a65003511ad73781f31880d",
+    "mtime": 1785539174.003675,
+    "ast_hash": "fb326df2193c700c3748bc875b83e910",
     "semantic_hash": ""
   },
   "mcp/src/repositories/authRepository.ts": {
@@ -2885,43 +2885,53 @@
     "semantic_hash": ""
   },
   "mcp/src/helpers/mappers.ts": {
-    "mtime": 1785538577.9142826,
-    "ast_hash": "4f77c998e23e6aaea952e351371ef85f",
+    "mtime": 1785538954.966524,
+    "ast_hash": "94ab2887f19c48cf6494b760b5fd29ba",
     "semantic_hash": ""
   },
   "mcp/src/repositories/readRepository.test.ts": {
-    "mtime": 1785538705.1709118,
-    "ast_hash": "7b145d2ae7afad70b46166bd9b47fe35",
+    "mtime": 1785539078.2075956,
+    "ast_hash": "c2922c93aefa587b471065e1b4d2a715",
     "semantic_hash": ""
   },
   "mcp/src/repositories/readRepository.ts": {
-    "mtime": 1785538578.0452888,
-    "ast_hash": "2cdf54c014603568fc6c1f1444b7fcfd",
+    "mtime": 1785538955.102512,
+    "ast_hash": "cf8ff4409964cd382a95033aa7591050",
     "semantic_hash": ""
   },
   "mcp/src/services/readService.test.ts": {
-    "mtime": 1785538716.6824346,
-    "ast_hash": "be48cffb9920503eb1e98ad7c2d84283",
+    "mtime": 1785539095.2028265,
+    "ast_hash": "a996f7aeef29cbf1e1141cb538e477f3",
     "semantic_hash": ""
   },
   "mcp/src/services/readService.ts": {
-    "mtime": 1785538578.177295,
-    "ast_hash": "ea4c6a11a1aabc81c44cc189c77be4c2",
+    "mtime": 1785538996.1822832,
+    "ast_hash": "01326a67029caa60894cd991dd09a66d",
     "semantic_hash": ""
   },
   "mcp/src/tools/readTools.ts": {
-    "mtime": 1785538618.8343132,
-    "ast_hash": "7c791abe7ba6c63b487b5e70b0d7a81d",
+    "mtime": 1785538996.3122742,
+    "ast_hash": "a134c2bf4c7784b123fc755d1d87b9ce",
     "semantic_hash": ""
   },
   "mcp/src/types/domain.ts": {
-    "mtime": 1785538577.7812765,
-    "ast_hash": "ed074efba8f3c3c85fcd542d55c45fac",
+    "mtime": 1785538954.8335357,
+    "ast_hash": "02251ab5af974d3271d030baf9ccd1eb",
     "semantic_hash": ""
   },
   "supabase/schema_048_mcp_read_batch_1.sql": {
     "mtime": 1785538665.9805572,
     "ast_hash": "152f086b93deb2459d5aaff47877bc70",
+    "semantic_hash": ""
+  },
+  "mcp/src/tools/readTools.test.ts": {
+    "mtime": 1785539105.0674036,
+    "ast_hash": "78055c8088b2100bee1dbd2002fb5ecd",
+    "semantic_hash": ""
+  },
+  "supabase/schema_049_mcp_read_batch_2.sql": {
+    "mtime": 1785539046.060215,
+    "ast_hash": "34882554b75ba9512f916969efd55ad3",
     "semantic_hash": ""
   }
 }
