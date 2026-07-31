@@ -33,6 +33,7 @@ Git. Jangan menaruh token pada argumen tool atau menyimpannya di source code.
 | `TM_PROJECT_ID` | Ya | Project yang mengikat satu sesi MCP. |
 | `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only dan membuat tool tulis tidak diregistrasikan; `0` atau kosong menonaktifkannya. |
 | `TM_MCP_RERUN_FAILED_MAX_TESTS` | Tidak | Ambang aman regression selektif; default `25`, rentang `1`–`500`. Di atas ambang, tool meminta konfirmasi manusia. |
+| `TM_MCP_REPOSITORY_CACHE_DIR` | Tidak | Cache clone repository remote; default `/tmp/testmanager-mcp-repositories`. |
 | `TM_SUPABASE_ACCESS_TOKEN` | Khusus AI | JWT user Supabase yang approved untuk memanggil `ai-gateway`; diperlukan oleh `issue.detect_duplicate`, tidak pernah menjadi argumen tool. |
 
 Tool baru harus dimasukkan ke grup `read` atau `write` di
@@ -128,3 +129,12 @@ atau `not_run`.
   termasuk jumlah requirement uncovered.
 - `testmanager.artifact.get_url`: signed URL maksimal satu jam untuk path pada
   bucket private `automation-artifacts` yang berada di project sesi.
+
+## Tool repository
+
+Jalankan `supabase/schema_057_mcp_repo_tools.sql` melalui proses migration proyek.
+Empat tool read-only menerima `repository_id` dari konfigurasi
+`project_repositories`: `testmanager.repo.list_files`, `repo.read_file`,
+`repo.search`, dan `repo.diff`. Mode `local_path` hanya membaca checkout lokal;
+repository remote di-clone atau diperbarui dalam cache MCP. Credential private
+diambil server-side dari Vault dan tidak pernah dikembalikan dalam output tool.

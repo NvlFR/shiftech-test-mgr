@@ -15,6 +15,7 @@ const config: ServerConfig = {
   projectId: PROJECT_ID,
   readonly: false,
   rerunFailedMaxTests: 25,
+  repositoryCacheDir: "/tmp/testmanager-mcp-test",
 };
 
 test("authenticates from config and binds the session to the token project", async () => {

@@ -3,7 +3,7 @@ import test from "node:test";
 import type { ServerConfig } from "../config.js";
 import { WriteRepository, WriteRepositoryError } from "./writeRepository.js";
 
-const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: `tm_${"a".repeat(64)}`, projectId: "11111111-1111-4111-8111-111111111111", readonly: false, rerunFailedMaxTests: 25 };
+const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: `tm_${"a".repeat(64)}`, projectId: "11111111-1111-4111-8111-111111111111", readonly: false, rerunFailedMaxTests: 25, repositoryCacheDir: "/tmp/testmanager-mcp-test" };
 
 test("create bulk maps camelCase input and includes project scope", async () => {
   let body: Record<string, any> = {};

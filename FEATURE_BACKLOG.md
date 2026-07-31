@@ -432,9 +432,9 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 
 **Repo / konteks kode** (butuh Section 10)
 
-- [ ] `repo.list_files`, `repo.read_file`, `repo.search` — baca source aplikasi under
+- [x] `repo.list_files`, `repo.read_file`, `repo.search` — baca source aplikasi under
       test untuk membantu generate test case yang akurat.
-- [ ] `repo.diff` — perubahan sejak commit/tag tertentu, dipakai memilih test regression.
+- [x] `repo.diff` — perubahan sejak commit/tag tertentu, dipakai memilih test regression.
 
 **Analisis**
 

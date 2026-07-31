@@ -11,6 +11,7 @@ const config: ServerConfig = {
   projectId: "11111111-1111-4111-8111-111111111111",
   readonly: true,
   rerunFailedMaxTests: 25,
+  repositoryCacheDir: "/tmp/testmanager-mcp-test",
 };
 
 test("search sends project scope and token in RPC body, then maps snake_case rows", async () => {

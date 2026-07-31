@@ -6,6 +6,7 @@ export interface ServerConfig {
   readonly: boolean;
   supabaseAccessToken?: string;
   rerunFailedMaxTests: number;
+  repositoryCacheDir: string;
 }
 
 const requiredEnv = (
@@ -50,4 +51,5 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ServerConfig =
   readonly: parseReadonly(env.TM_MCP_READONLY?.trim()),
   supabaseAccessToken: env.TM_SUPABASE_ACCESS_TOKEN?.trim() || undefined,
   rerunFailedMaxTests: parseRerunFailedMaxTests(env.TM_MCP_RERUN_FAILED_MAX_TESTS?.trim()),
+  repositoryCacheDir: env.TM_MCP_REPOSITORY_CACHE_DIR?.trim() || "/tmp/testmanager-mcp-repositories",
 });

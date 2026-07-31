@@ -1,5 +1,22 @@
 # Worklog
 
+## 2026-07-31 — MCP-14 tool konteks repository
+
+- Menambahkan tool read-only MCP `testmanager.repo.list_files`, `repo.read_file`,
+  `repo.search`, dan `repo.diff` dengan layering Tool → Service → Repository.
+- Menambahkan RPC `mcp_get_repository_configuration` pada
+  `schema_057_mcp_repo_tools.sql` untuk membaca repository aktif yang terikat ke
+  project sesi; credential private diambil internal dari Vault dan tidak masuk
+  output tool maupun log.
+- Mendukung checkout `local_path` tanpa mutasi serta clone/update repository
+  remote dalam cache yang dapat dikonfigurasi lewat
+  `TM_MCP_REPOSITORY_CACHE_DIR`.
+- Menambahkan guard path traversal/symlink, validasi revision, batas file 128 KiB,
+  batas hasil pencarian/list, dan batas patch 192 KiB.
+- Verifikasi: `cd mcp && npm test` lulus (14 test suite, 14 pass) termasuk test
+  konfigurasi RPC, scoping subdirectory, traversal rejection, search, read, list,
+  dan diff.
+
 ## 2026-07-31 — MCP-10 tool workflow Test Run
 
 - Menambahkan tool `testmanager.testrun.create`, `testmanager.testrun.record_result`, dan `testmanager.testrun.complete` melalui alur MCP tool → service → repository → Supabase RPC, termasuk validasi UUID, nama run, status hasil, dan tester terdaftar.
