@@ -48,3 +48,22 @@ test("test run workflow uses separate scoped RPC calls", async () => {
   assert.match(completeCall.url, /mcp_complete_test_run$/);
   assert.ok(calls.every((call) => call.body.p_project_id === config.projectId));
 });
+
+test("issue duplicate detection loads scoped candidates then calls ai-gateway with user JWT", async () => {
+  const aiConfig = { ...config, supabaseAccessToken: "user-jwt" };
+  const calls: Array<{ url: string; body: Record<string, unknown>; authorization?: string }> = [];
+  const fetchImpl: typeof fetch = async (input, init) => {
+    const url = String(input); calls.push({ url, body: JSON.parse(String(init?.body)), authorization: new Headers(init?.headers).get("authorization") ?? undefined });
+    const data = url.includes("mcp_issue_duplicate_candidates") ? [{ id: "22222222-2222-4222-8222-222222222222" }] : { data: { candidates: [] } };
+    return new Response(JSON.stringify(data), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  const repository = new WriteRepository(aiConfig, fetchImpl);
+  const candidates = await repository.duplicateIssueCandidates() as unknown[];
+  await repository.detectDuplicate({ title: "Login fails" }, candidates);
+  assert.match(calls[0]!.url, /mcp_issue_duplicate_candidates$/);
+  assert.equal(calls[0]!.body.p_project_id, config.projectId);
+  assert.match(calls[1]!.url, /functions\/v1\/ai-gateway$/);
+  assert.equal(calls[1]!.authorization, "Bearer user-jwt");
+  assert.equal(calls[1]!.body.action, "duplicate_issue_detection");
+  assert.deepEqual(calls[1]!.body.candidates, candidates);
+});

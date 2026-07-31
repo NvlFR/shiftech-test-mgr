@@ -6,6 +6,10 @@ export interface TestCaseWriteInput {
 }
 export interface TestCaseChanges extends Partial<TestCaseWriteInput> {}
 export type TestResultWriteStatus = "pass" | "fail" | "skip" | "blocked";
+export type IssuePriority = "low" | "medium" | "high" | "critical";
+export type IssueStatus = "backlog" | "open" | "in_progress" | "resolved" | "verified" | "closed" | "rejected" | "duplicate";
+export interface IssueWriteInput { testResultId: string; title: string; description?: string | null; actualResult?: string | null; expectedResult?: string | null; priority?: IssuePriority; }
+export interface DuplicateIssueDraft { title: string; description?: string; actualResult?: string; expectedResult?: string; priority?: IssuePriority; }
 
 export class WriteRepositoryError extends Error {
   constructor() { super("TestManager write service request failed"); this.name = "WriteRepositoryError"; }
@@ -45,6 +49,24 @@ export class WriteRepository {
   }
   completeTestRun(id: string, notes?: string | null) {
     return this.rpc("mcp_complete_test_run", { p_test_run_id: id, p_notes: notes ?? null });
+  }
+  createIssue(input: IssueWriteInput) { return this.rpc("mcp_create_issue", { p_test_result_id: input.testResultId, p_title: input.title, p_description: input.description ?? null, p_actual_result: input.actualResult ?? null, p_expected_result: input.expectedResult ?? null, p_priority: input.priority ?? "medium" }); }
+  commentIssue(id: string, body: string) { return this.rpc("mcp_comment_issue", { p_issue_id: id, p_body: body }); }
+  updateIssueStatus(id: string, status: IssueStatus) { return this.rpc("mcp_update_issue_status", { p_issue_id: id, p_status: status }); }
+  duplicateIssueCandidates() { return this.rpc("mcp_issue_duplicate_candidates", {}); }
+  async detectDuplicate(draft: DuplicateIssueDraft, candidates: unknown[]) {
+    if (!this.config.supabaseAccessToken) throw new WriteRepositoryError();
+    let response: Response;
+    try {
+      response = await this.fetchImpl(`${this.config.supabaseUrl}/functions/v1/ai-gateway`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey, Authorization: `Bearer ${this.config.supabaseAccessToken}` },
+        body: JSON.stringify({ action: "duplicate_issue_detection", projectId: this.config.projectId, draft, candidates }),
+      });
+    } catch { throw new WriteRepositoryError(); }
+    if (!response.ok) throw new WriteRepositoryError();
+    const payload = await response.json() as { data?: unknown };
+    return payload.data ?? payload;
   }
 }
 

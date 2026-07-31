@@ -1538,3 +1538,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Approval dicatat atomik di `audit_logs` dengan `changed_by` sebagai approver manusia, tipe approval eksplisit, dan ID token non-rahasia; token mentah/hash tidak dicatat.
 - Menambahkan unit/contract test untuk penolakan flag non-eksplisit, penerusan approver ke RPC, isolasi token dari URL, hasil approval, dan registrasi tool; dokumentasi MCP serta status backlog diperbarui.
 - Verifikasi lulus: `cd mcp && npm test` (9/9 test file), pemeriksaan pola secret, dan `git diff --check`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-11 workflow Issue
+
+- Menjalankan `graphify query` sebelum menelusuri MCP, domain Issue, comments, dan action AI sesuai Section 8.2 serta Section 4 `FEATURE_BACKLOG.md`.
+- Menambahkan tool `testmanager.issue.create`, `issue.comment`, `issue.update_status`, dan `issue.detect_duplicate` melalui layering `Tool → WriteService → WriteRepository → Supabase RPC/Edge Function` serta registrasi write yang otomatis hilang dalam mode read-only.
+- `issue.create` mewajibkan `test_result_id`, memvalidasi relasi project di RPC, dan membuat Issue berstatus awal `backlog`/review-only. Comment memakai profile pemilik API token sebagai author; perubahan status dibatasi ke workflow status Issue yang sah.
+- `issue.detect_duplicate` mengambil maksimal 300 kandidat project-scoped dari RPC lalu membungkus action `duplicate_issue_detection` pada Edge Function `ai-gateway`. JWT user approved dibaca hanya dari environment `TM_SUPABASE_ACCESS_TOKEN`, tidak dari argumen tool atau source code; respons AI ditandai `draft` dan `review_only`.
+- Menambahkan migration `schema_054_mcp_issue_workflow.sql` tanpa menjalankannya ke target, scope token `write:issues`, dokumentasi konfigurasi/migration, serta test registrasi, validasi relasi wajib, marker review AI, payload RPC, project scope, dan adapter gateway.
+- Verifikasi lulus: `cd mcp && npm test`, `cd mcp && npm run build`, `git diff --check`, dan pemeriksaan pola secret. Tidak menjalankan migration/deploy ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

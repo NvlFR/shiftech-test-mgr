@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785540449.4335928,
-    "ast_hash": "f1d8ced594ed2bbe05f1d0004fc1826a",
+    "mtime": 1785540741.3533406,
+    "ast_hash": "57c135ed8e2abad58aab62bf22f4c464",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2825,8 +2825,8 @@
     "semantic_hash": ""
   },
   "mcp/src/config.ts": {
-    "mtime": 1785537948.3742945,
-    "ast_hash": "9ca1737d860a3934ef5e8f015d01874d",
+    "mtime": 1785540659.8040059,
+    "ast_hash": "30db276b1b2001805329a535311f3eba",
     "semantic_hash": ""
   },
   "mcp/src/index.ts": {
@@ -2840,8 +2840,8 @@
     "semantic_hash": ""
   },
   "mcp/README.md": {
-    "mtime": 1785540154.0755508,
-    "ast_hash": "df9f107c3658c4dcee82a4e88309b480",
+    "mtime": 1785540696.222143,
+    "ast_hash": "39dc25cc9032637dfc8c711e26506e6a",
     "semantic_hash": ""
   },
   "mcp/src/repositories/authRepository.ts": {
@@ -2940,33 +2940,33 @@
     "semantic_hash": ""
   },
   "mcp/src/repositories/writeRepository.test.ts": {
-    "mtime": 1785540422.2567918,
-    "ast_hash": "63b2f32a740252d4f15ae68a5ac3fb8a",
+    "mtime": 1785540719.3115177,
+    "ast_hash": "06c174fee0d545720022e774803a5ce3",
     "semantic_hash": ""
   },
   "mcp/src/repositories/writeRepository.ts": {
-    "mtime": 1785540374.5644078,
-    "ast_hash": "83066dafd63e89115843baf01def27db",
+    "mtime": 1785540659.9330099,
+    "ast_hash": "89ac4beef2b10d7818a1dc3714507c23",
     "semantic_hash": ""
   },
   "mcp/src/services/writeService.test.ts": {
-    "mtime": 1785540375.2214267,
-    "ast_hash": "8a6923a4efdee743cde0cd6279823299",
+    "mtime": 1785540660.5900302,
+    "ast_hash": "aec2970c32d411fae6959cb164f4d372",
     "semantic_hash": ""
   },
   "mcp/src/services/writeService.ts": {
-    "mtime": 1785540374.6954117,
-    "ast_hash": "e18169b6cbf95d0576f12b4ed6b8bf8a",
+    "mtime": 1785540660.066014,
+    "ast_hash": "edaa6908d58139db104e01be8b17153c",
     "semantic_hash": ""
   },
   "mcp/src/tools/writeTools.test.ts": {
-    "mtime": 1785540374.9584193,
-    "ast_hash": "1d8322e66cbbc6d86876e963fcd28325",
+    "mtime": 1785540660.4610262,
+    "ast_hash": "063a4a65a9e0f7fcc07896606594dc6f",
     "semantic_hash": ""
   },
   "mcp/src/tools/writeTools.ts": {
-    "mtime": 1785540374.8274155,
-    "ast_hash": "71f62807fb96a1b0f60e54a538040988",
+    "mtime": 1785540660.1970181,
+    "ast_hash": "34a7e798951c643ec953dd8a437f02f4",
     "semantic_hash": ""
   },
   "supabase/schema_051_mcp_write_test_cases_plans.sql": {
@@ -2982,6 +2982,11 @@
   "supabase/schema_053_mcp_test_run_workflow.sql": {
     "mtime": 1785540407.236353,
     "ast_hash": "ae6588cb64693506a59d57bd427541c5",
+    "semantic_hash": ""
+  },
+  "supabase/schema_054_mcp_issue_workflow.sql": {
+    "mtime": 1785540696.0901387,
+    "ast_hash": "22e8d69e77ec1821789861e6318d4d83",
     "semantic_hash": ""
   }
 }

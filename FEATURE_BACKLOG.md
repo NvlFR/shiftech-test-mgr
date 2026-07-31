@@ -418,9 +418,9 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 - [x] `testrun.create` — selalu run baru, tidak pernah menimpa run lama.
 - [x] `testrun.record_result` — tulis satu `test_result`.
 - [x] `testrun.complete` — set `completed` (tetap aksi eksplisit).
-- [ ] `issue.create` — wajib menyertakan `test_result_id` (relasi ke Test Run + Test Case).
-- [ ] `issue.comment`, `issue.update_status`.
-- [ ] `issue.detect_duplicate` — bungkus AI action yang sudah ada (Section 4).
+- [x] `issue.create` — wajib menyertakan `test_result_id` (relasi ke Test Run + Test Case).
+- [x] `issue.comment`, `issue.update_status`.
+- [x] `issue.detect_duplicate` — bungkus AI action yang sudah ada (Section 4).
 
 **Automation**
 

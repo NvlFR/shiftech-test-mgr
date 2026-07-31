@@ -37,4 +37,18 @@ export const createWriteToolRegistrar = (session: ProjectSession, service: Write
     description: "Explicitly complete an in-progress test run. Completion is never inferred from its results.",
     inputSchema: { testrun_id: z.string().uuid(), notes: z.string().nullable().optional() }, annotations,
   }, async (a) => run(a, () => service.completeTestRun(a.testrun_id, a.notes)));
+  server.registerTool("testmanager.issue.create", {
+    description: "Create a review-only issue linked to a required test result.",
+    inputSchema: { test_result_id: z.string().uuid(), title: z.string().min(1), description: z.string().nullable().optional(), actual_result: z.string().nullable().optional(), expected_result: z.string().nullable().optional(), priority: z.enum(["low", "medium", "high", "critical"]).optional() }, annotations,
+  }, async (a) => run(a, () => service.createIssue({ testResultId: a.test_result_id, title: a.title, description: a.description, actualResult: a.actual_result, expectedResult: a.expected_result, priority: a.priority })));
+  server.registerTool("testmanager.issue.comment", {
+    description: "Add a comment to a project-scoped issue as the API-token owner.", inputSchema: { issue_id: z.string().uuid(), body: z.string().min(1).max(5000) }, annotations,
+  }, async (a) => run(a, () => service.commentIssue(a.issue_id, a.body)));
+  server.registerTool("testmanager.issue.update_status", {
+    description: "Update the workflow status of a project-scoped issue.", inputSchema: { issue_id: z.string().uuid(), status: z.enum(["backlog", "open", "in_progress", "resolved", "verified", "closed", "rejected", "duplicate"]) }, annotations,
+  }, async (a) => run(a, () => service.updateIssueStatus(a.issue_id, a.status)));
+  server.registerTool("testmanager.issue.detect_duplicate", {
+    description: "Use the existing ai-gateway duplicate_issue_detection action. Output is review-only.",
+    inputSchema: { draft: z.object({ title: z.string().min(1), description: z.string().optional(), actual_result: z.string().optional(), expected_result: z.string().optional(), priority: z.enum(["low", "medium", "high", "critical"]).optional() }) }, annotations,
+  }, async (a) => run(a, () => service.detectDuplicate({ title: a.draft.title, description: a.draft.description, actualResult: a.draft.actual_result, expectedResult: a.draft.expected_result, priority: a.draft.priority })));
 };

@@ -32,6 +32,7 @@ Git. Jangan menaruh token pada argumen tool atau menyimpannya di source code.
 | `TM_API_TOKEN` | Ya | API token TestManager untuk autentikasi. |
 | `TM_PROJECT_ID` | Ya | Project yang mengikat satu sesi MCP. |
 | `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only dan membuat tool tulis tidak diregistrasikan; `0` atau kosong menonaktifkannya. |
+| `TM_SUPABASE_ACCESS_TOKEN` | Khusus AI | JWT user Supabase yang approved untuk memanggil `ai-gateway`; diperlukan oleh `issue.detect_duplicate`, tidak pernah menjadi argumen tool. |
 
 Tool baru harus dimasukkan ke grup `read` atau `write` di
 `src/tools/registry.ts`. Saat `TM_MCP_READONLY=1`, server hanya menjalankan
@@ -68,6 +69,14 @@ Untuk tool tulis, jalankan `schema_051_mcp_write_test_cases_plans.sql`, lalu
 menerima `approver_id` user aktif yang memiliki akses project dan
 `explicit_approval: true`. RPC memvalidasi gate tersebut kembali dan mencatat
 approver di audit log; API token tidak dianggap sebagai approver manusia.
+
+Workflow Issue MCP memerlukan migration `schema_054_mcp_issue_workflow.sql` dan
+scope token `write:issues`. Tool `issue.create` selalu mewajibkan
+`test_result_id` dan membuat status awal `backlog` untuk review manusia.
+`issue.detect_duplicate` membungkus action `duplicate_issue_detection` pada
+Edge Function `ai-gateway`; karena gateway memverifikasi user JWT, isi
+`TM_SUPABASE_ACCESS_TOKEN` dengan sesi user approved dan rotasi sesuai kebijakan
+environment.
 
 ## Tool read batch 1
 

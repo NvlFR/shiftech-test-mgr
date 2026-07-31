@@ -4,6 +4,7 @@ export interface ServerConfig {
   apiToken: string;
   projectId: string;
   readonly: boolean;
+  supabaseAccessToken?: string;
 }
 
 const requiredEnv = (
@@ -37,4 +38,5 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ServerConfig =
   apiToken: requiredEnv(env, "TM_API_TOKEN"),
   projectId: requiredEnv(env, "TM_PROJECT_ID"),
   readonly: parseReadonly(env.TM_MCP_READONLY?.trim()),
+  supabaseAccessToken: env.TM_SUPABASE_ACCESS_TOKEN?.trim() || undefined,
 });

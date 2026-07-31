@@ -178,7 +178,14 @@
   "176": "TestManager MCP Server",
   "177": "4. Scope — Modul",
   "178": "@supabase/supabase-js",
+  "179": "schema_053_mcp_test_run_workflow.sql",
+  "180": "NotificationPanel.tsx",
+  "181": "2026-07-31 — FIX-00b error TypeScript ProjectDetailPage",
   "182": "useStoredState.ts",
-  "184": "activityRoutes.ts",
-  "186": "schema_051_mcp_write_test_cases_plans.sql"
+  "183": "useAuthContext",
+  "184": "2026-07-31 — SRC-04 penyelesaian notification center",
+  "185": "AppMenu.tsx",
+  "186": "schema_051_mcp_write_test_cases_plans.sql",
+  "187": "useNotifications.ts",
+  "188": "PRD — TestManager (shiftech-test-mgr)"
 }

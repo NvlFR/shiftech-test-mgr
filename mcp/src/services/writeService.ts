@@ -1,5 +1,5 @@
 import { McpToolError } from "../helpers/response.js";
-import type { TestCaseChanges, TestCaseWriteInput, TestResultWriteStatus, WriteRepository } from "../repositories/writeRepository.js";
+import type { DuplicateIssueDraft, IssueStatus, IssueWriteInput, TestCaseChanges, TestCaseWriteInput, TestResultWriteStatus, WriteRepository } from "../repositories/writeRepository.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const marker = (data: unknown) => ({ status: "draft" as const, mode: "review_only" as const, data });
@@ -39,6 +39,22 @@ export class WriteService {
   async completeTestRun(id: string, notes?: string | null) {
     this.uuid(id, "testrun_id");
     return this.repository.completeTestRun(id, notes);
+  }
+  async createIssue(input: IssueWriteInput) {
+    this.uuid(input.testResultId, "test_result_id"); this.text(input.title, "title");
+    if (input.priority !== undefined && !["low", "medium", "high", "critical"].includes(input.priority)) throw invalid("priority is invalid");
+    return marker(await this.repository.createIssue({ ...input, title: input.title.trim() }));
+  }
+  async commentIssue(id: string, body: string) { this.uuid(id, "issue_id"); this.text(body, "body"); return this.repository.commentIssue(id, body.trim()); }
+  async updateIssueStatus(id: string, status: IssueStatus) {
+    this.uuid(id, "issue_id");
+    if (!["backlog", "open", "in_progress", "resolved", "verified", "closed", "rejected", "duplicate"].includes(status)) throw invalid("status is invalid");
+    return this.repository.updateIssueStatus(id, status);
+  }
+  async detectDuplicate(draft: DuplicateIssueDraft) {
+    this.text(draft.title, "draft.title");
+    const candidates = await this.repository.duplicateIssueCandidates() as unknown[];
+    return marker(await this.repository.detectDuplicate({ ...draft, title: draft.title.trim() }, candidates));
   }
   private ids(ids: string[]) { if (ids.length < 1 || ids.length > 100) throw invalid("testcase_ids must contain between 1 and 100 IDs"); ids.forEach((id) => this.uuid(id, "testcase_ids")); }
   private validateCase(value: TestCaseChanges, path: string, required = true) {
