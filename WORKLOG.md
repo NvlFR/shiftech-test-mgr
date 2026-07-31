@@ -1325,3 +1325,10 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
   scope), dan `git diff --check`. `graphify update .` berhasil menyinkronkan
   knowledge graph menjadi 1.818 node dan 3.674 edge dengan warning 7 file
   konfigurasi/non-source menghasilkan zero node.
+
+### 2026-07-31 — E03-T06 audit filter priority dan status Test Case
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi halaman Test Case dan membaca scope `FEATURE_BACKLOG.md`.
+- Memverifikasi bahwa `TestCasesPage.tsx` pada baseline saat ini sudah menyediakan Dropdown priority (`low`, `medium`, `high`, `critical`) dan status (`active`, `archived`), meneruskan nilainya lewat `testCaseService.listFiltered()`, serta membersihkan keduanya melalui aksi Reset.
+- Tidak mengubah source fitur karena scope E03-T06 sudah terpenuhi oleh implementasi existing; tidak ada migration, perubahan database, dependency, commit, push, atau refactor di luar scope.
+- Verifikasi frontend: `npm run build` lulus.
