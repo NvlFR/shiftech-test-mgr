@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785524108.50441,
-    "ast_hash": "224a44fc39abdadbc0990db5ac6d1610",
+    "mtime": 1785524739.5949092,
+    "ast_hash": "fd5ebbc2c41af89043abc259b7ef1afb",
     "semantic_hash": ""
   },
   "README.md": {
@@ -700,13 +700,13 @@
     "semantic_hash": ""
   },
   "TODO.md": {
-    "mtime": 1784700432.6398652,
-    "ast_hash": "1851dbceb9efe1b1b31874c45301008b",
+    "mtime": 1785524739.864917,
+    "ast_hash": "606f59a3b33380895ed7e857f8e466f5",
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785524209.7028954,
-    "ast_hash": "03f6c7c2abc94403bd84d7f61d79672c",
+    "mtime": 1785524748.3041701,
+    "ast_hash": "62c6ab0e18b7a2176914c534d66ff16c",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2612,6 +2612,26 @@
   "frontend/src/pages/projects/ProjectTestCaseTab.tsx": {
     "mtime": 1785524154.7151854,
     "ast_hash": "4d9d846b900c74097f710cbde4ba643c",
+    "semantic_hash": ""
+  },
+  "scripts/codex-loop/run.sh": {
+    "mtime": 1785524520.9695764,
+    "ast_hash": "99904b8b3ad4da3abb211de80b5cb294",
+    "semantic_hash": ""
+  },
+  "scripts/codex-loop/verdict.schema.json": {
+    "mtime": 1785524442.2297206,
+    "ast_hash": "ab8649fcf14baa3c4521880c5def9f49",
+    "semantic_hash": ""
+  },
+  "scripts/codex-loop/README.md": {
+    "mtime": 1785524568.7672153,
+    "ast_hash": "d125377ccc63a273748eb64b3c4a4a81",
+    "semantic_hash": ""
+  },
+  "scripts/codex-loop/queue.md": {
+    "mtime": 1785524461.8789785,
+    "ast_hash": "2f8122dac3489892f6602e62390d7718",
     "semantic_hash": ""
   }
 }

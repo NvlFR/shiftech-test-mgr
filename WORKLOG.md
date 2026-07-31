@@ -4,6 +4,29 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### Commit porting source-new + ignore aset *-new
+
+- `.gitignore`: pola `*-new/`, `*-new.ts`, `*-new.tsx` — seluruh aset source-new
+  (layout-new, ui-new, helpers-new, hooks-new, pages-new, repositories-new,
+  services-new, domain-new.ts, App-new.tsx, supabase-new) tetap ada di disk
+  sebagai bahan referensi porting tapi tidak pernah di-commit. Diverifikasi
+  belum ada satu pun yang ter-track, jadi tidak perlu `git rm --cached`.
+  `supabase/schema_034_source_new_compatibility.sql` SENGAJA tidak diabaikan —
+  itu migration deliverable di folder `supabase/`, bukan bahan referensi.
+- Commit `93b42a0` di master: 221 file (porting source-new ke layer aktif,
+  migration schema_029–schema_038, section baru FEATURE_BACKLOG, renumber,
+  penunjuk TODO). Diverifikasi tidak ada file `-new` maupun `scripts/codex-loop/`
+  yang ikut, dan tidak ada file berisi secret.
+- **Build merah saat commit**: `npx tsc -b --force` menghasilkan 40 error di 7 file
+  — `types/domain.ts` (10, duplicate identifier `projectId`/`moduleId` sisa merge
+  domain-new), `ProjectDetailPage.tsx` (16), `ProfileView.tsx` (4),
+  `ImportCasesDialog.tsx` (4), `ProjectTestPlanTab.tsx` (3),
+  `NotificationPanel.tsx` (2), `ProjectTestCaseTab.tsx` (1). Kondisi ini sudah ada
+  sebelum sesi ini; sesi ini hanya mengubah `.md` dan `.gitignore`.
+- Konsekuensi: gate driver Codex (`npm run build`) akan menolak semua task selama
+  build merah. Ditambahkan **Blok 0 (FIX-00a–FIX-00d)** di paling depan antrean
+  untuk menghijaukan build lebih dulu. Total antrean jadi 100 task.
+
 ### Antrean Codex lengkap + renumber FEATURE_BACKLOG
 
 - Memperbaiki penomoran `FEATURE_BACKLOG.md`: setelah section 7 (integrasi
