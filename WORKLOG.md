@@ -4,6 +4,79 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### SRC-14 — Audit lengkap migration `supabase-new`
+
+- Menjalankan `graphify query` sebelum audit dan membaca scope Section 7. Seluruh
+  59 file di `supabase-new/migrations` diperiksa terhadap schema lokal. Tidak ada
+  SQL yang dijalankan ke Supabase target.
+- Migration kompatibel dipertahankan dalam rangkaian bernomor lokal yang sudah
+  diadaptasi: fondasi `schema.sql` sampai `schema_test_run_notes.sql`, lalu
+  `schema_029_project_ownership_visibility.sql`,
+  `schema_030_test_suite_library.sql`,
+  `schema_031_structured_steps_custom_runs.sql`,
+  `schema_032_activity_mentions_realtime.sql`, `schema_033_test_roles.sql`,
+  `schema_034_source_new_compatibility.sql`,
+  `schema_035_test_result_snapshot.sql`,
+  `schema_036_test_result_order_snapshot.sql`,
+  `schema_037_invited_project_metadata_access.sql`,
+  `schema_038_test_suite_structured_metadata.sql`,
+  `schema_039_issue_editor_metadata.sql`, dan
+  `schema_040_notification_delete_policy.sql`. Adaptasi ini memakai
+  `profiles(id)`, mempertahankan approval gate, memakai tabel attachment lokal,
+  menjaga status Test Run tetap manual, dan tidak membuat cache summary.
+- Migration yang diterima melalui schema lokal tersebut: `20260701000001`–
+  `20260701000017` (fondasi, kode entity/issue, snapshot, project RBAC, steps,
+  attachment lokal, order, Realtime, custom run), `20260723000001`–
+  `20260723000002` (suite/template dan test role), `20260725000002`–
+  `20260725000004` serta `20260725000007` (RLS ownership/visibility),
+  `20260725000009`–`20260725000012` (invitation dan suite privacy),
+  `20260727000013`, `20260728000001`–`20260728000002`,
+  `20260728000008`, `20260729000002`, bagian activity/comment saja dari
+  `20260730000001`, `20260730000002`, `20260730000004`–`20260730000006`,
+  `20260731000001`–`20260731000002`, `20260731000005`–`20260731000006`.
+  `20260725000001` terserap sebagai hasil akhir bernama `test_suites`, sehingga
+  rename transit `test_case_templates` tidak disalin sebagai migration terpisah.
+- Migration yang **ditolak** dan alasannya:
+  - `20260722000001_auto_approve_signup.sql` dan
+    `20260725000006_drop_approval_gate.sql`: menghapus alur wajib
+    `pending -> user/admin` dan bertentangan dengan RBAC lokal.
+  - `20260725000005_split_profiles_into_users_and_profiles.sql`,
+    `20260725000008_fix_profiles_realtime_publication.sql`,
+    `20260728000003_one_time_username.sql`,
+    `20260729000001_list_users_rpc.sql`,
+    `20260729000003_fix_soft_delete_security.sql`,
+    `20260729000004_delete_account_rpc.sql`,
+    `20260729000005_reactivate_account_rpc.sql`,
+    `20260729000006_fix_delete_account_username_trigger.sql`, dan
+    `20260731000004_project_members_read_users.sql`: bergantung pada pemisahan
+    `public.users`/`profiles`, username, atau lifecycle akun yang tidak ada dan
+    tidak kompatibel dengan model lokal `profiles` 1:1 ke `auth.users`.
+  - `20260728000004_delete_notifications_by_reference.sql`: RPC cleanup khusus
+    kontrak invitation source-new tidak dipakai oleh service lokal; delete
+    notification lokal dicakup policy recipient pada `schema_040`.
+  - `20260728000005_debug_invitation_visibility.sql` dan
+    `20260728000007_drop_debug_invitation_visibility.sql`: pasangan RPC
+    diagnostik sementara, bukan schema produksi.
+  - `20260728000006_invitation_rpc_security_definer.sql`: bentuk return dan RPC
+    accept/decline bergantung pada repository source-new; alur lokal memakai
+    fungsi/policy invitation pada `schema_029` dan akses metadata pada
+    `schema_037`.
+  - Bagian rename `attachments -> entity_attachments` dari
+    `20260730000001_entity_activity_and_attachments.sql`, seluruh
+    `20260730000003_entity_attachments_comment_type.sql`, dan
+    `20260731000003_test_result_attachments.sql`: entity attachment polymorphic
+    bertentangan dengan tabel/storage/RLS attachment lokal (`attachments` dan
+    `issue_attachments`), sehingga hanya bagian activity yang diadaptasi.
+- `20260725000001_rename_test_case_templates_to_test_suites.sql` tidak dijalankan
+  apa adanya karena schema lokal membuat `test_suites` langsung; menyalin rename
+  transit akan gagal/tumpang tindih. Semua migration lain yang diterima tetapi
+  sudah identik atau tersupersede oleh schema lokal tidak dicopy ulang agar tidak
+  menduplikasi trigger, policy, function, atau tabel.
+- Verifikasi statis: seluruh 59 nama migration tercakup dalam klasifikasi audit,
+  urutan schema lokal berlanjut sampai `schema_040`, `git diff --check` lulus,
+  dan knowledge graph diperbarui. Tidak ada kredensial/secret yang dibaca atau
+  dicatat.
+
 ### SRC-09b — Port halaman Test Runs, Issues, Test Suites, dan execution detail
 
 - Menjalankan `graphify query` sebelum membandingkan halaman aktif dengan

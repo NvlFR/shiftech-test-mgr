@@ -334,7 +334,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   baru boleh dijadikan `App.tsx` setelah route parity, RBAC, auth, dan smoke
   test seluruh halaman lulus.
 
-- [ ] **SRC-14 — `supabase-new`**
+- [x] **SRC-14 — `supabase-new`**
   Audit seluruh migration, pilih migration yang kompatibel, adaptasikan ke
   `supabase/schema_*.sql` bernomor urut, jalankan di Supabase SQL Editor, lalu
   verifikasi table, column, function, trigger, index, RLS, realtime, dan

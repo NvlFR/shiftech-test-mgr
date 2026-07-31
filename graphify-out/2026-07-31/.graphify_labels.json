@@ -69,7 +69,6 @@
   "67": "extraction-spec.md",
   "68": "schema_017_p1_rpc_hardening.sql",
   "69": "backupRetentionRepository.ts",
-  "70": "dataTablePaginator.tsx",
   "71": "useScreenSize.ts",
   "72": "package.json",
   "73": "schema_issue_code.sql",
@@ -159,6 +158,5 @@
   "157": "dashboardRepository.ts",
   "158": "useComments.ts",
   "159": "schema_040_notification_delete_policy.sql",
-  "161": "react-markdown",
-  "162": "@supabase/supabase-js"
+  "161": "react-markdown"
 }

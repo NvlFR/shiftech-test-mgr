@@ -178,7 +178,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_package",
-      "community": 117,
+      "community": 38,
       "norm_label": "package.json"
     },
     {
@@ -188,7 +188,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "frontend_package_name",
-      "community": 117,
+      "community": 38,
       "norm_label": "name"
     },
     {
@@ -198,7 +198,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_package_private",
-      "community": 117,
+      "community": 38,
       "norm_label": "private"
     },
     {
@@ -208,7 +208,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_package_version",
-      "community": 117,
+      "community": 38,
       "norm_label": "version"
     },
     {
@@ -218,7 +218,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_package_type",
-      "community": 117,
+      "community": 38,
       "norm_label": "type"
     },
     {
@@ -228,7 +228,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_package_scripts",
-      "community": 117,
+      "community": 38,
       "norm_label": "scripts"
     },
     {
@@ -238,7 +238,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_package_scripts_dev",
-      "community": 117,
+      "community": 38,
       "norm_label": "dev"
     },
     {
@@ -248,7 +248,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_package_scripts_build",
-      "community": 117,
+      "community": 38,
       "norm_label": "build"
     },
     {
@@ -258,7 +258,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "frontend_package_scripts_lint",
-      "community": 117,
+      "community": 38,
       "norm_label": "lint"
     },
     {
@@ -268,7 +268,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_package_scripts_test",
-      "community": 117,
+      "community": 38,
       "norm_label": "test"
     },
     {
@@ -278,7 +278,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "frontend_package_scripts_preview",
-      "community": 117,
+      "community": 38,
       "norm_label": "preview"
     },
     {
@@ -318,7 +318,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_package_dependencies_supabase_supabase_js",
-      "community": 25,
+      "community": 117,
       "norm_label": "@supabase/supabase-js"
     },
     {
@@ -328,7 +328,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "supabase_supabase_js",
-      "community": 25,
+      "community": 117,
       "norm_label": "@supabase/supabase-js"
     },
     {
@@ -578,7 +578,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "frontend_package_dependencies_xlsx",
-      "community": 72,
+      "community": 80,
       "norm_label": "xlsx"
     },
     {
@@ -588,7 +588,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "xlsx",
-      "community": 72,
+      "community": 80,
       "norm_label": "xlsx"
     },
     {
@@ -798,7 +798,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "frontend_src_app_app",
-      "community": 42,
+      "community": 23,
       "norm_label": "app()"
     },
     {
@@ -1148,7 +1148,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_issues_issueeditor",
-      "community": 21,
+      "community": 6,
       "norm_label": "issueeditor.tsx"
     },
     {
@@ -1158,7 +1158,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_components_issues_issueeditor_issueformdata",
-      "community": 21,
+      "community": 6,
       "norm_label": "issueformdata"
     },
     {
@@ -1178,7 +1178,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "frontend_src_components_issues_issueeditor_type_options",
-      "community": 21,
+      "community": 6,
       "norm_label": "type_options"
     },
     {
@@ -1188,7 +1188,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "frontend_src_components_issues_issueeditor_priority_options",
-      "community": 21,
+      "community": 6,
       "norm_label": "priority_options"
     },
     {
@@ -1198,7 +1198,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "frontend_src_components_issues_issueeditor_status_options",
-      "community": 21,
+      "community": 6,
       "norm_label": "status_options"
     },
     {
@@ -1208,7 +1208,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "frontend_src_components_issues_issueeditor_issueeditor",
-      "community": 21,
+      "community": 6,
       "norm_label": "issueeditor()"
     },
     {
@@ -1508,7 +1508,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel",
-      "community": 138,
+      "community": 139,
       "norm_label": "notificationpanel.tsx"
     },
     {
@@ -1518,7 +1518,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_notification_kind_icon",
-      "community": 138,
+      "community": 139,
       "norm_label": "notification_kind_icon"
     },
     {
@@ -1528,7 +1528,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_iconforkind",
-      "community": 138,
+      "community": 139,
       "norm_label": "iconforkind()"
     },
     {
@@ -1538,7 +1538,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_notificationpanelprops",
-      "community": 138,
+      "community": 139,
       "norm_label": "notificationpanelprops"
     },
     {
@@ -1548,7 +1548,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_notificationpanel",
-      "community": 138,
+      "community": 139,
       "norm_label": "notificationpanel()"
     },
     {
@@ -1558,7 +1558,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_profile_profileview",
-      "community": 6,
+      "community": 71,
       "norm_label": "profileview.tsx"
     },
     {
@@ -1568,7 +1568,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_src_components_profile_profileview_profileviewprops",
-      "community": 6,
+      "community": 71,
       "norm_label": "profileviewprops"
     },
     {
@@ -1578,7 +1578,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_components_profile_profileview_profileview",
-      "community": 39,
+      "community": 70,
       "norm_label": "profileview()"
     },
     {
@@ -1718,7 +1718,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb",
-      "community": 71,
+      "community": 70,
       "norm_label": "breadcrumb.tsx"
     },
     {
@@ -1728,7 +1728,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbitem",
-      "community": 71,
+      "community": 42,
       "norm_label": "breadcrumbitem"
     },
     {
@@ -1738,7 +1738,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbprops",
-      "community": 71,
+      "community": 70,
       "norm_label": "breadcrumbprops"
     },
     {
@@ -1778,7 +1778,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumb",
-      "community": 71,
+      "community": 70,
       "norm_label": "breadcrumb()"
     },
     {
@@ -3028,7 +3028,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapapitokenrow",
-      "community": 7,
+      "community": 27,
       "norm_label": "mapapitokenrow()"
     },
     {
@@ -3038,7 +3038,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapwebhookrow",
-      "community": 7,
+      "community": 27,
       "norm_label": "mapwebhookrow()"
     },
     {
@@ -3048,7 +3048,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapwebhookdeliveryrow",
-      "community": 7,
+      "community": 27,
       "norm_label": "mapwebhookdeliveryrow()"
     },
     {
@@ -3058,7 +3058,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapcicdpipelinerow",
-      "community": 28,
+      "community": 21,
       "norm_label": "mapcicdpipelinerow()"
     },
     {
@@ -3098,7 +3098,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapprojectrow",
-      "community": 7,
+      "community": 11,
       "norm_label": "mapprojectrow()"
     },
     {
@@ -3178,7 +3178,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestrolerow",
-      "community": 22,
+      "community": 55,
       "norm_label": "maptestrolerow()"
     },
     {
@@ -3218,7 +3218,7 @@
       "source_location": "L204",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestcaseversionrow",
-      "community": 22,
+      "community": 55,
       "norm_label": "maptestcaseversionrow()"
     },
     {
@@ -3238,7 +3238,7 @@
       "source_location": "L223",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapactivityeventrow",
-      "community": 89,
+      "community": 7,
       "norm_label": "mapactivityeventrow()"
     },
     {
@@ -3248,7 +3248,7 @@
       "source_location": "L227",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestplancaserow",
-      "community": 22,
+      "community": 55,
       "norm_label": "maptestplancaserow()"
     },
     {
@@ -3298,7 +3298,7 @@
       "source_location": "L277",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestresultrow",
-      "community": 4,
+      "community": 22,
       "norm_label": "maptestresultrow()"
     },
     {
@@ -3328,7 +3328,7 @@
       "source_location": "L344",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maprequirementrow",
-      "community": 18,
+      "community": 7,
       "norm_label": "maprequirementrow()"
     },
     {
@@ -3588,7 +3588,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels",
-      "community": 6,
+      "community": 71,
       "norm_label": "statuslabels.ts"
     },
     {
@@ -3598,7 +3598,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_tagseverity",
-      "community": 6,
+      "community": 71,
       "norm_label": "tagseverity"
     },
     {
@@ -3628,7 +3628,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_visibility_label",
-      "community": 6,
+      "community": 71,
       "norm_label": "project_visibility_label"
     },
     {
@@ -3638,7 +3638,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_visibility_severity",
-      "community": 6,
+      "community": 71,
       "norm_label": "project_visibility_severity"
     },
     {
@@ -3648,7 +3648,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_suite_visibility_label",
-      "community": 6,
+      "community": 71,
       "norm_label": "test_suite_visibility_label"
     },
     {
@@ -3658,7 +3658,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_suite_visibility_severity",
-      "community": 6,
+      "community": 71,
       "norm_label": "test_suite_visibility_severity"
     },
     {
@@ -3688,7 +3688,7 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_case_status_label",
-      "community": 17,
+      "community": 62,
       "norm_label": "test_case_status_label"
     },
     {
@@ -3698,7 +3698,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_case_status_severity",
-      "community": 17,
+      "community": 62,
       "norm_label": "test_case_status_severity"
     },
     {
@@ -3708,7 +3708,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_case_priority_label",
-      "community": 17,
+      "community": 71,
       "norm_label": "test_case_priority_label"
     },
     {
@@ -3718,7 +3718,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_case_priority_severity",
-      "community": 17,
+      "community": 71,
       "norm_label": "test_case_priority_severity"
     },
     {
@@ -3798,7 +3798,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_issue_status_severity",
-      "community": 6,
+      "community": 71,
       "norm_label": "issue_status_severity"
     },
     {
@@ -3828,7 +3828,7 @@
       "source_location": "L170",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_user_role_label",
-      "community": 6,
+      "community": 71,
       "norm_label": "user_role_label"
     },
     {
@@ -3838,7 +3838,7 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_user_role_severity",
-      "community": 6,
+      "community": 71,
       "norm_label": "user_role_severity"
     },
     {
@@ -3858,7 +3858,7 @@
       "source_location": "L189",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_member_role_severity",
-      "community": 6,
+      "community": 71,
       "norm_label": "project_member_role_severity"
     },
     {
@@ -3868,7 +3868,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_member_status_label",
-      "community": 6,
+      "community": 71,
       "norm_label": "project_member_status_label"
     },
     {
@@ -3878,7 +3878,7 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_member_status_severity",
-      "community": 6,
+      "community": 71,
       "norm_label": "project_member_status_severity"
     },
     {
@@ -3898,7 +3898,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel_importedtestcaserow",
-      "community": 29,
+      "community": 17,
       "norm_label": "importedtestcaserow"
     },
     {
@@ -4078,7 +4078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useactivity",
-      "community": 89,
+      "community": 7,
       "norm_label": "useactivity.ts"
     },
     {
@@ -4218,7 +4218,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth_authprovider",
-      "community": 42,
+      "community": 23,
       "norm_label": "authprovider()"
     },
     {
@@ -4278,7 +4278,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usecicdpipelines",
-      "community": 28,
+      "community": 21,
       "norm_label": "usecicdpipelines.ts"
     },
     {
@@ -4288,7 +4288,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_usecicdpipelines_usecicdpipelines",
-      "community": 28,
+      "community": 20,
       "norm_label": "usecicdpipelines()"
     },
     {
@@ -4318,7 +4318,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usedashboard",
-      "community": 70,
+      "community": 89,
       "norm_label": "usedashboard.ts"
     },
     {
@@ -4328,7 +4328,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_usedashboard_usedashboard",
-      "community": 20,
+      "community": 72,
       "norm_label": "usedashboard()"
     },
     {
@@ -4408,7 +4408,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissueeditoroptions_useissueeditoroptions",
-      "community": 6,
+      "community": 40,
       "norm_label": "useissueeditoroptions()"
     },
     {
@@ -4418,7 +4418,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissues",
-      "community": 71,
+      "community": 6,
       "norm_label": "useissues.ts"
     },
     {
@@ -4428,7 +4428,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissues_useissuesbyproject",
-      "community": 71,
+      "community": 6,
       "norm_label": "useissuesbyproject()"
     },
     {
@@ -4438,7 +4438,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissues_useissuesbytestrun",
-      "community": 71,
+      "community": 6,
       "norm_label": "useissuesbytestrun()"
     },
     {
@@ -4508,7 +4508,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofileview",
-      "community": 39,
+      "community": 70,
       "norm_label": "useprofileview.ts"
     },
     {
@@ -4518,7 +4518,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofileview_useprofileview",
-      "community": 39,
+      "community": 70,
       "norm_label": "useprofileview()"
     },
     {
@@ -4548,7 +4548,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectbreadcrumbitems",
-      "community": 52,
+      "community": 42,
       "norm_label": "useprojectbreadcrumbitems.ts"
     },
     {
@@ -4558,7 +4558,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectbreadcrumbitems_useprojectbreadcrumbitems",
-      "community": 52,
+      "community": 42,
       "norm_label": "useprojectbreadcrumbitems()"
     },
     {
@@ -4568,7 +4568,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext",
-      "community": 11,
+      "community": 138,
       "norm_label": "useprojectcontext.tsx"
     },
     {
@@ -4578,7 +4578,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_projectcontextvalue",
-      "community": 11,
+      "community": 138,
       "norm_label": "projectcontextvalue"
     },
     {
@@ -4588,7 +4588,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_projectcontext",
-      "community": 11,
+      "community": 138,
       "norm_label": "projectcontext"
     },
     {
@@ -4598,7 +4598,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_projectprovider",
-      "community": 49,
+      "community": 138,
       "norm_label": "projectprovider()"
     },
     {
@@ -4608,7 +4608,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_useprojectcontext",
-      "community": 20,
+      "community": 138,
       "norm_label": "useprojectcontext()"
     },
     {
@@ -4838,7 +4838,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_src_hooks_usetestplans_usetestplans",
-      "community": 28,
+      "community": 20,
       "norm_label": "usetestplans()"
     },
     {
@@ -4868,7 +4868,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usetestrundetail",
-      "community": 71,
+      "community": 22,
       "norm_label": "usetestrundetail.ts"
     },
     {
@@ -5028,7 +5028,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_main",
-      "community": 42,
+      "community": 23,
       "norm_label": "main.tsx"
     },
     {
@@ -5038,7 +5038,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_src_main_queryclient",
-      "community": 42,
+      "community": 23,
       "norm_label": "queryclient"
     },
     {
@@ -5048,7 +5048,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_auth_loginpage",
-      "community": 42,
+      "community": 20,
       "norm_label": "loginpage.tsx"
     },
     {
@@ -5058,7 +5058,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_pages_auth_loginpage_loginpage",
-      "community": 42,
+      "community": 20,
       "norm_label": "loginpage()"
     },
     {
@@ -5158,7 +5158,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage",
-      "community": 20,
+      "community": 72,
       "norm_label": "homepage.tsx"
     },
     {
@@ -5168,7 +5168,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage_statcard",
-      "community": 20,
+      "community": 72,
       "norm_label": "statcard()"
     },
     {
@@ -5178,7 +5178,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage_downloadcsv",
-      "community": 20,
+      "community": 72,
       "norm_label": "downloadcsv()"
     },
     {
@@ -5188,7 +5188,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage_homepage",
-      "community": 20,
+      "community": 72,
       "norm_label": "homepage()"
     },
     {
@@ -5198,7 +5198,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_integrations_cicdintegrationpage",
-      "community": 28,
+      "community": 20,
       "norm_label": "cicdintegrationpage.tsx"
     },
     {
@@ -5208,7 +5208,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "frontend_src_pages_integrations_cicdintegrationpage_provideroptions",
-      "community": 28,
+      "community": 20,
       "norm_label": "provideroptions"
     },
     {
@@ -5218,7 +5218,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_pages_integrations_cicdintegrationpage_cicdintegrationpage",
-      "community": 28,
+      "community": 20,
       "norm_label": "cicdintegrationpage()"
     },
     {
@@ -5298,7 +5298,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "frontend_src_pages_issues_issuedetailpage_issuedetailpage",
-      "community": 6,
+      "community": 20,
       "norm_label": "issuedetailpage()"
     },
     {
@@ -5588,7 +5588,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectspage",
-      "community": 8,
+      "community": 11,
       "norm_label": "projectspage.tsx"
     },
     {
@@ -5598,7 +5598,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectspage_status_options",
-      "community": 8,
+      "community": 11,
       "norm_label": "status_options"
     },
     {
@@ -5718,7 +5718,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_test_cases_testcasespage",
-      "community": 17,
+      "community": 8,
       "norm_label": "testcasespage.tsx"
     },
     {
@@ -5728,7 +5728,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_pages_test_cases_testcasespage_priorities",
-      "community": 17,
+      "community": 8,
       "norm_label": "priorities"
     },
     {
@@ -5738,7 +5738,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_src_pages_test_cases_testcasespage_statuses",
-      "community": 17,
+      "community": 8,
       "norm_label": "statuses"
     },
     {
@@ -5908,7 +5908,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_test_runs_testrunissuespage",
-      "community": 71,
+      "community": 6,
       "norm_label": "testrunissuespage.tsx"
     },
     {
@@ -5918,7 +5918,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_src_pages_test_runs_testrunissuespage_status_options",
-      "community": 71,
+      "community": 6,
       "norm_label": "status_options"
     },
     {
@@ -5928,7 +5928,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "frontend_src_pages_test_runs_testrunissuespage_priority_options",
-      "community": 71,
+      "community": 6,
       "norm_label": "priority_options"
     },
     {
@@ -6028,7 +6028,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_users_userdetailpage",
-      "community": 39,
+      "community": 70,
       "norm_label": "userdetailpage.tsx"
     },
     {
@@ -6038,7 +6038,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_pages_users_userdetailpage_userdetailpage",
-      "community": 39,
+      "community": 70,
       "norm_label": "userdetailpage()"
     },
     {
@@ -6078,7 +6078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_activityrepository",
-      "community": 89,
+      "community": 7,
       "norm_label": "activityrepository.ts"
     },
     {
@@ -6088,7 +6088,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_activityrepository_activityrepository",
-      "community": 89,
+      "community": 7,
       "norm_label": "activityrepository"
     },
     {
@@ -6368,7 +6368,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_cicdrepository",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdrepository.ts"
     },
     {
@@ -6378,7 +6378,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_repositories_cicdrepository_cicdrepository",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdrepository"
     },
     {
@@ -6428,7 +6428,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardreportrepository_dashboardreportissuerow",
-      "community": 21,
+      "community": 4,
       "norm_label": "dashboardreportissuerow"
     },
     {
@@ -6448,7 +6448,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository",
-      "community": 70,
+      "community": 89,
       "norm_label": "dashboardrepository.ts"
     },
     {
@@ -6458,7 +6458,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository_countrows",
-      "community": 70,
+      "community": 89,
       "norm_label": "countrows()"
     },
     {
@@ -6468,7 +6468,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository_countstatuses",
-      "community": 70,
+      "community": 89,
       "norm_label": "countstatuses()"
     },
     {
@@ -6478,7 +6478,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository_dashboardrepository",
-      "community": 70,
+      "community": 89,
       "norm_label": "dashboardrepository"
     },
     {
@@ -6508,7 +6508,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_integrationrepository",
-      "community": 7,
+      "community": 27,
       "norm_label": "integrationrepository.ts"
     },
     {
@@ -6598,7 +6598,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "frontend_src_repositories_issuerepository_issuerepository",
-      "community": 21,
+      "community": 55,
       "norm_label": "issuerepository"
     },
     {
@@ -6648,7 +6648,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_paginate",
-      "community": 4,
+      "community": 22,
       "norm_label": "paginate.ts"
     },
     {
@@ -6658,7 +6658,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_repositories_paginate_rangeresult",
-      "community": 4,
+      "community": 22,
       "norm_label": "rangeresult"
     },
     {
@@ -6668,7 +6668,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_repositories_paginate_fetchallrows",
-      "community": 4,
+      "community": 22,
       "norm_label": "fetchallrows()"
     },
     {
@@ -6828,7 +6828,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_testcaserepository",
-      "community": 22,
+      "community": 55,
       "norm_label": "testcaserepository.ts"
     },
     {
@@ -6838,7 +6838,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_testcaserepository_testcaserepository",
-      "community": 22,
+      "community": 29,
       "norm_label": "testcaserepository"
     },
     {
@@ -6888,7 +6888,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_testresultrepository",
-      "community": 4,
+      "community": 22,
       "norm_label": "testresultrepository.ts"
     },
     {
@@ -6898,7 +6898,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_repositories_testresultrepository_testresultrepository",
-      "community": 21,
+      "community": 22,
       "norm_label": "testresultrepository"
     },
     {
@@ -7018,7 +7018,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_activityservice",
-      "community": 89,
+      "community": 7,
       "norm_label": "activityservice.ts"
     },
     {
@@ -7028,7 +7028,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_activityservice_activityservice",
-      "community": 89,
+      "community": 7,
       "norm_label": "activityservice"
     },
     {
@@ -7268,7 +7268,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_cicdservice",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdservice.ts"
     },
     {
@@ -7278,7 +7278,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_services_cicdservice_createtoken",
-      "community": 28,
+      "community": 21,
       "norm_label": "createtoken()"
     },
     {
@@ -7288,7 +7288,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_services_cicdservice_cicdservice",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdservice"
     },
     {
@@ -7388,7 +7388,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_dashboardservice",
-      "community": 70,
+      "community": 89,
       "norm_label": "dashboardservice.ts"
     },
     {
@@ -7398,7 +7398,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_dashboardservice_dashboardservice",
-      "community": 70,
+      "community": 89,
       "norm_label": "dashboardservice"
     },
     {
@@ -7478,7 +7478,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_issueservice",
-      "community": 21,
+      "community": 6,
       "norm_label": "issueservice.ts"
     },
     {
@@ -7488,7 +7488,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_services_issueservice_issueservice",
-      "community": 71,
+      "community": 6,
       "norm_label": "issueservice"
     },
     {
@@ -7758,7 +7758,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_src_services_testrunservice_testrunservice",
-      "community": 71,
+      "community": 22,
       "norm_label": "testrunservice"
     },
     {
@@ -7858,7 +7858,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_types_ai_aiissuecandidateinput",
-      "community": 21,
+      "community": 6,
       "norm_label": "aiissuecandidateinput"
     },
     {
@@ -8128,7 +8128,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_types_domain",
-      "community": 40,
+      "community": 18,
       "norm_label": "domain.ts"
     },
     {
@@ -8138,7 +8138,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_types_domain_userrole",
-      "community": 6,
+      "community": 55,
       "norm_label": "userrole"
     },
     {
@@ -8148,7 +8148,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_types_domain_profile",
-      "community": 6,
+      "community": 71,
       "norm_label": "profile"
     },
     {
@@ -8278,7 +8278,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "frontend_src_types_domain_projectmemberstatus",
-      "community": 40,
+      "community": 71,
       "norm_label": "projectmemberstatus"
     },
     {
@@ -8298,7 +8298,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "frontend_src_types_domain_apitoken",
-      "community": 7,
+      "community": 27,
       "norm_label": "apitoken"
     },
     {
@@ -8308,7 +8308,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "frontend_src_types_domain_createdapitoken",
-      "community": 7,
+      "community": 27,
       "norm_label": "createdapitoken"
     },
     {
@@ -8328,7 +8328,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "frontend_src_types_domain_webhook",
-      "community": 7,
+      "community": 27,
       "norm_label": "webhook"
     },
     {
@@ -8338,7 +8338,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "frontend_src_types_domain_createdwebhook",
-      "community": 7,
+      "community": 27,
       "norm_label": "createdwebhook"
     },
     {
@@ -8348,7 +8348,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "frontend_src_types_domain_webhookdeliverystatus",
-      "community": 40,
+      "community": 18,
       "norm_label": "webhookdeliverystatus"
     },
     {
@@ -8358,7 +8358,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "frontend_src_types_domain_webhookdelivery",
-      "community": 7,
+      "community": 27,
       "norm_label": "webhookdelivery"
     },
     {
@@ -8448,7 +8448,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcasepriority",
-      "community": 17,
+      "community": 62,
       "norm_label": "testcasepriority"
     },
     {
@@ -8478,7 +8478,7 @@
       "source_location": "L178",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcaseversion",
-      "community": 22,
+      "community": 55,
       "norm_label": "testcaseversion"
     },
     {
@@ -8498,7 +8498,7 @@
       "source_location": "L198",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcasefilters",
-      "community": 40,
+      "community": 18,
       "norm_label": "testcasefilters"
     },
     {
@@ -8528,7 +8528,7 @@
       "source_location": "L214",
       "_origin": "ast",
       "id": "frontend_src_types_domain_commentmention",
-      "community": 40,
+      "community": 7,
       "norm_label": "commentmention"
     },
     {
@@ -8548,7 +8548,7 @@
       "source_location": "L235",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testplancase",
-      "community": 22,
+      "community": 55,
       "norm_label": "testplancase"
     },
     {
@@ -8558,7 +8558,7 @@
       "source_location": "L242",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testplancasewithdetails",
-      "community": 22,
+      "community": 55,
       "norm_label": "testplancasewithdetails"
     },
     {
@@ -8588,7 +8588,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdprovider",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdprovider"
     },
     {
@@ -8598,7 +8598,7 @@
       "source_location": "L277",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdpipeline",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdpipeline"
     },
     {
@@ -8608,7 +8608,7 @@
       "source_location": "L291",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdpipelinesecret",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdpipelinesecret"
     },
     {
@@ -8618,7 +8618,7 @@
       "source_location": "L292",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdingeststatus",
-      "community": 40,
+      "community": 18,
       "norm_label": "cicdingeststatus"
     },
     {
@@ -8628,7 +8628,7 @@
       "source_location": "L293",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdingestresultinput",
-      "community": 40,
+      "community": 18,
       "norm_label": "cicdingestresultinput"
     },
     {
@@ -8638,7 +8638,7 @@
       "source_location": "L294",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdingestpayload",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdingestpayload"
     },
     {
@@ -8648,7 +8648,7 @@
       "source_location": "L295",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdingestresponse",
-      "community": 28,
+      "community": 21,
       "norm_label": "cicdingestresponse"
     },
     {
@@ -8698,7 +8698,7 @@
       "source_location": "L327",
       "_origin": "ast",
       "id": "frontend_src_types_domain_automationartifact",
-      "community": 40,
+      "community": 18,
       "norm_label": "automationartifact"
     },
     {
@@ -8758,7 +8758,7 @@
       "source_location": "L379",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testresultsnapshot",
-      "community": 40,
+      "community": 18,
       "norm_label": "testresultsnapshot"
     },
     {
@@ -8808,7 +8808,7 @@
       "source_location": "L416",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issuepriority",
-      "community": 21,
+      "community": 6,
       "norm_label": "issuepriority"
     },
     {
@@ -8818,7 +8818,7 @@
       "source_location": "L417",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issuestatus",
-      "community": 21,
+      "community": 6,
       "norm_label": "issuestatus"
     },
     {
@@ -8828,7 +8828,7 @@
       "source_location": "L418",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issuetype",
-      "community": 21,
+      "community": 6,
       "norm_label": "issuetype"
     },
     {
@@ -8838,7 +8838,7 @@
       "source_location": "L419",
       "_origin": "ast",
       "id": "frontend_src_types_domain_externallink",
-      "community": 21,
+      "community": 6,
       "norm_label": "externallink"
     },
     {
@@ -8848,7 +8848,7 @@
       "source_location": "L421",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issue",
-      "community": 55,
+      "community": 1,
       "norm_label": "issue"
     },
     {
@@ -8858,7 +8858,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issuewithdetails",
-      "community": 55,
+      "community": 18,
       "norm_label": "issuewithdetails"
     },
     {
@@ -8908,7 +8908,7 @@
       "source_location": "L507",
       "_origin": "ast",
       "id": "frontend_src_types_domain_activityaction",
-      "community": 40,
+      "community": 18,
       "norm_label": "activityaction"
     },
     {
@@ -8918,7 +8918,7 @@
       "source_location": "L508",
       "_origin": "ast",
       "id": "frontend_src_types_domain_activityevent",
-      "community": 89,
+      "community": 7,
       "norm_label": "activityevent"
     },
     {
@@ -8988,7 +8988,7 @@
       "source_location": "L525",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirementcoverage",
-      "community": 40,
+      "community": 18,
       "norm_label": "requirementcoverage"
     },
     {
@@ -8998,7 +8998,7 @@
       "source_location": "L527",
       "_origin": "ast",
       "id": "frontend_src_types_domain_dashboardstats",
-      "community": 70,
+      "community": 89,
       "norm_label": "dashboardstats"
     },
     {
@@ -16042,10 +16042,20 @@
       "norm_label": "2026-07-31"
     },
     {
-      "label": "SRC-09b \u2014 Port halaman Test Runs, Issues, Test Suites, dan execution detail",
+      "label": "SRC-14 \u2014 Audit lengkap migration `supabase-new`",
       "file_type": "document",
       "source_file": "WORKLOG.md",
       "source_location": "L7",
+      "_origin": "ast",
+      "id": "worklog_src_14_audit_lengkap_migration_supabase_new",
+      "community": 83,
+      "norm_label": "src-14 \u2014 audit lengkap migration `supabase-new`"
+    },
+    {
+      "label": "SRC-09b \u2014 Port halaman Test Runs, Issues, Test Suites, dan execution detail",
+      "file_type": "document",
+      "source_file": "WORKLOG.md",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "worklog_src_09b_port_halaman_test_runs_issues_test_suites_dan_execution_detail",
       "community": 83,
@@ -16055,7 +16065,7 @@
       "label": "SRC-03 \u2014 Integrasi layout-new ke layout aktif",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L26",
+      "source_location": "L99",
       "_origin": "ast",
       "id": "worklog_src_03_integrasi_layout_new_ke_layout_aktif",
       "community": 83,
@@ -16065,7 +16075,7 @@
       "label": "Build hijau kembali + perbaikan desain gate codex-loop",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L49",
+      "source_location": "L122",
       "_origin": "ast",
       "id": "worklog_build_hijau_kembali_perbaikan_desain_gate_codex_loop",
       "community": 83,
@@ -16075,7 +16085,7 @@
       "label": "Commit porting source-new + ignore aset *-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L92",
+      "source_location": "L165",
       "_origin": "ast",
       "id": "worklog_commit_porting_source_new_ignore_aset_new",
       "community": 83,
@@ -16085,7 +16095,7 @@
       "label": "Antrean Codex lengkap + renumber FEATURE_BACKLOG",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L115",
+      "source_location": "L188",
       "_origin": "ast",
       "id": "worklog_antrean_codex_lengkap_renumber_feature_backlog",
       "community": 83,
@@ -16095,7 +16105,7 @@
       "label": "Codex task loop (otomasi antrean task)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L146",
+      "source_location": "L219",
       "_origin": "ast",
       "id": "worklog_codex_task_loop_otomasi_antrean_task",
       "community": 83,
@@ -16105,7 +16115,7 @@
       "label": "Penambahan roadmap: MCP server, Playwright interaktif, link repository",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L167",
+      "source_location": "L240",
       "_origin": "ast",
       "id": "worklog_penambahan_roadmap_mcp_server_playwright_interaktif_link_repository",
       "community": 83,
@@ -16115,7 +16125,7 @@
       "label": "Audit fitur repo pembanding",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L192",
+      "source_location": "L265",
       "_origin": "ast",
       "id": "worklog_audit_fitur_repo_pembanding",
       "community": 83,
@@ -16125,7 +16135,7 @@
       "label": "2026-07-26",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L199",
+      "source_location": "L272",
       "_origin": "ast",
       "id": "worklog_2026_07_26",
       "community": 68,
@@ -16135,7 +16145,7 @@
       "label": "Persiapan commit setelah sync fork",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L201",
+      "source_location": "L274",
       "_origin": "ast",
       "id": "worklog_persiapan_commit_setelah_sync_fork",
       "community": 68,
@@ -16145,7 +16155,7 @@
       "label": "2026-07-26 \u2014 Fix AI_INVALID_OUTPUT ai-gateway (schema hint untuk provider nyata)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L209",
+      "source_location": "L282",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_ai_invalid_output_ai_gateway_schema_hint_untuk_provider_nyata",
       "community": 68,
@@ -16155,7 +16165,7 @@
       "label": "2026-07-26 \u2014 Fix CORS ai-gateway (browser blokir POST)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L216",
+      "source_location": "L289",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_cors_ai_gateway_browser_blokir_post",
       "community": 68,
@@ -16165,7 +16175,7 @@
       "label": "2026-07-26 \u2014 Section 4: deploy Edge Function ai-gateway \u2014 FUNGSIONAL",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L223",
+      "source_location": "L296",
       "_origin": "ast",
       "id": "worklog_2026_07_26_section_4_deploy_edge_function_ai_gateway_fungsional",
       "community": 68,
@@ -16175,7 +16185,7 @@
       "label": "2026-07-26 \u2014 Section 3: webhook HTTP delivery (schema_028) \u2014 FUNGSIONAL",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L231",
+      "source_location": "L304",
       "_origin": "ast",
       "id": "worklog_2026_07_26_section_3_webhook_http_delivery_schema_028_fungsional",
       "community": 68,
@@ -16185,7 +16195,7 @@
       "label": "2026-07-26 \u2014 Audit fungsional semua fitur FEATURE_BACKLOG",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L241",
+      "source_location": "L314",
       "_origin": "ast",
       "id": "worklog_2026_07_26_audit_fungsional_semua_fitur_feature_backlog",
       "community": 68,
@@ -16195,7 +16205,7 @@
       "label": "2026-07-26 \u2014 Coordinator: integrasi AI Integration",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L249",
+      "source_location": "L322",
       "_origin": "ast",
       "id": "worklog_2026_07_26_coordinator_integrasi_ai_integration",
       "community": 68,
@@ -16205,7 +16215,7 @@
       "label": "2026-07-26 \u2014 Final integration verification AI",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L259",
+      "source_location": "L332",
       "_origin": "ast",
       "id": "worklog_2026_07_26_final_integration_verification_ai",
       "community": 68,
@@ -16215,7 +16225,7 @@
       "label": "2026-07-26 \u2014 Fix permission denied attachment RLS helpers (schema_027)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L266",
+      "source_location": "L339",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_permission_denied_attachment_rls_helpers_schema_027",
       "community": 13,
@@ -16225,7 +16235,7 @@
       "label": "2026-07-26 \u2014 Auto-upload artifact ke Supabase Storage (BERHASIL end-to-end)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L271",
+      "source_location": "L344",
       "_origin": "ast",
       "id": "worklog_2026_07_26_auto_upload_artifact_ke_supabase_storage_berhasil_end_to_end",
       "community": 13,
@@ -16235,7 +16245,7 @@
       "label": "2026-07-26 \u2014 Uji end-to-end automation BERHASIL",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L281",
+      "source_location": "L354",
       "_origin": "ast",
       "id": "worklog_2026_07_26_uji_end_to_end_automation_berhasil",
       "community": 13,
@@ -16245,7 +16255,7 @@
       "label": "2026-07-26 \u2014 Fix 2 bug runtime pasca-apply (schema_025)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L288",
+      "source_location": "L361",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_2_bug_runtime_pasca_apply_schema_025",
       "community": 13,
@@ -16255,7 +16265,7 @@
       "label": "2026-07-26 \u2014 Apply migration P2+P3 ke Supabase target (via MCP)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L297",
+      "source_location": "L370",
       "_origin": "ast",
       "id": "worklog_2026_07_26_apply_migration_p2_p3_ke_supabase_target_via_mcp",
       "community": 13,
@@ -16265,7 +16275,7 @@
       "label": "2026-07-26 \u2014 CLI Playwright Local Runner (folder runner/)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L307",
+      "source_location": "L380",
       "_origin": "ast",
       "id": "worklog_2026_07_26_cli_playwright_local_runner_folder_runner",
       "community": 13,
@@ -16275,7 +16285,7 @@
       "label": "2026-07-26 \u2014 Implementasi Section 5 Automation (sisi server pusat, Local Runner)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L316",
+      "source_location": "L389",
       "_origin": "ast",
       "id": "worklog_2026_07_26_implementasi_section_5_automation_sisi_server_pusat_local_runner",
       "community": 13,
@@ -16285,7 +16295,7 @@
       "label": "2026-07-26 \u2014 Perjelas Section 5 FEATURE_BACKLOG.md (Playwright Local Runner)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L326",
+      "source_location": "L399",
       "_origin": "ast",
       "id": "worklog_2026_07_26_perjelas_section_5_feature_backlog_md_playwright_local_runner",
       "community": 13,
@@ -16295,7 +16305,7 @@
       "label": "2026-07-26 \u2014 Sub-agent 4: AI Test Run Analysis frontend contract",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L335",
+      "source_location": "L408",
       "_origin": "ast",
       "id": "worklog_2026_07_26_sub_agent_4_ai_test_run_analysis_frontend_contract",
       "community": 13,
@@ -16305,7 +16315,7 @@
       "label": "2026-07-22 \u2014 P2 Reporting, Integrasi, Backup, Retention, dan QA final",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L344",
+      "source_location": "L417",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_reporting_integrasi_backup_retention_dan_qa_final",
       "community": 13,
@@ -16315,7 +16325,7 @@
       "label": "2026-07-22 \u2014 P2 Backup/Restore dan Data Retention (sub-agent 4)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L384",
+      "source_location": "L457",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_backup_restore_dan_data_retention_sub_agent_4",
       "community": 13,
@@ -16325,7 +16335,7 @@
       "label": "2026-07-22 \u2014 P2 Integrasi CI/CD (sub-agent 3)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L396",
+      "source_location": "L469",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_integrasi_ci_cd_sub_agent_3",
       "community": 13,
@@ -16335,7 +16345,7 @@
       "label": "2026-07-22 \u2014 P2 API Token dan Webhook (sub-agent 2)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L408",
+      "source_location": "L481",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_api_token_dan_webhook_sub_agent_2",
       "community": 13,
@@ -16345,7 +16355,7 @@
       "label": "2026-07-22 \u2014 Integrasi P1 dan QA final",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L422",
+      "source_location": "L495",
       "_origin": "ast",
       "id": "worklog_2026_07_22_integrasi_p1_dan_qa_final",
       "community": 13,
@@ -16355,7 +16365,7 @@
       "label": "2026-07-22 \u2014 Apply migration P1 dan checklist",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L433",
+      "source_location": "L506",
       "_origin": "ast",
       "id": "worklog_2026_07_22_apply_migration_p1_dan_checklist",
       "community": 13,
@@ -16365,7 +16375,7 @@
       "label": "2026-07-22 \u2014 Test Run Enhancement (sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L442",
+      "source_location": "L515",
       "_origin": "ast",
       "id": "worklog_2026_07_22_test_run_enhancement_sub_agent",
       "community": 13,
@@ -16375,7 +16385,7 @@
       "label": "2026-07-22 \u2014 P1 Duplicate Test Case dan Comment/Mention",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L454",
+      "source_location": "L527",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p1_duplicate_test_case_dan_comment_mention",
       "community": 13,
@@ -16385,7 +16395,7 @@
       "label": "2026-07-22 \u2014 P1 Requirement Traceability",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L465",
+      "source_location": "L538",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p1_requirement_traceability",
       "community": 13,
@@ -16395,7 +16405,7 @@
       "label": "2026-07-22",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L476",
+      "source_location": "L549",
       "_origin": "ast",
       "id": "worklog_2026_07_22",
       "community": 2,
@@ -16405,7 +16415,7 @@
       "label": "P1 Environment Management (sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L478",
+      "source_location": "L551",
       "_origin": "ast",
       "id": "worklog_p1_environment_management_sub_agent",
       "community": 2,
@@ -16415,7 +16425,7 @@
       "label": "Integration Review / QA (Codex sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L488",
+      "source_location": "L561",
       "_origin": "ast",
       "id": "worklog_integration_review_qa_codex_sub_agent",
       "community": 2,
@@ -16425,7 +16435,7 @@
       "label": "P1 \u2014 Attachment Test Case/Test Run dan Archive Project (sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L498",
+      "source_location": "L571",
       "_origin": "ast",
       "id": "worklog_p1_attachment_test_case_test_run_dan_archive_project_sub_agent",
       "community": 2,
@@ -16435,7 +16445,7 @@
       "label": "Graphify Codex integration",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L510",
+      "source_location": "L583",
       "_origin": "ast",
       "id": "worklog_graphify_codex_integration",
       "community": 2,
@@ -16445,7 +16455,7 @@
       "label": "Feature backlog diperluas",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L524",
+      "source_location": "L597",
       "_origin": "ast",
       "id": "worklog_feature_backlog_diperluas",
       "community": 2,
@@ -16455,7 +16465,7 @@
       "label": "P2 \u2014 Peningkatan workflow (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L530",
+      "source_location": "L603",
       "_origin": "ast",
       "id": "worklog_p2_peningkatan_workflow_selesai",
       "community": 2,
@@ -16465,7 +16475,7 @@
       "label": "Selesai",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L542",
+      "source_location": "L615",
       "_origin": "ast",
       "id": "worklog_selesai",
       "community": 2,
@@ -16475,7 +16485,7 @@
       "label": "Import Excel Test Case (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L552",
+      "source_location": "L625",
       "_origin": "ast",
       "id": "worklog_import_excel_test_case_selesai",
       "community": 2,
@@ -16485,7 +16495,7 @@
       "label": "Export Excel (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L560",
+      "source_location": "L633",
       "_origin": "ast",
       "id": "worklog_export_excel_selesai",
       "community": 2,
@@ -16495,7 +16505,7 @@
       "label": "AI Integration (roadmap)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L568",
+      "source_location": "L641",
       "_origin": "ast",
       "id": "worklog_ai_integration_roadmap",
       "community": 2,
@@ -16505,7 +16515,7 @@
       "label": "Self-hosted automation (roadmap)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L573",
+      "source_location": "L646",
       "_origin": "ast",
       "id": "worklog_self_hosted_automation_roadmap",
       "community": 2,
@@ -16515,7 +16525,7 @@
       "label": "Feature backlog (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L578",
+      "source_location": "L651",
       "_origin": "ast",
       "id": "worklog_feature_backlog_selesai",
       "community": 2,
@@ -16525,7 +16535,7 @@
       "label": "Project selector global (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L582",
+      "source_location": "L655",
       "_origin": "ast",
       "id": "worklog_project_selector_global_selesai",
       "community": 2,
@@ -16535,7 +16545,7 @@
       "label": "Export laporan Test Run (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L589",
+      "source_location": "L662",
       "_origin": "ast",
       "id": "worklog_export_laporan_test_run_selesai",
       "community": 2,
@@ -16545,7 +16555,7 @@
       "label": "Attachment Issue (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L596",
+      "source_location": "L669",
       "_origin": "ast",
       "id": "worklog_attachment_issue_selesai",
       "community": 2,
@@ -16555,7 +16565,7 @@
       "label": "Template Excel import (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L605",
+      "source_location": "L678",
       "_origin": "ast",
       "id": "worklog_template_excel_import_selesai",
       "community": 2,
@@ -16565,9 +16575,9 @@
       "label": "Export laporan Test Run (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L612",
+      "source_location": "L685",
       "_origin": "ast",
-      "id": "worklog_export_laporan_test_run_selesai_612",
+      "id": "worklog_export_laporan_test_run_selesai_685",
       "community": 2,
       "norm_label": "export laporan test run (selesai)"
     },
@@ -16575,7 +16585,7 @@
       "label": "Export PDF (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L619",
+      "source_location": "L692",
       "_origin": "ast",
       "id": "worklog_export_pdf_selesai",
       "community": 2,
@@ -16585,7 +16595,7 @@
       "label": "File yang berubah",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L625",
+      "source_location": "L698",
       "_origin": "ast",
       "id": "worklog_file_yang_berubah",
       "community": 2,
@@ -16595,7 +16605,7 @@
       "label": "Rencana implementasi",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L641",
+      "source_location": "L714",
       "_origin": "ast",
       "id": "worklog_rencana_implementasi",
       "community": 2,
@@ -16605,7 +16615,7 @@
       "label": "2026-07-22 \u2014 Sub-agent 5: Security, RLS, migration review, integration QA",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L649",
+      "source_location": "L722",
       "_origin": "ast",
       "id": "worklog_2026_07_22_sub_agent_5_security_rls_migration_review_integration_qa",
       "community": 2,
@@ -16615,7 +16625,7 @@
       "label": "2026-07-22 \u2014 Sub-agent 1: P2 Dashboard Trend dan Reporting",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L661",
+      "source_location": "L734",
       "_origin": "ast",
       "id": "worklog_2026_07_22_sub_agent_1_p2_dashboard_trend_dan_reporting",
       "community": 2,
@@ -16625,7 +16635,7 @@
       "label": "2026-07-26 \u2014 Audit potensi bug (read-only, tanpa perubahan kode)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L673",
+      "source_location": "L746",
       "_origin": "ast",
       "id": "worklog_2026_07_26_audit_potensi_bug_read_only_tanpa_perubahan_kode",
       "community": 2,
@@ -16635,7 +16645,7 @@
       "label": "2026-07-26 \u2014 Sub-agent 5: Frontend AI Issue dan Assistant Contract",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L684",
+      "source_location": "L757",
       "_origin": "ast",
       "id": "worklog_2026_07_26_sub_agent_5_frontend_ai_issue_dan_assistant_contract",
       "community": 2,
@@ -16645,7 +16655,7 @@
       "label": "2026-07-26 \u2014 Fix bug hasil audit (HIGH + race guard)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L693",
+      "source_location": "L766",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_bug_hasil_audit_high_race_guard",
       "community": 2,
@@ -16655,7 +16665,7 @@
       "label": "2026-07-26 \u2014 Fix bug #3: paginasi agregasi (batas 1000 baris PostgREST)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L703",
+      "source_location": "L776",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_bug_3_paginasi_agregasi_batas_1000_baris_postgrest",
       "community": 2,
@@ -16665,7 +16675,7 @@
       "label": "2026-07-26 \u2014 Fix bug #5, #6, #7 (footgun hook + business rule)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L714",
+      "source_location": "L787",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_bug_5_6_7_footgun_hook_business_rule",
       "community": 2,
@@ -16675,7 +16685,7 @@
       "label": "2026-07-26 \u2014 Benchmark penghematan token Graphify",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L723",
+      "source_location": "L796",
       "_origin": "ast",
       "id": "worklog_2026_07_26_benchmark_penghematan_token_graphify",
       "community": 2,
@@ -16685,7 +16695,7 @@
       "label": "2026-07-31 \u2014 Port additive fitur ownership dan invitation",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L729",
+      "source_location": "L802",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_additive_fitur_ownership_dan_invitation",
       "community": 2,
@@ -16695,7 +16705,7 @@
       "label": "2026-07-31 \u2014 Tambah Test Suite Library dasar",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L738",
+      "source_location": "L811",
       "_origin": "ast",
       "id": "worklog_2026_07_31_tambah_test_suite_library_dasar",
       "community": 2,
@@ -16705,7 +16715,7 @@
       "label": "2026-07-31 \u2014 Structured steps, custom Test Run, dan execution UX",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L745",
+      "source_location": "L818",
       "_origin": "ast",
       "id": "worklog_2026_07_31_structured_steps_custom_test_run_dan_execution_ux",
       "community": 2,
@@ -16715,7 +16725,7 @@
       "label": "2026-07-31 \u2014 Activity, mentions, notifications, dan realtime",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L755",
+      "source_location": "L828",
       "_origin": "ast",
       "id": "worklog_2026_07_31_activity_mentions_notifications_dan_realtime",
       "community": 2,
@@ -16725,7 +16735,7 @@
       "label": "2026-07-31 \u2014 Penyamaan UI/UX dengan repo referensi",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L764",
+      "source_location": "L837",
       "_origin": "ast",
       "id": "worklog_2026_07_31_penyamaan_ui_ux_dengan_repo_referensi",
       "community": 2,
@@ -16735,7 +16745,7 @@
       "label": "2026-07-31 \u2014 Instalasi Graphify Git hooks",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L772",
+      "source_location": "L845",
       "_origin": "ast",
       "id": "worklog_2026_07_31_instalasi_graphify_git_hooks",
       "community": 2,
@@ -16745,7 +16755,7 @@
       "label": "2026-07-31 \u2014 Audit dan batch awal UI/UX parity",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L779",
+      "source_location": "L852",
       "_origin": "ast",
       "id": "worklog_2026_07_31_audit_dan_batch_awal_ui_ux_parity",
       "community": 2,
@@ -16755,7 +16765,7 @@
       "label": "2026-07-31 \u2014 UI/UX parity Projects dan Custom Test Run",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L787",
+      "source_location": "L860",
       "_origin": "ast",
       "id": "worklog_2026_07_31_ui_ux_parity_projects_dan_custom_test_run",
       "community": 2,
@@ -16765,7 +16775,7 @@
       "label": "2026-07-31 \u2014 Project Settings parity dan stabilisasi build",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L794",
+      "source_location": "L867",
       "_origin": "ast",
       "id": "worklog_2026_07_31_project_settings_parity_dan_stabilisasi_build",
       "community": 2,
@@ -16775,7 +16785,7 @@
       "label": "2026-07-31 \u2014 UI/UX parity Test Plans dan Test Cases",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L800",
+      "source_location": "L873",
       "_origin": "ast",
       "id": "worklog_2026_07_31_ui_ux_parity_test_plans_dan_test_cases",
       "community": 2,
@@ -16785,7 +16795,7 @@
       "label": "2026-07-31 \u2014 Audit source of truth folder new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L807",
+      "source_location": "L880",
       "_origin": "ast",
       "id": "worklog_2026_07_31_audit_source_of_truth_folder_new",
       "community": 2,
@@ -16795,7 +16805,7 @@
       "label": "2026-07-31 \u2014 Integrasi shared UI dan TestRole dari source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L814",
+      "source_location": "L887",
       "_origin": "ast",
       "id": "worklog_2026_07_31_integrasi_shared_ui_dan_testrole_dari_source_new",
       "community": 2,
@@ -16805,7 +16815,7 @@
       "label": "2026-07-31 \u2014 Parallel audit source new dan compatibility migration",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L823",
+      "source_location": "L896",
       "_origin": "ast",
       "id": "worklog_2026_07_31_parallel_audit_source_new_dan_compatibility_migration",
       "community": 2,
@@ -16815,7 +16825,7 @@
       "label": "2026-07-31 \u2014 Final verification batch source new compatibility",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L831",
+      "source_location": "L904",
       "_origin": "ast",
       "id": "worklog_2026_07_31_final_verification_batch_source_new_compatibility",
       "community": 2,
@@ -16825,7 +16835,7 @@
       "label": "2026-07-31 \u2014 Port execution detail dari source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L837",
+      "source_location": "L910",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_execution_detail_dari_source_new",
       "community": 2,
@@ -16835,7 +16845,7 @@
       "label": "2026-07-31 \u2014 Port shared components dari source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L845",
+      "source_location": "L918",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_shared_components_dari_source_new",
       "community": 2,
@@ -16845,7 +16855,7 @@
       "label": "2026-07-31 \u2014 Port TestCaseDetailPage dari source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L853",
+      "source_location": "L926",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_testcasedetailpage_dari_source_new",
       "community": 2,
@@ -16855,7 +16865,7 @@
       "label": "2026-07-31 \u2014 Compatibility helper source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L861",
+      "source_location": "L934",
       "_origin": "ast",
       "id": "worklog_2026_07_31_compatibility_helper_source_new",
       "community": 2,
@@ -16865,7 +16875,7 @@
       "label": "2026-07-31 \u2014 Additive Test Result snapshot",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L869",
+      "source_location": "L942",
       "_origin": "ast",
       "id": "worklog_2026_07_31_additive_test_result_snapshot",
       "community": 2,
@@ -16875,7 +16885,7 @@
       "label": "2026-07-31 \u2014 Koreksi port execution detail dan batch lanjutan",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L877",
+      "source_location": "L950",
       "_origin": "ast",
       "id": "worklog_2026_07_31_koreksi_port_execution_detail_dan_batch_lanjutan",
       "community": 2,
@@ -16885,7 +16895,7 @@
       "label": "2026-07-31 \u2014 Verifikasi port TestCase, snapshot, dan compatibility hooks",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L885",
+      "source_location": "L958",
       "_origin": "ast",
       "id": "worklog_2026_07_31_verifikasi_port_testcase_snapshot_dan_compatibility_hooks",
       "community": 2,
@@ -16895,7 +16905,7 @@
       "label": "2026-07-31 \u2014 Port minimal dialog dan audit tabs source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L891",
+      "source_location": "L964",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_minimal_dialog_dan_audit_tabs_source_new",
       "community": 2,
@@ -16905,7 +16915,7 @@
       "label": "2026-07-31 \u2014 Port minimal pages utama Projects dan Test Plans",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L900",
+      "source_location": "L973",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_minimal_pages_utama_projects_dan_test_plans",
       "community": 2,
@@ -16915,7 +16925,7 @@
       "label": "2026-07-31 \u2014 Port pages Test Runs/Issues (compile-safe)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L909",
+      "source_location": "L982",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_pages_test_runs_issues_compile_safe",
       "community": 13,
@@ -16925,7 +16935,7 @@
       "label": "2026-07-31 \u2014 Port pages/dialogs/tabs utama dari source new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L917",
+      "source_location": "L990",
       "_origin": "ast",
       "id": "worklog_2026_07_31_port_pages_dialogs_tabs_utama_dari_source_new",
       "community": 13,
@@ -16935,7 +16945,7 @@
       "label": "2026-07-31 \u2014 Sinkronisasi kontrak Issue, Test Suite, dan execution pages",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L927",
+      "source_location": "L1000",
       "_origin": "ast",
       "id": "worklog_2026_07_31_sinkronisasi_kontrak_issue_test_suite_dan_execution_pages",
       "community": 13,
@@ -16945,7 +16955,7 @@
       "label": "2026-07-31 \u2014 Adaptasi minimal pages Test Runs dan Issues",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L936",
+      "source_location": "L1009",
       "_origin": "ast",
       "id": "worklog_2026_07_31_adaptasi_minimal_pages_test_runs_dan_issues",
       "community": 13,
@@ -16955,7 +16965,7 @@
       "label": "2026-07-31 \u2014 Execution UX compile-safe Test Runs/Issues",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L947",
+      "source_location": "L1020",
       "_origin": "ast",
       "id": "worklog_2026_07_31_execution_ux_compile_safe_test_runs_issues",
       "community": 13,
@@ -16965,7 +16975,7 @@
       "label": "2026-07-31 \u2014 Adaptasi additive Project Test Plan Tab",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L956",
+      "source_location": "L1029",
       "_origin": "ast",
       "id": "worklog_2026_07_31_adaptasi_additive_project_test_plan_tab",
       "community": 13,
@@ -16975,7 +16985,7 @@
       "label": "2026-07-31 \u2014 Aktivasi Test Suite pages dan execution UX lanjutan",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L964",
+      "source_location": "L1037",
       "_origin": "ast",
       "id": "worklog_2026_07_31_aktivasi_test_suite_pages_dan_execution_ux_lanjutan",
       "community": 13,
@@ -16985,7 +16995,7 @@
       "label": "2026-07-31 \u2014 Integrasi compile-safe dialogs, notifications, dan profile",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L972",
+      "source_location": "L1045",
       "_origin": "ast",
       "id": "worklog_2026_07_31_integrasi_compile_safe_dialogs_notifications_dan_profile",
       "community": 99,
@@ -16995,7 +17005,7 @@
       "label": "2026-07-31 \u2014 Membuat task integrasi penuh source-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L981",
+      "source_location": "L1054",
       "_origin": "ast",
       "id": "worklog_2026_07_31_membuat_task_integrasi_penuh_source_new",
       "community": 99,
@@ -17005,7 +17015,7 @@
       "label": "2026-07-31 \u2014 FIX-00a duplikasi domain TestCase",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L989",
+      "source_location": "L1062",
       "_origin": "ast",
       "id": "worklog_2026_07_31_fix_00a_duplikasi_domain_testcase",
       "community": 99,
@@ -17015,7 +17025,7 @@
       "label": "2026-07-31 \u2014 FIX-00b error TypeScript ProjectDetailPage",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L996",
+      "source_location": "L1069",
       "_origin": "ast",
       "id": "worklog_2026_07_31_fix_00b_error_typescript_projectdetailpage",
       "community": 99,
@@ -17025,7 +17035,7 @@
       "label": "2026-07-31 \u2014 SRC-12 konsolidasi domain aktif",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1004",
+      "source_location": "L1077",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_12_konsolidasi_domain_aktif",
       "community": 99,
@@ -17035,7 +17045,7 @@
       "label": "2026-07-31 \u2014 SRC-07 port helper source-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1011",
+      "source_location": "L1084",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_07_port_helper_source_new",
       "community": 99,
@@ -17045,7 +17055,7 @@
       "label": "2026-07-31 \u2014 SRC-10 sinkronisasi repository source-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1020",
+      "source_location": "L1093",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_10_sinkronisasi_repository_source_new",
       "community": 99,
@@ -17055,7 +17065,7 @@
       "label": "2026-07-31 \u2014 SRC-11 sinkronisasi business rule service source-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1029",
+      "source_location": "L1102",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_11_sinkronisasi_business_rule_service_source_new",
       "community": 99,
@@ -17065,7 +17075,7 @@
       "label": "2026-07-31 \u2014 SRC-08 sinkronisasi hooks-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1039",
+      "source_location": "L1112",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_08_sinkronisasi_hooks_new",
       "community": 67,
@@ -17075,7 +17085,7 @@
       "label": "2026-07-31 \u2014 SRC-06 audit dan port shared UI",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1049",
+      "source_location": "L1122",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_06_audit_dan_port_shared_ui",
       "community": 67,
@@ -17085,7 +17095,7 @@
       "label": "2026-07-31 \u2014 SRC-01 aktivasi dialog source-new",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1067",
+      "source_location": "L1140",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_01_aktivasi_dialog_source_new",
       "community": 67,
@@ -17095,7 +17105,7 @@
       "label": "2026-07-31 \u2014 SRC-02 integrasi komponen Issue",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1078",
+      "source_location": "L1151",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_02_integrasi_komponen_issue",
       "community": 67,
@@ -17105,7 +17115,7 @@
       "label": "2026-07-31 \u2014 SRC-04 penyelesaian notification center",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1088",
+      "source_location": "L1161",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_04_penyelesaian_notification_center",
       "community": 67,
@@ -17115,7 +17125,7 @@
       "label": "2026-07-31 \u2014 SRC-05 aktivasi profile view lokal",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1099",
+      "source_location": "L1172",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_05_aktivasi_profile_view_lokal",
       "community": 67,
@@ -17125,7 +17135,7 @@
       "label": "2026-07-31 \u2014 SRC-09a port halaman utama batch 1",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1109",
+      "source_location": "L1182",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_09a_port_halaman_utama_batch_1",
       "community": 67,
@@ -17135,7 +17145,7 @@
       "label": "2026-07-31 \u2014 SRC-09c port halaman utama batch 3",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L1128",
+      "source_location": "L1201",
       "_origin": "ast",
       "id": "worklog_2026_07_31_src_09c_port_halaman_utama_batch_3",
       "community": 67,
@@ -54963,7 +54973,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L972",
+      "source_location": "L1045",
       "weight": 1.0,
       "source": "worklog",
       "target": "worklog_2026_07_31_integrasi_compile_safe_dialogs_notifications_dan_profile",
@@ -54973,7 +54983,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1039",
+      "source_location": "L1112",
       "weight": 1.0,
       "source": "worklog",
       "target": "worklog_2026_07_31_src_08_sinkronisasi_hooks_new",
@@ -54993,7 +55003,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L476",
+      "source_location": "L549",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22",
@@ -55003,7 +55013,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L433",
+      "source_location": "L506",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_apply_migration_p1_dan_checklist",
@@ -55013,7 +55023,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L422",
+      "source_location": "L495",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_integrasi_p1_dan_qa_final",
@@ -55023,7 +55033,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L454",
+      "source_location": "L527",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p1_duplicate_test_case_dan_comment_mention",
@@ -55033,7 +55043,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L465",
+      "source_location": "L538",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p1_requirement_traceability",
@@ -55043,7 +55053,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L408",
+      "source_location": "L481",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_api_token_dan_webhook_sub_agent_2",
@@ -55053,7 +55063,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L384",
+      "source_location": "L457",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_backup_restore_dan_data_retention_sub_agent_4",
@@ -55063,7 +55073,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L396",
+      "source_location": "L469",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_integrasi_ci_cd_sub_agent_3",
@@ -55073,7 +55083,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L344",
+      "source_location": "L417",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_reporting_integrasi_backup_retention_dan_qa_final",
@@ -55083,7 +55093,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L442",
+      "source_location": "L515",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_test_run_enhancement_sub_agent",
@@ -55093,7 +55103,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L199",
+      "source_location": "L272",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26",
@@ -55103,7 +55113,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L297",
+      "source_location": "L370",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_apply_migration_p2_p3_ke_supabase_target_via_mcp",
@@ -55113,7 +55123,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L271",
+      "source_location": "L344",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_auto_upload_artifact_ke_supabase_storage_berhasil_end_to_end",
@@ -55123,7 +55133,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L307",
+      "source_location": "L380",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_cli_playwright_local_runner_folder_runner",
@@ -55133,7 +55143,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L288",
+      "source_location": "L361",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_fix_2_bug_runtime_pasca_apply_schema_025",
@@ -55143,7 +55153,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L266",
+      "source_location": "L339",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_fix_permission_denied_attachment_rls_helpers_schema_027",
@@ -55153,7 +55163,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L316",
+      "source_location": "L389",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_implementasi_section_5_automation_sisi_server_pusat_local_runner",
@@ -55163,7 +55173,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L326",
+      "source_location": "L399",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_perjelas_section_5_feature_backlog_md_playwright_local_runner",
@@ -55173,7 +55183,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L335",
+      "source_location": "L408",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_sub_agent_4_ai_test_run_analysis_frontend_contract",
@@ -55183,7 +55193,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L281",
+      "source_location": "L354",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_uji_end_to_end_automation_berhasil",
@@ -55203,7 +55213,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L956",
+      "source_location": "L1029",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_adaptasi_additive_project_test_plan_tab",
@@ -55213,7 +55223,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L936",
+      "source_location": "L1009",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_adaptasi_minimal_pages_test_runs_dan_issues",
@@ -55223,7 +55233,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L964",
+      "source_location": "L1037",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_aktivasi_test_suite_pages_dan_execution_ux_lanjutan",
@@ -55233,7 +55243,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L947",
+      "source_location": "L1020",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_execution_ux_compile_safe_test_runs_issues",
@@ -55243,7 +55253,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L917",
+      "source_location": "L990",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_port_pages_dialogs_tabs_utama_dari_source_new",
@@ -55253,7 +55263,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L909",
+      "source_location": "L982",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_port_pages_test_runs_issues_compile_safe",
@@ -55263,7 +55273,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L927",
+      "source_location": "L1000",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_31_sinkronisasi_kontrak_issue_test_suite_dan_execution_pages",
@@ -55273,7 +55283,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L115",
+      "source_location": "L188",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_antrean_codex_lengkap_renumber_feature_backlog",
@@ -55283,7 +55293,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L192",
+      "source_location": "L265",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_audit_fitur_repo_pembanding",
@@ -55293,7 +55303,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L49",
+      "source_location": "L122",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_build_hijau_kembali_perbaikan_desain_gate_codex_loop",
@@ -55303,7 +55313,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L146",
+      "source_location": "L219",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_codex_task_loop_otomasi_antrean_task",
@@ -55313,7 +55323,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L92",
+      "source_location": "L165",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_commit_porting_source_new_ignore_aset_new",
@@ -55323,7 +55333,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L167",
+      "source_location": "L240",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_penambahan_roadmap_mcp_server_playwright_interaktif_link_repository",
@@ -55333,7 +55343,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L26",
+      "source_location": "L99",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_src_03_integrasi_layout_new_ke_layout_aktif",
@@ -55343,7 +55353,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L7",
+      "source_location": "L80",
       "weight": 1.0,
       "source": "worklog_2026_07_31",
       "target": "worklog_src_09b_port_halaman_test_runs_issues_test_suites_dan_execution_detail",
@@ -55353,7 +55363,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L241",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "worklog_2026_07_31",
+      "target": "worklog_src_14_audit_lengkap_migration_supabase_new",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "WORKLOG.md",
+      "source_location": "L314",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_audit_fungsional_semua_fitur_feature_backlog",
@@ -55363,7 +55383,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L249",
+      "source_location": "L322",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_coordinator_integrasi_ai_integration",
@@ -55373,7 +55393,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L259",
+      "source_location": "L332",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_final_integration_verification_ai",
@@ -55383,7 +55403,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L209",
+      "source_location": "L282",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_fix_ai_invalid_output_ai_gateway_schema_hint_untuk_provider_nyata",
@@ -55393,7 +55413,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L216",
+      "source_location": "L289",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_fix_cors_ai_gateway_browser_blokir_post",
@@ -55403,7 +55423,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L231",
+      "source_location": "L304",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_section_3_webhook_http_delivery_schema_028_fungsional",
@@ -55413,7 +55433,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L223",
+      "source_location": "L296",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_section_4_deploy_edge_function_ai_gateway_fungsional",
@@ -55423,7 +55443,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L201",
+      "source_location": "L274",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_persiapan_commit_setelah_sync_fork",
@@ -55433,7 +55453,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L661",
+      "source_location": "L734",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_22_sub_agent_1_p2_dashboard_trend_dan_reporting",
@@ -55443,7 +55463,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L649",
+      "source_location": "L722",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_22_sub_agent_5_security_rls_migration_review_integration_qa",
@@ -55453,7 +55473,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L673",
+      "source_location": "L746",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_audit_potensi_bug_read_only_tanpa_perubahan_kode",
@@ -55463,7 +55483,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L723",
+      "source_location": "L796",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_benchmark_penghematan_token_graphify",
@@ -55473,7 +55493,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L703",
+      "source_location": "L776",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_fix_bug_3_paginasi_agregasi_batas_1000_baris_postgrest",
@@ -55483,7 +55503,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L714",
+      "source_location": "L787",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_fix_bug_5_6_7_footgun_hook_business_rule",
@@ -55493,7 +55513,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L693",
+      "source_location": "L766",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_fix_bug_hasil_audit_high_race_guard",
@@ -55503,7 +55523,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L684",
+      "source_location": "L757",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_sub_agent_5_frontend_ai_issue_dan_assistant_contract",
@@ -55513,7 +55533,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L755",
+      "source_location": "L828",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_activity_mentions_notifications_dan_realtime",
@@ -55523,7 +55543,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L869",
+      "source_location": "L942",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_additive_test_result_snapshot",
@@ -55533,7 +55553,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L779",
+      "source_location": "L852",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_audit_dan_batch_awal_ui_ux_parity",
@@ -55543,7 +55563,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L807",
+      "source_location": "L880",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_audit_source_of_truth_folder_new",
@@ -55553,7 +55573,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L861",
+      "source_location": "L934",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_compatibility_helper_source_new",
@@ -55563,7 +55583,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L831",
+      "source_location": "L904",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_final_verification_batch_source_new_compatibility",
@@ -55573,7 +55593,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L772",
+      "source_location": "L845",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_instalasi_graphify_git_hooks",
@@ -55583,7 +55603,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L814",
+      "source_location": "L887",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_integrasi_shared_ui_dan_testrole_dari_source_new",
@@ -55593,7 +55613,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L877",
+      "source_location": "L950",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_koreksi_port_execution_detail_dan_batch_lanjutan",
@@ -55603,7 +55623,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L823",
+      "source_location": "L896",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_parallel_audit_source_new_dan_compatibility_migration",
@@ -55613,7 +55633,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L764",
+      "source_location": "L837",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_penyamaan_ui_ux_dengan_repo_referensi",
@@ -55623,7 +55643,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L729",
+      "source_location": "L802",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_port_additive_fitur_ownership_dan_invitation",
@@ -55633,7 +55653,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L837",
+      "source_location": "L910",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_port_execution_detail_dari_source_new",
@@ -55643,7 +55663,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L891",
+      "source_location": "L964",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_port_minimal_dialog_dan_audit_tabs_source_new",
@@ -55653,7 +55673,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L900",
+      "source_location": "L973",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_port_minimal_pages_utama_projects_dan_test_plans",
@@ -55663,7 +55683,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L845",
+      "source_location": "L918",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_port_shared_components_dari_source_new",
@@ -55673,7 +55693,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L853",
+      "source_location": "L926",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_port_testcasedetailpage_dari_source_new",
@@ -55683,7 +55703,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L794",
+      "source_location": "L867",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_project_settings_parity_dan_stabilisasi_build",
@@ -55693,7 +55713,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L745",
+      "source_location": "L818",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_structured_steps_custom_test_run_dan_execution_ux",
@@ -55703,7 +55723,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L738",
+      "source_location": "L811",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_tambah_test_suite_library_dasar",
@@ -55713,7 +55733,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L787",
+      "source_location": "L860",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_ui_ux_parity_projects_dan_custom_test_run",
@@ -55723,7 +55743,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L800",
+      "source_location": "L873",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_ui_ux_parity_test_plans_dan_test_cases",
@@ -55733,7 +55753,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L885",
+      "source_location": "L958",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_31_verifikasi_port_testcase_snapshot_dan_compatibility_hooks",
@@ -55743,7 +55763,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L568",
+      "source_location": "L641",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_ai_integration_roadmap",
@@ -55753,7 +55773,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L596",
+      "source_location": "L669",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_attachment_issue_selesai",
@@ -55763,7 +55783,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L560",
+      "source_location": "L633",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_export_excel_selesai",
@@ -55773,7 +55793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L589",
+      "source_location": "L662",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_export_laporan_test_run_selesai",
@@ -55783,17 +55803,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L612",
+      "source_location": "L685",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
-      "target": "worklog_export_laporan_test_run_selesai_612",
+      "target": "worklog_export_laporan_test_run_selesai_685",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L619",
+      "source_location": "L692",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_export_pdf_selesai",
@@ -55803,7 +55823,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L524",
+      "source_location": "L597",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_feature_backlog_diperluas",
@@ -55813,7 +55833,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L578",
+      "source_location": "L651",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_feature_backlog_selesai",
@@ -55823,7 +55843,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L625",
+      "source_location": "L698",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_file_yang_berubah",
@@ -55833,7 +55853,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L510",
+      "source_location": "L583",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_graphify_codex_integration",
@@ -55843,7 +55863,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L552",
+      "source_location": "L625",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_import_excel_test_case_selesai",
@@ -55853,7 +55873,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L488",
+      "source_location": "L561",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_integration_review_qa_codex_sub_agent",
@@ -55863,7 +55883,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L498",
+      "source_location": "L571",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_p1_attachment_test_case_test_run_dan_archive_project_sub_agent",
@@ -55873,7 +55893,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L478",
+      "source_location": "L551",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_p1_environment_management_sub_agent",
@@ -55883,7 +55903,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L530",
+      "source_location": "L603",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_p2_peningkatan_workflow_selesai",
@@ -55893,7 +55913,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L582",
+      "source_location": "L655",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_project_selector_global_selesai",
@@ -55903,7 +55923,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L641",
+      "source_location": "L714",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_rencana_implementasi",
@@ -55913,7 +55933,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L542",
+      "source_location": "L615",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_selesai",
@@ -55923,7 +55943,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L573",
+      "source_location": "L646",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_self_hosted_automation_roadmap",
@@ -55933,7 +55953,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L605",
+      "source_location": "L678",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_template_excel_import_selesai",
@@ -55943,7 +55963,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L989",
+      "source_location": "L1062",
       "weight": 1.0,
       "source": "worklog_2026_07_31_integrasi_compile_safe_dialogs_notifications_dan_profile",
       "target": "worklog_2026_07_31_fix_00a_duplikasi_domain_testcase",
@@ -55953,7 +55973,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L996",
+      "source_location": "L1069",
       "weight": 1.0,
       "source": "worklog_2026_07_31_integrasi_compile_safe_dialogs_notifications_dan_profile",
       "target": "worklog_2026_07_31_fix_00b_error_typescript_projectdetailpage",
@@ -55963,7 +55983,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L981",
+      "source_location": "L1054",
       "weight": 1.0,
       "source": "worklog_2026_07_31_integrasi_compile_safe_dialogs_notifications_dan_profile",
       "target": "worklog_2026_07_31_membuat_task_integrasi_penuh_source_new",
@@ -55973,7 +55993,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1011",
+      "source_location": "L1084",
       "weight": 1.0,
       "source": "worklog_2026_07_31_fix_00b_error_typescript_projectdetailpage",
       "target": "worklog_2026_07_31_src_07_port_helper_source_new",
@@ -55983,7 +56003,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1020",
+      "source_location": "L1093",
       "weight": 1.0,
       "source": "worklog_2026_07_31_fix_00b_error_typescript_projectdetailpage",
       "target": "worklog_2026_07_31_src_10_sinkronisasi_repository_source_new",
@@ -55993,7 +56013,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1029",
+      "source_location": "L1102",
       "weight": 1.0,
       "source": "worklog_2026_07_31_fix_00b_error_typescript_projectdetailpage",
       "target": "worklog_2026_07_31_src_11_sinkronisasi_business_rule_service_source_new",
@@ -56003,7 +56023,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1004",
+      "source_location": "L1077",
       "weight": 1.0,
       "source": "worklog_2026_07_31_fix_00b_error_typescript_projectdetailpage",
       "target": "worklog_2026_07_31_src_12_konsolidasi_domain_aktif",
@@ -56013,7 +56033,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1067",
+      "source_location": "L1140",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_08_sinkronisasi_hooks_new",
       "target": "worklog_2026_07_31_src_01_aktivasi_dialog_source_new",
@@ -56023,7 +56043,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1078",
+      "source_location": "L1151",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_08_sinkronisasi_hooks_new",
       "target": "worklog_2026_07_31_src_02_integrasi_komponen_issue",
@@ -56033,7 +56053,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1088",
+      "source_location": "L1161",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_08_sinkronisasi_hooks_new",
       "target": "worklog_2026_07_31_src_04_penyelesaian_notification_center",
@@ -56043,7 +56063,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1049",
+      "source_location": "L1122",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_08_sinkronisasi_hooks_new",
       "target": "worklog_2026_07_31_src_06_audit_dan_port_shared_ui",
@@ -56053,7 +56073,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1099",
+      "source_location": "L1172",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_04_penyelesaian_notification_center",
       "target": "worklog_2026_07_31_src_05_aktivasi_profile_view_lokal",
@@ -56063,7 +56083,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1109",
+      "source_location": "L1182",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_04_penyelesaian_notification_center",
       "target": "worklog_2026_07_31_src_09a_port_halaman_utama_batch_1",
@@ -56073,7 +56093,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L1128",
+      "source_location": "L1201",
       "weight": 1.0,
       "source": "worklog_2026_07_31_src_04_penyelesaian_notification_center",
       "target": "worklog_2026_07_31_src_09c_port_halaman_utama_batch_3",
@@ -57031,5 +57051,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5e4d20e1023e2d86688aa7a478150f3deb0390a4"
+  "built_at_commit": "fa64df2138a9832e6f971f688c2fa893d6375771"
 }
