@@ -288,7 +288,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   realtime refresh, dan navigasi notification menggunakan notification service
   lokal serta RLS yang sesuai.
 
-- [ ] **SRC-05 — `components/profile`**
+- [x] **SRC-05 — `components/profile`**
   Aktifkan halaman/profile view penuh dengan field lokal `fullName`, `email`,
   `avatarUrl`, role, approval status, dan route `/users/:id`. Jangan
   mengaktifkan kontrak `username`/`bio` source-new tanpa migration pendukung.

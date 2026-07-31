@@ -1053,3 +1053,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menandai SRC-04 selesai di `FEATURE_BACKLOG.md`; tidak menjalankan migration, commit, push, atau perubahan di luar scope.
 - Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing di luar scope, dan `git diff --check` lulus sebelum sinkronisasi graph akhir.
 - Verifikasi tambahan: 4 test Vitest lulus; `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.805 node dan 3.607 edge dengan warning 7 file konfigurasi/non-source menghasilkan zero node.
+
+### 2026-07-31 — SRC-05 aktivasi profile view lokal
+
+- Graphify query digunakan lebih dulu untuk memetakan `ProfileView`, profile repository/service/hook, `UserDetailPage`, dan route `/users/:id`.
+- Mengaktifkan `frontend/src/components/profile/ProfileView.tsx` pada halaman detail user melalui alur `Page → Hook → Service → Repository → Supabase`.
+- Profile view menampilkan kontrak lokal `fullName`, `email`, `avatarUrl`, role, serta status persetujuan yang diturunkan dari role (`pending` berarti menunggu persetujuan); tidak menambahkan atau memakai `username`/`bio`.
+- Profile service mengorkestrasi profile beserta project dan test suite milik user untuk tampilan penuh, tanpa perubahan schema atau migration.
+- Route admin `/users/:id` tetap aktif dan sekarang merender shared profile view.
+- Verifikasi: `npm run build` lulus (661 modules), `npm run lint` lulus dengan 7 warning existing di luar scope, dan `git diff --check` lulus; warning ukuran chunk utama tetap existing. Migration tidak dibuat maupun dijalankan ke Supabase target.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.808 node dan 3.611 edge; Graphify memberi warning 7 file konfigurasi/non-source menghasilkan zero node.

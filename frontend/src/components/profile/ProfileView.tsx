@@ -8,6 +8,8 @@ import {
   PROJECT_VISIBILITY_SEVERITY,
   TEST_SUITE_VISIBILITY_LABEL,
   TEST_SUITE_VISIBILITY_SEVERITY,
+  USER_ROLE_LABEL,
+  USER_ROLE_SEVERITY,
 } from '../../helpers/statusLabels';
 import type { Profile, Project, TestSuite } from '../../types/domain';
 
@@ -21,6 +23,7 @@ interface ProfileViewProps {
 
 export function ProfileView({ profile, projects, suites, isSpying, adminOverlay }: ProfileViewProps) {
   const displayName = profile.fullName ?? profile.email;
+  const isApproved = profile.role !== 'pending';
 
   return (
     <div className="detail-content-col mx-auto">
@@ -32,24 +35,40 @@ export function ProfileView({ profile, projects, suites, isSpying, adminOverlay 
               <h2 className="m-0">{displayName}</h2>
               {isSpying && <Tag value="Spy" severity="warning" />}
             </div>
-            <p className="m-0 username-text">{profile.email}</p>
+            <p className="m-0 text-color-secondary">{profile.email}</p>
+          </div>
+          <div className="flex align-items-center gap-2 flex-wrap justify-content-end">
+            <Tag value={USER_ROLE_LABEL[profile.role]} severity={USER_ROLE_SEVERITY[profile.role]} />
+            <Tag value={isApproved ? 'Disetujui' : 'Menunggu Persetujuan'} severity={isApproved ? 'success' : 'warning'} />
           </div>
           {adminOverlay}
         </div>
       </Card>
 
-      <Card title="Account Info" className="mb-2 detail-content-card">
-        <div className="flex flex-wrap column-gap-4 row-gap-1 text-xs">
-          <span className="text-color-secondary">
-            <i className="pi pi-calendar-plus mr-1" style={{ fontSize: '0.75rem' }} />
-            Member since <span className="text-color">{profile.createdAt ? formatDateTime(profile.createdAt) : '-'}</span>
-          </span>
+      <Card title="Informasi Akun" className="mb-2 detail-content-card">
+        <div className="grid">
+          <div className="col-12 md:col-6">
+            <span className="block text-color-secondary text-sm mb-1">Nama Lengkap</span>
+            <span>{profile.fullName ?? '-'}</span>
+          </div>
+          <div className="col-12 md:col-6">
+            <span className="block text-color-secondary text-sm mb-1">Email</span>
+            <span>{profile.email}</span>
+          </div>
+          <div className="col-12 md:col-6">
+            <span className="block text-color-secondary text-sm mb-1">Terdaftar</span>
+            <span>{profile.createdAt ? formatDateTime(profile.createdAt) : '-'}</span>
+          </div>
+          <div className="col-12 md:col-6">
+            <span className="block text-color-secondary text-sm mb-1">Update Terakhir</span>
+            <span>{profile.updatedAt ? formatDateTime(profile.updatedAt) : '-'}</span>
+          </div>
         </div>
       </Card>
 
       <Card title="Projects" className="mb-2 detail-content-card">
         {projects.length === 0 ? (
-          <p className="text-color-secondary m-0">No projects.</p>
+          <p className="text-color-secondary m-0">Belum memiliki project.</p>
         ) : (
           <div className="flex flex-column gap-2">
             {projects.map((p) => (
@@ -68,7 +87,7 @@ export function ProfileView({ profile, projects, suites, isSpying, adminOverlay 
 
       <Card title="Test Suites" className="mb-2 detail-content-card">
         {suites.length === 0 ? (
-          <p className="text-color-secondary m-0">No test suites.</p>
+          <p className="text-color-secondary m-0">Belum memiliki test suite.</p>
         ) : (
           <div className="flex flex-column gap-2">
             {suites.map((s) => (

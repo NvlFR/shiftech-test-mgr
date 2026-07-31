@@ -1,4 +1,6 @@
 import { profileRepository } from '../repositories/profileRepository';
+import { projectRepository } from '../repositories/projectRepository';
+import { testSuiteRepository } from '../repositories/testSuiteRepository';
 
 export const profileService = {
   getOwnProfile(userId: string) {
@@ -7,6 +9,18 @@ export const profileService = {
 
   getById(id: string) {
     return profileRepository.findById(id);
+  },
+
+  async getViewById(id: string) {
+    const profile = await profileRepository.findById(id);
+    if (!profile) return null;
+
+    const [projects, suites] = await Promise.all([
+      projectRepository.findByOwner(id),
+      testSuiteRepository.findByOwner(id),
+    ]);
+
+    return { profile, projects, suites };
   },
 
   listAll() {
