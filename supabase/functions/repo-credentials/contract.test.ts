@@ -34,7 +34,7 @@ test("handler tidak pernah mengembalikan token atau error database ke browser", 
       };
     },
     getRepositoryConnection: async () => ({ data: null, error: null }),
-    fetchGitHub: fetch,
+    fetchGitProvider: fetch,
   });
   const response = await handler(new Request("http://localhost/repo-credentials", {
     method: "POST",
@@ -61,7 +61,7 @@ test("handler meredam pesan error upstream yang mungkin mengandung token", async
     authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
     manageCredential: async () => ({ data: null, error: { message: `failed for ${token}` } }),
     getRepositoryConnection: async () => ({ data: null, error: null }),
-    fetchGitHub: fetch,
+    fetchGitProvider: fetch,
   });
   const response = await handler(new Request("http://localhost/repo-credentials", {
     method: "POST",
@@ -82,7 +82,7 @@ test("test connection mengembalikan metadata aman dan warning untuk scope berleb
       data: { source_type: "github_private", url_or_path: "https://github.com/acme/app.git", token: "private-test-token" },
       error: null,
     }),
-    fetchGitHub: async (_input, init) => {
+    fetchGitProvider: async (_input, init) => {
       assert.equal((init?.headers as Record<string, string>).Authorization, "Bearer private-test-token");
       return new Response(JSON.stringify({ full_name: "acme/app", default_branch: "main", permissions: { pull: true, push: true } }), {
         status: 200,
@@ -112,7 +112,7 @@ test("GitHub public diuji tanpa authorization token", async () => {
     authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
     manageCredential: async () => ({ data: null, error: null }),
     getRepositoryConnection: async () => ({ data: { source_type: "github_public", url_or_path: "https://github.com/acme/public", token: null }, error: null }),
-    fetchGitHub: async (_input, init) => {
+    fetchGitProvider: async (_input, init) => {
       assert.equal((init?.headers as Record<string, string>).Authorization, undefined);
       return new Response(JSON.stringify({ full_name: "acme/public", default_branch: "trunk" }), { status: 200 });
     },
@@ -124,4 +124,43 @@ test("GitHub public diuji tanpa authorization token", async () => {
   }));
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { data: { name: "acme/public", default_branch: "trunk", permissions: ["contents: read"], warning: null } });
+});
+
+test("git_url mendukung GitHub Enterprise dengan bearer token generik", async () => {
+  const requested: string[] = [];
+  const handler = createRepoCredentialsHandler({
+    authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
+    manageCredential: async () => ({ data: null, error: null }),
+    getRepositoryConnection: async () => ({ data: { source_type: "git_url", url_or_path: "https://git.example.test/acme/app.git", token: "generic-read-token" }, error: null }),
+    fetchGitProvider: async (input, init) => {
+      requested.push(String(input));
+      assert.equal((init?.headers as Record<string, string>).Authorization, "Bearer generic-read-token");
+      return new Response(JSON.stringify({ full_name: "acme/app", default_branch: "main", permissions: { pull: true } }), { status: 200 });
+    },
+  });
+  const response = await handler(new Request("http://localhost/repo-credentials", { method: "POST", headers: { Authorization: "Bearer user-session", "Content-Type": "application/json" }, body: JSON.stringify({ action: "test", project_id: projectId, repository_id: repositoryId }) }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(requested, ["https://git.example.test/api/v3/repos/acme/app"]);
+  assert.deepEqual(await response.json(), { data: { name: "acme/app", default_branch: "main", permissions: ["contents: read"], warning: null } });
+});
+
+test("git_url fallback ke API GitLab self-hosted tanpa membocorkan token", async () => {
+  const requested: string[] = [];
+  const handler = createRepoCredentialsHandler({
+    authenticate: async () => ({ id: "33333333-3333-4333-8333-333333333333" }),
+    manageCredential: async () => ({ data: null, error: null }),
+    getRepositoryConnection: async () => ({ data: { source_type: "git_url", url_or_path: "https://gitlab.example.test/team/app.git", token: "generic-read-token" }, error: null }),
+    fetchGitProvider: async (input, init) => {
+      requested.push(String(input));
+      assert.equal((init?.headers as Record<string, string>).Authorization, "Bearer generic-read-token");
+      if (requested.length === 1) return new Response("not found", { status: 404 });
+      return new Response(JSON.stringify({ path_with_namespace: "team/app", default_branch: "trunk", repository_access_level: "enabled" }), { status: 200 });
+    },
+  });
+  const response = await handler(new Request("http://localhost/repo-credentials", { method: "POST", headers: { Authorization: "Bearer user-session", "Content-Type": "application/json" }, body: JSON.stringify({ action: "test", project_id: projectId, repository_id: repositoryId }) }));
+  const body = await response.text();
+  assert.equal(response.status, 200);
+  assert.deepEqual(requested, ["https://gitlab.example.test/api/v3/repos/team/app", "https://gitlab.example.test/api/v4/projects/team%2Fapp"]);
+  assert.doesNotMatch(body, /generic-read-token/);
+  assert.deepEqual(JSON.parse(body), { data: { name: "team/app", default_branch: "trunk", permissions: ["repository: read"], warning: null } });
 });

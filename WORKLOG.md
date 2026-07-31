@@ -1435,3 +1435,10 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menyambungkan tombol Test di Project Settings melalui alur `Page → Hook → Service → Repository → Supabase Edge Function`, termasuk loading per-row, hasil metadata, warning scope, error, dan pembatasan UI untuk GitHub public/private.
 - Menambahkan tes kontrak Edge Function untuk GitHub private (warning scope berlebih dan token tidak bocor) serta GitHub public (tanpa Authorization).
 - Verifikasi: `node --experimental-strip-types --test supabase/functions/repo-credentials/contract.test.ts` lulus; `cd frontend && npm run build` lulus; `cd frontend && npm run lint` lulus dengan 7 warning lama yang tidak terkait; `git diff --check` lulus.
+## 2026-07-31 — REPO-09 dukungan `git_url` generik
+
+- Menambahkan validasi URL HTTP(S), penyimpanan/rotasi token generik melalui alur UI → hook → service → repository → Edge Function, serta metadata mask/waktu credential pada domain dan mapper repository.
+- Edge Function `repo-credentials` kini menguji GitHub Enterprise melalui API `/api/v3` dan fallback GitLab self-hosted melalui API `/api/v4`, selalu memakai bearer token pada host repository dan tidak mengembalikan nilai token.
+- UI Project Settings menerima token generik opsional untuk `git_url`, mempertahankan token lama saat edit dikosongkan, menampilkan mask credential aktual, dan mengaktifkan Test connection untuk `git_url`.
+- Contract test ditambah untuk GitHub Enterprise dan GitLab self-hosted. Verifikasi lulus: contract test Edge Function, `npm run build`, `npm run lint` (hanya warning lama di file di luar scope), dan `git diff --check`.
+- Tidak menjalankan migration ke target Supabase, tidak menghapus data, tidak commit, dan tidak push.

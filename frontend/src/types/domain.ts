@@ -37,6 +37,9 @@ export interface ProjectRepository {
   urlOrPath: string;
   defaultBranch: string | null;
   credentialId: string | null;
+  credentialMask: string | null;
+  credentialCreatedAt: string | null;
+  credentialExpiresAt: string | null;
   subdirectory: string | null;
   isActive: boolean;
   createdAt: string;

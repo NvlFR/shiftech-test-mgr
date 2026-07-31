@@ -7,6 +7,7 @@ import { Column } from 'primereact/column';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -71,6 +72,7 @@ export function ProjectSettingsPage() {
     remove: removeRepository,
     testConnection: testRepositoryConnection,
     testingRepositoryId,
+    saveGenericToken,
   } = useProjectRepositories(id);
 
   const [project, setProject] = useState<Project | null>(null);
@@ -96,6 +98,7 @@ export function ProjectSettingsPage() {
   const [repositorySubdirectory, setRepositorySubdirectory] = useState('');
   const [repositoryIsActive, setRepositoryIsActive] = useState(true);
   const [repositoryError, setRepositoryError] = useState<string | null>(null);
+  const [repositoryGenericToken, setRepositoryGenericToken] = useState('');
 
   function openCreateRepositoryDialog() {
     setEditingRepositoryId(null);
@@ -106,6 +109,7 @@ export function ProjectSettingsPage() {
     setRepositorySubdirectory('');
     setRepositoryIsActive(true);
     setRepositoryError(null);
+    setRepositoryGenericToken('');
     setRepositoryDialogOpen(true);
   }
 
@@ -118,6 +122,7 @@ export function ProjectSettingsPage() {
     setRepositorySubdirectory(repository.subdirectory ?? '');
     setRepositoryIsActive(repository.isActive);
     setRepositoryError(null);
+    setRepositoryGenericToken('');
     setRepositoryDialogOpen(true);
   }
 
@@ -133,8 +138,12 @@ export function ProjectSettingsPage() {
     };
 
     try {
-      if (editingRepositoryId) await updateRepository(editingRepositoryId, input);
-      else await createRepository(input);
+      const repository = editingRepositoryId
+        ? await updateRepository(editingRepositoryId, input)
+        : await createRepository(input);
+      if (repositorySourceType === 'git_url' && repositoryGenericToken.trim()) {
+        await saveGenericToken(repository, repositoryGenericToken);
+      }
       setRepositoryDialogOpen(false);
       toast.current?.show({ severity: 'success', summary: editingRepositoryId ? 'Repository diperbarui' : 'Repository ditambahkan' });
     } catch (error) {
@@ -852,9 +861,9 @@ export function ProjectSettingsPage() {
                 header="Kredensial"
                 body={(row: ProjectRepository) => row.credentialId ? (
                   <div className="flex flex-column gap-1">
-                    <span className="font-monospace">ghp_••••••••</span>
-                    <small className="text-color-secondary">Dibuat: {formatDateTime(row.createdAt)}</small>
-                    <small className="text-color-secondary">Kedaluwarsa: -</small>
+                    <span className="font-monospace">{row.credentialMask ?? '••••••'}</span>
+                    <small className="text-color-secondary">Dibuat: {row.credentialCreatedAt ? formatDateTime(row.credentialCreatedAt) : '-'}</small>
+                    <small className="text-color-secondary">Kedaluwarsa: {row.credentialExpiresAt ? formatDateTime(row.credentialExpiresAt) : '-'}</small>
                   </div>
                 ) : <span className="text-color-secondary">Tanpa token</span>}
               />
@@ -864,7 +873,7 @@ export function ProjectSettingsPage() {
                 style={{ width: '12rem' }}
                 body={(row: ProjectRepository) => (
                   <div className="flex gap-1 justify-content-end">
-                    <Button label="Test" icon="pi pi-bolt" text size="small" loading={testingRepositoryId === row.id} disabled={row.sourceType !== 'github_public' && row.sourceType !== 'github_private'} onClick={() => void handleTestRepositoryConnection(row)} />
+                    <Button label="Test" icon="pi pi-bolt" text size="small" loading={testingRepositoryId === row.id} disabled={row.sourceType === 'local_path'} onClick={() => void handleTestRepositoryConnection(row)} />
                     <RowActionsMenu items={[
                       { label: 'Edit', icon: 'pi pi-pencil', command: () => openEditRepositoryDialog(row) },
                       { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => handleDeleteRepository(row) },
@@ -1035,7 +1044,7 @@ export function ProjectSettingsPage() {
           </div>
           <div className="flex flex-column gap-1">
             <label htmlFor="repository-location">{repositorySourceType === 'local_path' ? 'Path absolut' : 'URL repository'}</label>
-            <InputText id="repository-location" value={repositoryLocation} onChange={(event) => setRepositoryLocation(event.target.value)} placeholder={repositorySourceType === 'local_path' ? '/home/tester/app' : 'https://github.com/org/repository'} />
+            <InputText id="repository-location" value={repositoryLocation} onChange={(event) => setRepositoryLocation(event.target.value)} placeholder={repositorySourceType === 'local_path' ? '/home/tester/app' : repositorySourceType === 'git_url' ? 'https://git.example.com/group/repository.git' : 'https://github.com/org/repository'} />
           </div>
           <div className="flex flex-column gap-1">
             <label htmlFor="repository-branch">Default branch (opsional)</label>
@@ -1053,6 +1062,13 @@ export function ProjectSettingsPage() {
             <small className="text-color-secondary">
               Kredensial dikelola oleh layanan server dan tidak pernah dikirim kembali ke browser. Gunakan token dengan scope minimum.
             </small>
+          )}
+          {repositorySourceType === 'git_url' && (
+            <div className="flex flex-column gap-1">
+              <label htmlFor="repository-generic-token">Token generik (opsional)</label>
+              <Password inputId="repository-generic-token" value={repositoryGenericToken} onChange={(event) => setRepositoryGenericToken(event.target.value)} feedback={false} toggleMask inputClassName="w-full" className="w-full" placeholder={editingRepositoryId ? 'Kosongkan untuk mempertahankan token' : 'Access token read-only'} />
+              <small className="text-color-secondary">Token dikirim langsung ke layanan Vault dan tidak dapat dibaca ulang.</small>
+            </div>
           )}
           <Button label="Simpan" icon="pi pi-save" size="small" onClick={() => void handleSaveRepository()} />
         </div>

@@ -11,6 +11,10 @@ Respons hanya berisi `credential_id` dan mask. Metadata waktu aman tersimpan pad
 record repository untuk dibaca melalui alur repository biasa yang dilindungi RLS.
 Nilai credential tidak mempunyai endpoint baca ulang dan tidak dicetak ke log.
 
+Aksi `test` mendukung GitHub.com, GitHub Enterprise, dan GitLab self-hosted.
+Sumber `git_url` memakai token generik read-only dan mencoba endpoint API provider
+pada host yang sama dengan URL repository.
+
 Secret runtime yang dibutuhkan: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, dan
 `SUPABASE_SERVICE_ROLE_KEY`. Jangan memakai prefix `VITE_` untuk ketiganya.
 

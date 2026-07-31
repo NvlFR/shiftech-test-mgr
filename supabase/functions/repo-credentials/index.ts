@@ -19,7 +19,7 @@ Deno.serve(createRepoCredentialsHandler({
   getRepositoryConnection(args) {
     return admin.rpc("get_repository_connection", args);
   },
-  fetchGitHub(input, init) {
+  fetchGitProvider(input, init) {
     return fetch(input, init);
   },
 }));

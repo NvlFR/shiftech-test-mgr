@@ -38,12 +38,12 @@ function validateLocation({ sourceType, urlOrPath }: RepositoryLocation): string
     return location;
   }
 
-  if (sourceType === 'github_public' || sourceType === 'github_private') {
+  if (sourceType === 'github_public' || sourceType === 'github_private' || sourceType === 'git_url') {
     try {
       const url = new URL(location);
       if (url.protocol !== 'https:' && url.protocol !== 'http:') throw new Error();
     } catch {
-      throw new Error('URL repository GitHub tidak valid');
+      throw new Error(sourceType === 'git_url' ? 'Git URL harus berupa URL HTTP(S) yang valid' : 'URL repository GitHub tidak valid');
     }
   }
 

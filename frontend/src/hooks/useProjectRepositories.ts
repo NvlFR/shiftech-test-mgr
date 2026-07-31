@@ -74,5 +74,10 @@ export function useProjectRepositories(projectId: string | undefined) {
     }
   }, []);
 
-  return { repositories, loading, testingRepositoryId, reload, create, update, remove, testConnection };
+  const saveGenericToken = useCallback(async (repository: ProjectRepository, token: string) => {
+    await repositoryConnectionService.saveGenericToken(repository, token);
+    await reload();
+  }, [reload]);
+
+  return { repositories, loading, testingRepositoryId, reload, create, update, remove, testConnection, saveGenericToken };
 }
