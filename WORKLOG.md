@@ -1379,3 +1379,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperbarui `UserRole`, mapper Profile, dan `profileService.reject()` tanpa mengubah layering repository yang sudah menerima domain `UserRole` melalui `updateRole()`.
 - Memperbarui User Management dengan label/filter status Ditolak, aksi Tolak untuk user pending, konfirmasi dan toast, serta opsi approve ulang untuk user rejected. Cabut Akses tetap mengembalikan user approved ke `pending` karena berbeda dari penolakan pendaftaran eksplisit.
 - Verifikasi lulus: `npm run build`, `npm run lint` (7 warning existing di luar scope), dan `git diff --check`. Knowledge graph disinkronkan kembali dengan `graphify update .`.
+
+### 2026-07-31 — REPO-03 service dan hook project repository
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi, lalu mengikuti keputusan Section 10.1–10.4 `FEATURE_BACKLOG.md` dan policy `is_project_manager` pada schema.
+- Menambahkan `projectRepositoryLinkService.ts` untuk validasi nama dan lokasi per `sourceType`: `local_path` wajib path absolut, sedangkan `github_public`/`github_private` wajib URL HTTP(S) valid.
+- Service menolak field payload browser yang mengandung token/secret/password/nilai kredensial; frontend hanya dapat meneruskan referensi `credentialId`, bukan nilai rahasia.
+- Mutasi create, update, dan delete kini memverifikasi actor sebagai global admin atau member project ber-role `manager`, selaras dengan RLS `is_project_manager`; RLS tetap menjadi batas keamanan utama.
+- Menambahkan `useProjectRepositories.ts` untuk lifecycle list/reload serta aksi create/update/remove melalui service dengan context auth aktif.
+- Tidak menjalankan migration, mengubah database target, menambahkan dependency, commit, push, atau refactor di luar scope.
+- Verifikasi frontend lulus: `npm run build` (664 modul; warning ukuran chunk existing), `npm run lint` (7 warning existing di luar scope), dan `git diff --check`.

@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785534597.3457344,
-    "ast_hash": "d842042849c1415447dabb6b9f79bfa9",
+    "mtime": 1785534972.1672525,
+    "ast_hash": "59fdcd0ff2c59bbbf3d6ed7f4ca123d1",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -410,8 +410,8 @@
     "semantic_hash": "72c5e4015aac520516c569b6c899cc08"
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785534337.5215447,
-    "ast_hash": "bfdcfec5043904af23a7dd0d268e75b5",
+    "mtime": 1785534972.036265,
+    "ast_hash": "b34818e854a57b2e33d57bf9d6f851f1",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785534794.8133984,
-    "ast_hash": "97bf928b8c008f53234e5c6359801b7d",
+    "mtime": 1785535015.9012244,
+    "ast_hash": "c5ee514eac66356b45d6cc4ab43dcba5",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2727,6 +2727,11 @@
   "supabase/schema_029_project_repositories.sql": {
     "mtime": 1785534794.6774151,
     "ast_hash": "8ad1a517cac2de8efc23237887da9a5a",
+    "semantic_hash": ""
+  },
+  "frontend/src/repositories/projectRepositoryLinkRepository.ts": {
+    "mtime": 1785534972.2972403,
+    "ast_hash": "8bb2b281b0bac6989a958b7c74223fad",
     "semantic_hash": ""
   }
 }
