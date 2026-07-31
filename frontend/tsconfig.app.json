@@ -24,7 +24,6 @@
   },
   "include": ["src"],
   "exclude": [
-    "src/components/issues",
     "src/components/layout-new",
     "src/components/ui-new",
     "src/helpers/helpers-new",

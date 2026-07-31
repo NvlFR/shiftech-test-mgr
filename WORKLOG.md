@@ -1218,3 +1218,93 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.816 node
   dan 3.672 edge; Graphify memberi warning 7 file konfigurasi/non-source
   menghasilkan zero node.
+
+### 2026-07-31 — SRC-13 audit App-new (BLOCKED untuk promosi)
+
+- Menjalankan `graphify query` sebelum menelusuri `App.tsx`, `App-new.tsx`,
+  guard auth/admin, layout, toast, fallback, redirect, dan halaman tujuan sesuai
+  FEATURE_BACKLOG Section 7 SRC-13.
+- Keputusan: `App-new.tsx` **tidak menggantikan** `App.tsx`. Promosi diblokir
+  karena route parity, auth, dan RBAC belum setara; `App.tsx` aktif tetap menjadi
+  sumber route aplikasi.
+- Parity yang sudah ada: kedua app memakai `ProtectedRoute` di luar
+  `AppLayout`, memakai `AdminRoute` untuk `/users` dan `/users/:id`, serta
+  mempertahankan route bersama `/login`, Project detail/settings, Test
+  Plan/Case/Suite list-detail, Test Run list issue/detail, dan Issue detail.
+- Selisih route/auth aktif yang hilang dari App-new: public
+  `/pending-approval`; `/home`; `/dashboard`; Project integrations,
+  requirements, CI/CD, automation, data management, dan custom Test Run; serta
+  admin `/admin/data-retention`. Ketiadaan `/pending-approval` memutus tujuan
+  redirect user ber-role `pending` dari `ProtectedRoute`.
+- Konflik route: `/` aktif membuka Projects, sedangkan App-new membuka Home;
+  App-new memindahkan Projects ke `/projects`. Route `/test-runs/:id` juga
+  mengganti `TestRunDetailPage` aktif dengan `TestRunResultDetailPage` yang tidak
+  tersedia pada source aktif.
+- Route tambahan App-new `/settings` dan `/:usernameWithAt` belum bisa
+  diaktifkan karena `SettingsPage`, `PublicProfilePage`, dan kontrak public
+  profile `username` tidak tersedia/didukung oleh domain lokal. Wildcard dinamis
+  tingkat-root tersebut juga berisiko menangkap URL yang tidak dikenal; kedua
+  app belum memiliki catch-all `*`/404 redirect eksplisit.
+- Guard dan layout yang direferensikan sama, tetapi cakupan RBAC App-new lebih
+  lemah karena route data-retention admin hilang. Redirect guard aktif tetap:
+  tanpa sesi → `/login`, pending → `/pending-approval`, tidak approved →
+  `/login`, dan non-admin → `/`.
+- Lazy loading/fallback belum parity dengan kriteria target: kedua app masih
+  memakai import eager dan tidak memakai `React.lazy`/`Suspense`; fallback yang
+  tersedia hanya spinner loading auth di `ProtectedRoute`, tanpa fallback
+  route-level atau error/404 fallback.
+- App-new juga tidak dapat dikompilasi apa adanya karena merujuk `AppToast`,
+  `useDialogResizeFix`, `TestRunResultDetailPage`, `SettingsPage`, dan
+  `PublicProfilePage` yang tidak ada pada source aktif. Karena file referensi
+  tersebut tidak diaktifkan, tidak ada smoke test seluruh halaman App-new yang
+  dapat dinyatakan lulus.
+- Tidak ada migration, perubahan route aktif, commit, push, atau refactor di
+  luar scope. Tindak lanjut sebelum promosi memerlukan penyelesaian SRC-09 dan
+  SRC-12, pemulihan seluruh route lokal/RBAC/auth di kandidat app, keputusan
+  produk untuk landing `/` dan public profile/settings, implementasi lazy +
+  fallback/404, lalu smoke test semua halaman.
+- Verifikasi aplikasi aktif: `npm run build` lulus (663 modul; warning chunk
+  utama existing sekaligus bukti belum ada route-level code splitting) dan
+  `git diff --check` lulus. `graphify update .` berhasil menyinkronkan graph
+  menjadi 1.818 node/3.674 edge dengan warning 7 file konfigurasi/non-source
+  menghasilkan zero node.
+
+### 2026-07-31 — SRC-DOD audit exclusion TypeScript source-new
+
+- Menjalankan `graphify query` dan mengacu pada FEATURE_BACKLOG Section 7
+  sebelum mengaudit `frontend/tsconfig.app.json`.
+- Menghapus exclusion `src/components/issues` karena implementasi aktifnya
+  sudah kompatibel dengan domain/service lokal dan lulus pemeriksaan TypeScript.
+- Exclusion berikut masih dipertahankan dengan alasan tertulis:
+  - `src/components/layout-new`: snapshot masih memakai kontrak auth/profile dan
+    notification source-new (`user`, `username`, `displayName`,
+    `referenceType`/`referenceId`) yang tidak tersedia pada domain lokal.
+  - `src/components/ui-new`: snapshot masih memakai type dan API activity,
+    attachment, profile, serta import service source-new yang tidak tersedia
+    atau berbeda dari kontrak aktif.
+  - `src/helpers/helpers-new`: import relatif snapshot menunjuk
+    `../types/domain` dari lokasi yang salah dan helper tersebut sudah dipilih
+    atau diadaptasi ke helper aktif pada SRC-07, bukan diaktifkan mentah.
+  - `src/hooks/hooks-new`: import relatif snapshot menunjuk service,
+    repository, config, type, dan component dari lokasi yang salah; lifecycle
+    serta permission behavior yang valid sudah dipindahkan ke hook aktif.
+  - `src/pages/pages-new`: SRC-09 belum selesai dan halaman snapshot belum
+    memiliki parity route, fitur lokal, auth, serta RBAC penuh.
+  - `src/repositories/repositories-new`: import relatif snapshot menunjuk
+    config/helper/type dari lokasi yang salah dan kontrak query yang kompatibel
+    sudah dipindahkan ke repository aktif pada SRC-10.
+  - `src/services/services-new`: import relatif snapshot menunjuk repository,
+    helper, config, dan type dari lokasi yang salah; business rule yang valid
+    sudah dipindahkan ke service aktif pada SRC-11.
+  - `src/App-new.tsx`: SRC-13 belum dapat dipromosikan karena route parity,
+    auth/RBAC, lazy fallback, sejumlah component/page, dan kontrak public
+    profile belum tersedia.
+- Percobaan type-check tanpa seluruh exclusion `*-new` mengonfirmasi alasan di
+  atas melalui error import/kontrak; exclusion tersebut dipulihkan tanpa
+  mengubah snapshot referensi. Tidak ada migration, commit, push, atau perubahan
+  fitur di luar scope.
+- Verifikasi final lulus: `npx tsc -b --force`, `npm run build` (663 modul;
+  warning ukuran chunk existing), `npm run lint` (7 warning existing di luar
+  scope), dan `git diff --check`. `graphify update .` berhasil menyinkronkan
+  knowledge graph menjadi 1.818 node dan 3.674 edge dengan warning 7 file
+  konfigurasi/non-source menghasilkan zero node.
