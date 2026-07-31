@@ -1124,3 +1124,24 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.813 node
   dan 3.638 edge; Graphify memberi warning 7 file konfigurasi/non-source
   menghasilkan zero node.
+
+### 2026-07-31 — SRC-09c port halaman utama batch 3
+
+- Menjalankan `graphify query` sebelum mengaudit Dashboard, Requirements,
+  Integrations, Automation, serta User/Profile aktif dan referensi `pages-new`
+  sesuai FEATURE_BACKLOG Section 7.
+- Memport UX daftar user yang kompatibel dengan domain lokal: pencarian nama
+  atau email, filter multi-role, reset filter, paginator bersama, pilihan jumlah
+  baris, dan representasi baris responsif pada layar kecil.
+- Mempertahankan seluruh aksi approval, promote/demote, revoke, delete, route
+  admin `/users` dan `/users/:id`, serta profile view lokal berbasis `fullName`,
+  `email`, dan `avatarUrl`; kontrak source-new `username`/`bio` dan public
+  profile tidak diaktifkan karena tidak didukung schema lokal.
+- Dashboard, Requirements, Integrations, dan Automation dipertahankan pada
+  halaman aktif karena tidak memiliki pasangan referensi di snapshot
+  `pages-new`; route dan fitur lokalnya telah diaudit tanpa mengganti `App.tsx`.
+- Tidak ada migration yang dibuat atau dijalankan. Verifikasi `npm run build`
+  lulus (663 modul; warning ukuran chunk existing).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 1.816 node
+  dan 3.672 edge; Graphify memberi warning 7 file konfigurasi/non-source
+  menghasilkan zero node.
