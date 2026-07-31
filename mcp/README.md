@@ -56,7 +56,9 @@ keamanan terakhir. Jalankan `supabase/schema_047_mcp_auth.sql` setelah
 `supabase/schema_025_fix_pgcrypto_and_audit.sql` melalui proses
 migration proyek sebelum mengoperasikan server (jangan memasukkan token ke SQL).
 Migration read tools `supabase/schema_048_mcp_read_batch_1.sql` juga harus
-dijalankan sesudahnya.
+dijalankan sesudahnya, lalu `supabase/schema_049_mcp_read_batch_2.sql` untuk
+tool Test Plan, Test Run, dan Test Result. Ikuti proses migration proyek; server
+tidak menjalankan migration otomatis.
 
 ## Tool read batch 1
 
@@ -68,3 +70,15 @@ dijalankan sesudahnya.
 
 Semua query mengirim token hanya dalam body RPC internal. RPC memvalidasi ulang
 token aktif dan project scope; hasil dari project lain tidak dapat dikembalikan.
+
+## Tool read batch 2
+
+- `testmanager.testplan.list` dan `testmanager.testplan.get`; detail menyertakan
+  test case sesuai urutan plan
+- `testmanager.testrun.list` dan `testmanager.testrun.get`; summary selalu
+  dihitung saat query dari `test_results`
+- `testmanager.testresult.list`: filter status, tester, dan test run
+
+Tool list memakai pagination cursor yang sama dengan batch 1. Nilai status hasil
+di argumen tool menggunakan bentuk lowercase: `pass`, `fail`, `skip`, `blocked`,
+atau `not_run`.

@@ -1,10 +1,11 @@
 import { McpToolError, normalizePageSize } from "../helpers/response.js";
 import type { ProjectSession } from "./authService.js";
-import type { ReadRepository, TestCaseSearchQuery } from "../repositories/readRepository.js";
+import type { ReadRepository, TestCaseSearchQuery, TestResultListQuery, TestRunListQuery } from "../repositories/readRepository.js";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 interface SearchCursor { code: string; id: string }
+interface ResultCursor { createdAt: string; id: string }
 
 const decodeCursor = (cursor: string | undefined): SearchCursor | undefined => {
   if (!cursor) return undefined;
@@ -19,6 +20,20 @@ const decodeCursor = (cursor: string | undefined): SearchCursor | undefined => {
 
 export const encodeTestCaseCursor = (row: { code: string; id: string }): string =>
   Buffer.from(JSON.stringify({ code: row.code, id: row.id }), "utf8").toString("base64url");
+export const encodeCodeCursor = encodeTestCaseCursor;
+export const encodeTestResultCursor = (row: { createdAt: string; id: string }): string =>
+  Buffer.from(JSON.stringify({ createdAt: row.createdAt, id: row.id }), "utf8").toString("base64url");
+
+const decodeResultCursor = (cursor: string | undefined): ResultCursor | undefined => {
+  if (!cursor) return undefined;
+  try {
+    const value = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8")) as Partial<ResultCursor>;
+    if (typeof value.createdAt !== "string" || Number.isNaN(Date.parse(value.createdAt)) || !UUID_PATTERN.test(value.id ?? "")) throw new Error();
+    return { createdAt: value.createdAt, id: value.id! };
+  } catch {
+    throw new McpToolError("INVALID_CURSOR", "cursor is invalid", "Use the nextCursor returned by the previous response.");
+  }
+};
 
 export class ReadService {
   constructor(private readonly session: ProjectSession, private readonly repository: ReadRepository) {}
@@ -52,5 +67,37 @@ export class ReadService {
     const testCase = await this.repository.getTestCase(testCaseId);
     if (!testCase) throw new McpToolError("NOT_FOUND", "Test case was not found", "Check the ID and confirm it belongs to the scoped project.");
     return testCase;
+  }
+
+  listTestPlans(input: { cursor?: string; limit?: number }) {
+    const cursor = decodeCursor(input.cursor);
+    return this.repository.listTestPlans({ limit: normalizePageSize(input.limit) + 1, afterCode: cursor?.code, afterId: cursor?.id });
+  }
+  async getTestPlan(id: string) {
+    this.assertUuid(id, "testplan_id", "testplan.list");
+    const value = await this.repository.getTestPlan(id);
+    if (!value) throw new McpToolError("NOT_FOUND", "Test plan was not found", "Check the ID and confirm it belongs to the scoped project.");
+    return value;
+  }
+  listTestRuns(input: Omit<TestRunListQuery, "limit" | "afterCode" | "afterId"> & { cursor?: string; limit?: number }) {
+    if (input.testPlanId) this.assertUuid(input.testPlanId, "testplan_id", "testplan.list");
+    const cursor = decodeCursor(input.cursor);
+    return this.repository.listTestRuns({ ...input, limit: normalizePageSize(input.limit) + 1, afterCode: cursor?.code, afterId: cursor?.id });
+  }
+  async getTestRun(id: string) {
+    this.assertUuid(id, "testrun_id", "testrun.list");
+    const value = await this.repository.getTestRun(id);
+    if (!value) throw new McpToolError("NOT_FOUND", "Test run was not found", "Check the ID and confirm it belongs to the scoped project.");
+    return value;
+  }
+  listTestResults(input: Omit<TestResultListQuery, "limit" | "afterCreatedAt" | "afterId"> & { cursor?: string; limit?: number }) {
+    if (input.testerId) this.assertUuid(input.testerId, "tester_id", "profile IDs from TestManager");
+    if (input.testRunId) this.assertUuid(input.testRunId, "testrun_id", "testrun.list");
+    const cursor = decodeResultCursor(input.cursor);
+    return this.repository.listTestResults({ ...input, limit: normalizePageSize(input.limit) + 1,
+      afterCreatedAt: cursor?.createdAt, afterId: cursor?.id });
+  }
+  private assertUuid(value: string, field: string, source: string): void {
+    if (!UUID_PATTERN.test(value)) throw new McpToolError("INVALID_ARGUMENT", `${field} must be a valid UUID`, `Pass a UUID returned by ${source}.`);
   }
 }

@@ -1496,3 +1496,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_048_mcp_read_batch_1.sql` tanpa menjalankannya ke target. RPC security-definer read-only memvalidasi ulang hash token aktif dan project scope pada setiap panggilan agar API token tidak melewati batas project meskipun query berjalan di luar sesi JWT user.
 - Menambahkan mapper snake_case ke camelCase, tipe domain MCP, dependency langsung `zod`, dokumentasi tool, serta contract/unit test untuk payload RPC, mapping, redaksi error upstream, cursor, validasi UUID, dan penolakan lintas project.
 - Verifikasi lulus: `cd mcp && npm test` (5 suite), `cd mcp && npm run build`, dan `git diff --check`. Tidak mengakses atau menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-06 tool read batch 2
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi MCP dan mengikuti katalog Discovery/read Section 8.2 `FEATURE_BACKLOG.md`.
+- Menambahkan tool read-only `testmanager.testplan.list/get`, `testmanager.testrun.list/get`, dan `testmanager.testresult.list` melalui layering `Tool → ReadService → ReadRepository → Supabase RPC`.
+- Detail Test Plan menyertakan test case terurut beserta module, tag, isi, structured steps, dan versions. Daftar Test Result mendukung filter status, tester, serta run; seluruh daftar memakai cursor stabil, batas halaman bersama, dan project scope sesi.
+- Menambahkan migration `schema_049_mcp_read_batch_2.sql` tanpa menjalankannya ke target. Setiap RPC memvalidasi ulang token/project, mendukung standard maupun custom run, dan menghitung summary Test Run on-the-fly dari `test_results` tanpa kolom hasil atau cache summary.
+- Menambahkan tipe domain, mapper snake_case ke camelCase, validasi UUID/cursor, dokumentasi setup/tool batch 2, serta test untuk registrasi kelima tool, payload/filter repository, nested mapping, cursor result, dan summary hasil per status.
+- Verifikasi lulus: `cd mcp && npm test` (6 suite), `git diff --check`, dan `graphify update .` (2.130 node/4.280 edge). Tidak mengakses atau menjalankan migration ke Supabase target, tidak menghapus data, tidak mengubah dependency, tidak commit, dan tidak push.

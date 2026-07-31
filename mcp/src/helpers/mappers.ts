@@ -1,10 +1,11 @@
-import type { Project, TestCaseDetail, TestCaseSummary } from "../types/domain.js";
+import type { Project, TestCaseDetail, TestCaseSummary, TestPlanDetail, TestPlanSummary, TestResultSummary, TestRunDetail, TestRunSummary, TestRunSummaryCounts } from "../types/domain.js";
 
 type JsonRecord = Record<string, unknown>;
 
 const record = (value: unknown): JsonRecord => value && typeof value === "object" ? value as JsonRecord : {};
 const stringValue = (value: unknown): string => typeof value === "string" ? value : "";
 const nullableString = (value: unknown): string | null => typeof value === "string" ? value : null;
+const numberValue = (value: unknown): number => Number(value) || 0;
 
 export const mapProjectRow = (value: unknown): Project => {
   const row = record(value);
@@ -72,4 +73,48 @@ export const mapTestCaseDetailRow = (value: unknown): TestCaseDetail => {
     notes: nullableString(row.notes),
     createdAt: stringValue(row.created_at),
   };
+};
+
+export const mapTestPlanSummaryRow = (value: unknown): TestPlanSummary => {
+  const row = record(value);
+  return { id: stringValue(row.id), projectId: stringValue(row.project_id), code: stringValue(row.code),
+    name: stringValue(row.name), description: nullableString(row.description), status: row.status as TestPlanSummary["status"],
+    testCaseCount: numberValue(row.test_case_count), createdAt: stringValue(row.created_at), updatedAt: stringValue(row.updated_at) };
+};
+
+export const mapTestPlanDetailRow = (value: unknown): TestPlanDetail => {
+  const row = record(value);
+  return { ...mapTestPlanSummaryRow(row), testCases: Array.isArray(row.test_cases) ? row.test_cases.map((item) => {
+    const planCase = record(item);
+    return { order: numberValue(planCase.order), testCase: mapTestCaseDetailRow(planCase.test_case) };
+  }) : [] };
+};
+
+const mapRunCounts = (value: unknown): TestRunSummaryCounts => {
+  const summary = record(value);
+  return { total: numberValue(summary.total), executed: numberValue(summary.executed), progressPercent: numberValue(summary.progress_percent),
+    pass: numberValue(summary.pass), fail: numberValue(summary.fail), skip: numberValue(summary.skip),
+    blocked: numberValue(summary.blocked), notRun: numberValue(summary.not_run) };
+};
+
+export const mapTestRunSummaryRow = (value: unknown): TestRunSummary => {
+  const row = record(value);
+  return { id: stringValue(row.id), projectId: stringValue(row.project_id), testPlanId: nullableString(row.test_plan_id),
+    code: stringValue(row.code), name: stringValue(row.name), status: row.status as TestRunSummary["status"],
+    startedAt: stringValue(row.started_at), completedAt: nullableString(row.completed_at), summary: mapRunCounts(row.summary) };
+};
+
+export const mapTestRunDetailRow = (value: unknown): TestRunDetail => {
+  const row = record(value);
+  return { ...mapTestRunSummaryRow(row), isCustom: row.is_custom === true, notes: nullableString(row.notes),
+    createdAt: stringValue(row.created_at), updatedAt: stringValue(row.updated_at) };
+};
+
+export const mapTestResultSummaryRow = (value: unknown): TestResultSummary => {
+  const row = record(value); const testCase = record(row.test_case); const tester = record(row.tester);
+  return { id: stringValue(row.id), projectId: stringValue(row.project_id), testRunId: stringValue(row.test_run_id),
+    testCaseId: stringValue(row.test_case_id), testCase: { code: nullableString(testCase.code), title: nullableString(testCase.title) },
+    tester: row.tester ? { id: stringValue(tester.id), email: stringValue(tester.email), fullName: nullableString(tester.full_name) } : null,
+    status: row.status as TestResultSummary["status"], executedAt: nullableString(row.executed_at), notes: nullableString(row.notes),
+    createdAt: stringValue(row.created_at), updatedAt: stringValue(row.updated_at) };
 };

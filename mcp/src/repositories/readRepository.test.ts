@@ -47,3 +47,28 @@ test("upstream failures are replaced with a credential-safe repository error", a
     return true;
   });
 });
+
+test("batch 2 result listing sends filters and maps nested result data", async () => {
+  let requestBody: Record<string, unknown> = {};
+  const fetchImpl: typeof fetch = async (_input, init) => {
+    requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+    return new Response(JSON.stringify([{ id: "55555555-5555-4555-8555-555555555555", project_id: config.projectId,
+      test_run_id: "66666666-6666-4666-8666-666666666666", test_case_id: "77777777-7777-4777-8777-777777777777",
+      test_case: { code: "TC-0001", title: "Login" }, tester: { id: "88888888-8888-4888-8888-888888888888", email: "qa@example.com", full_name: "QA" },
+      status: "fail", executed_at: "2026-07-31T01:00:00Z", notes: "Mismatch", created_at: "2026-07-31T00:00:00Z", updated_at: "2026-07-31T01:00:00Z" }]),
+      { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  const rows = await new ReadRepository(config, fetchImpl).listTestResults({ status: "fail", testerId: "88888888-8888-4888-8888-888888888888", testRunId: "66666666-6666-4666-8666-666666666666", limit: 11 });
+  assert.equal(requestBody.p_status, "fail"); assert.equal(requestBody.p_test_run_id, "66666666-6666-4666-8666-666666666666");
+  assert.equal(rows[0]?.testCase.code, "TC-0001"); assert.equal(rows[0]?.tester?.fullName, "QA");
+});
+
+test("test run summaries are mapped from on-the-fly RPC output", async () => {
+  const repository = new ReadRepository(config, async () => new Response(JSON.stringify([{ id: "99999999-9999-4999-8999-999999999999",
+    project_id: config.projectId, test_plan_id: null, code: "TR-0001", name: "Regression", status: "in_progress",
+    started_at: "2026-07-31T00:00:00Z", completed_at: null,
+    summary: { total: 4, executed: 3, progress_percent: 75, pass: 1, fail: 1, skip: 1, blocked: 0, not_run: 1 } }]),
+    { status: 200, headers: { "Content-Type": "application/json" } }));
+  const rows = await repository.listTestRuns({ limit: 2 });
+  assert.deepEqual(rows[0]?.summary, { total: 4, executed: 3, progressPercent: 75, pass: 1, fail: 1, skip: 1, blocked: 0, notRun: 1 });
+});

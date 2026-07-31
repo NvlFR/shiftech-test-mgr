@@ -3,7 +3,7 @@ import * as z from "zod/v4";
 
 import { paginatedResponse, successResponse, withErrorHandling } from "../helpers/response.js";
 import type { ReadService } from "../services/readService.js";
-import { encodeTestCaseCursor } from "../services/readService.js";
+import { encodeCodeCursor, encodeTestCaseCursor, encodeTestResultCursor } from "../services/readService.js";
 import type { ProjectSession } from "../services/authService.js";
 
 const paginationSchema = {
@@ -69,5 +69,41 @@ export const createReadToolRegistrar = (session: ProjectSession, service: ReadSe
     }, async (arguments_) => withErrorHandling(async () => {
       session.assertToolArguments(arguments_);
       return successResponse(await service.getTestCase(arguments_.testcase_id));
+    }));
+
+    server.registerTool("testmanager.testplan.list", {
+      description: "List test plans in the scoped project.", inputSchema: paginationSchema,
+      annotations: { readOnlyHint: true, idempotentHint: true },
+    }, async (arguments_) => withErrorHandling(async () => {
+      session.assertToolArguments(arguments_); const rows = await service.listTestPlans(arguments_);
+      return paginatedResponse(rows, arguments_, encodeCodeCursor);
+    }));
+    server.registerTool("testmanager.testplan.get", {
+      description: "Get a test plan and all test cases in its ordered scope.",
+      inputSchema: { testplan_id: z.string().uuid() }, annotations: { readOnlyHint: true, idempotentHint: true },
+    }, async (arguments_) => withErrorHandling(async () => {
+      session.assertToolArguments(arguments_); return successResponse(await service.getTestPlan(arguments_.testplan_id));
+    }));
+    server.registerTool("testmanager.testrun.list", {
+      description: "List test runs with result summaries computed on demand.",
+      inputSchema: { testplan_id: z.string().uuid().optional(), status: z.enum(["in_progress", "completed"]).optional(), ...paginationSchema },
+      annotations: { readOnlyHint: true, idempotentHint: true },
+    }, async (arguments_) => withErrorHandling(async () => {
+      session.assertToolArguments(arguments_); const rows = await service.listTestRuns({ testPlanId: arguments_.testplan_id, status: arguments_.status, cursor: arguments_.cursor, limit: arguments_.limit });
+      return paginatedResponse(rows, arguments_, encodeCodeCursor);
+    }));
+    server.registerTool("testmanager.testrun.get", {
+      description: "Get a test run with a result summary computed on demand.",
+      inputSchema: { testrun_id: z.string().uuid() }, annotations: { readOnlyHint: true, idempotentHint: true },
+    }, async (arguments_) => withErrorHandling(async () => {
+      session.assertToolArguments(arguments_); return successResponse(await service.getTestRun(arguments_.testrun_id));
+    }));
+    server.registerTool("testmanager.testresult.list", {
+      description: "List test results filtered by status, tester, or run.",
+      inputSchema: { status: z.enum(["pass", "fail", "skip", "blocked", "not_run"]).optional(), tester_id: z.string().uuid().optional(), testrun_id: z.string().uuid().optional(), ...paginationSchema },
+      annotations: { readOnlyHint: true, idempotentHint: true },
+    }, async (arguments_) => withErrorHandling(async () => {
+      session.assertToolArguments(arguments_); const rows = await service.listTestResults({ status: arguments_.status, testerId: arguments_.tester_id, testRunId: arguments_.testrun_id, cursor: arguments_.cursor, limit: arguments_.limit });
+      return paginatedResponse(rows, arguments_, encodeTestResultCursor);
     }));
   };

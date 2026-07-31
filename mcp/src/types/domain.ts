@@ -48,3 +48,32 @@ export interface TestCaseDetail extends TestCaseSummary {
   notes: string | null;
   createdAt: string;
 }
+
+export type TestPlanStatus = "draft" | "active" | "completed" | "archived";
+export interface TestPlanSummary {
+  id: string; projectId: string; code: string; name: string; description: string | null;
+  status: TestPlanStatus; testCaseCount: number; createdAt: string; updatedAt: string;
+}
+export interface TestPlanCase { order: number; testCase: TestCaseDetail }
+export interface TestPlanDetail extends TestPlanSummary { testCases: TestPlanCase[] }
+
+export type TestRunStatus = "in_progress" | "completed";
+export type TestResultStatus = "pass" | "fail" | "skip" | "blocked" | "not_run";
+export interface TestRunSummaryCounts {
+  total: number; executed: number; progressPercent: number; pass: number; fail: number;
+  skip: number; blocked: number; notRun: number;
+}
+export interface TestRunSummary {
+  id: string; projectId: string; testPlanId: string | null; code: string; name: string;
+  status: TestRunStatus; startedAt: string; completedAt: string | null; summary: TestRunSummaryCounts;
+}
+export interface TestRunDetail extends TestRunSummary {
+  isCustom: boolean; notes: string | null; createdAt: string; updatedAt: string;
+}
+export interface TestResultSummary {
+  id: string; projectId: string; testRunId: string; testCaseId: string;
+  testCase: { code: string | null; title: string | null };
+  tester: { id: string; email: string; fullName: string | null } | null;
+  status: TestResultStatus; executedAt: string | null; notes: string | null;
+  createdAt: string; updatedAt: string;
+}
