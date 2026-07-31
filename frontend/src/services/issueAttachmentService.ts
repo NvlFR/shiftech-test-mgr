@@ -8,6 +8,7 @@ export const issueAttachmentService = {
   },
 
   upload(issueId: string, file: File, uploadedBy: string) {
+    if (file.size === 0) throw new Error('File tidak boleh kosong');
     if (file.size > MAX_FILE_SIZE) throw new Error('Ukuran file maksimal 10 MB');
     return issueAttachmentRepository.upload(issueId, file, uploadedBy);
   },

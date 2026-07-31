@@ -4,6 +4,30 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### E08-T15 — Verifikasi dan pelengkapan Attachment Issue end-to-end
+
+- Memetakan alur dengan `graphify query`, lalu mengaudit upload, list dengan
+  signed URL, hapus, RLS metadata/Storage, dan retention berdasarkan scope
+  `FEATURE_BACKLOG.md`.
+- Memindahkan lifecycle dan aksi attachment Issue ke hook
+  `useIssueAttachments`, sehingga alurnya konsisten Page → Hook → Service →
+  Repository → Supabase.
+- Memusatkan mapping row Issue attachment di `helpers/mappers.ts`, menolak file
+  kosong di service, dan memakai fallback MIME `application/octet-stream` saat
+  upload.
+- Menambahkan `schema_042_issue_attachment_storage_cleanup.sql` untuk menghapus
+  object bucket private ketika metadata terhapus melalui cascade Issue/Test
+  Result/Test Run/Project. Migration hanya dibuat dan tidak dijalankan ke target.
+- RLS terverifikasi secara statis pada `schema_issue_attachments.sql`: select
+  membutuhkan akses project, sedangkan insert/delete metadata dan Storage
+  membutuhkan `can_manage_issues`; retention Issue attachment tercakup oleh
+  preview/cleanup pada `schema_021_p2_backup_retention.sql`.
+- Memperbarui `FEATURES.md` dan `TODO.md` dengan bukti file/fungsi relevan.
+- Verifikasi lulus: `cd frontend && npm run build`, `npm run lint` (hanya tujuh
+  warning existing), `git diff --check`, serta pemeriksaan statis policy RLS dan
+  cakupan retention Issue attachment. Build tetap memberi warning ukuran chunk
+  utama yang sudah ada.
+
 ### SRC-DOC — Sinkronisasi dokumentasi akhir integrasi source-new
 
 - Menjalankan `graphify query` dan membaca FEATURE_BACKLOG Section 7 serta

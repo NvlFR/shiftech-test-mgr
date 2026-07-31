@@ -34,7 +34,7 @@ import type {
   ActivityEvent,
   Notification,
 } from '../types/domain';
-import type { Attachment } from '../types/domain';
+import type { Attachment, IssueAttachment } from '../types/domain';
 
 export function mapApiTokenRow(row: any): ApiToken { return { id: row.id, projectId: row.project_id, name: row.name, tokenPrefix: row.token_prefix, scopes: row.scopes ?? [], revokedAt: row.revoked_at ?? null, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapWebhookRow(row: any): Webhook { return { id: row.id, projectId: row.project_id, name: row.name, url: row.url, events: row.events ?? [], isActive: row.is_active, maxRetries: row.max_retries, createdAt: row.created_at, updatedAt: row.updated_at }; }
@@ -375,6 +375,20 @@ export function mapAttachmentRow(row: any, url: string | null = null): Attachmen
     entityKind: row.entity_kind,
     testCaseId: row.test_case_id ?? null,
     testRunId: row.test_run_id ?? null,
+    fileName: row.file_name,
+    storagePath: row.storage_path,
+    mimeType: row.mime_type,
+    sizeBytes: Number(row.size_bytes),
+    uploadedBy: row.uploaded_by,
+    createdAt: row.created_at,
+    url,
+  };
+}
+
+export function mapIssueAttachmentRow(row: any, url: string | null = null): IssueAttachment {
+  return {
+    id: row.id,
+    issueId: row.issue_id,
     fileName: row.file_name,
     storagePath: row.storage_path,
     mimeType: row.mime_type,

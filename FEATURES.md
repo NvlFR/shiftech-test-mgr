@@ -62,7 +62,11 @@ Ringkasan cepat status fitur per modul. Detail task-level ada di [`docs/TASKS.md
 ## Issues
 - [x] Buat issue dari Test Result FAIL (title, description, actual/expected result)
 - [x] List issue per Test Run, ubah status & assignee inline
-- [ ] Attachment/screenshot (skip untuk v1)
+- [x] Attachment Issue end-to-end — upload/list/hapus file private maksimal 10 MB,
+  signed URL, RLS berbasis akses project/`can_manage_issues`, dan retention cleanup
+  (`IssueDetailPage`, `useIssueAttachments`, `issueAttachmentService`,
+  `issueAttachmentRepository`, `schema_issue_attachments.sql`,
+  `schema_021_p2_backup_retention.sql`, `schema_042_issue_attachment_storage_cleanup.sql`)
 
 ## User Management & Auth (RBAC)
 - [x] Login via Google OAuth (Supabase Auth)

@@ -16,7 +16,6 @@ Titik mulai sesi kerja. Update file ini setiap kali mulai/selesai mengerjakan se
 - [ ] E02-T05 — Project selector/context global
 - [ ] E03-T06 — Filter test case by priority/status di list
 - [ ] E06-T14 — Status "rejected" terpisah dari "pending" (jika diperlukan)
-- [ ] E08-T15 — Attachment Issue (jika diperlukan)
 
 ## Sedang Dikerjakan
 
@@ -35,6 +34,9 @@ _(kosong)_
 
 ## Selesai (recent)
 
+- [x] E08-T15 — Attachment Issue lengkap end-to-end: upload/list/hapus private
+  Storage, clean layering, RLS, retention, dan cleanup object saat metadata
+  terhapus cascade (`schema_042`) (2026-07-31)
 - [x] SRC-EPIC — Integrasi source-new selesai secara selektif: SRC-01–SRC-12
   di-port ke kontrak aktif, SRC-13 diaudit dan promosi `App-new.tsx` ditolak,
   SRC-14 mengklasifikasikan seluruh migration tanpa menjalankannya ke target

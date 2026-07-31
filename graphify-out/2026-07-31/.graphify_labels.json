@@ -119,6 +119,7 @@
   "117": "react-dom",
   "118": "schema_027_fix_attachment_helper_grants.sql",
   "119": "zod",
+  "120": "schema_041_profile_rejected_role.sql",
   "121": "react-router-dom",
   "122": "jspdf",
   "123": "useScreenSize.ts",
@@ -126,6 +127,7 @@
   "125": "jspdf",
   "126": "testCaseStepRepository.ts",
   "127": "notificationRepository.ts",
+  "128": "primeflex",
   "129": "react-hook-form",
   "130": "@supabase/supabase-js",
   "131": "package.json",
@@ -135,6 +137,8 @@
   "135": "schema_issue_attachments.sql",
   "136": "CLAUDE.md",
   "137": "extraction-spec.md",
+  "138": "react-dom",
+  "139": "react-hook-form",
   "140": ".mcp.json",
   "141": "schema_025_fix_pgcrypto_and_audit.sql",
   "142": "schema_035_test_result_snapshot.sql",
@@ -152,5 +156,8 @@
   "154": "schema_027_fix_attachment_helper_grants.sql",
   "155": "schema_037_invited_project_metadata_access.sql",
   "156": "seed.sql",
-  "159": "schema_040_notification_delete_policy.sql"
+  "157": "react-markdown",
+  "158": "react-router-dom",
+  "159": "schema_040_notification_delete_policy.sql",
+  "160": "@supabase/supabase-js"
 }

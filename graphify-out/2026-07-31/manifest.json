@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785531860.9437962,
-    "ast_hash": "b761f853fe5ca145ba86af817fcd5d2a",
+    "mtime": 1785534349.265545,
+    "ast_hash": "8a246946a59362d63f495452e51999c4",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -120,9 +120,9 @@
     "semantic_hash": "54f0d45db2ed5ff5b4baad86a54e1719"
   },
   "frontend/src/helpers/statusLabels.ts": {
-    "mtime": 1785529672.8698232,
-    "ast_hash": "528cdf7e8c8d37ac05c502b90aa4b1f0",
-    "semantic_hash": "528cdf7e8c8d37ac05c502b90aa4b1f0"
+    "mtime": 1785534337.9485447,
+    "ast_hash": "36b5127d2c763f1b32bad0475440032f",
+    "semantic_hash": ""
   },
   "frontend/src/helpers/testCaseExcel.ts": {
     "mtime": 1784732678.0156267,
@@ -280,8 +280,8 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/users/UserManagementPage.tsx": {
-    "mtime": 1785533141.4322176,
-    "ast_hash": "877aa0da4842a889813a03d56999ae84",
+    "mtime": 1785534338.0825448,
+    "ast_hash": "82b6c7bc448e70895c92b1b34c61cb22",
     "semantic_hash": ""
   },
   "frontend/src/repositories/dashboardRepository.ts": {
@@ -375,8 +375,8 @@
     "semantic_hash": ""
   },
   "frontend/src/services/profileService.ts": {
-    "mtime": 1785532204.8132017,
-    "ast_hash": "c703db1538544294b8a64f755f0fcf35",
+    "mtime": 1785534337.7815447,
+    "ast_hash": "5affccf5cebec113f10d8342d1a869bc",
     "semantic_hash": ""
   },
   "frontend/src/services/projectMemberService.ts": {
@@ -410,8 +410,8 @@
     "semantic_hash": "72c5e4015aac520516c569b6c899cc08"
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785531828.461759,
-    "ast_hash": "57ace4e5ec66d9ce719fab97f126898c",
+    "mtime": 1785534337.5215447,
+    "ast_hash": "bfdcfec5043904af23a7dd0d268e75b5",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785534193.298547,
-    "ast_hash": "d91602f06f794d24959d7946558c5c11",
+    "mtime": 1785534392.304546,
+    "ast_hash": "74e8026e7aaa8e1c6e49105ad55e848d",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2707,6 +2707,11 @@
   "frontend/src/hooks/useProfileView.ts": {
     "mtime": 1785532204.944202,
     "ast_hash": "7dad59c956a4dbf567f6225969d79dff",
+    "semantic_hash": ""
+  },
+  "supabase/schema_041_profile_rejected_role.sql": {
+    "mtime": 1785534337.3895447,
+    "ast_hash": "b50be4130e73537107b3c7eca82fd8de",
     "semantic_hash": ""
   }
 }

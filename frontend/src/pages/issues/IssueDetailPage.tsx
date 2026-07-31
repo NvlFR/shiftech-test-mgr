@@ -7,12 +7,12 @@ import { Dropdown } from 'primereact/dropdown';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { issueService } from '../../services/issueService';
-import { issueAttachmentService } from '../../services/issueAttachmentService';
 import type { IssueAttachment } from '../../types/domain';
 import { profileService } from '../../services/profileService';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { useAuthContext } from '../../hooks/useAuth';
+import { useIssueAttachments } from '../../hooks/useIssueAttachments';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { CommentsPanel } from '../../components/ui/CommentsPanel';
 import { IssueEditor, type IssueFormData } from '../../components/issues/IssueEditor';
@@ -49,9 +49,8 @@ export function IssueDetailPage() {
   const [loading, setLoading] = useState(true);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [projectName, setProjectName] = useState<string | null>(null);
-  const [attachments, setAttachments] = useState<IssueAttachment[]>([]);
-  const [attachmentsLoading, setAttachmentsLoading] = useState(false);
   const [attachmentUploading, setAttachmentUploading] = useState(false);
+  const { attachments, loading: attachmentsLoading, upload: uploadAttachment, remove: removeAttachment } = useIssueAttachments(id ?? null);
   const { canManageIssues, canDeleteContent } = useProjectRole(issue?.projectId ?? undefined);
   const { testRoles, projectMembers } = useIssueEditorOptions(issue?.projectId ?? null);
 
@@ -69,21 +68,6 @@ export function IssueDetailPage() {
       setApprovedUsers(users.filter((p) => p.role === 'user' || p.role === 'admin'));
       setLoading(false);
     });
-  }, [id]);
-
-  async function reloadAttachments() {
-    if (!id) return;
-    setAttachmentsLoading(true);
-    try {
-      setAttachments(await issueAttachmentService.listByIssue(id));
-    } finally {
-      setAttachmentsLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    void reloadAttachments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -170,8 +154,7 @@ export function IssueDetailPage() {
 
     setAttachmentUploading(true);
     try {
-      const attachment = await issueAttachmentService.upload(issue.id, file, profile.id);
-      setAttachments((current) => [attachment, ...current]);
+      await uploadAttachment(file, profile.id);
       toast.current?.show({ severity: 'success', summary: 'Attachment berhasil diupload' });
     } catch (err) {
       toast.current?.show({ severity: 'error', summary: 'Upload attachment gagal', detail: err instanceof Error ? err.message : undefined });
@@ -190,8 +173,7 @@ export function IssueDetailPage() {
       acceptClassName: 'p-button-danger',
       accept: async () => {
         try {
-          await issueAttachmentService.remove(attachment);
-          setAttachments((current) => current.filter((item) => item.id !== attachment.id));
+          await removeAttachment(attachment);
           toast.current?.show({ severity: 'success', summary: 'Attachment dihapus' });
         } catch (err) {
           toast.current?.show({ severity: 'error', summary: 'Gagal menghapus attachment', detail: err instanceof Error ? err.message : undefined });
