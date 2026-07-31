@@ -19,3 +19,14 @@ test("write repository hides upstream response details", async () => {
   const repository = new WriteRepository(config, async () => new Response("secret detail", { status: 403 }));
   await assert.rejects(repository.archiveTestCase("22222222-2222-4222-8222-222222222222"), WriteRepositoryError);
 });
+
+test("test plan approval sends the explicit approver gate only in the RPC body", async () => {
+  const id = "22222222-2222-4222-8222-222222222222";
+  const approverId = "33333333-3333-4333-8333-333333333333";
+  let url = ""; let body: Record<string, unknown> = {};
+  const fetchImpl: typeof fetch = async (input, init) => { url = String(input); body = JSON.parse(String(init?.body)); return new Response(JSON.stringify({ id, status: "active" }), { status: 200, headers: { "Content-Type": "application/json" } }); };
+  await new WriteRepository(config, fetchImpl).approveTestPlan(id, approverId, true);
+  assert.match(url, /\/rpc\/mcp_approve_test_plan$/);
+  assert.equal(body.p_test_plan_id, id); assert.equal(body.p_approver_id, approverId); assert.equal(body.p_explicit_approval, true);
+  assert.equal(url.includes(config.apiToken), false);
+});

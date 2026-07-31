@@ -22,6 +22,11 @@ export class WriteService {
   async createTestPlan(input: { name: string; description?: string | null }) { this.text(input.name, "name"); return marker(await this.repository.createTestPlan({ ...input, name: input.name.trim() })); }
   async addTestPlanCases(id: string, ids: string[]) { this.uuid(id, "testplan_id"); this.ids(ids); return marker(await this.repository.addTestPlanCases(id, [...new Set(ids)])); }
   async removeTestPlanCases(id: string, ids: string[]) { this.uuid(id, "testplan_id"); this.ids(ids); return marker(await this.repository.removeTestPlanCases(id, [...new Set(ids)])); }
+  async approveTestPlan(id: string, approverId: string, explicitApproval: boolean) {
+    this.uuid(id, "testplan_id"); this.uuid(approverId, "approver_id");
+    if (explicitApproval !== true) throw invalid("explicit_approval must be true for API-token approval");
+    return this.repository.approveTestPlan(id, approverId, explicitApproval);
+  }
   private ids(ids: string[]) { if (ids.length < 1 || ids.length > 100) throw invalid("testcase_ids must contain between 1 and 100 IDs"); ids.forEach((id) => this.uuid(id, "testcase_ids")); }
   private validateCase(value: TestCaseChanges, path: string, required = true) {
     for (const field of ["title", "steps", "expectedResult"] as const) { const text = value[field]; if (required || text !== undefined) this.text(text, `${path}.${field}`); }

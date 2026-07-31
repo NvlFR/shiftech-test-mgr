@@ -1522,3 +1522,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan `supabase/schema_051_mcp_write_test_cases_plans.sql` (belum dijalankan ke target) dengan RPC security-definer, validasi token/project/scope `write:test-cases` atau `write:test-plans`, serta validasi relasi lintas project.
 - Menambahkan unit test registrar, service marker/validasi, dan repository RPC/credential-safe error.
 - Verifikasi: `cd mcp && npm test` lulus (9 test files), `cd mcp && npm run build` lulus, dan `git diff --check` lulus.
+
+## 2026-07-31 — MCP-09 gate manusia approval Test Plan
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi MCP serta mengikuti keputusan Section 8.2 dan 11.2 `FEATURE_BACKLOG.md`.
+- Menambahkan tool `testmanager.testplan.approve` melalui layering `Tool → WriteService → WriteRepository → Supabase RPC`; tool hanya menerima `approver_id` valid dan konfirmasi literal `explicit_approval: true` untuk sesi API-token.
+- Menambahkan migration `schema_052_mcp_testplan_approval.sql` tanpa menjalankannya ke target. RPC memvalidasi ulang scope token `write:test-plans`, profile approver aktif (`user`/`admin`), dan akses approver ke project sebelum mengubah Test Plan `draft` menjadi `active`.
+- Approval dicatat atomik di `audit_logs` dengan `changed_by` sebagai approver manusia, tipe approval eksplisit, dan ID token non-rahasia; token mentah/hash tidak dicatat.
+- Menambahkan unit/contract test untuk penolakan flag non-eksplisit, penerusan approver ke RPC, isolasi token dari URL, hasil approval, dan registrasi tool; dokumentasi MCP serta status backlog diperbarui.
+- Verifikasi lulus: `cd mcp && npm test` (9/9 test file), pemeriksaan pola secret, dan `git diff --check`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

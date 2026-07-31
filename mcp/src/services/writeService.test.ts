@@ -23,3 +23,14 @@ test("deduplicates case IDs and validates UUIDs before repository calls", async 
   assert.deepEqual(received, [id]);
   await assert.rejects(new WriteService(repository).addTestPlanCases("bad", [id]), (error: unknown) => error instanceof McpToolError && error.code === "INVALID_ARGUMENT");
 });
+
+test("requires explicit human approval before approving a test plan", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  let received: unknown[] = [];
+  const repo = { approveTestPlan: async (...args: unknown[]) => { received = args; return { id, status: "active", approved_by: id }; } } as unknown as WriteRepository;
+  const service = new WriteService(repo);
+  await assert.rejects(service.approveTestPlan(id, id, false), (error: unknown) => error instanceof McpToolError && error.code === "INVALID_ARGUMENT");
+  const result = await service.approveTestPlan(id, id, true);
+  assert.deepEqual(received, [id, id, true]);
+  assert.deepEqual(result, { id, status: "active", approved_by: id });
+});

@@ -63,6 +63,12 @@ ulang Edge Function `automation-artifacts` agar `artifact.get_url` dapat membuat
 signed download URL. Ikuti proses migration/deploy proyek; server tidak
 menjalankannya otomatis.
 
+Untuk tool tulis, jalankan `schema_051_mcp_write_test_cases_plans.sql`, lalu
+`schema_052_mcp_testplan_approval.sql`. `testmanager.testplan.approve` hanya
+menerima `approver_id` user aktif yang memiliki akses project dan
+`explicit_approval: true`. RPC memvalidasi gate tersebut kembali dan mencatat
+approver di audit log; API token tidak dianggap sebagai approver manusia.
+
 ## Tool read batch 1
 
 - `testmanager.project.list` dan `testmanager.project.get`

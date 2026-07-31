@@ -413,7 +413,7 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 - [ ] `testcase.create_bulk` — import banyak test case sekaligus (dipakai alur CSV, §11).
 - [ ] `testcase.update`, `testcase.duplicate`, `testcase.archive`.
 - [ ] `testplan.create`, `testplan.add_cases`, `testplan.remove_cases`.
-- [ ] `testplan.approve` — **gate manusia**; tool ini hanya boleh sukses kalau
+- [x] `testplan.approve` — **gate manusia**; tool ini hanya boleh sukses kalau
       approver adalah user (bukan token agent) atau flag approval eksplisit diberikan.
 - [ ] `testrun.create` — selalu run baru, tidak pernah menimpa run lama.
 - [ ] `testrun.record_result` — tulis satu `test_result`.
