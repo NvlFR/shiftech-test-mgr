@@ -1,5 +1,12 @@
 # Worklog
 
+## 2026-07-31 — REPO-01 project repositories migration
+
+- Menambahkan `supabase/schema_029_project_repositories.sql` untuk tabel tautan repository per project, termasuk tipe sumber, metadata branch/subdirectory, status aktif, dan timestamps.
+- Kredensial tidak disimpan di tabel; `credential_id` hanya mereferensikan UUID secret di Supabase Vault dengan perilaku `on delete set null`.
+- Mengaktifkan RLS project-scoped: anggota yang memiliki akses project dapat membaca, sedangkan insert/update/delete hanya diizinkan melalui `is_project_manager(project_id)` (owner/manager project atau global admin).
+- Migration hanya dibuat dan diverifikasi secara lokal; tidak dijalankan ke Supabase target.
+
 Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
