@@ -959,3 +959,9 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - `npx tsc -b --force` tidak lagi melaporkan error pada `ProjectDetailPage.tsx` (16 error FIX-00b selesai). Command masih exit non-zero karena 14 error di file lain yang berada di luar scope task ini.
 - `npm run build` mencapai tahap TypeScript dan tidak melaporkan error pada `ProjectDetailPage.tsx`, tetapi belum dapat melanjutkan ke Vite karena 14 error TypeScript di file task lain.
 - `graphify update .` dijalankan; Graphify menolak overwrite karena hasil baru 1721 node lebih kecil daripada graph existing 2595 node. Opsi destruktif `--force` tidak dijalankan.
+### 2026-07-31 — SRC-12 konsolidasi domain aktif
+
+- Membandingkan `frontend/src/types/domain-new.ts` dengan `frontend/src/types/domain.ts` serta memvalidasi perbedaannya terhadap schema, mapper, repository, service, dan fitur lokal.
+- Menghapus `domain-new.ts` yang sudah tidak diimpor agar `types/domain.ts` menjadi satu-satunya sumber domain aktif; kontrak lokal untuk AI, attachment, activity, custom run, automation, reporting, dan traceability tetap dipertahankan.
+- Menetapkan `TestCase.stepType` sebagai field domain wajib yang backward-compatible dengan default `simple`, lalu menyelaraskan mapper, repository, dan service agar `step_type` dibaca dan ditulis konsisten. Persistensi `external_links` Test Case juga diselaraskan dengan field domain/schema yang sudah valid.
+- Verifikasi: `npm run build` lulus (651 modules; warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing, dan `git diff --check` lulus.

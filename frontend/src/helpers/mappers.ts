@@ -187,6 +187,7 @@ export function mapTestCaseRow(row: any): TestCase {
     preconditions: row.preconditions,
     steps: row.steps,
     expectedResult: row.expected_result,
+    stepType: row.step_type ?? 'simple',
     priority: row.priority,
     status: row.status,
     notes: row.notes,

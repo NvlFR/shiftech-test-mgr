@@ -163,7 +163,7 @@ export interface TestCase {
   preconditions: string | null;
   steps: string;
   expectedResult: string;
-  stepType?: TestCaseStepType;
+  stepType: TestCaseStepType;
   priority: TestCasePriority;
   status: TestCaseStatus;
   notes: string | null;

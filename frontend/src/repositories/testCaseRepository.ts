@@ -70,11 +70,13 @@ export const testCaseRepository = {
         preconditions: input.preconditions,
         steps: input.steps,
         expected_result: input.expectedResult,
+        step_type: input.stepType,
         priority: input.priority,
         status: input.status,
         notes: input.notes,
         assigned_to: input.assignedTo ?? null,
         target_role_id: input.targetRoleId ?? null,
+        external_links: input.externalLinks ?? [],
       })
       .select('*')
       .single();
@@ -92,11 +94,13 @@ export const testCaseRepository = {
     if (changes.preconditions !== undefined) payload.preconditions = changes.preconditions;
     if (changes.steps !== undefined) payload.steps = changes.steps;
     if (changes.expectedResult !== undefined) payload.expected_result = changes.expectedResult;
+    if (changes.stepType !== undefined) payload.step_type = changes.stepType;
     if (changes.priority !== undefined) payload.priority = changes.priority;
     if (changes.status !== undefined) payload.status = changes.status;
     if (changes.notes !== undefined) payload.notes = changes.notes;
     if (changes.assignedTo !== undefined) payload.assigned_to = changes.assignedTo;
     if (changes.targetRoleId !== undefined) payload.target_role_id = changes.targetRoleId;
+    if (changes.externalLinks !== undefined) payload.external_links = changes.externalLinks;
 
     const { data, error } = await supabase
       .from('test_cases')

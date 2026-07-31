@@ -53,6 +53,7 @@ export const testCaseService = {
       preconditions: source.preconditions ?? undefined,
       steps: source.steps,
       expectedResult: source.expectedResult,
+      stepType: source.stepType,
       priority: source.priority,
       notes: source.notes ?? undefined,
       tagNames: source.tags.map((tag) => tag.name),
@@ -68,6 +69,7 @@ export const testCaseService = {
     objective?: string;
     steps: string;
     expectedResult: string;
+    stepType?: TestCase['stepType'];
     preconditions?: string;
     priority?: TestCase['priority'];
     notes?: string;
@@ -86,10 +88,14 @@ export const testCaseService = {
       preconditions: input.preconditions?.trim() || null,
       steps: input.steps.trim(),
       expectedResult: input.expectedResult.trim(),
+      stepType: input.stepType ?? 'simple',
       priority: input.priority ?? 'medium',
       status: 'active',
       notes: input.notes?.trim() || null,
       assignedTo: null,
+      targetRoleId: null,
+      createdBy: null,
+      externalLinks: [],
     });
 
     if (input.tagNames?.length) {
