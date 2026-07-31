@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785522784.5912094,
-    "ast_hash": "1edde8e95dcf3b95d8ef19fd5f11f2e3",
+    "mtime": 1785529098.0582366,
+    "ast_hash": "18dde5f0e5edc116e2a956a4e2a60ae1",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -330,8 +330,8 @@
     "semantic_hash": ""
   },
   "frontend/src/repositories/testCaseRepository.ts": {
-    "mtime": 1785519045.881095,
-    "ast_hash": "f16343b2be888fe4ce023645ae6164fc",
+    "mtime": 1785529071.934991,
+    "ast_hash": "ca37421212c78671b9c839bf99c54361",
     "semantic_hash": ""
   },
   "frontend/src/repositories/testPlanRepository.ts": {
@@ -395,9 +395,9 @@
     "semantic_hash": "4ecef8b46fb7d91ab095ddd0b1ffbac3"
   },
   "frontend/src/services/testCaseService.ts": {
-    "mtime": 1784738534.242765,
-    "ast_hash": "797fbde77497bb94a31984fc7c972ea4",
-    "semantic_hash": "797fbde77497bb94a31984fc7c972ea4"
+    "mtime": 1785529072.068987,
+    "ast_hash": "01005935dcfa3a41103c6b94a54734a6",
+    "semantic_hash": ""
   },
   "frontend/src/services/testPlanService.ts": {
     "mtime": 1784700432.6477952,
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785526305.6681674,
-    "ast_hash": "304e7a7a1510510f31411451973d39d8",
+    "mtime": 1785529071.6699986,
+    "ast_hash": "e0423a0ca0a591238b7cf941e9249d56",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785527464.985778,
-    "ast_hash": "04bf7292da1130a946d3ed37c99dd703",
+    "mtime": 1785529123.4345412,
+    "ast_hash": "93deae8e6c3d9377cb3fcdaf8bf775fb",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2112,11 +2112,6 @@
   "frontend/src/services/services-new/userService.ts": {
     "mtime": 1785517573.403664,
     "ast_hash": "9a4059271defd35abfe2e2d452850801",
-    "semantic_hash": ""
-  },
-  "frontend/src/types/domain-new.ts": {
-    "mtime": 1785517624.0464542,
-    "ast_hash": "835f6dc9c175f2c18a5d93ade149e3fe",
     "semantic_hash": ""
   },
   "supabase-new/migrations/20260701000001_initial_schema.sql": {

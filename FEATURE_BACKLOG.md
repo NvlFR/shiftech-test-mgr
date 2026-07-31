@@ -298,7 +298,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   activity, owner label, hover card, attachment, pagination, dan bulk action.
   Setiap komponen harus punya kontrak props yang kompatibel dengan pemakai aktif.
 
-- [ ] **SRC-07 — `helpers/helpers-new`**
+- [x] **SRC-07 — `helpers/helpers-new`**
   Port helper yang belum tersedia di active, terutama mapper utility, date,
   error/toast, validation, export/import, dan URL helper. Mapping snake_case ↔
   camelCase tetap terpusat di `helpers/mappers.ts`.

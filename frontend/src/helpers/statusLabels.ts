@@ -3,6 +3,7 @@ import type {
   IssueStatus,
   IssueType,
   ProjectMemberRole,
+  ProjectMemberStatus,
   ProjectStatus,
   ProjectVisibility,
   TestSuiteVisibility,
@@ -190,4 +191,16 @@ export const PROJECT_MEMBER_ROLE_SEVERITY: Record<ProjectMemberRole, TagSeverity
   supervisor: 'warning',
   tester: 'info',
   member: 'secondary',
+};
+
+export const PROJECT_MEMBER_STATUS_LABEL: Record<ProjectMemberStatus, string> = {
+  invited: 'Menunggu',
+  accepted: 'Bergabung',
+  declined: 'Ditolak',
+};
+
+export const PROJECT_MEMBER_STATUS_SEVERITY: Record<ProjectMemberStatus, TagSeverity> = {
+  invited: 'warning',
+  accepted: 'success',
+  declined: 'secondary',
 };

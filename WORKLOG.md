@@ -965,3 +965,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menghapus `domain-new.ts` yang sudah tidak diimpor agar `types/domain.ts` menjadi satu-satunya sumber domain aktif; kontrak lokal untuk AI, attachment, activity, custom run, automation, reporting, dan traceability tetap dipertahankan.
 - Menetapkan `TestCase.stepType` sebagai field domain wajib yang backward-compatible dengan default `simple`, lalu menyelaraskan mapper, repository, dan service agar `step_type` dibaca dan ditulis konsisten. Persistensi `external_links` Test Case juga diselaraskan dengan field domain/schema yang sudah valid.
 - Verifikasi: `npm run build` lulus (651 modules; warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing, dan `git diff --check` lulus.
+
+### 2026-07-31 — SRC-07 port helper source-new
+
+- Menjalankan `graphify query` sebelum mengaudit `helpers/helpers-new`, helper aktif, tipe domain, dan pemakai terkait.
+- Memindahkan helper yang belum tersedia ke folder aktif: routing/URL entity activity, deskripsi event activity, ekstraksi dan linkifikasi mention, serta parser dan template impor CSV (termasuk validasi row, priority, dan detailed steps).
+- Menambahkan label dan severity `ProjectMemberStatus` ke `statusLabels.ts` sambil mempertahankan label Bahasa Indonesia milik aplikasi aktif.
+- Mapper snake_case ke camelCase tetap hanya berada di `helpers/mappers.ts`; mapper source-new yang tidak kompatibel dengan domain/schema lokal tidak diduplikasi. Helper date, toast/error, validation, dan export/import yang sudah tersedia juga tidak diduplikasi.
+- Menandai SRC-07 selesai di `FEATURE_BACKLOG.md` dan menjalankan `graphify update .` hingga graph berhasil dibangun ulang (1767 node, 3546 edge).
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing, `npm test -- --run` lulus (4 test), dan `git diff --check` lulus.
