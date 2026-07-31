@@ -1,5 +1,14 @@
 # Worklog
 
+## 2026-07-31 — REPO-08 traceability repository pada Test Run
+
+- Menambahkan migration baru `schema_045_test_run_repository_traceability.sql` yang secara idempotent memastikan kolom `branch` dan `commit_sha`, menambahkan `repository_id` dengan foreign key `on delete set null` ke `project_repositories`, serta index repository/commit. Migration tidak dijalankan ke Supabase target.
+- Memperluas domain dan mapper Test Run dengan `repositoryId`, serta meneruskan metadata repository, branch, dan commit melalui repository dan service. Service memvalidasi repository berasal dari project Test Plan/Test Run sebelum metadata disimpan.
+- Memperluas `useTestRunDetail` melalui service untuk memuat traceability dan menampilkan indikator repository, branch, serta commit SHA ringkas (dengan SHA penuh pada tooltip) di halaman detail Test Run.
+- Tidak menambahkan secret/token, menghapus data, menjalankan migration target, commit, push, atau refactor di luar scope REPO-08.
+- Verifikasi lulus: `cd frontend && npm run build` (669 modul; warning ukuran chunk existing) dan `git diff --check`.
+- Knowledge graph disinkronkan dengan `graphify update .` menjadi 1.910 node dan 3.839 edge; Graphify memberi warning existing bahwa 7 file konfigurasi/non-source menghasilkan zero node.
+
 ## 2026-07-31 — REPO-07 mode `local_path` pada runner
 
 - Menambahkan inspeksi repository lokal pada runner dengan validasi fail-fast: `TM_PROJECT_DIR` wajib absolut, path harus ada, berupa direktori yang terbaca, memiliki `.git`, dan dikenali Git sebagai root repository.

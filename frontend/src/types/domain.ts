@@ -278,6 +278,7 @@ export interface TestRun {
   device: string | null;
   buildVersion: string | null;
   release: string | null;
+  repositoryId: string | null;
   pipelineId: string | null;
   branch: string | null;
   commitSha: string | null;

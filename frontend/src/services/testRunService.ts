@@ -1,6 +1,8 @@
 import { testRunRepository } from '../repositories/testRunRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
 import { testCaseRepository } from '../repositories/testCaseRepository';
+import { projectRepositoryLinkRepository } from '../repositories/projectRepositoryLinkRepository';
+import { testPlanRepository } from '../repositories/testPlanRepository';
 import { calculateTestRunSummary } from '../helpers/testRunSummary';
 import type { TestResultStatus, TestRunStatus } from '../types/domain';
 import type { TestRunFilters } from '../repositories/testRunRepository';
@@ -58,15 +60,31 @@ export const testRunService = {
     return testRunRepository.findById(id);
   },
 
+  async getRepositoryTraceability(testRunId: string) {
+    const run = await testRunRepository.findById(testRunId);
+    if (!run || (!run.repositoryId && !run.branch && !run.commitSha)) return null;
+    const repository = run.repositoryId
+      ? await projectRepositoryLinkRepository.findById(run.repositoryId)
+      : null;
+    return { repository, branch: run.branch, commitSha: run.commitSha };
+  },
+
   // Starting a run snapshots every test case currently in the plan's scope into
   // test_results as 'not_run' — later edits to the plan's case list don't retroactively
   // change what this run covers, matching how a real regression cycle has a fixed scope.
-  async start(testPlanId: string, name: string, options: { code?: string; environmentId?: string | null; browser?: string; device?: string; buildVersion?: string; release?: string } = {}) {
+  async start(testPlanId: string, name: string, options: { code?: string; environmentId?: string | null; browser?: string; device?: string; buildVersion?: string; release?: string; repositoryId?: string | null; branch?: string; commitSha?: string } = {}) {
     if (!name.trim()) throw new Error('Nama test run tidak boleh kosong');
 
-    const planCases = await testCaseRepository.findCasesForPlan(testPlanId);
+    const [planCases, plan, repository] = await Promise.all([
+      testCaseRepository.findCasesForPlan(testPlanId),
+      testPlanRepository.findById(testPlanId),
+      options.repositoryId ? projectRepositoryLinkRepository.findById(options.repositoryId) : null,
+    ]);
     if (planCases.length === 0) {
       throw new Error('Test plan ini belum punya test case — tambahkan test case dulu sebelum memulai run');
+    }
+    if (options.repositoryId && (!plan || !repository || repository.projectId !== plan.projectId)) {
+      throw new Error('Repository tidak berasal dari project Test Plan');
     }
 
     const run = await testRunRepository.create({
@@ -74,6 +92,8 @@ export const testRunService = {
       environmentId: options.environmentId || null, browser: options.browser?.trim() || null,
       device: options.device?.trim() || null, buildVersion: options.buildVersion?.trim() || null,
       release: options.release?.trim() || null,
+      repositoryId: options.repositoryId || null, branch: options.branch?.trim() || null,
+      commitSha: options.commitSha?.trim() || null,
     });
     await testResultRepository.seedForRun(
       run.id,
@@ -100,6 +120,25 @@ export const testRunService = {
     if (!input.name.trim()) throw new Error('Nama test run tidak boleh kosong');
     if (!input.code.trim()) throw new Error('Kode test run tidak boleh kosong');
     return testRunRepository.update(id, { name: input.name.trim(), code: input.code.trim() });
+  },
+
+  async setRepositoryTraceability(id: string, input: { repositoryId: string; branch?: string | null; commitSha?: string | null }) {
+    const [run, repository] = await Promise.all([
+      testRunRepository.findById(id),
+      projectRepositoryLinkRepository.findById(input.repositoryId),
+    ]);
+    if (!run) throw new Error('Test run tidak ditemukan');
+    if (!repository) throw new Error('Repository project tidak ditemukan');
+    const plan = run.testPlanId ? await testPlanRepository.findById(run.testPlanId) : null;
+    const projectId = plan?.projectId ?? run.projectId;
+    if (!projectId || repository.projectId !== projectId) {
+      throw new Error('Repository tidak berasal dari project Test Run');
+    }
+    return testRunRepository.update(id, {
+      repositoryId: repository.id,
+      branch: input.branch?.trim() || null,
+      commitSha: input.commitSha?.trim() || null,
+    });
   },
 
   // "Completed" is always a manual action (per product decision) — never inferred

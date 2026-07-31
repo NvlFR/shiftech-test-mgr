@@ -269,6 +269,7 @@ export function mapTestRunRow(row: any): TestRun {
     device: row.device ?? null,
     buildVersion: row.build_version ?? null,
     release: row.release ?? null,
+    repositoryId: row.repository_id ?? null,
     pipelineId: row.pipeline_id ?? null,
     branch: row.branch ?? null,
     commitSha: row.commit_sha ?? null,

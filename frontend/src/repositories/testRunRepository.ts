@@ -83,10 +83,10 @@ export const testRunRepository = {
   },
 
   // `code` optional — omit/empty lets the `set_test_run_code` DB trigger auto-generate TR-####.
-  async create(input: { testPlanId: string | null; customProjectId?: string | null; isCustom?: boolean; name: string; code?: string | null; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null }): Promise<TestRun> {
+  async create(input: { testPlanId: string | null; customProjectId?: string | null; isCustom?: boolean; name: string; code?: string | null; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null; repositoryId?: string | null; branch?: string | null; commitSha?: string | null }): Promise<TestRun> {
     const { data, error } = await supabase
       .from('test_runs')
-      .insert({ test_plan_id: input.testPlanId, custom_project_id: input.customProjectId ?? null, is_custom: input.isCustom ?? false, name: input.name, code: input.code || undefined, environment_id: input.environmentId || null, browser: input.browser || null, device: input.device || null, build_version: input.buildVersion || null, release: input.release || null })
+      .insert({ test_plan_id: input.testPlanId, custom_project_id: input.customProjectId ?? null, is_custom: input.isCustom ?? false, name: input.name, code: input.code || undefined, environment_id: input.environmentId || null, browser: input.browser || null, device: input.device || null, build_version: input.buildVersion || null, release: input.release || null, repository_id: input.repositoryId || null, branch: input.branch || null, commit_sha: input.commitSha || null })
       .select('*')
       .single();
 
@@ -104,8 +104,8 @@ export const testRunRepository = {
     if (error) throw error;
   },
 
-  async update(id: string, changes: { name?: string; code?: string; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null }): Promise<TestRun> {
-    const payload: Record<string, unknown> = { name: changes.name, code: changes.code, environment_id: changes.environmentId, browser: changes.browser, device: changes.device, build_version: changes.buildVersion, release: changes.release };
+  async update(id: string, changes: { name?: string; code?: string; environmentId?: string | null; browser?: string | null; device?: string | null; buildVersion?: string | null; release?: string | null; repositoryId?: string | null; branch?: string | null; commitSha?: string | null }): Promise<TestRun> {
+    const payload: Record<string, unknown> = { name: changes.name, code: changes.code, environment_id: changes.environmentId, browser: changes.browser, device: changes.device, build_version: changes.buildVersion, release: changes.release, repository_id: changes.repositoryId, branch: changes.branch, commit_sha: changes.commitSha };
     Object.keys(payload).forEach((key) => payload[key] === undefined && delete payload[key]);
     const { data, error } = await supabase.from('test_runs').update(payload).eq('id', id).select('*').single();
     if (error) throw error;

@@ -63,7 +63,7 @@ export function TestRunDetailPage() {
   const isMobile = lt.sm;
   const { profile: currentProfile } = useAuthContext();
 
-  const { testRun, results, summary, loading, reload } = useTestRunDetail(id ?? null);
+  const { testRun, repositoryTraceability, results, summary, loading, reload } = useTestRunDetail(id ?? null);
   const { issues: runIssues } = useIssuesByTestRun(id ?? null);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [testPlan, setTestPlan] = useState<TestPlan | null>(null);
@@ -254,6 +254,17 @@ export function TestRunDetailPage() {
         <div className="mb-3 p-3 surface-100 border-round">
           <div className="text-sm font-medium mb-1">Catatan Test Run</div>
           <div className="text-sm white-space-pre-line">{testRun.notes}</div>
+        </div>
+      )}
+
+      {repositoryTraceability && (
+        <div className="mb-3 p-3 surface-100 border-round flex align-items-center flex-wrap gap-3 text-sm">
+          <span className="font-medium"><i className="pi pi-code mr-2" />{repositoryTraceability.repository?.name ?? '-'}</span>
+          <span><i className="pi pi-code-branch mr-2" />{repositoryTraceability.branch ?? '-'}</span>
+          <span title={repositoryTraceability.commitSha ?? undefined}>
+            <i className="pi pi-hashtag mr-2" />
+            {repositoryTraceability.commitSha?.slice(0, 12) ?? '-'}
+          </span>
         </div>
       )}
 

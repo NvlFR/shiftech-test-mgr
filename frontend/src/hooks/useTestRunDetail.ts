@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { testRunService } from '../services/testRunService';
-import type { TestResultWithDetails, TestRun, TestRunSummary } from '../types/domain';
+import type { ProjectRepository, TestResultWithDetails, TestRun, TestRunSummary } from '../types/domain';
 
 export function useTestRunDetail(testRunId: string | null) {
   const [testRun, setTestRun] = useState<TestRun | null>(null);
+  const [repositoryTraceability, setRepositoryTraceability] = useState<{ repository: ProjectRepository | null; branch: string | null; commitSha: string | null } | null>(null);
   const [results, setResults] = useState<TestResultWithDetails[]>([]);
   const [summary, setSummary] = useState<TestRunSummary>({
     total: 0,
@@ -24,12 +25,14 @@ export function useTestRunDetail(testRunId: string | null) {
     const requestId = ++requestRef.current;
     setLoading(true);
     try {
-      const [run, withResults] = await Promise.all([
+      const [run, withResults, traceability] = await Promise.all([
         testRunService.getById(testRunId),
         testRunService.getWithResults(testRunId),
+        testRunService.getRepositoryTraceability(testRunId),
       ]);
       if (requestId !== requestRef.current) return;
       setTestRun(run);
+      setRepositoryTraceability(traceability);
       setResults(withResults.results);
       setSummary(withResults.summary);
     } finally {
@@ -41,5 +44,5 @@ export function useTestRunDetail(testRunId: string | null) {
     reload();
   }, [reload]);
 
-  return { testRun, results, summary, loading, reload };
+  return { testRun, repositoryTraceability, results, summary, loading, reload };
 }
