@@ -314,7 +314,7 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   Automation, User/Profile, serta execution detail. Pertahankan route dan
   fitur lokal; jangan mengganti `App.tsx` dengan `App-new.tsx` sekaligus.
 
-- [ ] **SRC-10 — `repositories/repositories-new`**
+- [x] **SRC-10 — `repositories/repositories-new`**
   Sinkronkan query repository untuk project, test case, test plan, test run,
   result, issue, suite, activity, notification, profile, attachment, dan
   integration. Repository hanya boleh berisi query Supabase dan mapper.

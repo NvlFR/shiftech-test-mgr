@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabaseClient';
-import { mapProfileRow, mapTestCaseRow, mapTestResultRow } from '../helpers/mappers';
+import { mapProfileRow, mapTestCaseRow, mapTestResultRow, mapTestResultStepRow } from '../helpers/mappers';
 import { fetchAllRows } from './paginate';
 import type { TestResult, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
 
@@ -71,6 +71,24 @@ export const testResultRepository = {
       testCase: mapTestCaseRow(row.test_case),
       tester: row.tester ? mapProfileRow(row.tester) : null,
     }));
+  },
+
+  async syncWithTestCase(id: string): Promise<TestResult> {
+    const { data: result, error: resultError } = await supabase.from('test_results').select('test_case_id').eq('id', id).single();
+    if (resultError) throw resultError;
+    const { data: testCase, error: testCaseError } = await supabase.from('test_cases').select('*').eq('id', result.test_case_id).single();
+    if (testCaseError) throw testCaseError;
+    const { data, error } = await supabase.from('test_results').update({
+      test_case_code: testCase.code,
+      test_case_title: testCase.title,
+      test_case_objective: testCase.objective,
+      test_case_preconditions: testCase.preconditions,
+      test_case_steps: testCase.steps,
+      test_case_expected_result: testCase.expected_result,
+      test_case_priority: testCase.priority,
+    }).eq('id', id).select('*').single();
+    if (error) throw error;
+    return mapTestResultRow(data);
   },
 
   async getSummaryByRunIds(runIds: string[]): Promise<Record<string, { total: number; pass: number; fail: number; skip: number; blocked: number; notRun: number }>> {
@@ -145,6 +163,12 @@ export const testResultRepository = {
 
     if (error) throw error;
     return mapTestResultRow(data);
+  },
+
+  async recordStepResult(testResultStepId: string, input: { status: 'pass' | 'fail'; actualResult: string | null }) {
+    const { data, error } = await supabase.from('test_result_steps').update({ status: input.status, actual_result: input.actualResult }).eq('id', testResultStepId).select('*').single();
+    if (error) throw error;
+    return mapTestResultStepRow(data);
   },
 
   // Lightweight lookup for business-rule guards: a result's own status plus its run's status,

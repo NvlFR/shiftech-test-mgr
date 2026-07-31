@@ -974,3 +974,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Mapper snake_case ke camelCase tetap hanya berada di `helpers/mappers.ts`; mapper source-new yang tidak kompatibel dengan domain/schema lokal tidak diduplikasi. Helper date, toast/error, validation, dan export/import yang sudah tersedia juga tidak diduplikasi.
 - Menandai SRC-07 selesai di `FEATURE_BACKLOG.md` dan menjalankan `graphify update .` hingga graph berhasil dibangun ulang (1767 node, 3546 edge).
 - Verifikasi: `npm run build` lulus (warning ukuran chunk existing), `npm run lint` lulus dengan 7 warning existing, `npm test -- --run` lulus (4 test), dan `git diff --check` lulus.
+
+### 2026-07-31 — SRC-10 sinkronisasi repository source-new
+
+- Menjalankan `graphify query` sebelum membandingkan repository aktif dengan `frontend/src/repositories/repositories-new` dan membaca keputusan teknis FEATURE_BACKLOG Section 7.
+- Menambahkan query kompatibel untuk pagination, filter, pencarian kode, bulk insert, lookup detail, reorder plan case, sinkronisasi snapshot result, step result, summary project, notification center, dan pencarian profile pada repository aktif project, test case, test plan, test run, result, issue, notification, serta profile.
+- Mempertahankan query lokal yang sudah lengkap untuk suite, activity, attachment, dan integration. Kontrak source-new `entity_activity`, `entity_attachments`, notification `user_id/is_read`, dan profile `username/display_name/bio` tidak diaktifkan karena tidak cocok dengan schema/domain lokal; query lokal tetap memakai `audit_logs`, `attachments`, `recipient_id/read_at`, dan `full_name/email`.
+- Tidak mengubah service/hook/page, tidak menjalankan migration, dan tidak memasukkan business rule baru ke repository; perubahan bersifat query Supabase serta pemetaan lewat mapper aktif.
+- Menandai SRC-10 selesai di `FEATURE_BACKLOG.md`.
+- Verifikasi: `npm run build` lulus (warning ukuran chunk existing) dan `git diff --check` lulus sebelum pembaruan graph akhir.

@@ -3,6 +3,20 @@ import { mapModuleRow, mapTagRow, mapTestCaseRow, mapTestCaseVersionRow, mapTest
 import type { TestCase, TestCaseVersion, TestCaseWithDetails, TestPlanCase, TestPlanCaseWithDetails } from '../types/domain';
 
 export const testCaseRepository = {
+  async searchByProject(projectId: string, query: string, limit = 5): Promise<Pick<TestCase, 'id' | 'code' | 'title'>[]> {
+    const search = query.trim().replace(/^#/, '').replace(/[,()%*]/g, '');
+    if (!search) return [];
+    const { data, error } = await supabase.from('test_cases').select('id, code, title').eq('project_id', projectId).or(`code.ilike.%${search}%,title.ilike.%${search}%`).limit(limit);
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async findByCode(projectId: string, code: string): Promise<TestCase | null> {
+    const { data, error } = await supabase.from('test_cases').select('*').eq('project_id', projectId).eq('code', code).maybeSingle();
+    if (error) throw error;
+    return data ? mapTestCaseRow(data) : null;
+  },
+
   async findAllByProject(projectId: string): Promise<TestCase[]> {
     const { data, error } = await supabase
       .from('test_cases')
@@ -16,18 +30,45 @@ export const testCaseRepository = {
 
   // Includes module + tags in one round trip — used by the list page so the
   // Module column and tag chips don't need N+1 queries.
-  async findAllByProjectWithDetails(projectId: string): Promise<TestCaseWithDetails[]> {
-    const { data, error } = await supabase
+  async findAllByProjectWithDetails(projectId: string, options?: { search?: string; statuses?: TestCase['status'][]; priorities?: TestCase['priority'][]; moduleIds?: string[]; tagIds?: string[]; testRoleIds?: string[] }): Promise<TestCaseWithDetails[]> {
+    let query = supabase
       .from('test_cases')
       .select('*, module:modules(*), test_case_tags(tag:tags(*)), target_role:test_roles(*)')
-      .eq('project_id', projectId)
-      .order('code');
+      .eq('project_id', projectId);
+
+    const search = options?.search?.trim().replace(/[,()%*]/g, '');
+    if (search) query = query.or(`title.ilike.%${search}%,code.ilike.%${search}%`);
+    if (options?.statuses?.length) query = query.in('status', options.statuses);
+    if (options?.priorities?.length) query = query.in('priority', options.priorities);
+    if (options?.moduleIds?.length) query = query.in('module_id', options.moduleIds);
+    if (options?.testRoleIds?.length) query = query.in('target_role_id', options.testRoleIds);
+    if (options?.tagIds?.length) {
+      const { data: linked, error: linkedError } = await supabase.from('test_case_tags').select('test_case_id').in('tag_id', options.tagIds);
+      if (linkedError) throw linkedError;
+      const caseIds = [...new Set((linked ?? []).map((row: any) => row.test_case_id))];
+      if (!caseIds.length) return [];
+      query = query.in('id', caseIds);
+    }
+
+    const { data, error } = await query.order('code');
 
     if (error) throw error;
     return (data ?? []).map((row: any) => ({
       ...mapTestCaseRow(row),
       module: row.module ? mapModuleRow(row.module) : null,
       tags: (row.test_case_tags ?? []).map((t: any) => mapTagRow(t.tag)),
+      targetRole: row.target_role ? mapTestRoleRow(row.target_role) : null,
+    }));
+  },
+
+  async findByIdsWithDetails(ids: string[]): Promise<TestCaseWithDetails[]> {
+    if (!ids.length) return [];
+    const { data, error } = await supabase.from('test_cases').select('*, module:modules(*), test_case_tags(tag:tags(*)), target_role:test_roles(*)').in('id', ids);
+    if (error) throw error;
+    return (data ?? []).map((row: any) => ({
+      ...mapTestCaseRow(row),
+      module: row.module ? mapModuleRow(row.module) : null,
+      tags: (row.test_case_tags ?? []).map((tag: any) => mapTagRow(tag.tag)),
       targetRole: row.target_role ? mapTestRoleRow(row.target_role) : null,
     }));
   },
@@ -130,6 +171,20 @@ export const testCaseRepository = {
     if (error) throw error;
   },
 
+  async createMany(inputs: (Omit<TestCase, 'id' | 'createdAt' | 'updatedAt' | 'code' | 'assignedTo'> & { code?: string | null; assignedTo?: string | null })[]): Promise<TestCase[]> {
+    if (!inputs.length) return [];
+    const { data, error } = await supabase.from('test_cases').insert(inputs.map((input) => ({
+      project_id: input.projectId, module_id: input.moduleId, code: input.code || undefined,
+      title: input.title, objective: input.objective, preconditions: input.preconditions,
+      steps: input.steps, expected_result: input.expectedResult, step_type: input.stepType,
+      priority: input.priority, status: input.status, notes: input.notes,
+      assigned_to: input.assignedTo ?? null, target_role_id: input.targetRoleId ?? null,
+      external_links: input.externalLinks ?? [], created_by: input.createdBy ?? null,
+    }))).select('*');
+    if (error) throw error;
+    return (data ?? []).map(mapTestCaseRow);
+  },
+
   async remove(id: string): Promise<void> {
     const { error } = await supabase.from('test_cases').delete().eq('id', id);
     if (error) throw error;
@@ -164,6 +219,32 @@ export const testCaseRepository = {
 
     if (error) throw error;
     return mapTestPlanCaseRow(data);
+  },
+
+  async attachToPlanMany(inputs: { testPlanId: string; testCaseId: string; order: number }[]): Promise<TestPlanCase[]> {
+    if (!inputs.length) return [];
+    const { data, error } = await supabase.from('test_plan_cases').insert(inputs.map((input) => ({ test_plan_id: input.testPlanId, test_case_id: input.testCaseId, order: input.order }))).select('*');
+    if (error) throw error;
+    return (data ?? []).map(mapTestPlanCaseRow);
+  },
+
+  async findAdjacentPlanCase(testPlanId: string, order: number, direction: 'before' | 'after'): Promise<TestPlanCase | null> {
+    const { data, error } = await supabase.from('test_plan_cases').select('*').eq('test_plan_id', testPlanId).or(direction === 'after' ? `order.gt.${order}` : `order.lt.${order}`);
+    if (error) throw error;
+    if (!data?.length) return null;
+    const rows = data.map(mapTestPlanCaseRow);
+    return direction === 'after'
+      ? rows.reduce((nearest, row) => row.order < nearest.order ? row : nearest)
+      : rows.reduce((nearest, row) => row.order > nearest.order ? row : nearest);
+  },
+
+  async swapCaseOrder(testPlanCaseIdA: string, orderA: number, testPlanCaseIdB: string, orderB: number): Promise<void> {
+    const [first, second] = await Promise.all([
+      supabase.from('test_plan_cases').update({ order: orderB }).eq('id', testPlanCaseIdA),
+      supabase.from('test_plan_cases').update({ order: orderA }).eq('id', testPlanCaseIdB),
+    ]);
+    if (first.error) throw first.error;
+    if (second.error) throw second.error;
   },
 
   async detachFromPlan(testPlanCaseId: string): Promise<void> {

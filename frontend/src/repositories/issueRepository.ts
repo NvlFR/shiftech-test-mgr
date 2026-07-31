@@ -30,6 +30,20 @@ function mapIssueDetails(row: any): IssueWithDetails {
 }
 
 export const issueRepository = {
+  async searchByProject(projectId: string, query: string, limit = 5): Promise<Pick<Issue, 'id' | 'code' | 'title'>[]> {
+    const search = query.trim().replace(/^!/, '').replace(/[,()%*]/g, '');
+    if (!search) return [];
+    const { data, error } = await supabase.from('issues').select('id, code, title').eq('project_id', projectId).or(`code.ilike.%${search}%,title.ilike.%${search}%`).limit(limit);
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async findByCode(projectId: string, code: string): Promise<Issue | null> {
+    const { data, error } = await supabase.from('issues').select('*').eq('project_id', projectId).eq('code', code).maybeSingle();
+    if (error) throw error;
+    return data ? mapIssueRow(data) : null;
+  },
+
   async findById(id: string): Promise<(IssueWithDetails & { projectId: string | null }) | null> {
     const { data, error } = await supabase
       .from('issues')

@@ -29,6 +29,20 @@ export const testRunRepository = {
     return (data ?? []).map(mapTestRunRow);
   },
 
+  async findAllByPlanPaginated(testPlanId: string, options: { search?: string; statuses?: TestRunStatus[]; page: number; rowsPerPage: number }): Promise<{ data: TestRun[]; total: number }> {
+    let query = supabase.from('test_runs').select('*', { count: 'exact' }).eq('test_plan_id', testPlanId);
+    const search = options.search?.trim().replace(/[,()%*]/g, '');
+    if (search) query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+    if (options.statuses?.length) query = query.in('status', options.statuses);
+    if (options.rowsPerPage > 0) {
+      const from = (options.page - 1) * options.rowsPerPage;
+      query = query.range(from, from + options.rowsPerPage - 1);
+    }
+    const { data, error, count } = await query.order('started_at', { ascending: false });
+    if (error) throw error;
+    return { data: (data ?? []).map(mapTestRunRow), total: count ?? 0 };
+  },
+
   // Cross-plan listing for a whole project — joins through test_plans since
   // test_runs only has test_plan_id, not project_id directly.
   async findAllByProject(projectId: string, filters: TestRunFilters = {}): Promise<(TestRun & { testPlanId: string; testPlanName: string })[]> {
