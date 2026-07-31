@@ -31,6 +31,8 @@ import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { TestRunAnalysisPanel } from '../../components/test-runs/TestRunAnalysisPanel';
 import { AiIssueDraftDialog } from '../../components/ai/AiIssueDraftDialog';
 import { IssueDialog } from '../../components/dialogs/IssueDialog';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 import {
   TEST_RESULT_STATUS_LABEL,
   TEST_RESULT_STATUS_SEVERITY,
@@ -57,6 +59,8 @@ export function TestRunDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const { profile: currentProfile } = useAuthContext();
 
   const { testRun, results, summary, loading, reload } = useTestRunDetail(id ?? null);
@@ -297,21 +301,22 @@ export function TestRunDetailPage() {
         </div>
       )}
 
-      <DataTable value={visibleResults} selection={selectedResults} onSelectionChange={(e) => setSelectedResults(e.value as TestResultWithDetails[])} selectionMode="multiple" loading={loading} paginator rows={10} emptyMessage="Tidak ada hasil yang sesuai filter" size="small" responsiveLayout="scroll">
+      <DataTable value={visibleResults} selection={selectedResults} onSelectionChange={(e) => setSelectedResults(e.value as TestResultWithDetails[])} selectionMode="multiple" loading={loading} {...dataTablePaginatorProps} rows={10} rowsPerPageOptions={[5, 10, 25, 50]} emptyMessage="Tidak ada hasil yang sesuai filter" size="small" responsiveLayout="scroll">
         {canRunTests && <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />}
-        <Column field="testCase.code" header="Kode" sortable style={{ width: '7rem' }} />
-        <Column field="testCase.title" header="Test Case" sortable />
-        <Column
+        {isMobile && <Column body={(row: TestResultWithDetails) => <div className="flex flex-column gap-2 py-1"><span className="font-bold">{row.testCase.code}</span><span>{row.testCase.title}</span><div className="flex gap-2 flex-wrap"><Tag value={TEST_CASE_PRIORITY_LABEL[row.testCase.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.testCase.priority]} /><Tag value={TEST_RESULT_STATUS_LABEL[row.status]} severity={TEST_RESULT_STATUS_SEVERITY[row.status]} /></div><span className="text-sm text-color-secondary">Tester: {row.tester?.fullName ?? row.tester?.email ?? '-'}</span>{row.notes && <span className="text-sm text-color-secondary">{row.notes}</span>}</div>} />}
+        {!isMobile && <Column field="testCase.code" header="Kode" sortable style={{ width: '7rem' }} />}
+        {!isMobile && <Column field="testCase.title" header="Test Case" sortable />}
+        {!isMobile && <Column
           field="testCase.priority"
           header="Prioritas"
           sortable
           body={(row: TestResultWithDetails) => (
             <Tag value={TEST_CASE_PRIORITY_LABEL[row.testCase.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.testCase.priority]} />
           )}
-        />
-        <Column field="status" header="Hasil" body={(row: TestResultWithDetails) => <Tag value={TEST_RESULT_STATUS_LABEL[row.status]} severity={TEST_RESULT_STATUS_SEVERITY[row.status]} />} sortable />
-        <Column field="tester.fullName" header="Tester" body={(row: TestResultWithDetails) => row.tester?.fullName ?? row.tester?.email ?? '-'} />
-        <Column field="notes" header="Catatan" />
+        />}
+        {!isMobile && <Column field="status" header="Hasil" body={(row: TestResultWithDetails) => <Tag value={TEST_RESULT_STATUS_LABEL[row.status]} severity={TEST_RESULT_STATUS_SEVERITY[row.status]} />} sortable />}
+        {!isMobile && <Column field="tester.fullName" header="Tester" body={(row: TestResultWithDetails) => row.tester?.fullName ?? row.tester?.email ?? '-'} />}
+        {!isMobile && <Column field="notes" header="Catatan" />}
         <Column
           header="Issue"
           style={{ width: '6rem' }}

@@ -15,6 +15,8 @@ import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
 import { TestSuiteDialog } from '../../components/dialogs/TestSuiteDialog';
 import { testSuiteService } from '../../services/testSuiteService';
 import type { TestSuite, TestSuiteVisibility } from '../../types/domain';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const VISIBILITY_OPTIONS: { label: string; value: TestSuiteVisibility }[] = [
   { label: 'Private', value: 'private' },
@@ -25,6 +27,8 @@ const VISIBILITY_OPTIONS: { label: string; value: TestSuiteVisibility }[] = [
 export function TestSuitesPage() {
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const [suites, setSuites] = useState<TestSuite[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -117,11 +121,12 @@ export function TestSuitesPage() {
         <div className="col-12 md:col-6"><SearchInput value={search} onChange={setSearch} placeholder="Cari suite..." className="w-full" /></div>
         <div className="col-12 md:col-3"><Dropdown value={visibility} options={[{ label: 'Semua visibilitas', value: 'all' }, ...VISIBILITY_OPTIONS]} onChange={(e) => setVisibility(e.value)} className="w-full" /></div>
       </FilterToolbar>
-      <DataTable value={filteredSuites} loading={loading} dataKey="id" emptyMessage="Belum ada test suite." paginator rows={10} rowHover onRowClick={(e) => navigate(`/test-suites/${(e.data as TestSuite).id}`)} className="cursor-pointer">
-        <Column field="name" header="Nama" sortable />
-        <Column field="description" header="Deskripsi" body={(row: TestSuite) => row.description || '-'} />
-        <Column header="Visibilitas" body={(row: TestSuite) => <Tag value={row.visibility} severity={row.visibility === 'public' ? 'success' : row.visibility === 'unlisted' ? 'warning' : 'info'} />} />
-        <Column field="updatedAt" header="Diperbarui" body={(row: TestSuite) => new Date(row.updatedAt).toLocaleDateString('id-ID')} />
+      <DataTable value={filteredSuites} loading={loading} dataKey="id" emptyMessage="Belum ada test suite." {...dataTablePaginatorProps} rows={10} rowsPerPageOptions={[5, 10, 25, 50]} rowHover onRowClick={(e) => navigate(`/test-suites/${(e.data as TestSuite).id}`)} className="cursor-pointer">
+        {isMobile && <Column body={(row: TestSuite) => <div className="flex flex-column gap-2 py-1"><span className="font-bold">{row.name}</span>{row.description && <span className="text-sm text-color-secondary">{row.description}</span>}<div className="flex align-items-center gap-2"><Tag value={row.visibility} severity={row.visibility === 'public' ? 'success' : row.visibility === 'unlisted' ? 'warning' : 'info'} /><span className="text-sm text-color-secondary">Update {new Date(row.updatedAt).toLocaleDateString('id-ID')}</span></div></div>} />}
+        {!isMobile && <Column field="name" header="Nama" sortable />}
+        {!isMobile && <Column field="description" header="Deskripsi" body={(row: TestSuite) => row.description || '-'} />}
+        {!isMobile && <Column header="Visibilitas" body={(row: TestSuite) => <Tag value={row.visibility} severity={row.visibility === 'public' ? 'success' : row.visibility === 'unlisted' ? 'warning' : 'info'} />} />}
+        {!isMobile && <Column field="updatedAt" header="Diperbarui" body={(row: TestSuite) => new Date(row.updatedAt).toLocaleDateString('id-ID')} />}
         <Column header="" style={{ width: '3.5rem' }} body={(row: TestSuite) => <RowActionsMenu items={[
           { label: 'Lihat detail', icon: 'pi pi-eye', command: () => navigate(`/test-suites/${row.id}`) },
           { label: 'Duplikasi', icon: 'pi pi-copy', command: () => openDialog('duplicate', row) },

@@ -4,6 +4,25 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 
 ## 2026-07-31
 
+### SRC-09b — Port halaman Test Runs, Issues, Test Suites, dan execution detail
+
+- Menjalankan `graphify query` sebelum membandingkan halaman aktif dengan
+  referensi `pages-new` dan membaca scope SRC-09 pada FEATURE_BACKLOG Section 7.
+- Memport pola tabel responsif source-new ke halaman execution detail, daftar
+  Issue per Test Run, daftar Test Suite, dan detail Test Suite: baris ringkas
+  khusus layar kecil, paginator bersama, pilihan jumlah baris, serta tetap
+  menyediakan row actions dan bulk selection yang sudah aktif.
+- Mempertahankan route lokal `/test-runs/:id`, `/test-runs/:id/issues`,
+  `/issues/:id`, `/test-suites`, dan `/test-suites/:id`. Flow lokal record
+  result/structured steps, complete manual/reopen run, AI Issue, assignment,
+  attachment, comments, activity, CRUD suite/item, filter, dan RBAC tidak
+  diganti oleh kontrak source-new yang berbeda.
+- Tidak mengubah schema, domain, mapper, repository, service, hook data, atau
+  menjalankan migration ke Supabase target.
+- Verifikasi: `cd frontend && npm run build` lulus (warning ukuran chunk
+  existing), `npm run lint` dan `git diff --check` dijalankan sebelum
+  sinkronisasi Graphify akhir.
+
 ### SRC-03 — Integrasi layout-new ke layout aktif
 
 - Membandingkan seluruh komponen `components/layout-new` dengan layout aktif.

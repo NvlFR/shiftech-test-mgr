@@ -265,14 +265,14 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestRunDetailPage.tsx": {
-    "mtime": 1785531235.1231604,
-    "ast_hash": "99d4af2fafd82c65d8f5277e0d97e57a",
+    "mtime": 1785532936.488677,
+    "ast_hash": "1a2417ce6a515317c3ca395bea0299d5",
     "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestRunIssuesPage.tsx": {
-    "mtime": 1785523566.812747,
-    "ast_hash": "078acf57c0b85335157efdcfa54d6ddf",
-    "semantic_hash": "078acf57c0b85335157efdcfa54d6ddf"
+    "mtime": 1785532936.6206768,
+    "ast_hash": "ae6a8b6824c356ade31c3d69488afd33",
+    "semantic_hash": ""
   },
   "frontend/src/pages/users/UserDetailPage.tsx": {
     "mtime": 1785532205.2152023,
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785532725.581409,
-    "ast_hash": "febbf802698dd0ac7ad2f0b0b4bcb443",
+    "mtime": 1785532966.5995963,
+    "ast_hash": "7d1eed4dea9262cca8ee388fbd6341a5",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1260,9 +1260,9 @@
     "semantic_hash": "071b4c52507b702fa1e91c9e5905649c"
   },
   "frontend/src/pages/test-suites/TestSuitesPage.tsx": {
-    "mtime": 1785523534.4882555,
-    "ast_hash": "ad8bbb2b5612ccc5f4651dc77ce4df74",
-    "semantic_hash": "ad8bbb2b5612ccc5f4651dc77ce4df74"
+    "mtime": 1785532936.7536762,
+    "ast_hash": "bb23678498f0637529dbc90bfadf4362",
+    "semantic_hash": ""
   },
   "frontend/src/repositories/testSuiteRepository.ts": {
     "mtime": 1785522578.559624,
@@ -1330,9 +1330,9 @@
     "semantic_hash": "26e9753c21676e3609bd497924f873c1"
   },
   "frontend/src/pages/test-suites/TestSuiteDetailPage.tsx": {
-    "mtime": 1785523750.6935093,
-    "ast_hash": "d71097355ed7eb3d6b98cb17535b715b",
-    "semantic_hash": "d71097355ed7eb3d6b98cb17535b715b"
+    "mtime": 1785532936.887676,
+    "ast_hash": "f6ce939b2b87e1c68bc694158c5c20f6",
+    "semantic_hash": ""
   },
   "frontend/src/App-new.tsx": {
     "mtime": 1785517674.513946,

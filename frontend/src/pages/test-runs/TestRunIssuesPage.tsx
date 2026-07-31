@@ -20,6 +20,8 @@ import { useProjectRole } from '../../hooks/useProjectRole';
 import type { TestPlan, TestRun } from '../../types/domain';
 import { ISSUE_PRIORITY_LABEL, ISSUE_PRIORITY_SEVERITY, ISSUE_STATUS_LABEL } from '../../helpers/statusLabels';
 import type { IssuePriority } from '../../types/domain';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
   ['backlog', 'open', 'in_progress', 'resolved', 'verified', 'closed', 'rejected', 'duplicate'] as const
@@ -29,6 +31,8 @@ const PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (['critical'
 export function TestRunIssuesPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const [searchParams, setSearchParams] = useSearchParams();
   const testResultId = searchParams.get('testResultId');
   const { issues: allIssues, loading, reload } = useIssuesByTestRun(id ?? null);
@@ -148,8 +152,9 @@ export function TestRunIssuesPage() {
       <DataTable
         value={issues}
         loading={loading}
-        paginator
+        {...dataTablePaginatorProps}
         rows={10}
+        rowsPerPageOptions={[5, 10, 25, 50]}
         emptyMessage="Belum ada issue"
         size="small"
         responsiveLayout="scroll"
@@ -157,10 +162,11 @@ export function TestRunIssuesPage() {
         rowHover
         className="cursor-pointer"
       >
-        <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />
-        <Column field="title" header="Judul" sortable />
-        <Column field="priority" header="Prioritas" body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} sortable />
-        <Column
+        {isMobile && <Column body={(row: IssueWithDetails) => <div className="flex flex-column gap-2 py-1"><span className="font-bold">{row.code}</span><span>{row.title}</span><div className="flex gap-2"><Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} /><Tag value={ISSUE_STATUS_LABEL[row.status]} /></div><span className="text-sm text-color-secondary">{row.assignee?.fullName ?? row.assignee?.email ?? 'Belum ditugaskan'}</span></div>} />}
+        {!isMobile && <Column field="code" header="Kode" sortable style={{ width: '7rem' }} />}
+        {!isMobile && <Column field="title" header="Judul" sortable />}
+        {!isMobile && <Column field="priority" header="Prioritas" body={(row: IssueWithDetails) => <Tag value={ISSUE_PRIORITY_LABEL[row.priority]} severity={ISSUE_PRIORITY_SEVERITY[row.priority]} />} sortable />}
+        {!isMobile && <Column
           field="status"
           header="Status"
           body={(row: IssueWithDetails) => (
@@ -174,8 +180,8 @@ export function TestRunIssuesPage() {
               />
             </div>
           )}
-        />
-        <Column
+        />}
+        {!isMobile && <Column
           field="assignee"
           header="Ditugaskan Ke"
           body={(row: IssueWithDetails) => (
@@ -191,7 +197,7 @@ export function TestRunIssuesPage() {
               />
             </div>
           )}
-        />
+        />}
         <Column
           header=""
           style={{ width: '3.5rem' }}

@@ -118,8 +118,8 @@
   "116": "schema_026_automation_artifacts_storage.sql",
   "117": "react-dom",
   "118": "schema_027_fix_attachment_helper_grants.sql",
-  "119": "@tanstack/react-query",
-  "120": "react-hook-form",
+  "119": "react",
+  "120": "AppMenu.tsx",
   "121": "react-router-dom",
   "122": "jspdf",
   "123": "useScreenSize.ts",
@@ -137,7 +137,8 @@
   "135": "schema_issue_attachments.sql",
   "136": "CLAUDE.md",
   "137": "extraction-spec.md",
-  "138": "react-markdown",
+  "138": "Breadcrumb.tsx",
+  "139": "useNotifications.ts",
   "140": ".mcp.json",
   "141": "schema_025_fix_pgcrypto_and_audit.sql",
   "142": "schema_035_test_result_snapshot.sql",
@@ -155,7 +156,10 @@
   "154": "schema_027_fix_attachment_helper_grants.sql",
   "155": "schema_037_invited_project_metadata_access.sql",
   "156": "seed.sql",
+  "157": "dashboardRepository.ts",
+  "158": "useComments.ts",
   "159": "schema_040_notification_delete_policy.sql",
-  "161": "primeicons",
-  "165": "react-router-dom"
+  "160": "NotificationPanel.tsx",
+  "161": "react-markdown",
+  "162": "@supabase/supabase-js"
 }

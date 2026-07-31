@@ -22,6 +22,8 @@ import { TestSuiteDialog } from '../../components/dialogs/TestSuiteDialog';
 import { testSuiteService } from '../../services/testSuiteService';
 import { TEST_CASE_PRIORITY_LABEL, TEST_CASE_PRIORITY_SEVERITY } from '../../helpers/statusLabels';
 import type { TestCasePriority, TestCaseStepType, TestSuite, TestSuiteItem } from '../../types/domain';
+import { useScreenSize } from '../../hooks/useScreenSize';
+import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const PRIORITIES: { label: string; value: TestCasePriority }[] = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ label: TEST_CASE_PRIORITY_LABEL[value], value }));
 
@@ -34,6 +36,8 @@ type ItemForm = {
 const EMPTY_FORM: ItemForm = { moduleName: '', title: '', objective: '', preconditions: '', steps: '', expectedResult: '', priority: 'medium', targetRole: '', tagNames: '', stepType: 'simple', detailedSteps: [] };
 
 export function TestSuiteDetailPage() {
+  const { lt } = useScreenSize();
+  const isMobile = lt.sm;
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
@@ -123,8 +127,8 @@ export function TestSuiteDetailPage() {
       <div className="col-12 md:col-3"><MultiSelect value={stepTypeFilter} options={[{ label: 'Simple', value: 'simple' }, { label: 'Detailed', value: 'detailed' }]} onChange={(e) => setStepTypeFilter(e.value)} placeholder="Semua mode" className="w-full" /></div>
     </FilterToolbar>
     {selected.length > 0 && <div className="flex align-items-center gap-2 mb-2"><span>{selected.length} item dipilih</span><Button label="Hapus terpilih" icon="pi pi-trash" severity="danger" outlined size="small" onClick={deleteSelected} /><Button label="Batal" text size="small" onClick={() => setSelected([])} /></div>}
-    <Card title={`Test Cases (${filteredItems.length})`}><DataTable value={filteredItems} loading={loading} dataKey="id" selection={selected} onSelectionChange={(e) => setSelected(e.value)} selectionMode="checkbox" emptyMessage="Belum ada test case di suite ini." paginator rows={10} size="small">
-      <Column selectionMode="multiple" style={{ width: '3rem' }} /><Column field="orderIndex" header="#" /><Column field="title" header="Judul" sortable /><Column field="moduleName" header="Module" body={(row: TestSuiteItem) => row.moduleName || '-'} /><Column field="priority" header="Prioritas" body={(row: TestSuiteItem) => <Tag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} />} /><Column field="stepType" header="Mode" body={(row: TestSuiteItem) => row.stepType === 'detailed' ? 'Detailed' : 'Simple'} /><Column header="" style={{ width: '3.5rem' }} body={(row: TestSuiteItem) => <RowActionsMenu items={[{ label: 'Edit', icon: 'pi pi-pencil', command: () => openItem('edit', row) }, { label: 'Duplikasi', icon: 'pi pi-copy', command: () => openItem('duplicate', row) }, { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => deleteItem(row) }]} />} />
+    <Card title={`Test Cases (${filteredItems.length})`}><DataTable value={filteredItems} loading={loading} dataKey="id" selection={selected} onSelectionChange={(e) => setSelected(e.value)} selectionMode="checkbox" emptyMessage="Belum ada test case di suite ini." {...dataTablePaginatorProps} rows={10} rowsPerPageOptions={[5, 10, 25, 50]} size="small">
+      <Column selectionMode="multiple" style={{ width: '3rem' }} />{isMobile && <Column body={(row: TestSuiteItem) => <div className="flex flex-column gap-2 py-1"><span className="font-bold">{row.title}</span><span className="text-sm text-color-secondary">{row.moduleName || 'Tanpa module'}</span><div className="flex gap-2"><Tag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} /><Tag value={row.stepType === 'detailed' ? 'Detailed' : 'Simple'} severity="secondary" /></div></div>} />}{!isMobile && <Column field="orderIndex" header="#" />}{!isMobile && <Column field="title" header="Judul" sortable />}{!isMobile && <Column field="moduleName" header="Module" body={(row: TestSuiteItem) => row.moduleName || '-'} />}{!isMobile && <Column field="priority" header="Prioritas" body={(row: TestSuiteItem) => <Tag value={TEST_CASE_PRIORITY_LABEL[row.priority]} severity={TEST_CASE_PRIORITY_SEVERITY[row.priority]} />} />}{!isMobile && <Column field="stepType" header="Mode" body={(row: TestSuiteItem) => row.stepType === 'detailed' ? 'Detailed' : 'Simple'} />}<Column header="" style={{ width: '3.5rem' }} body={(row: TestSuiteItem) => <RowActionsMenu items={[{ label: 'Edit', icon: 'pi pi-pencil', command: () => openItem('edit', row) }, { label: 'Duplikasi', icon: 'pi pi-copy', command: () => openItem('duplicate', row) }, { label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => deleteItem(row) }]} />} />
     </DataTable></Card>
     <TestSuiteDialog visible={suiteDialogOpen} mode="edit" initialData={suite ? { name: suite.name, description: suite.description, visibility: suite.visibility } : undefined} onHide={() => setSuiteDialogOpen(false)} onSave={async (data) => { if (!id) return; await testSuiteService.update(id, data); setSuiteDialogOpen(false); await reload(); }} />
     <Dialog header={itemMode === 'edit' ? 'Edit Item' : itemMode === 'duplicate' ? 'Duplikasi Item' : 'Item Baru'} visible={itemDialogOpen} onHide={() => setItemDialogOpen(false)} style={{ width: '42rem' }} footer={<><Button label="Batal" text onClick={() => setItemDialogOpen(false)} /><Button label="Simpan" onClick={saveItem} /></>}>

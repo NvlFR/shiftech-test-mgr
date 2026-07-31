@@ -230,8 +230,8 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectDetailPage.tsx": {
-    "mtime": 1785531226.188153,
-    "ast_hash": "eb41e416178fb7c1ae3e548eeef23594",
+    "mtime": 1785532691.2515612,
+    "ast_hash": "0ca78870d506f7f78096a759075d884f",
     "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectSettingsPage.tsx": {
@@ -240,9 +240,9 @@
     "semantic_hash": "f016292167abb2bbf4f6435aa23b8202"
   },
   "frontend/src/pages/projects/ProjectsPage.tsx": {
-    "mtime": 1785516953.6861253,
-    "ast_hash": "482227afa1983129fbe5462a7fb2e3f2",
-    "semantic_hash": "482227afa1983129fbe5462a7fb2e3f2"
+    "mtime": 1785532690.845563,
+    "ast_hash": "3c3188a8abdef0e94c19f2899216298c",
+    "semantic_hash": ""
   },
   "frontend/src/pages/test-cases/TestCaseDetailPage.tsx": {
     "mtime": 1785520458.2138026,
@@ -250,9 +250,9 @@
     "semantic_hash": "8ea72a2217637a3d5881437e602f3efb"
   },
   "frontend/src/pages/test-cases/TestCasesPage.tsx": {
-    "mtime": 1785517643.9163616,
-    "ast_hash": "048771d2eb4690363900642704a91ff9",
-    "semantic_hash": "048771d2eb4690363900642704a91ff9"
+    "mtime": 1785532690.9815624,
+    "ast_hash": "aba812c8eb4b28523859ec392e72bf06",
+    "semantic_hash": ""
   },
   "frontend/src/pages/test-plans/TestPlanDetailPage.tsx": {
     "mtime": 1785531226.3201532,
@@ -260,9 +260,9 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/test-plans/TestPlansPage.tsx": {
-    "mtime": 1785521377.066891,
-    "ast_hash": "1d3d6735070cc76495f721ffb4bbbc61",
-    "semantic_hash": "1d3d6735070cc76495f721ffb4bbbc61"
+    "mtime": 1785532691.1135619,
+    "ast_hash": "fe4d45d83f180ce518922facb5a1317b",
+    "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestRunDetailPage.tsx": {
     "mtime": 1785531235.1231604,
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785532478.5915368,
-    "ast_hash": "ea0f5013827554acda013844a443066e",
+    "mtime": 1785532740.3683465,
+    "ast_hash": "e528ef820a8d78198d7cd1e778f7743d",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
