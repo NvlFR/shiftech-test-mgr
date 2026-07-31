@@ -1398,3 +1398,14 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan `useProjectRepositories.ts` untuk lifecycle list/reload serta aksi create/update/remove melalui service dengan context auth aktif.
 - Tidak menjalankan migration, mengubah database target, menambahkan dependency, commit, push, atau refactor di luar scope.
 - Verifikasi frontend lulus: `npm run build` (664 modul; warning ukuran chunk existing), `npm run lint` (7 warning existing di luar scope), dan `git diff --check`.
+
+### 2026-07-31 — REPO-05 Edge Function kredensial repository
+
+- Menjalankan `graphify query` sebelum menelusuri implementasi dan mengikuti keputusan penyimpanan kredensial pada Section 10.4 `FEATURE_BACKLOG.md`.
+- Menambahkan migration `schema_043_repository_credentials_vault.sql` tanpa menjalankannya ke target. RPC service-role-only menyimpan, merotasi, dan mencabut secret Supabase Vault secara atomik; hanya admin global, owner project, atau manager project aktif yang diizinkan.
+- Menambahkan metadata aman `credential_mask`, waktu dibuat, dan waktu kedaluwarsa pada `project_repositories`; nilai credential tetap hanya berada di Vault, sedangkan tabel hanya menyimpan UUID referensi dan metadata non-rahasia.
+- Menambahkan Edge Function `repo-credentials` dengan autentikasi bearer user, validasi payload ketat, respons allow-list yang hanya berisi `credential_id` dan mask, error generik, dan tanpa logging payload maupun error upstream.
+- Menambahkan contract test untuk mask, larangan token pada revoke, proyeksi respons yang membuang field rahasia tak terduga, dan redaksi implisit error upstream.
+- Audit event store/rotate/revoke dicatat tanpa nilai credential. Tidak ada migration target, dependency, commit, push, atau perubahan frontend.
+- Verifikasi lulus: `node --experimental-strip-types --test supabase/functions/repo-credentials/contract.test.ts`, `npm run build` (667 modul; warning ukuran chunk existing), dan `git diff --check`.
+- `graphify update .` pertama berhasil menyinkronkan graph menjadi 1.881 node dan 3.790 edge. Pemanggilan ulang setelah penyempitan tipe respons mendeteksi tidak ada AST yang perlu diperbarui, lalu watcher melaporkan `Operation not permitted`; graph hasil pembaruan pertama tetap tersedia dan perubahan terakhir hanya menghapus field respons dari interface/fixture.
