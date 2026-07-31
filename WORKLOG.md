@@ -1547,3 +1547,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - `issue.detect_duplicate` mengambil maksimal 300 kandidat project-scoped dari RPC lalu membungkus action `duplicate_issue_detection` pada Edge Function `ai-gateway`. JWT user approved dibaca hanya dari environment `TM_SUPABASE_ACCESS_TOKEN`, tidak dari argumen tool atau source code; respons AI ditandai `draft` dan `review_only`.
 - Menambahkan migration `schema_054_mcp_issue_workflow.sql` tanpa menjalankannya ke target, scope token `write:issues`, dokumentasi konfigurasi/migration, serta test registrasi, validasi relasi wajib, marker review AI, payload RPC, project scope, dan adapter gateway.
 - Verifikasi lulus: `cd mcp && npm test`, `cd mcp && npm run build`, `git diff --check`, dan pemeriksaan pola secret. Tidak menjalankan migration/deploy ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-12 tool Automation
+
+- Menjalankan `graphify query` sebelum menelusuri MCP dan mengikuti katalog Automation Section 8.2 `FEATURE_BACKLOG.md`.
+- Menambahkan `testmanager.automation.map_script`, `automation.enqueue`, `automation.job_status`, dan `automation.runner_list` melalui layering `Tool → AutomationService → AutomationRepository → Supabase RPC`.
+- `map_script` melakukan upsert mapping Test Case ke `script_ref`; `enqueue` menerima tepat satu Test Case atau Test Plan, selalu membuat Test Run baru, dan menggabungkan label mapping dengan label runner eksplisit. Status job dan daftar runner bersifat read-only; online dihitung dari heartbeat 90 detik dan token hash tidak pernah dikembalikan.
+- Menambahkan migration `schema_055_mcp_automation.sql` tanpa menjalankannya ke target, validasi ulang token/project pada setiap RPC, dan scope `write:automation` untuk mutation.
+- Menambahkan unit/contract test untuk registrasi read/write, validasi target enqueue, normalisasi label, payload RPC project-scoped, dan redaksi error upstream; dokumentasi MCP serta checklist backlog diperbarui.
+- Verifikasi lulus: `cd mcp && npm test` (12/12 test file) dan `cd mcp && npm run build`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

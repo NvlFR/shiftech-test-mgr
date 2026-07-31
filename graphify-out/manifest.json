@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785540449.2985888,
-    "ast_hash": "1a3459f847ab1d42f1cb0db04bb458d8",
+    "mtime": 1785540994.440199,
+    "ast_hash": "8cd5f6771b0f97e8da395e15297a48fe",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785540741.3533406,
-    "ast_hash": "57c135ed8e2abad58aab62bf22f4c464",
+    "mtime": 1785541031.3124154,
+    "ast_hash": "a846afa1dfb2142dc44833198bb91df5",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2830,8 +2830,8 @@
     "semantic_hash": ""
   },
   "mcp/src/index.ts": {
-    "mtime": 1785539747.2670078,
-    "ast_hash": "6a7492e25b58c52df87212be0ace790d",
+    "mtime": 1785540921.3311164,
+    "ast_hash": "081024e9afe16f7e6e90f9687fa628da",
     "semantic_hash": ""
   },
   "mcp/tsconfig.json": {
@@ -2840,8 +2840,8 @@
     "semantic_hash": ""
   },
   "mcp/README.md": {
-    "mtime": 1785540696.222143,
-    "ast_hash": "39dc25cc9032637dfc8c711e26506e6a",
+    "mtime": 1785540994.3112018,
+    "ast_hash": "61eb34e4b7365b5d8053db55b705bf28",
     "semantic_hash": ""
   },
   "mcp/src/repositories/authRepository.ts": {
@@ -2987,6 +2987,41 @@
   "supabase/schema_054_mcp_issue_workflow.sql": {
     "mtime": 1785540696.0901387,
     "ast_hash": "22e8d69e77ec1821789861e6318d4d83",
+    "semantic_hash": ""
+  },
+  "mcp/src/repositories/automationRepository.test.ts": {
+    "mtime": 1785540994.046208,
+    "ast_hash": "56e03bdd91e48129b89d046bf35c5c67",
+    "semantic_hash": ""
+  },
+  "mcp/src/repositories/automationRepository.ts": {
+    "mtime": 1785540920.9321282,
+    "ast_hash": "cf439db96f2a88183b97f423c849962a",
+    "semantic_hash": ""
+  },
+  "mcp/src/services/automationService.test.ts": {
+    "mtime": 1785541009.7038605,
+    "ast_hash": "f725eb26912a0172d76bf192a2757603",
+    "semantic_hash": ""
+  },
+  "mcp/src/services/automationService.ts": {
+    "mtime": 1785540921.0671244,
+    "ast_hash": "02e51ec472db862f54b2173eac62c653",
+    "semantic_hash": ""
+  },
+  "mcp/src/tools/automationTools.test.ts": {
+    "mtime": 1785540994.1772048,
+    "ast_hash": "0ae36bc1ff951b7aa4e2f70f5291bf1a",
+    "semantic_hash": ""
+  },
+  "mcp/src/tools/automationTools.ts": {
+    "mtime": 1785540921.2021203,
+    "ast_hash": "e4ac928ad5931edf295fa454acdabfad",
+    "semantic_hash": ""
+  },
+  "supabase/schema_055_mcp_automation.sql": {
+    "mtime": 1785540960.926015,
+    "ast_hash": "194bb7f93a2246a89645f3d65bceed0e",
     "semantic_hash": ""
   }
 }

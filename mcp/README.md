@@ -78,6 +78,13 @@ Edge Function `ai-gateway`; karena gateway memverifikasi user JWT, isi
 `TM_SUPABASE_ACCESS_TOKEN` dengan sesi user approved dan rotasi sesuai kebijakan
 environment.
 
+Automation MCP memerlukan migration `schema_055_mcp_automation.sql` dan scope
+token `write:automation` untuk `automation.map_script` serta
+`automation.enqueue`. Enqueue menerima tepat satu `testcase_id` atau
+`testplan_id`; `runner_labels` tambahan digabung dengan label mapping script.
+`automation.job_status` dan `automation.runner_list` bersifat read-only, dengan
+runner dianggap online bila heartbeat terakhir berada dalam 90 detik.
+
 ## Tool read batch 1
 
 - `testmanager.project.list` dan `testmanager.project.get`

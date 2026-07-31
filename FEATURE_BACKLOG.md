@@ -424,10 +424,10 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 
 **Automation**
 
-- [ ] `automation.map_script` — petakan Test Case ↔ `script_ref`.
-- [ ] `automation.enqueue` — enqueue job dari Test Case / Test Plan, dengan label runner.
-- [ ] `automation.job_status` — poll status job (`queued`/`running`/`passed`/`failed`).
-- [ ] `automation.runner_list` — runner online/offline + kapabilitas.
+- [x] `automation.map_script` — petakan Test Case ↔ `script_ref`.
+- [x] `automation.enqueue` — enqueue job dari Test Case / Test Plan, dengan label runner.
+- [x] `automation.job_status` — poll status job (`queued`/`running`/`passed`/`failed`).
+- [x] `automation.runner_list` — runner online/offline + kapabilitas.
 - [ ] `automation.rerun_failed` — enqueue ulang **hanya** test yang relevan (regression, §11).
 
 **Repo / konteks kode** (butuh Section 10)
