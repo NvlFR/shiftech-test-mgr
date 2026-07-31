@@ -2,6 +2,15 @@
 
 Catatan perubahan dan pekerjaan pada project TestManager.
 
+## 2026-07-31
+
+### Audit fitur repo pembanding
+
+- Membandingkan repository lokal dengan `https://github.com/ffrz/shiftech-test-mgr` secara read-only.
+- Repo pembanding memiliki fitur tambahan: project ownership/visibility, project membership/invite, Test Suite Library, activity/comment/mention, public profile, identity split, structured test steps, unplanned Test Run, duplicate project, React Query, dan Supabase Realtime.
+- Fitur lokal yang harus dipertahankan: AI Integration, Playwright automation runner, CI/CD, backup/retention, dashboard/reporting, requirement traceability, API/webhook, dan self-hosted infrastructure.
+- Strategi integrasi: port fitur repo pembanding secara additive dan bertahap; tidak melakukan merge atau menghapus fitur lokal.
+
 ## 2026-07-26
 
 ### Persiapan commit setelah sync fork
@@ -11,6 +20,28 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 - Perubahan kerja akan diamankan dalam commit baru; folder `.codex/` tetap dikecualikan dari commit sesuai keputusan sebelumnya.
 - Percobaan push ke `origin/master` ditolak karena remote berada 244 commit di depan lokal (`non-fast-forward`); tidak ada force-push yang dilakukan.
 - Menyiapkan penggantian histori `origin/master` dengan histori lokal menggunakan backup branch dan `git push --force-with-lease` sesuai permintaan.
+
+### 2026-07-26 — Fix AI_INVALID_OUTPUT ai-gateway (schema hint untuk provider nyata)
+
+- Setelah CORS diperbaiki, OpenAI terpanggil tapi balas `AI_INVALID_OUTPUT`: output JSON tidak lolos `AnalysisOutputSchema` (strict). Penyebab: prompt tidak pernah memberi tahu provider bentuk output yang diharapkan (nama field, enum, nesting) — mock provider selalu pas karena hard-coded, provider nyata menebak. Modul AI sebelumnya hanya teruji mode mock.
+- Fix di `contract.ts`: tambah `OUTPUT_SCHEMA_HINT` (contoh JSON shape per action) yang disuntikkan ke prompt (`handler.ts`) + instruksi ketat "hanya key ini, enum ini, id disalin dari scopedContext". Skema OUTPUT dilonggarkan dari `.strict()` → strip unknown keys + `.default([])` pada array + `counts.partial()` (counts di-recompute server-side, jadi longgar aman). REQUEST schema tetap strict.
+- Redeploy `ai-gateway` version 4 ACTIVE. VERIFIED end-to-end dari browser: `ai_audit_events` mencatat `action=test_run_analysis, provider=openai, model=gpt-4o-mini, status=completed, latency 3279ms, error_code=null`. Output analisis kontekstual nyata (bukan mock). Section 4 AI Integration fungsional dengan OpenAI.
+- Catatan minor (belum difix): retest recommendation menampilkan `TC-UNKNOWN` karena OpenAI kadang mengembalikan `testCaseId` yang bukan uuid asli dari scopedContext → lookup `analysisResponse` gagal. Kosmetik, bisa diperbaiki dengan resolve testCaseId by code juga.
+
+### 2026-07-26 — Fix CORS ai-gateway (browser blokir POST)
+
+- Gejala: dari browser muncul "AI gateway tidak dapat memproses analisis Test Run"; `ai_audit_events` kosong (gagal sebelum audit insert). Log Edge Function menunjukkan hanya `OPTIONS 204` untuk percobaan user, TANPA `POST` sama sekali.
+- Akar masalah: `corsHeaders` di `security.ts` hanya mengizinkan `authorization, content-type, x-request-id`. `supabase.functions.invoke` mengirim juga header `apikey` dan `x-client-info`, sehingga CORS preflight gagal → browser MEMBLOKIR POST sebelum terkirim. (Curl lolos karena CORS hanya ditegakkan browser — itu sebabnya smoke test awal hijau tapi UI gagal.)
+- Fix: `access-control-allow-headers` ditambah `x-client-info, apikey, x-supabase-api-version`. Redeploy `ai-gateway` (version 3, ACTIVE). Terverifikasi via curl OPTIONS: preflight kini mengembalikan allow-headers lengkap.
+- Bukan masalah OpenAI/secret — audit kosong membuktikan kegagalan terjadi sebelum provider dipanggil. Kunci diagnosis: OPTIONS-tanpa-POST = preflight ditolak browser.
+
+### 2026-07-26 — Section 4: deploy Edge Function ai-gateway — FUNGSIONAL
+
+- Menutup gap terbesar audit: seluruh fitur AI (Section 4, 8 item `[x]`) memanggil `supabase.functions.invoke('ai-gateway')` tapi Edge Function-nya belum pernah di-deploy → semua tombol AI error runtime.
+- Deploy `ai-gateway` (5 file: index/handler/contract/providers/security) ke Supabase target `fohuxwzczepdqyrfkovc` via MCP `deploy_edge_function`, `verify_jwt=true`, status ACTIVE version 1. Tidak ada perubahan source; file sudah ada di `supabase/functions/ai-gateway/`.
+- Prasyarat terverifikasi: migration `023_p3_ai_integration` sudah diterapkan; RPC `consume_ai_rate_limit(p_project_id uuid, p_action text, p_limit int, p_window_seconds int)` cocok persis dengan pemanggilan handler; tabel `ai_audit_events`/`ai_rate_limits` ada.
+- Smoke test remote (anon JWT, karena user JWT hanya ada di browser): `OPTIONS`→204 (CORS preflight); body valid + token non-user→`AUTH_INVALID` 401 (fungsi boot, import esm.sh zod + supabase-js resolve, schema+validateInput lolos, sampai `authenticate`); body ngaco→`INVALID_REQUEST` 400 (zod union). Envelope error terstruktur, bukan crash boot → deployment sehat.
+- Provider default `mock` (createProvider fallback) → fitur AI langsung berfungsi menghasilkan draft tanpa API key. Untuk output AI nyata set secret Edge Function `AI_PROVIDER` + `OPENAI_API_KEY`/`GEMINI_API_KEY` via dashboard/`supabase secrets set` (tidak tersedia via MCP).
 
 ### 2026-07-26 — Section 3: webhook HTTP delivery (schema_028) — FUNGSIONAL
 
@@ -503,3 +534,9 @@ Catatan perubahan dan pekerjaan pada project TestManager.
 - FIX #7a — `frontend/src/services/testRunService.ts`: `recordResult` kini async, menolak pencatatan bila run sudah `completed` ("buka kembali/reopen dulu"). Ditambah guard UX di `TestRunDetailPage` — tombol "Catat" disembunyikan saat run completed (alur reopen sudah ada).
 - FIX #7b — `frontend/src/repositories/testResultRepository.ts`: `executed_at` di-set `null` saat status dikembalikan ke `not_run` (sebelumnya selalu stamp now → timestamp eksekusi tertinggal padahal summary menghitungnya belum dieksekusi). Ditambah method `findExecutionContext` (1 round trip: status result + status run) untuk mendukung guard #6/#7a.
 - Verifikasi: `npx tsc -b --noEmit` → exit 0; `npm run lint` (oxlint) → exit 0, tanpa warning baru dari file yang diubah. Build penuh & verifikasi Supabase remote tidak dijalankan pada sesi ini.
+
+### 2026-07-26 — Benchmark penghematan token Graphify
+
+- Menjawab pertanyaan tentang dampak Graphify berdasarkan graph proyek yang sudah ada: 240 file/~160 ribu kata, 1.445 node, dan 2.901 edge.
+- Menjalankan `graphify benchmark`: rata-rata konteks query turun dari ~15.504 token menjadi sekitar 6,2x lebih hemat; variasi per pertanyaan 3,4x–41,3x.
+- Tidak ada perubahan kode aplikasi.

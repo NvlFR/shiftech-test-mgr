@@ -100,7 +100,7 @@ export function allowedOrigin(request: Request, env: Record<string, string | und
 export function corsHeaders(request: Request, env: Record<string, string | undefined>): HeadersInit {
   return {
     "access-control-allow-origin": allowedOrigin(request, env),
-    "access-control-allow-headers": "authorization, content-type, x-request-id",
+    "access-control-allow-headers": "authorization, x-client-info, apikey, content-type, x-request-id, x-supabase-api-version",
     "access-control-allow-methods": "POST, OPTIONS",
     "access-control-max-age": "86400",
     vary: "Origin",

@@ -8,6 +8,7 @@ import {
   requestInput,
   type CanonicalAction,
   validateActionOutput,
+  OUTPUT_SCHEMA_HINT,
 } from "./contract.ts";
 import { createProvider, ProviderError, type AiProvider } from "./providers.ts";
 import {
@@ -199,7 +200,7 @@ export async function handleAiGateway(request: Request): Promise<Response> {
     const context = ["test_run_analysis", "issue_draft", "duplicate_issue_detection", "assistant_search"].includes(action)
       ? await projectContext(client, gatewayRequest.projectId, input)
       : { testCases: [], testPlans: [], testRuns: [], testResults: [], issues: [], requirements: [], history: [] } satisfies ScopedContext;
-    const prompt = JSON.stringify({ action, input: JSON.parse(redactPromptInput(input)), scopedContext: JSON.parse(redactPromptInput(context)), promptVersion: PROMPT_VERSION, outputInstruction: "Return JSON only; all results are drafts and require human review." });
+    const prompt = JSON.stringify({ action, input: JSON.parse(redactPromptInput(input)), scopedContext: JSON.parse(redactPromptInput(context)), promptVersion: PROMPT_VERSION, outputSchema: OUTPUT_SCHEMA_HINT[action], outputInstruction: "Return a single JSON object that EXACTLY matches the keys, nesting, and enum values shown in outputSchema. Use only those keys — no extra keys, no markdown, no prose. Enum fields (priority, severity, risk) must be one of the listed values. Any id you output must be copied verbatim from scopedContext. All results are drafts requiring human review." });
     const provider = createProvider(env);
     const startedAt = Date.now();
     const { data: audit, error: auditError } = await client.from("ai_audit_events").insert({

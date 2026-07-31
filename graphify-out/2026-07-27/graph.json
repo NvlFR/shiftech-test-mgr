@@ -108,7 +108,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ref_react",
-      "community": 2,
+      "community": 93,
       "norm_label": "react"
     },
     {
@@ -178,7 +178,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_package",
-      "community": 93,
+      "community": 6,
       "norm_label": "package.json"
     },
     {
@@ -188,7 +188,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "frontend_package_name",
-      "community": 93,
+      "community": 6,
       "norm_label": "name"
     },
     {
@@ -198,7 +198,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_package_private",
-      "community": 93,
+      "community": 6,
       "norm_label": "private"
     },
     {
@@ -208,7 +208,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_package_version",
-      "community": 93,
+      "community": 6,
       "norm_label": "version"
     },
     {
@@ -218,7 +218,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_package_type",
-      "community": 93,
+      "community": 6,
       "norm_label": "type"
     },
     {
@@ -228,7 +228,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_package_scripts",
-      "community": 82,
+      "community": 6,
       "norm_label": "scripts"
     },
     {
@@ -238,7 +238,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_package_scripts_dev",
-      "community": 82,
+      "community": 6,
       "norm_label": "dev"
     },
     {
@@ -248,7 +248,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_package_scripts_build",
-      "community": 82,
+      "community": 6,
       "norm_label": "build"
     },
     {
@@ -258,7 +258,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "frontend_package_scripts_lint",
-      "community": 82,
+      "community": 6,
       "norm_label": "lint"
     },
     {
@@ -268,7 +268,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_package_scripts_test",
-      "community": 82,
+      "community": 6,
       "norm_label": "test"
     },
     {
@@ -278,7 +278,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "frontend_package_scripts_preview",
-      "community": 82,
+      "community": 6,
       "norm_label": "preview"
     },
     {
@@ -318,7 +318,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_package_dependencies_supabase_supabase_js",
-      "community": 109,
+      "community": 4,
       "norm_label": "@supabase/supabase-js"
     },
     {
@@ -328,7 +328,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "supabase_supabase_js",
-      "community": 109,
+      "community": 4,
       "norm_label": "@supabase/supabase-js"
     },
     {
@@ -338,7 +338,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_package_dependencies_tanstack_react_query",
-      "community": 110,
+      "community": 4,
       "norm_label": "@tanstack/react-query"
     },
     {
@@ -348,7 +348,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tanstack_react_query",
-      "community": 110,
+      "community": 4,
       "norm_label": "@tanstack/react-query"
     },
     {
@@ -418,7 +418,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_package_dependencies_primeicons",
-      "community": 100,
+      "community": 4,
       "norm_label": "primeicons"
     },
     {
@@ -428,7 +428,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "primeicons",
-      "community": 100,
+      "community": 4,
       "norm_label": "primeicons"
     },
     {
@@ -518,7 +518,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_package_dependencies_react_router_dom",
-      "community": 107,
+      "community": 4,
       "norm_label": "react-router-dom"
     },
     {
@@ -528,7 +528,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "react_router_dom",
-      "community": 107,
+      "community": 4,
       "norm_label": "react-router-dom"
     },
     {
@@ -538,7 +538,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_package_dependencies_xlsx",
-      "community": 7,
+      "community": 110,
       "norm_label": "xlsx"
     },
     {
@@ -548,7 +548,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "xlsx",
-      "community": 7,
+      "community": 110,
       "norm_label": "xlsx"
     },
     {
@@ -768,7 +768,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ai_aiassistantpanel",
-      "community": 48,
+      "community": 46,
       "norm_label": "aiassistantpanel.tsx"
     },
     {
@@ -778,7 +778,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "frontend_src_components_ai_aiassistantpanel_aiassistantpanel",
-      "community": 48,
+      "community": 46,
       "norm_label": "aiassistantpanel()"
     },
     {
@@ -1048,7 +1048,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_layout_apptopbar",
-      "community": 5,
+      "community": 93,
       "norm_label": "apptopbar.tsx"
     },
     {
@@ -1118,7 +1118,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "frontend_src_components_layout_breadcrumbcontext_usebreadcrumbcontext",
-      "community": 5,
+      "community": 93,
       "norm_label": "usebreadcrumbcontext()"
     },
     {
@@ -1308,7 +1308,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb",
-      "community": 5,
+      "community": 93,
       "norm_label": "breadcrumb.tsx"
     },
     {
@@ -1318,7 +1318,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbitem",
-      "community": 5,
+      "community": 93,
       "norm_label": "breadcrumbitem"
     },
     {
@@ -1328,7 +1328,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbprops",
-      "community": 5,
+      "community": 93,
       "norm_label": "breadcrumbprops"
     },
     {
@@ -1338,7 +1338,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbtrail",
-      "community": 5,
+      "community": 93,
       "norm_label": "breadcrumbtrail()"
     },
     {
@@ -1348,7 +1348,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumb",
-      "community": 5,
+      "community": 93,
       "norm_label": "breadcrumb()"
     },
     {
@@ -1358,7 +1358,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_bulkactionsbar",
-      "community": 3,
+      "community": 7,
       "norm_label": "bulkactionsbar.tsx"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_components_ui_bulkactionsbar_bulkactionsbarprops",
-      "community": 3,
+      "community": 7,
       "norm_label": "bulkactionsbarprops"
     },
     {
@@ -1378,7 +1378,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_components_ui_bulkactionsbar_bulkactionsbar",
-      "community": 3,
+      "community": 7,
       "norm_label": "bulkactionsbar()"
     },
     {
@@ -1388,7 +1388,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_commentspanel",
-      "community": 48,
+      "community": 100,
       "norm_label": "commentspanel.tsx"
     },
     {
@@ -1398,7 +1398,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_components_ui_commentspanel_commentspanel",
-      "community": 48,
+      "community": 100,
       "norm_label": "commentspanel()"
     },
     {
@@ -1408,7 +1408,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_pageheader",
-      "community": 2,
+      "community": 81,
       "norm_label": "pageheader.tsx"
     },
     {
@@ -1418,7 +1418,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_components_ui_pageheader_pageheaderprops",
-      "community": 2,
+      "community": 81,
       "norm_label": "pageheaderprops"
     },
     {
@@ -1428,7 +1428,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_components_ui_pageheader_pageheader",
-      "community": 2,
+      "community": 81,
       "norm_label": "pageheader()"
     },
     {
@@ -1438,7 +1438,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_rowactionsmenu",
-      "community": 2,
+      "community": 7,
       "norm_label": "rowactionsmenu.tsx"
     },
     {
@@ -1448,7 +1448,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_components_ui_rowactionsmenu_rowactionsmenuprops",
-      "community": 2,
+      "community": 7,
       "norm_label": "rowactionsmenuprops"
     },
     {
@@ -1458,7 +1458,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_components_ui_rowactionsmenu_rowactionsmenu",
-      "community": 2,
+      "community": 7,
       "norm_label": "rowactionsmenu()"
     },
     {
@@ -1978,7 +1978,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_dateformatter",
-      "community": 48,
+      "community": 7,
       "norm_label": "dateformatter.ts"
     },
     {
@@ -1988,7 +1988,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_dateformatter_formatdate",
-      "community": 5,
+      "community": 7,
       "norm_label": "formatdate()"
     },
     {
@@ -2008,7 +2008,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_excelexporter",
-      "community": 7,
+      "community": 110,
       "norm_label": "excelexporter.ts"
     },
     {
@@ -2018,7 +2018,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_helpers_excelexporter_exporttestcasestoexcel",
-      "community": 7,
+      "community": 110,
       "norm_label": "exporttestcasestoexcel()"
     },
     {
@@ -2028,7 +2028,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "frontend_src_helpers_excelexporter_downloadtestcaseimporttemplate",
-      "community": 7,
+      "community": 110,
       "norm_label": "downloadtestcaseimporttemplate()"
     },
     {
@@ -2038,7 +2038,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers",
-      "community": 1,
+      "community": 95,
       "norm_label": "mappers.ts"
     },
     {
@@ -2118,7 +2118,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapprojectrow",
-      "community": 5,
+      "community": 82,
       "norm_label": "mapprojectrow()"
     },
     {
@@ -2128,7 +2128,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapprojectmemberrow",
-      "community": 1,
+      "community": 95,
       "norm_label": "mapprojectmemberrow()"
     },
     {
@@ -2138,7 +2138,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapprojectmemberwithprofilerow",
-      "community": 1,
+      "community": 95,
       "norm_label": "mapprojectmemberwithprofilerow()"
     },
     {
@@ -2188,7 +2188,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestcaserow",
-      "community": 97,
+      "community": 95,
       "norm_label": "maptestcaserow()"
     },
     {
@@ -2198,7 +2198,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestcaseversionrow",
-      "community": 102,
+      "community": 95,
       "norm_label": "maptestcaseversionrow()"
     },
     {
@@ -2208,7 +2208,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapnotificationrow",
-      "community": 5,
+      "community": 97,
       "norm_label": "mapnotificationrow()"
     },
     {
@@ -2218,7 +2218,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestplancaserow",
-      "community": 102,
+      "community": 95,
       "norm_label": "maptestplancaserow()"
     },
     {
@@ -2228,7 +2228,7 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestrunrow",
-      "community": 97,
+      "community": 85,
       "norm_label": "maptestrunrow()"
     },
     {
@@ -2238,7 +2238,7 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestrunassignmentrow",
-      "community": 97,
+      "community": 85,
       "norm_label": "maptestrunassignmentrow()"
     },
     {
@@ -2248,7 +2248,7 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestresultrow",
-      "community": 97,
+      "community": 95,
       "norm_label": "maptestresultrow()"
     },
     {
@@ -2268,7 +2268,7 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapprofilerow",
-      "community": 97,
+      "community": 95,
       "norm_label": "mapprofilerow()"
     },
     {
@@ -2278,7 +2278,7 @@
       "source_location": "L224",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maprequirementrow",
-      "community": 79,
+      "community": 13,
       "norm_label": "maprequirementrow()"
     },
     {
@@ -2288,7 +2288,7 @@
       "source_location": "L228",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maprequirementlinkrow",
-      "community": 79,
+      "community": 13,
       "norm_label": "maprequirementlinkrow()"
     },
     {
@@ -2298,7 +2298,7 @@
       "source_location": "L232",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapcommentmentionrow",
-      "community": 97,
+      "community": 95,
       "norm_label": "mapcommentmentionrow()"
     },
     {
@@ -2308,7 +2308,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_mapcommentrow",
-      "community": 97,
+      "community": 95,
       "norm_label": "mapcommentrow()"
     },
     {
@@ -2408,7 +2408,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels",
-      "community": 81,
+      "community": 102,
       "norm_label": "statuslabels.ts"
     },
     {
@@ -2418,7 +2418,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_tagseverity",
-      "community": 81,
+      "community": 102,
       "norm_label": "tagseverity"
     },
     {
@@ -2428,7 +2428,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_status_label",
-      "community": 3,
+      "community": 102,
       "norm_label": "project_status_label"
     },
     {
@@ -2438,7 +2438,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_status_severity",
-      "community": 3,
+      "community": 102,
       "norm_label": "project_status_severity"
     },
     {
@@ -2448,7 +2448,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_plan_status_label",
-      "community": 81,
+      "community": 7,
       "norm_label": "test_plan_status_label"
     },
     {
@@ -2458,7 +2458,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_plan_status_severity",
-      "community": 81,
+      "community": 7,
       "norm_label": "test_plan_status_severity"
     },
     {
@@ -2488,7 +2488,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_case_priority_label",
-      "community": 70,
+      "community": 37,
       "norm_label": "test_case_priority_label"
     },
     {
@@ -2518,7 +2518,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_run_status_severity",
-      "community": 81,
+      "community": 37,
       "norm_label": "test_run_status_severity"
     },
     {
@@ -2528,7 +2528,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_result_status_label",
-      "community": 81,
+      "community": 102,
       "norm_label": "test_result_status_label"
     },
     {
@@ -2538,7 +2538,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_test_result_status_severity",
-      "community": 81,
+      "community": 37,
       "norm_label": "test_result_status_severity"
     },
     {
@@ -2548,7 +2548,7 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_issue_priority_label",
-      "community": 48,
+      "community": 93,
       "norm_label": "issue_priority_label"
     },
     {
@@ -2558,7 +2558,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_issue_priority_severity",
-      "community": 48,
+      "community": 81,
       "norm_label": "issue_priority_severity"
     },
     {
@@ -2568,7 +2568,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_issue_status_label",
-      "community": 48,
+      "community": 93,
       "norm_label": "issue_status_label"
     },
     {
@@ -2578,7 +2578,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_issue_status_severity",
-      "community": 81,
+      "community": 102,
       "norm_label": "issue_status_severity"
     },
     {
@@ -2588,7 +2588,7 @@
       "source_location": "L122",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_user_role_label",
-      "community": 48,
+      "community": 93,
       "norm_label": "user_role_label"
     },
     {
@@ -2598,7 +2598,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_user_role_severity",
-      "community": 48,
+      "community": 93,
       "norm_label": "user_role_severity"
     },
     {
@@ -2608,7 +2608,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_member_role_label",
-      "community": 3,
+      "community": 102,
       "norm_label": "project_member_role_label"
     },
     {
@@ -2618,7 +2618,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "frontend_src_helpers_statuslabels_project_member_role_severity",
-      "community": 81,
+      "community": 102,
       "norm_label": "project_member_role_severity"
     },
     {
@@ -2628,7 +2628,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel",
-      "community": 7,
+      "community": 109,
       "norm_label": "testcaseexcel.ts"
     },
     {
@@ -2638,7 +2638,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel_importedtestcaserow",
-      "community": 7,
+      "community": 109,
       "norm_label": "importedtestcaserow"
     },
     {
@@ -2648,7 +2648,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel_normalizeheader",
-      "community": 7,
+      "community": 109,
       "norm_label": "normalizeheader()"
     },
     {
@@ -2658,7 +2658,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel_valuefrom",
-      "community": 7,
+      "community": 109,
       "norm_label": "valuefrom()"
     },
     {
@@ -2668,7 +2668,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel_normalizepriority",
-      "community": 7,
+      "community": 109,
       "norm_label": "normalizepriority()"
     },
     {
@@ -2678,7 +2678,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "frontend_src_helpers_testcaseexcel_parsetestcaseexcel",
-      "community": 7,
+      "community": 109,
       "norm_label": "parsetestcaseexcel()"
     },
     {
@@ -2688,7 +2688,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunexporter",
-      "community": 48,
+      "community": 79,
       "norm_label": "testrunexporter.ts"
     },
     {
@@ -2698,7 +2698,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunexporter_testrunexportrow",
-      "community": 48,
+      "community": 79,
       "norm_label": "testrunexportrow"
     },
     {
@@ -2708,7 +2708,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunexporter_filename",
-      "community": 48,
+      "community": 79,
       "norm_label": "filename()"
     },
     {
@@ -2718,7 +2718,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunexporter_exporttestrunstoexcel",
-      "community": 48,
+      "community": 79,
       "norm_label": "exporttestrunstoexcel()"
     },
     {
@@ -2728,7 +2728,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunexporter_exporttestrunstopdf",
-      "community": 48,
+      "community": 79,
       "norm_label": "exporttestrunstopdf()"
     },
     {
@@ -2738,7 +2738,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunsummary",
-      "community": 85,
+      "community": 46,
       "norm_label": "testrunsummary.ts"
     },
     {
@@ -2748,7 +2748,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_helpers_testrunsummary_calculatetestrunsummary",
-      "community": 85,
+      "community": 46,
       "norm_label": "calculatetestrunsummary()"
     },
     {
@@ -2768,7 +2768,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_hooks_useaiassistant_useaiassistant",
-      "community": 48,
+      "community": 46,
       "norm_label": "useaiassistant()"
     },
     {
@@ -2848,7 +2848,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth",
-      "community": 48,
+      "community": 93,
       "norm_label": "useauth.tsx"
     },
     {
@@ -2858,7 +2858,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth_authcontextvalue",
-      "community": 48,
+      "community": 93,
       "norm_label": "authcontextvalue"
     },
     {
@@ -2868,7 +2868,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth_authcontext",
-      "community": 48,
+      "community": 93,
       "norm_label": "authcontext"
     },
     {
@@ -2918,7 +2918,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usebackupretention",
-      "community": 48,
+      "community": 69,
       "norm_label": "usebackupretention.ts"
     },
     {
@@ -2958,7 +2958,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usecomments",
-      "community": 48,
+      "community": 100,
       "norm_label": "usecomments.ts"
     },
     {
@@ -2968,7 +2968,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_usecomments_usecomments",
-      "community": 48,
+      "community": 100,
       "norm_label": "usecomments()"
     },
     {
@@ -2978,7 +2978,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usedashboard",
-      "community": 27,
+      "community": 107,
       "norm_label": "usedashboard.ts"
     },
     {
@@ -2988,7 +2988,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_usedashboard_usedashboard",
-      "community": 48,
+      "community": 79,
       "norm_label": "usedashboard()"
     },
     {
@@ -3018,7 +3018,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useenvironments",
-      "community": 3,
+      "community": 97,
       "norm_label": "useenvironments.ts"
     },
     {
@@ -3028,7 +3028,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useenvironments_useenvironments",
-      "community": 3,
+      "community": 27,
       "norm_label": "useenvironments()"
     },
     {
@@ -3058,7 +3058,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissues",
-      "community": 95,
+      "community": 81,
       "norm_label": "useissues.ts"
     },
     {
@@ -3068,7 +3068,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissues_useissuesbyproject",
-      "community": 95,
+      "community": 81,
       "norm_label": "useissuesbyproject()"
     },
     {
@@ -3078,7 +3078,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_src_hooks_useissues_useissuesbytestrun",
-      "community": 95,
+      "community": 81,
       "norm_label": "useissuesbytestrun()"
     },
     {
@@ -3108,7 +3108,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofiles",
-      "community": 48,
+      "community": 93,
       "norm_label": "useprofiles.ts"
     },
     {
@@ -3118,7 +3118,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofiles_useprofiles",
-      "community": 48,
+      "community": 27,
       "norm_label": "useprofiles()"
     },
     {
@@ -3128,7 +3128,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext",
-      "community": 5,
+      "community": 82,
       "norm_label": "useprojectcontext.tsx"
     },
     {
@@ -3138,7 +3138,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_projectcontextvalue",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectcontextvalue"
     },
     {
@@ -3148,7 +3148,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_projectcontext",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectcontext"
     },
     {
@@ -3158,7 +3158,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_projectprovider",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectprovider()"
     },
     {
@@ -3168,7 +3168,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectcontext_useprojectcontext",
-      "community": 48,
+      "community": 79,
       "norm_label": "useprojectcontext()"
     },
     {
@@ -3228,7 +3228,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojects",
-      "community": 5,
+      "community": 82,
       "norm_label": "useprojects.ts"
     },
     {
@@ -3278,7 +3278,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_hooks_usetestplandetail_usetestplandetail",
-      "community": 2,
+      "community": 37,
       "norm_label": "usetestplandetail()"
     },
     {
@@ -3318,7 +3318,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_usetestrunanalysis_usetestrunanalysis",
-      "community": 81,
+      "community": 9,
       "norm_label": "usetestrunanalysis()"
     },
     {
@@ -3328,7 +3328,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usetestrundetail",
-      "community": 85,
+      "community": 81,
       "norm_label": "usetestrundetail.ts"
     },
     {
@@ -3378,7 +3378,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_hooks_usetestruns_usetestruns",
-      "community": 2,
+      "community": 85,
       "norm_label": "usetestruns()"
     },
     {
@@ -3618,7 +3618,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage",
-      "community": 48,
+      "community": 79,
       "norm_label": "homepage.tsx"
     },
     {
@@ -3628,7 +3628,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage_statcard",
-      "community": 48,
+      "community": 79,
       "norm_label": "statcard()"
     },
     {
@@ -3638,7 +3638,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage_downloadcsv",
-      "community": 48,
+      "community": 79,
       "norm_label": "downloadcsv()"
     },
     {
@@ -3648,7 +3648,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "frontend_src_pages_home_homepage_homepage",
-      "community": 48,
+      "community": 79,
       "norm_label": "homepage()"
     },
     {
@@ -3728,7 +3728,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_issues_issuedetailpage",
-      "community": 48,
+      "community": 93,
       "norm_label": "issuedetailpage.tsx"
     },
     {
@@ -3738,7 +3738,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "frontend_src_pages_issues_issuedetailpage_status_options",
-      "community": 48,
+      "community": 93,
       "norm_label": "status_options"
     },
     {
@@ -3748,7 +3748,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "frontend_src_pages_issues_issuedetailpage_priority_options",
-      "community": 48,
+      "community": 93,
       "norm_label": "priority_options"
     },
     {
@@ -3758,7 +3758,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "frontend_src_pages_issues_issuedetailpage_issuedetail",
-      "community": 48,
+      "community": 93,
       "norm_label": "issuedetail"
     },
     {
@@ -3928,7 +3928,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectdetailpage_projectdetailpage",
-      "community": 7,
+      "community": 48,
       "norm_label": "projectdetailpage()"
     },
     {
@@ -3938,7 +3938,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectsettingspage",
-      "community": 3,
+      "community": 102,
       "norm_label": "projectsettingspage.tsx"
     },
     {
@@ -3948,7 +3948,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectsettingspage_member_role_options",
-      "community": 3,
+      "community": 102,
       "norm_label": "member_role_options"
     },
     {
@@ -3958,7 +3958,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectsettingspage_projectsettingspage",
-      "community": 3,
+      "community": 48,
       "norm_label": "projectsettingspage()"
     },
     {
@@ -3968,7 +3968,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectspage",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectspage.tsx"
     },
     {
@@ -3978,7 +3978,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectspage_status_options",
-      "community": 5,
+      "community": 82,
       "norm_label": "status_options"
     },
     {
@@ -3988,7 +3988,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "frontend_src_pages_projects_projectspage_projectspage",
-      "community": 5,
+      "community": 7,
       "norm_label": "projectspage()"
     },
     {
@@ -4088,7 +4088,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "frontend_src_pages_test_cases_testcasedetailpage_testcasedetailpage",
-      "community": 37,
+      "community": 48,
       "norm_label": "testcasedetailpage()"
     },
     {
@@ -4128,7 +4128,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "frontend_src_pages_test_cases_testcasespage_testcasespage",
-      "community": 48,
+      "community": 79,
       "norm_label": "testcasespage()"
     },
     {
@@ -4138,7 +4138,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplandetailpage",
-      "community": 2,
+      "community": 37,
       "norm_label": "testplandetailpage.tsx"
     },
     {
@@ -4148,7 +4148,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplandetailpage_priority_options",
-      "community": 2,
+      "community": 37,
       "norm_label": "priority_options"
     },
     {
@@ -4158,7 +4158,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplandetailpage_test_run_status_options",
-      "community": 2,
+      "community": 37,
       "norm_label": "test_run_status_options"
     },
     {
@@ -4168,7 +4168,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplandetailpage_test_plan_status_options",
-      "community": 2,
+      "community": 37,
       "norm_label": "test_plan_status_options"
     },
     {
@@ -4178,7 +4178,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplandetailpage_testplandetailpage",
-      "community": 2,
+      "community": 37,
       "norm_label": "testplandetailpage()"
     },
     {
@@ -4188,7 +4188,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplanspage",
-      "community": 2,
+      "community": 7,
       "norm_label": "testplanspage.tsx"
     },
     {
@@ -4198,7 +4198,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplanspage_test_plan_status_options",
-      "community": 2,
+      "community": 7,
       "norm_label": "test_plan_status_options"
     },
     {
@@ -4208,7 +4208,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_src_pages_test_plans_testplanspage_testplanspage",
-      "community": 48,
+      "community": 7,
       "norm_label": "testplanspage()"
     },
     {
@@ -4248,7 +4248,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_test_runs_testrunissuespage",
-      "community": 95,
+      "community": 81,
       "norm_label": "testrunissuespage.tsx"
     },
     {
@@ -4258,7 +4258,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "frontend_src_pages_test_runs_testrunissuespage_status_options",
-      "community": 95,
+      "community": 81,
       "norm_label": "status_options"
     },
     {
@@ -4268,7 +4268,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "frontend_src_pages_test_runs_testrunissuespage_testrunissuespage",
-      "community": 95,
+      "community": 81,
       "norm_label": "testrunissuespage()"
     },
     {
@@ -4278,7 +4278,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_users_userdetailpage",
-      "community": 48,
+      "community": 93,
       "norm_label": "userdetailpage.tsx"
     },
     {
@@ -4298,7 +4298,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_users_usermanagementpage",
-      "community": 48,
+      "community": 93,
       "norm_label": "usermanagementpage.tsx"
     },
     {
@@ -4578,7 +4578,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "frontend_src_repositories_backupretentionrepository_backupretentionrepository",
-      "community": 48,
+      "community": 69,
       "norm_label": "backupretentionrepository"
     },
     {
@@ -4608,7 +4608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_commentrepository",
-      "community": 97,
+      "community": 100,
       "norm_label": "commentrepository.ts"
     },
     {
@@ -4618,7 +4618,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_repositories_commentrepository_commentrepository",
-      "community": 97,
+      "community": 100,
       "norm_label": "commentrepository"
     },
     {
@@ -4668,7 +4668,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository",
-      "community": 27,
+      "community": 107,
       "norm_label": "dashboardrepository.ts"
     },
     {
@@ -4678,7 +4678,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository_countrows",
-      "community": 27,
+      "community": 107,
       "norm_label": "countrows()"
     },
     {
@@ -4688,7 +4688,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository_countstatuses",
-      "community": 27,
+      "community": 107,
       "norm_label": "countstatuses()"
     },
     {
@@ -4698,7 +4698,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_src_repositories_dashboardrepository_dashboardrepository",
-      "community": 27,
+      "community": 107,
       "norm_label": "dashboardrepository"
     },
     {
@@ -4748,7 +4748,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_issueattachmentrepository",
-      "community": 48,
+      "community": 3,
       "norm_label": "issueattachmentrepository.ts"
     },
     {
@@ -4758,7 +4758,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_repositories_issueattachmentrepository_maprow",
-      "community": 48,
+      "community": 3,
       "norm_label": "maprow()"
     },
     {
@@ -4768,7 +4768,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_src_repositories_issueattachmentrepository_withsignedurl",
-      "community": 48,
+      "community": 3,
       "norm_label": "withsignedurl()"
     },
     {
@@ -4778,7 +4778,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_src_repositories_issueattachmentrepository_issueattachmentrepository",
-      "community": 48,
+      "community": 3,
       "norm_label": "issueattachmentrepository"
     },
     {
@@ -4838,7 +4838,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_notificationrepository",
-      "community": 5,
+      "community": 97,
       "norm_label": "notificationrepository.ts"
     },
     {
@@ -4848,7 +4848,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_notificationrepository_notificationrepository",
-      "community": 5,
+      "community": 97,
       "norm_label": "notificationrepository"
     },
     {
@@ -4928,7 +4928,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_projectrepository",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectrepository.ts"
     },
     {
@@ -4938,7 +4938,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_projectrepository_sort_column",
-      "community": 5,
+      "community": 82,
       "norm_label": "sort_column"
     },
     {
@@ -4948,7 +4948,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "frontend_src_repositories_projectrepository_projectquery",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectquery"
     },
     {
@@ -4958,7 +4958,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_repositories_projectrepository_projectrepository",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectrepository"
     },
     {
@@ -4968,7 +4968,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_requirementrepository",
-      "community": 79,
+      "community": 13,
       "norm_label": "requirementrepository.ts"
     },
     {
@@ -4978,7 +4978,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_repositories_requirementrepository_maplink",
-      "community": 79,
+      "community": 13,
       "norm_label": "maplink()"
     },
     {
@@ -4988,7 +4988,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_repositories_requirementrepository_requirementrepository",
-      "community": 79,
+      "community": 13,
       "norm_label": "requirementrepository"
     },
     {
@@ -5018,7 +5018,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_testcaserepository",
-      "community": 102,
+      "community": 95,
       "norm_label": "testcaserepository.ts"
     },
     {
@@ -5028,7 +5028,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_testcaserepository_testcaserepository",
-      "community": 85,
+      "community": 37,
       "norm_label": "testcaserepository"
     },
     {
@@ -5058,7 +5058,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_testresultrepository",
-      "community": 97,
+      "community": 95,
       "norm_label": "testresultrepository.ts"
     },
     {
@@ -5068,7 +5068,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_repositories_testresultrepository_testresultrepository",
-      "community": 97,
+      "community": 95,
       "norm_label": "testresultrepository"
     },
     {
@@ -5078,7 +5078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_testrunrepository",
-      "community": 97,
+      "community": 85,
       "norm_label": "testrunrepository.ts"
     },
     {
@@ -5098,7 +5098,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_repositories_testrunrepository_testrunrepository",
-      "community": 97,
+      "community": 85,
       "norm_label": "testrunrepository"
     },
     {
@@ -5308,7 +5308,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_backupretentionservice",
-      "community": 48,
+      "community": 69,
       "norm_label": "backupretentionservice.ts"
     },
     {
@@ -5318,7 +5318,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_backupretentionservice_validatedays",
-      "community": 48,
+      "community": 69,
       "norm_label": "validatedays()"
     },
     {
@@ -5328,7 +5328,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_services_backupretentionservice_backupretentionservice",
-      "community": 48,
+      "community": 69,
       "norm_label": "backupretentionservice"
     },
     {
@@ -5368,7 +5368,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_commentservice",
-      "community": 48,
+      "community": 100,
       "norm_label": "commentservice.ts"
     },
     {
@@ -5378,7 +5378,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_services_commentservice_commentservice",
-      "community": 48,
+      "community": 100,
       "norm_label": "commentservice"
     },
     {
@@ -5458,7 +5458,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_dashboardservice",
-      "community": 27,
+      "community": 107,
       "norm_label": "dashboardservice.ts"
     },
     {
@@ -5468,7 +5468,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_dashboardservice_dashboardservice",
-      "community": 27,
+      "community": 107,
       "norm_label": "dashboardservice"
     },
     {
@@ -5478,7 +5478,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_environmentservice",
-      "community": 3,
+      "community": 97,
       "norm_label": "environmentservice.ts"
     },
     {
@@ -5488,7 +5488,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_environmentservice_environmentservice",
-      "community": 3,
+      "community": 97,
       "norm_label": "environmentservice"
     },
     {
@@ -5528,7 +5528,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_issueattachmentservice",
-      "community": 48,
+      "community": 3,
       "norm_label": "issueattachmentservice.ts"
     },
     {
@@ -5538,7 +5538,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_services_issueattachmentservice_issueattachmentservice",
-      "community": 48,
+      "community": 3,
       "norm_label": "issueattachmentservice"
     },
     {
@@ -5558,7 +5558,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_services_issueservice_issueservice",
-      "community": 95,
+      "community": 81,
       "norm_label": "issueservice"
     },
     {
@@ -5588,7 +5588,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_notificationservice",
-      "community": 5,
+      "community": 97,
       "norm_label": "notificationservice.ts"
     },
     {
@@ -5598,7 +5598,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_notificationservice_notificationservice",
-      "community": 5,
+      "community": 97,
       "norm_label": "notificationservice"
     },
     {
@@ -5608,7 +5608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_profileservice",
-      "community": 48,
+      "community": 93,
       "norm_label": "profileservice.ts"
     },
     {
@@ -5618,7 +5618,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_profileservice_profileservice",
-      "community": 48,
+      "community": 93,
       "norm_label": "profileservice"
     },
     {
@@ -5648,7 +5648,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_projectservice",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectservice.ts"
     },
     {
@@ -5658,7 +5658,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_services_projectservice_projectservice",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectservice"
     },
     {
@@ -5758,7 +5758,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_src_services_testrunservice_testrunservice",
-      "community": 85,
+      "community": 81,
       "norm_label": "testrunservice"
     },
     {
@@ -5808,7 +5808,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_types_ai_aiissuecandidateinput",
-      "community": 95,
+      "community": 46,
       "norm_label": "aiissuecandidateinput"
     },
     {
@@ -6078,7 +6078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_types_domain",
-      "community": 102,
+      "community": 72,
       "norm_label": "domain.ts"
     },
     {
@@ -6098,7 +6098,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_types_domain_profile",
-      "community": 48,
+      "community": 93,
       "norm_label": "profile"
     },
     {
@@ -6108,7 +6108,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_types_domain_projectstatus",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectstatus"
     },
     {
@@ -6118,7 +6118,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_types_domain_projectsortfield",
-      "community": 5,
+      "community": 82,
       "norm_label": "projectsortfield"
     },
     {
@@ -6128,7 +6128,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_src_types_domain_sortdirection",
-      "community": 5,
+      "community": 82,
       "norm_label": "sortdirection"
     },
     {
@@ -6138,7 +6138,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_types_domain_project",
-      "community": 5,
+      "community": 82,
       "norm_label": "project"
     },
     {
@@ -6218,7 +6218,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "frontend_src_types_domain_webhookdeliverystatus",
-      "community": 102,
+      "community": 72,
       "norm_label": "webhookdeliverystatus"
     },
     {
@@ -6298,7 +6298,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "frontend_src_types_domain_environment",
-      "community": 3,
+      "community": 97,
       "norm_label": "environment"
     },
     {
@@ -6308,7 +6308,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcasepriority",
-      "community": 70,
+      "community": 9,
       "norm_label": "testcasepriority"
     },
     {
@@ -6318,7 +6318,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcasestatus",
-      "community": 81,
+      "community": 102,
       "norm_label": "testcasestatus"
     },
     {
@@ -6328,7 +6328,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcase",
-      "community": 102,
+      "community": 95,
       "norm_label": "testcase"
     },
     {
@@ -6338,7 +6338,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testcaseversion",
-      "community": 102,
+      "community": 95,
       "norm_label": "testcaseversion"
     },
     {
@@ -6368,7 +6368,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "frontend_src_types_domain_commenttargettype",
-      "community": 48,
+      "community": 100,
       "norm_label": "commenttargettype"
     },
     {
@@ -6378,7 +6378,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "frontend_src_types_domain_commentmention",
-      "community": 102,
+      "community": 95,
       "norm_label": "commentmention"
     },
     {
@@ -6388,7 +6388,7 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "frontend_src_types_domain_comment",
-      "community": 97,
+      "community": 100,
       "norm_label": "comment"
     },
     {
@@ -6398,7 +6398,7 @@
       "source_location": "L157",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testplancase",
-      "community": 102,
+      "community": 95,
       "norm_label": "testplancase"
     },
     {
@@ -6408,7 +6408,7 @@
       "source_location": "L164",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testplancasewithdetails",
-      "community": 102,
+      "community": 95,
       "norm_label": "testplancasewithdetails"
     },
     {
@@ -6418,7 +6418,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testrunstatus",
-      "community": 97,
+      "community": 95,
       "norm_label": "testrunstatus"
     },
     {
@@ -6468,7 +6468,7 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdingeststatus",
-      "community": 102,
+      "community": 72,
       "norm_label": "cicdingeststatus"
     },
     {
@@ -6478,7 +6478,7 @@
       "source_location": "L212",
       "_origin": "ast",
       "id": "frontend_src_types_domain_cicdingestresultinput",
-      "community": 102,
+      "community": 72,
       "norm_label": "cicdingestresultinput"
     },
     {
@@ -6548,7 +6548,7 @@
       "source_location": "L246",
       "_origin": "ast",
       "id": "frontend_src_types_domain_automationartifact",
-      "community": 102,
+      "community": 72,
       "norm_label": "automationartifact"
     },
     {
@@ -6608,7 +6608,7 @@
       "source_location": "L296",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testrunassignment",
-      "community": 97,
+      "community": 85,
       "norm_label": "testrunassignment"
     },
     {
@@ -6628,7 +6628,7 @@
       "source_location": "L310",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issuepriority",
-      "community": 95,
+      "community": 46,
       "norm_label": "issuepriority"
     },
     {
@@ -6638,7 +6638,7 @@
       "source_location": "L311",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issuestatus",
-      "community": 95,
+      "community": 27,
       "norm_label": "issuestatus"
     },
     {
@@ -6668,7 +6668,7 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "frontend_src_types_domain_issueattachment",
-      "community": 48,
+      "community": 3,
       "norm_label": "issueattachment"
     },
     {
@@ -6698,7 +6698,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "frontend_src_types_domain_notification",
-      "community": 5,
+      "community": 93,
       "norm_label": "notification"
     },
     {
@@ -6738,7 +6738,7 @@
       "source_location": "L384",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirement",
-      "community": 79,
+      "community": 13,
       "norm_label": "requirement"
     },
     {
@@ -6748,7 +6748,7 @@
       "source_location": "L385",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirementlink",
-      "community": 79,
+      "community": 13,
       "norm_label": "requirementlink"
     },
     {
@@ -6758,7 +6758,7 @@
       "source_location": "L386",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirementwithlinks",
-      "community": 79,
+      "community": 13,
       "norm_label": "requirementwithlinks"
     },
     {
@@ -6768,7 +6768,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirementcoverage",
-      "community": 102,
+      "community": 72,
       "norm_label": "requirementcoverage"
     },
     {
@@ -6778,7 +6778,7 @@
       "source_location": "L389",
       "_origin": "ast",
       "id": "frontend_src_types_domain_dashboardstats",
-      "community": 27,
+      "community": 107,
       "norm_label": "dashboardstats"
     },
     {
@@ -6828,7 +6828,7 @@
       "source_location": "L466",
       "_origin": "ast",
       "id": "frontend_src_types_domain_retentionpolicy",
-      "community": 48,
+      "community": 69,
       "norm_label": "retentionpolicy"
     },
     {
@@ -6838,7 +6838,7 @@
       "source_location": "L467",
       "_origin": "ast",
       "id": "frontend_src_types_domain_retentioncleanuppreview",
-      "community": 48,
+      "community": 69,
       "norm_label": "retentioncleanuppreview"
     },
     {
@@ -8445,7 +8445,7 @@
       "label": "canonicalAction",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L137",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_canonicalaction",
       "community": 83,
@@ -8465,7 +8465,7 @@
       "label": "TestCaseDraftSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L73",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_testcasedraftschema",
       "community": 80,
@@ -8475,7 +8475,7 @@
       "label": "GenerateOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L79",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_generateoutputschema",
       "community": 80,
@@ -8485,7 +8485,7 @@
       "label": "AnalysisOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L84",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_analysisoutputschema",
       "community": 80,
@@ -8495,7 +8495,7 @@
       "label": "IssueDraftSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L93",
+      "source_location": "L88",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_issuedraftschema",
       "community": 80,
@@ -8505,7 +8505,7 @@
       "label": "DuplicateOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L98",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_duplicateoutputschema",
       "community": 80,
@@ -8515,7 +8515,7 @@
       "label": "AssistantOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L99",
+      "source_location": "L94",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_assistantoutputschema",
       "community": 80,
@@ -8525,7 +8525,7 @@
       "label": "OutputSchemas",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L104",
+      "source_location": "L99",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_outputschemas",
       "community": 80,
@@ -8535,27 +8535,17 @@
       "label": "ActionOutput",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L105",
+      "source_location": "L100",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_actionoutput",
       "community": 76,
       "norm_label": "actionoutput"
     },
     {
-      "label": "OUTPUT_SCHEMA_HINT",
-      "file_type": "code",
-      "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L109",
-      "_origin": "ast",
-      "id": "supabase_functions_ai_gateway_contract_output_schema_hint",
-      "community": 83,
-      "norm_label": "output_schema_hint"
-    },
-    {
       "label": "GatewayErrorCode",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L133",
+      "source_location": "L102",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_gatewayerrorcode",
       "community": 86,
@@ -8565,7 +8555,7 @@
       "label": "ErrorEnvelope",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L134",
+      "source_location": "L103",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_errorenvelope",
       "community": 83,
@@ -8575,7 +8565,7 @@
       "label": "SuccessEnvelope",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L135",
+      "source_location": "L104",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_successenvelope",
       "community": 83,
@@ -8585,7 +8575,7 @@
       "label": "requestInput()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L146",
+      "source_location": "L115",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_requestinput",
       "community": 83,
@@ -8595,7 +8585,7 @@
       "label": "parseProviderJson()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L155",
+      "source_location": "L124",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_parseproviderjson",
       "community": 80,
@@ -8605,7 +8595,7 @@
       "label": "validateActionOutput()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L162",
+      "source_location": "L131",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_validateactionoutput",
       "community": 80,
@@ -8615,21 +8605,11 @@
       "label": "computeDuplicateConfidence()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L168",
+      "source_location": "L137",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_computeduplicateconfidence",
       "community": 80,
       "norm_label": "computeduplicateconfidence()"
-    },
-    {
-      "label": "NOTE: OUTPUT schemas are intentionally NOT `.strict()`. They validate the fields",
-      "file_type": "rationale",
-      "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L69",
-      "_origin": "ast",
-      "id": "supabase_functions_ai_gateway_contract_rationale_69",
-      "community": 80,
-      "norm_label": "note: output schemas are intentionally not `.strict()`. they validate the fields"
     },
     {
       "label": "handler.ts",
@@ -8645,7 +8625,7 @@
       "label": "env",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L23",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_env",
       "community": 83,
@@ -8655,7 +8635,7 @@
       "label": "ScopedContext",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L25",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_scopedcontext",
       "community": 83,
@@ -8665,7 +8645,7 @@
       "label": "requestId()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L35",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_requestid",
       "community": 83,
@@ -8675,7 +8655,7 @@
       "label": "response()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L39",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_response",
       "community": 83,
@@ -8685,7 +8665,7 @@
       "label": "errorResponse()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L46",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_errorresponse",
       "community": 83,
@@ -8695,7 +8675,7 @@
       "label": "query()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L62",
+      "source_location": "L61",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_query",
       "community": 83,
@@ -8705,7 +8685,7 @@
       "label": "requestHash()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L68",
+      "source_location": "L67",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_requesthash",
       "community": 83,
@@ -8715,7 +8695,7 @@
       "label": "projectContext()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L74",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_projectcontext",
       "community": 83,
@@ -8725,7 +8705,7 @@
       "label": "validateInput()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L105",
+      "source_location": "L104",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_validateinput",
       "community": 83,
@@ -8735,7 +8715,7 @@
       "label": "completeWithRetry()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L116",
+      "source_location": "L115",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_completewithretry",
       "community": 83,
@@ -8745,7 +8725,7 @@
       "label": "restrictOutput()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L134",
+      "source_location": "L133",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_restrictoutput",
       "community": 83,
@@ -8755,7 +8735,7 @@
       "label": "analysisResponse()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L144",
+      "source_location": "L143",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_analysisresponse",
       "community": 83,
@@ -8765,7 +8745,7 @@
       "label": "handleAiGateway()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L174",
+      "source_location": "L173",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_handler_handleaigateway",
       "community": 83,
@@ -8968,7 +8948,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_createprovider",
-      "community": 83,
+      "community": 76,
       "norm_label": "createprovider()"
     },
     {
@@ -12972,20 +12952,10 @@
       "norm_label": "persiapan commit setelah sync fork"
     },
     {
-      "label": "2026-07-26 \u2014 Fix AI_INVALID_OUTPUT ai-gateway (schema hint untuk provider nyata)",
-      "file_type": "document",
-      "source_file": "WORKLOG.md",
-      "source_location": "L15",
-      "_origin": "ast",
-      "id": "worklog_2026_07_26_fix_ai_invalid_output_ai_gateway_schema_hint_untuk_provider_nyata",
-      "community": 108,
-      "norm_label": "2026-07-26 \u2014 fix ai_invalid_output ai-gateway (schema hint untuk provider nyata)"
-    },
-    {
       "label": "2026-07-26 \u2014 Fix CORS ai-gateway (browser blokir POST)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L21",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_cors_ai_gateway_browser_blokir_post",
       "community": 108,
@@ -12995,7 +12965,7 @@
       "label": "2026-07-26 \u2014 Section 4: deploy Edge Function ai-gateway \u2014 FUNGSIONAL",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L28",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "worklog_2026_07_26_section_4_deploy_edge_function_ai_gateway_fungsional",
       "community": 108,
@@ -13005,7 +12975,7 @@
       "label": "2026-07-26 \u2014 Section 3: webhook HTTP delivery (schema_028) \u2014 FUNGSIONAL",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L36",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "worklog_2026_07_26_section_3_webhook_http_delivery_schema_028_fungsional",
       "community": 108,
@@ -13015,7 +12985,7 @@
       "label": "2026-07-26 \u2014 Audit fungsional semua fitur FEATURE_BACKLOG",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L46",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "worklog_2026_07_26_audit_fungsional_semua_fitur_feature_backlog",
       "community": 108,
@@ -13025,7 +12995,7 @@
       "label": "2026-07-26 \u2014 Coordinator: integrasi AI Integration",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L54",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "worklog_2026_07_26_coordinator_integrasi_ai_integration",
       "community": 108,
@@ -13035,7 +13005,7 @@
       "label": "2026-07-26 \u2014 Final integration verification AI",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L64",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "worklog_2026_07_26_final_integration_verification_ai",
       "community": 108,
@@ -13045,7 +13015,7 @@
       "label": "2026-07-26 \u2014 Fix permission denied attachment RLS helpers (schema_027)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L71",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_permission_denied_attachment_rls_helpers_schema_027",
       "community": 49,
@@ -13055,7 +13025,7 @@
       "label": "2026-07-26 \u2014 Auto-upload artifact ke Supabase Storage (BERHASIL end-to-end)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L76",
+      "source_location": "L70",
       "_origin": "ast",
       "id": "worklog_2026_07_26_auto_upload_artifact_ke_supabase_storage_berhasil_end_to_end",
       "community": 49,
@@ -13065,7 +13035,7 @@
       "label": "2026-07-26 \u2014 Uji end-to-end automation BERHASIL",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L86",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "worklog_2026_07_26_uji_end_to_end_automation_berhasil",
       "community": 49,
@@ -13075,7 +13045,7 @@
       "label": "2026-07-26 \u2014 Fix 2 bug runtime pasca-apply (schema_025)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L93",
+      "source_location": "L87",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_2_bug_runtime_pasca_apply_schema_025",
       "community": 49,
@@ -13085,7 +13055,7 @@
       "label": "2026-07-26 \u2014 Apply migration P2+P3 ke Supabase target (via MCP)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L102",
+      "source_location": "L96",
       "_origin": "ast",
       "id": "worklog_2026_07_26_apply_migration_p2_p3_ke_supabase_target_via_mcp",
       "community": 49,
@@ -13095,7 +13065,7 @@
       "label": "2026-07-26 \u2014 CLI Playwright Local Runner (folder runner/)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L112",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "worklog_2026_07_26_cli_playwright_local_runner_folder_runner",
       "community": 49,
@@ -13105,7 +13075,7 @@
       "label": "2026-07-26 \u2014 Implementasi Section 5 Automation (sisi server pusat, Local Runner)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L121",
+      "source_location": "L115",
       "_origin": "ast",
       "id": "worklog_2026_07_26_implementasi_section_5_automation_sisi_server_pusat_local_runner",
       "community": 49,
@@ -13115,7 +13085,7 @@
       "label": "2026-07-26 \u2014 Perjelas Section 5 FEATURE_BACKLOG.md (Playwright Local Runner)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L131",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "worklog_2026_07_26_perjelas_section_5_feature_backlog_md_playwright_local_runner",
       "community": 49,
@@ -13125,7 +13095,7 @@
       "label": "2026-07-26 \u2014 Sub-agent 4: AI Test Run Analysis frontend contract",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L140",
+      "source_location": "L134",
       "_origin": "ast",
       "id": "worklog_2026_07_26_sub_agent_4_ai_test_run_analysis_frontend_contract",
       "community": 49,
@@ -13135,7 +13105,7 @@
       "label": "2026-07-22 \u2014 P2 Reporting, Integrasi, Backup, Retention, dan QA final",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L149",
+      "source_location": "L143",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_reporting_integrasi_backup_retention_dan_qa_final",
       "community": 49,
@@ -13145,7 +13115,7 @@
       "label": "2026-07-22 \u2014 P2 Backup/Restore dan Data Retention (sub-agent 4)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L189",
+      "source_location": "L183",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_backup_restore_dan_data_retention_sub_agent_4",
       "community": 49,
@@ -13155,7 +13125,7 @@
       "label": "2026-07-22 \u2014 P2 Integrasi CI/CD (sub-agent 3)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L201",
+      "source_location": "L195",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_integrasi_ci_cd_sub_agent_3",
       "community": 49,
@@ -13165,7 +13135,7 @@
       "label": "2026-07-22 \u2014 P2 API Token dan Webhook (sub-agent 2)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L213",
+      "source_location": "L207",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p2_api_token_dan_webhook_sub_agent_2",
       "community": 49,
@@ -13175,7 +13145,7 @@
       "label": "2026-07-22 \u2014 Integrasi P1 dan QA final",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L227",
+      "source_location": "L221",
       "_origin": "ast",
       "id": "worklog_2026_07_22_integrasi_p1_dan_qa_final",
       "community": 49,
@@ -13185,7 +13155,7 @@
       "label": "2026-07-22 \u2014 Apply migration P1 dan checklist",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L238",
+      "source_location": "L232",
       "_origin": "ast",
       "id": "worklog_2026_07_22_apply_migration_p1_dan_checklist",
       "community": 49,
@@ -13195,7 +13165,7 @@
       "label": "2026-07-22 \u2014 Test Run Enhancement (sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L247",
+      "source_location": "L241",
       "_origin": "ast",
       "id": "worklog_2026_07_22_test_run_enhancement_sub_agent",
       "community": 49,
@@ -13205,7 +13175,7 @@
       "label": "2026-07-22 \u2014 P1 Duplicate Test Case dan Comment/Mention",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L259",
+      "source_location": "L253",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p1_duplicate_test_case_dan_comment_mention",
       "community": 49,
@@ -13215,7 +13185,7 @@
       "label": "2026-07-22 \u2014 P1 Requirement Traceability",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L270",
+      "source_location": "L264",
       "_origin": "ast",
       "id": "worklog_2026_07_22_p1_requirement_traceability",
       "community": 49,
@@ -13225,7 +13195,7 @@
       "label": "2026-07-22",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L281",
+      "source_location": "L275",
       "_origin": "ast",
       "id": "worklog_2026_07_22",
       "community": 19,
@@ -13235,7 +13205,7 @@
       "label": "P1 Environment Management (sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L283",
+      "source_location": "L277",
       "_origin": "ast",
       "id": "worklog_p1_environment_management_sub_agent",
       "community": 19,
@@ -13245,7 +13215,7 @@
       "label": "Integration Review / QA (Codex sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L293",
+      "source_location": "L287",
       "_origin": "ast",
       "id": "worklog_integration_review_qa_codex_sub_agent",
       "community": 19,
@@ -13255,7 +13225,7 @@
       "label": "P1 \u2014 Attachment Test Case/Test Run dan Archive Project (sub-agent)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L303",
+      "source_location": "L297",
       "_origin": "ast",
       "id": "worklog_p1_attachment_test_case_test_run_dan_archive_project_sub_agent",
       "community": 19,
@@ -13265,7 +13235,7 @@
       "label": "Graphify Codex integration",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L315",
+      "source_location": "L309",
       "_origin": "ast",
       "id": "worklog_graphify_codex_integration",
       "community": 19,
@@ -13275,7 +13245,7 @@
       "label": "Feature backlog diperluas",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L329",
+      "source_location": "L323",
       "_origin": "ast",
       "id": "worklog_feature_backlog_diperluas",
       "community": 19,
@@ -13285,7 +13255,7 @@
       "label": "P2 \u2014 Peningkatan workflow (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L335",
+      "source_location": "L329",
       "_origin": "ast",
       "id": "worklog_p2_peningkatan_workflow_selesai",
       "community": 19,
@@ -13295,7 +13265,7 @@
       "label": "Selesai",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L347",
+      "source_location": "L341",
       "_origin": "ast",
       "id": "worklog_selesai",
       "community": 19,
@@ -13305,7 +13275,7 @@
       "label": "Import Excel Test Case (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L357",
+      "source_location": "L351",
       "_origin": "ast",
       "id": "worklog_import_excel_test_case_selesai",
       "community": 19,
@@ -13315,7 +13285,7 @@
       "label": "Export Excel (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L365",
+      "source_location": "L359",
       "_origin": "ast",
       "id": "worklog_export_excel_selesai",
       "community": 19,
@@ -13325,7 +13295,7 @@
       "label": "AI Integration (roadmap)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L373",
+      "source_location": "L367",
       "_origin": "ast",
       "id": "worklog_ai_integration_roadmap",
       "community": 19,
@@ -13335,7 +13305,7 @@
       "label": "Self-hosted automation (roadmap)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L378",
+      "source_location": "L372",
       "_origin": "ast",
       "id": "worklog_self_hosted_automation_roadmap",
       "community": 19,
@@ -13345,7 +13315,7 @@
       "label": "Feature backlog (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L383",
+      "source_location": "L377",
       "_origin": "ast",
       "id": "worklog_feature_backlog_selesai",
       "community": 19,
@@ -13355,7 +13325,7 @@
       "label": "Project selector global (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L387",
+      "source_location": "L381",
       "_origin": "ast",
       "id": "worklog_project_selector_global_selesai",
       "community": 19,
@@ -13365,7 +13335,7 @@
       "label": "Export laporan Test Run (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L394",
+      "source_location": "L388",
       "_origin": "ast",
       "id": "worklog_export_laporan_test_run_selesai",
       "community": 19,
@@ -13375,7 +13345,7 @@
       "label": "Attachment Issue (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L401",
+      "source_location": "L395",
       "_origin": "ast",
       "id": "worklog_attachment_issue_selesai",
       "community": 19,
@@ -13385,7 +13355,7 @@
       "label": "Template Excel import (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L410",
+      "source_location": "L404",
       "_origin": "ast",
       "id": "worklog_template_excel_import_selesai",
       "community": 19,
@@ -13395,9 +13365,9 @@
       "label": "Export laporan Test Run (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L417",
+      "source_location": "L411",
       "_origin": "ast",
-      "id": "worklog_export_laporan_test_run_selesai_417",
+      "id": "worklog_export_laporan_test_run_selesai_411",
       "community": 19,
       "norm_label": "export laporan test run (selesai)"
     },
@@ -13405,7 +13375,7 @@
       "label": "Export PDF (selesai)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L424",
+      "source_location": "L418",
       "_origin": "ast",
       "id": "worklog_export_pdf_selesai",
       "community": 19,
@@ -13415,7 +13385,7 @@
       "label": "File yang berubah",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L430",
+      "source_location": "L424",
       "_origin": "ast",
       "id": "worklog_file_yang_berubah",
       "community": 19,
@@ -13425,7 +13395,7 @@
       "label": "Rencana implementasi",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L446",
+      "source_location": "L440",
       "_origin": "ast",
       "id": "worklog_rencana_implementasi",
       "community": 19,
@@ -13435,7 +13405,7 @@
       "label": "2026-07-22 \u2014 Sub-agent 5: Security, RLS, migration review, integration QA",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L454",
+      "source_location": "L448",
       "_origin": "ast",
       "id": "worklog_2026_07_22_sub_agent_5_security_rls_migration_review_integration_qa",
       "community": 19,
@@ -13445,7 +13415,7 @@
       "label": "2026-07-22 \u2014 Sub-agent 1: P2 Dashboard Trend dan Reporting",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L466",
+      "source_location": "L460",
       "_origin": "ast",
       "id": "worklog_2026_07_22_sub_agent_1_p2_dashboard_trend_dan_reporting",
       "community": 19,
@@ -13455,7 +13425,7 @@
       "label": "2026-07-26 \u2014 Audit potensi bug (read-only, tanpa perubahan kode)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L478",
+      "source_location": "L472",
       "_origin": "ast",
       "id": "worklog_2026_07_26_audit_potensi_bug_read_only_tanpa_perubahan_kode",
       "community": 19,
@@ -13465,7 +13435,7 @@
       "label": "2026-07-26 \u2014 Sub-agent 5: Frontend AI Issue dan Assistant Contract",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L489",
+      "source_location": "L483",
       "_origin": "ast",
       "id": "worklog_2026_07_26_sub_agent_5_frontend_ai_issue_dan_assistant_contract",
       "community": 19,
@@ -13475,7 +13445,7 @@
       "label": "2026-07-26 \u2014 Fix bug hasil audit (HIGH + race guard)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L498",
+      "source_location": "L492",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_bug_hasil_audit_high_race_guard",
       "community": 19,
@@ -13485,7 +13455,7 @@
       "label": "2026-07-26 \u2014 Fix bug #3: paginasi agregasi (batas 1000 baris PostgREST)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L508",
+      "source_location": "L502",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_bug_3_paginasi_agregasi_batas_1000_baris_postgrest",
       "community": 19,
@@ -13495,7 +13465,7 @@
       "label": "2026-07-26 \u2014 Fix bug #5, #6, #7 (footgun hook + business rule)",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L519",
+      "source_location": "L513",
       "_origin": "ast",
       "id": "worklog_2026_07_26_fix_bug_5_6_7_footgun_hook_business_rule",
       "community": 19,
@@ -13505,7 +13475,7 @@
       "label": "2026-07-26 \u2014 Benchmark penghematan token Graphify",
       "file_type": "document",
       "source_file": "WORKLOG.md",
-      "source_location": "L528",
+      "source_location": "L522",
       "_origin": "ast",
       "id": "worklog_2026_07_26_benchmark_penghematan_token_graphify",
       "community": 19,
@@ -28055,7 +28025,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L127",
+      "source_location": "L126",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_completewithretry",
       "target": "frontend_src_hooks_usetheme_resolve"
@@ -38336,7 +38306,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L105",
+      "source_location": "L100",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_actionoutput",
@@ -38346,7 +38316,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L84",
+      "source_location": "L80",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_analysisoutputschema",
@@ -38366,7 +38336,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L99",
+      "source_location": "L94",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_assistantoutputschema",
@@ -38386,7 +38356,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L137",
+      "source_location": "L106",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_canonicalaction",
@@ -38396,7 +38366,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L168",
+      "source_location": "L137",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_computeduplicateconfidence",
@@ -38406,7 +38376,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L98",
+      "source_location": "L93",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_duplicateoutputschema",
@@ -38426,7 +38396,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L134",
+      "source_location": "L103",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_errorenvelope",
@@ -38436,7 +38406,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L133",
+      "source_location": "L102",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_gatewayerrorcode",
@@ -38456,7 +38426,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L79",
+      "source_location": "L75",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_generateoutputschema",
@@ -38476,7 +38446,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L93",
+      "source_location": "L88",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_issuedraftschema",
@@ -38506,17 +38476,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L109",
-      "weight": 1.0,
-      "source": "supabase_functions_ai_gateway_contract",
-      "target": "supabase_functions_ai_gateway_contract_output_schema_hint",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L104",
+      "source_location": "L99",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_outputschemas",
@@ -38526,7 +38486,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L155",
+      "source_location": "L124",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_parseproviderjson",
@@ -38556,7 +38516,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L146",
+      "source_location": "L115",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_requestinput",
@@ -38576,7 +38536,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L135",
+      "source_location": "L104",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_successenvelope",
@@ -38586,7 +38546,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L73",
+      "source_location": "L69",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_testcasedraftschema",
@@ -38616,20 +38576,10 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L162",
+      "source_location": "L131",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_validateactionoutput",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L69",
-      "weight": 1.0,
-      "source": "supabase_functions_ai_gateway_contract_rationale_69",
-      "target": "supabase_functions_ai_gateway_contract",
       "confidence_score": 1.0
     },
     {
@@ -38682,7 +38632,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L183",
+      "source_location": "L182",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_contract_requestschema"
@@ -38714,7 +38664,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L145",
+      "source_location": "L144",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_analysisresponse",
       "target": "supabase_functions_ai_gateway_contract_canonicalaction",
@@ -38725,7 +38675,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L117",
+      "source_location": "L116",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_completewithretry",
       "target": "supabase_functions_ai_gateway_contract_canonicalaction",
@@ -38737,7 +38687,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L188",
+      "source_location": "L187",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_contract_canonicalaction"
@@ -38747,7 +38697,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L106",
+      "source_location": "L105",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_validateinput",
       "target": "supabase_functions_ai_gateway_contract_canonicalaction",
@@ -38784,17 +38734,6 @@
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_mockprovider_complete",
       "target": "supabase_functions_ai_gateway_contract_actionoutput",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "supabase_functions_ai_gateway_handler",
-      "target": "supabase_functions_ai_gateway_contract_output_schema_hint",
       "confidence_score": 1.0
     },
     {
@@ -38857,7 +38796,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L146",
+      "source_location": "L145",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_analysisresponse",
       "target": "supabase_functions_ai_gateway_contract_requestinput",
@@ -38869,7 +38808,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L199",
+      "source_location": "L198",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_contract_requestinput"
@@ -38879,7 +38818,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L107",
+      "source_location": "L106",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_validateinput",
       "target": "supabase_functions_ai_gateway_contract_requestinput",
@@ -38890,7 +38829,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L163",
+      "source_location": "L132",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract_validateactionoutput",
       "target": "supabase_functions_ai_gateway_contract_parseproviderjson",
@@ -38912,7 +38851,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L122",
+      "source_location": "L121",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_completewithretry",
       "target": "supabase_functions_ai_gateway_contract_validateactionoutput",
@@ -38922,7 +38861,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L144",
+      "source_location": "L143",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_analysisresponse",
@@ -38932,7 +38871,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L116",
+      "source_location": "L115",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_completewithretry",
@@ -38942,7 +38881,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L23",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_env",
@@ -38952,7 +38891,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L46",
+      "source_location": "L45",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_errorresponse",
@@ -38962,7 +38901,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L174",
+      "source_location": "L173",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_handleaigateway",
@@ -38972,7 +38911,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L74",
+      "source_location": "L73",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_projectcontext",
@@ -38982,7 +38921,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L62",
+      "source_location": "L61",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_query",
@@ -38992,7 +38931,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L68",
+      "source_location": "L67",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_requesthash",
@@ -39002,7 +38941,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L35",
+      "source_location": "L34",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_requestid",
@@ -39012,7 +38951,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L39",
+      "source_location": "L38",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_response",
@@ -39022,7 +38961,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L134",
+      "source_location": "L133",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_restrictoutput",
@@ -39032,7 +38971,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L25",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_scopedcontext",
@@ -39042,7 +38981,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L105",
+      "source_location": "L104",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_handler_validateinput",
@@ -39053,7 +38992,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_providers",
@@ -39064,7 +39003,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_providers_aiprovider",
@@ -39075,7 +39014,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_providers_createprovider",
@@ -39086,7 +39025,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_providers_providererror",
@@ -39097,7 +39036,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_security",
@@ -39108,7 +39047,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_security_authenticate",
@@ -39119,7 +39058,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_security_corsheaders",
@@ -39130,7 +39069,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_security_envnumber",
@@ -39141,7 +39080,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_security_gatewayhttperror",
@@ -39152,7 +39091,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler",
       "target": "supabase_functions_ai_gateway_security_redactpromptinput",
@@ -39174,7 +39113,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L175",
+      "source_location": "L174",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_requestid",
@@ -39185,7 +39124,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L59",
+      "source_location": "L58",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_errorresponse",
       "target": "supabase_functions_ai_gateway_handler_response",
@@ -39196,7 +39135,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L219",
+      "source_location": "L218",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_response",
@@ -39207,7 +39146,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L42",
+      "source_location": "L41",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_response",
       "target": "supabase_functions_ai_gateway_security_corsheaders",
@@ -39218,7 +39157,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L177",
+      "source_location": "L176",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_errorresponse",
@@ -39229,7 +39168,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L197",
+      "source_location": "L196",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_query",
@@ -39240,7 +39179,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L75",
+      "source_location": "L74",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_projectcontext",
       "target": "supabase_functions_ai_gateway_handler_query",
@@ -39251,7 +39190,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L211",
+      "source_location": "L210",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_requesthash",
@@ -39262,7 +39201,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L201",
+      "source_location": "L200",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_projectcontext",
@@ -39273,7 +39212,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L186",
+      "source_location": "L185",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_validateinput",
@@ -39285,7 +39224,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L121",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_completewithretry",
       "target": "supabase_functions_ai_gateway_providers_aiprovider_complete"
@@ -39295,7 +39234,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L214",
+      "source_location": "L213",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_completewithretry",
@@ -39306,7 +39245,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L214",
+      "source_location": "L213",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_restrictoutput",
@@ -39317,7 +39256,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L216",
+      "source_location": "L215",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_handler_analysisresponse",
@@ -39329,7 +39268,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L204",
+      "source_location": "L203",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_providers_createprovider"
@@ -39340,7 +39279,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L187",
+      "source_location": "L186",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_security_authenticate"
@@ -39351,7 +39290,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L176",
+      "source_location": "L175",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_security_corsheaders"
@@ -39362,7 +39301,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L192",
+      "source_location": "L191",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_security_envnumber"
@@ -39373,7 +39312,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/handler.ts",
-      "source_location": "L203",
+      "source_location": "L202",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_handler_handleaigateway",
       "target": "supabase_functions_ai_gateway_security_redactpromptinput"
@@ -43813,7 +43752,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L281",
+      "source_location": "L275",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22",
@@ -43823,7 +43762,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L238",
+      "source_location": "L232",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_apply_migration_p1_dan_checklist",
@@ -43833,7 +43772,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L227",
+      "source_location": "L221",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_integrasi_p1_dan_qa_final",
@@ -43843,7 +43782,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L259",
+      "source_location": "L253",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p1_duplicate_test_case_dan_comment_mention",
@@ -43853,7 +43792,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L270",
+      "source_location": "L264",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p1_requirement_traceability",
@@ -43863,7 +43802,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L213",
+      "source_location": "L207",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_api_token_dan_webhook_sub_agent_2",
@@ -43873,7 +43812,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L189",
+      "source_location": "L183",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_backup_restore_dan_data_retention_sub_agent_4",
@@ -43883,7 +43822,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L201",
+      "source_location": "L195",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_integrasi_ci_cd_sub_agent_3",
@@ -43893,7 +43832,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L149",
+      "source_location": "L143",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_p2_reporting_integrasi_backup_retention_dan_qa_final",
@@ -43903,7 +43842,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L247",
+      "source_location": "L241",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_22_test_run_enhancement_sub_agent",
@@ -43923,7 +43862,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L102",
+      "source_location": "L96",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_apply_migration_p2_p3_ke_supabase_target_via_mcp",
@@ -43933,7 +43872,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L76",
+      "source_location": "L70",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_auto_upload_artifact_ke_supabase_storage_berhasil_end_to_end",
@@ -43943,7 +43882,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L112",
+      "source_location": "L106",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_cli_playwright_local_runner_folder_runner",
@@ -43953,7 +43892,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L93",
+      "source_location": "L87",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_fix_2_bug_runtime_pasca_apply_schema_025",
@@ -43963,7 +43902,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L71",
+      "source_location": "L65",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_fix_permission_denied_attachment_rls_helpers_schema_027",
@@ -43973,7 +43912,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L121",
+      "source_location": "L115",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_implementasi_section_5_automation_sisi_server_pusat_local_runner",
@@ -43983,7 +43922,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L131",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_perjelas_section_5_feature_backlog_md_playwright_local_runner",
@@ -43993,7 +43932,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L140",
+      "source_location": "L134",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_sub_agent_4_ai_test_run_analysis_frontend_contract",
@@ -44003,7 +43942,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L86",
+      "source_location": "L80",
       "weight": 1.0,
       "source": "worklog_worklog",
       "target": "worklog_2026_07_26_uji_end_to_end_automation_berhasil",
@@ -44013,7 +43952,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L46",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_audit_fungsional_semua_fitur_feature_backlog",
@@ -44023,7 +43962,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L54",
+      "source_location": "L48",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_coordinator_integrasi_ai_integration",
@@ -44033,7 +43972,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L64",
+      "source_location": "L58",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_final_integration_verification_ai",
@@ -44046,16 +43985,6 @@
       "source_location": "L15",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
-      "target": "worklog_2026_07_26_fix_ai_invalid_output_ai_gateway_schema_hint_untuk_provider_nyata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "WORKLOG.md",
-      "source_location": "L21",
-      "weight": 1.0,
-      "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_fix_cors_ai_gateway_browser_blokir_post",
       "confidence_score": 1.0
     },
@@ -44063,7 +43992,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L36",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_section_3_webhook_http_delivery_schema_028_fungsional",
@@ -44073,7 +44002,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L28",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "worklog_2026_07_26",
       "target": "worklog_2026_07_26_section_4_deploy_edge_function_ai_gateway_fungsional",
@@ -44093,7 +44022,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L466",
+      "source_location": "L460",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_22_sub_agent_1_p2_dashboard_trend_dan_reporting",
@@ -44103,7 +44032,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L454",
+      "source_location": "L448",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_22_sub_agent_5_security_rls_migration_review_integration_qa",
@@ -44113,7 +44042,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L478",
+      "source_location": "L472",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_audit_potensi_bug_read_only_tanpa_perubahan_kode",
@@ -44123,7 +44052,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L528",
+      "source_location": "L522",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_benchmark_penghematan_token_graphify",
@@ -44133,7 +44062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L508",
+      "source_location": "L502",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_fix_bug_3_paginasi_agregasi_batas_1000_baris_postgrest",
@@ -44143,7 +44072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L519",
+      "source_location": "L513",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_fix_bug_5_6_7_footgun_hook_business_rule",
@@ -44153,7 +44082,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L498",
+      "source_location": "L492",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_fix_bug_hasil_audit_high_race_guard",
@@ -44163,7 +44092,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L489",
+      "source_location": "L483",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_2026_07_26_sub_agent_5_frontend_ai_issue_dan_assistant_contract",
@@ -44173,7 +44102,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L373",
+      "source_location": "L367",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_ai_integration_roadmap",
@@ -44183,7 +44112,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L401",
+      "source_location": "L395",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_attachment_issue_selesai",
@@ -44193,7 +44122,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L365",
+      "source_location": "L359",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_export_excel_selesai",
@@ -44203,7 +44132,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L394",
+      "source_location": "L388",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_export_laporan_test_run_selesai",
@@ -44213,17 +44142,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L417",
+      "source_location": "L411",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
-      "target": "worklog_export_laporan_test_run_selesai_417",
+      "target": "worklog_export_laporan_test_run_selesai_411",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L424",
+      "source_location": "L418",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_export_pdf_selesai",
@@ -44233,7 +44162,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L329",
+      "source_location": "L323",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_feature_backlog_diperluas",
@@ -44243,7 +44172,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L383",
+      "source_location": "L377",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_feature_backlog_selesai",
@@ -44253,7 +44182,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L430",
+      "source_location": "L424",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_file_yang_berubah",
@@ -44263,7 +44192,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L315",
+      "source_location": "L309",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_graphify_codex_integration",
@@ -44273,7 +44202,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L357",
+      "source_location": "L351",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_import_excel_test_case_selesai",
@@ -44283,7 +44212,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L293",
+      "source_location": "L287",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_integration_review_qa_codex_sub_agent",
@@ -44293,7 +44222,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L303",
+      "source_location": "L297",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_p1_attachment_test_case_test_run_dan_archive_project_sub_agent",
@@ -44303,7 +44232,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L283",
+      "source_location": "L277",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_p1_environment_management_sub_agent",
@@ -44313,7 +44242,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L335",
+      "source_location": "L329",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_p2_peningkatan_workflow_selesai",
@@ -44323,7 +44252,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L387",
+      "source_location": "L381",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_project_selector_global_selesai",
@@ -44333,7 +44262,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L446",
+      "source_location": "L440",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_rencana_implementasi",
@@ -44343,7 +44272,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L347",
+      "source_location": "L341",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_selesai",
@@ -44353,7 +44282,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L378",
+      "source_location": "L372",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_self_hosted_automation_roadmap",
@@ -44363,7 +44292,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
-      "source_location": "L410",
+      "source_location": "L404",
       "weight": 1.0,
       "source": "worklog_2026_07_22",
       "target": "worklog_template_excel_import_selesai",

@@ -66,38 +66,69 @@ export type GatewayRequest = z.infer<typeof RequestSchema>;
 export type CanonicalAction = "generate_test_cases" | "test_run_analysis" | "issue_draft" | "duplicate_issue_detection" | "assistant_search";
 export type ProviderAction = CanonicalAction;
 
+// NOTE: OUTPUT schemas are intentionally NOT `.strict()`. They validate the fields
+// the gateway consumes but silently strip any extra keys a real LLM may add, so a
+// slightly over-generated response is tolerated instead of failing the whole call.
+// Field names/enums the model must produce are conveyed via OUTPUT_SCHEMA_HINT below.
 export const TestCaseDraftSchema = z.object({
   title: Text.min(1).max(300), objective: Text.max(4_000), preconditions: Text.max(4_000),
   steps: z.string().min(1).max(10_000), expectedResult: Text.min(1).max(4_000), priority: Priority,
-  tags: z.array(Text.min(1).max(80)).max(20), notes: Text.max(4_000),
-  scenarios: z.array(Text.min(1).max(2_000)).max(30), edgeCases: z.array(Text.min(1).max(2_000)).max(30),
-}).strict();
+  tags: z.array(Text.min(1).max(80)).max(20).default([]), notes: Text.max(4_000).default(""),
+  scenarios: z.array(Text.min(1).max(2_000)).max(30).default([]), edgeCases: z.array(Text.min(1).max(2_000)).max(30).default([]),
+});
 export const GenerateOutputSchema = z.object({
-  testCases: z.array(TestCaseDraftSchema).min(1).max(50), scenarios: z.array(Text).max(30), edgeCases: z.array(Text).max(30),
+  testCases: z.array(TestCaseDraftSchema).min(1).max(50), scenarios: z.array(Text).max(30).default([]), edgeCases: z.array(Text).max(30).default([]),
   provider: Text.max(100).optional(), model: Text.max(200).nullable().optional(), promptVersion: Text.max(100).nullable().optional(),
-}).strict();
+});
 
 export const AnalysisOutputSchema = z.object({
   summary: Text.min(1).max(8_000),
-  counts: z.object({ pass: z.number().int().nonnegative(), fail: z.number().int().nonnegative(), skip: z.number().int().nonnegative(), blocked: z.number().int().nonnegative(), notRun: z.number().int().nonnegative() }).strict(),
-  failurePatterns: z.array(z.object({ pattern: Text.min(1).max(500), evidence: z.array(Text.min(1).max(2_000)).max(10), risk: z.enum(["low", "medium", "high", "critical"]) }).strict()).max(30),
-  regressionRisks: z.array(Text.min(1).max(2_000)).max(30),
-  retestRecommendations: z.array(z.object({ testCaseId: Uuid.optional(), reason: Text.min(1).max(2_000), priority: Priority }).strict()).max(50),
-}).strict();
+  // counts is recomputed by the gateway from real test_results, so accept a loose/partial object.
+  counts: z.object({ pass: z.number().int().nonnegative(), fail: z.number().int().nonnegative(), skip: z.number().int().nonnegative(), blocked: z.number().int().nonnegative(), notRun: z.number().int().nonnegative() }).partial().default({}),
+  failurePatterns: z.array(z.object({ pattern: Text.min(1).max(500), evidence: z.array(Text.min(1).max(2_000)).max(10).default([]), risk: z.enum(["low", "medium", "high", "critical"]) })).max(30).default([]),
+  regressionRisks: z.array(Text.min(1).max(2_000)).max(30).default([]),
+  retestRecommendations: z.array(z.object({ testCaseId: Text.max(100).optional(), reason: Text.min(1).max(2_000), priority: Priority })).max(50).default([]),
+});
 
 export const IssueDraftSchema = z.object({
   projectId: Uuid.optional(), testResultId: Uuid.optional(),
   title: Text.min(1).max(300), description: Text.max(10_000), actualResult: Text.max(10_000), expectedResult: Text.max(10_000), priority: Priority,
   severity: z.enum(["low", "medium", "high", "critical"]), reproductionSteps: Text.max(10_000),
-}).strict();
-export const DuplicateOutputSchema = z.object({ candidates: z.array(z.object({ issueId: Uuid, confidence: z.number().min(0).max(1), reason: Text.min(1).max(2_000) }).strict()).max(100) }).strict();
+});
+export const DuplicateOutputSchema = z.object({ candidates: z.array(z.object({ issueId: Uuid, confidence: z.number().min(0).max(1), reason: Text.min(1).max(2_000) })).max(100).default([]) });
 export const AssistantOutputSchema = z.object({
   answer: Text.max(8_000).nullable(),
-  matches: z.array(z.object({ entityType: z.enum(["test_case", "test_run", "test_result", "issue", "requirement", "history"]), entityId: Uuid, projectId: Uuid, code: Text.max(100).nullable(), title: Text.min(1).max(500), snippet: Text.max(5_000), score: z.number().min(0).max(1) }).strict()).max(50),
-}).strict();
+  matches: z.array(z.object({ entityType: z.enum(["test_case", "test_run", "test_result", "issue", "requirement", "history"]), entityId: Uuid, projectId: Uuid, code: Text.max(100).nullable(), title: Text.min(1).max(500), snippet: Text.max(5_000), score: z.number().min(0).max(1) })).max(50).default([]),
+});
 
 export const OutputSchemas = { generate_test_cases: GenerateOutputSchema, test_run_analysis: AnalysisOutputSchema, issue_draft: IssueDraftSchema, duplicate_issue_detection: DuplicateOutputSchema, assistant_search: AssistantOutputSchema } as const;
 export type ActionOutput = z.infer<(typeof OutputSchemas)[keyof typeof OutputSchemas]>;
+
+// Exact JSON shape each action's provider must return. Injected into the prompt so
+// real LLM providers (OpenAI/Gemini) emit contract-conforming JSON, not a guess.
+export const OUTPUT_SCHEMA_HINT: Record<CanonicalAction, unknown> = {
+  generate_test_cases: {
+    testCases: [{ title: "string", objective: "string", preconditions: "string", steps: "string (numbered)", expectedResult: "string", priority: "low|medium|high|critical", tags: ["string"], notes: "string", scenarios: ["string"], edgeCases: ["string"] }],
+    scenarios: ["string"], edgeCases: ["string"],
+  },
+  test_run_analysis: {
+    summary: "string",
+    counts: { pass: 0, fail: 0, skip: 0, blocked: 0, notRun: 0 },
+    failurePatterns: [{ pattern: "string", evidence: ["string"], risk: "low|medium|high|critical" }],
+    regressionRisks: ["string"],
+    retestRecommendations: [{ testCaseId: "uuid from scopedContext.testCases (optional)", reason: "string", priority: "low|medium|high|critical" }],
+  },
+  issue_draft: {
+    title: "string", description: "string", actualResult: "string", expectedResult: "string", priority: "low|medium|high|critical", severity: "low|medium|high|critical", reproductionSteps: "string (numbered)",
+  },
+  duplicate_issue_detection: {
+    candidates: [{ issueId: "uuid from provided candidates", confidence: "number 0..1", reason: "string" }],
+  },
+  assistant_search: {
+    answer: "string or null",
+    matches: [{ entityType: "test_case|test_run|test_result|issue|requirement|history", entityId: "uuid from scopedContext", projectId: "uuid", code: "string or null", title: "string", snippet: "string", score: "number 0..1" }],
+  },
+};
 
 export type GatewayErrorCode = "AUTH_REQUIRED" | "AUTH_INVALID" | "PROJECT_ACCESS_DENIED" | "INVALID_REQUEST" | "INVALID_INPUT" | "RATE_LIMITED" | "AI_TIMEOUT" | "AI_PROVIDER_ERROR" | "AI_INVALID_OUTPUT" | "CONFIGURATION_ERROR" | "INTERNAL_ERROR";
 export type ErrorEnvelope = { error: { code: GatewayErrorCode; message: string; requestId: string; retryAfterSeconds?: number; details?: unknown } };
