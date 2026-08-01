@@ -5,15 +5,16 @@ import type { ProjectSession } from "../services/authService.js";
 import type { WriteService } from "../services/writeService.js";
 import { createWriteToolRegistrar } from "./writeTools.js";
 
-test("registers the MCP write tools including the human approval gate", () => {
+test("registers MCP write tools without an AI approval bypass", () => {
   const names: string[] = [];
   const server = { registerTool: (name: string) => names.push(name) } as unknown as McpServer;
   createWriteToolRegistrar({} as ProjectSession, {} as WriteService)(server);
   assert.deepEqual(names, [
     "testmanager.testcase.create_bulk", "testmanager.testcase.update", "testmanager.testcase.duplicate",
     "testmanager.testcase.archive", "testmanager.testplan.create", "testmanager.testplan.add_cases",
-    "testmanager.testplan.remove_cases", "testmanager.testplan.approve",
+    "testmanager.testplan.remove_cases",
     "testmanager.testrun.create", "testmanager.testrun.record_result", "testmanager.testrun.complete",
     "testmanager.issue.create", "testmanager.issue.comment", "testmanager.issue.update_status", "testmanager.issue.detect_duplicate",
   ]);
+  assert.equal(names.some((name) => name.includes("approve")), false);
 });

@@ -90,7 +90,6 @@ Tool berikut tidak diregistrasikan ketika `TM_MCP_READONLY=1`.
 | `testmanager.testplan.create` | Membuat Test Plan draft. |
 | `testmanager.testplan.add_cases` | Menambah Test Case ke scope plan draft. |
 | `testmanager.testplan.remove_cases` | Melepas Test Case dari scope plan tanpa menghapus case. |
-| `testmanager.testplan.approve` | Approval eksplisit dengan identitas approver manusia. |
 | `testmanager.testrun.create` | Membuat run baru dan hasil awal; tidak menimpa run lama. |
 | `testmanager.testrun.record_result` | Mencatat satu hasil menggunakan profile tester terdaftar. |
 | `testmanager.testrun.complete` | Menyelesaikan run secara eksplisit, bukan otomatis. |

@@ -38,9 +38,6 @@ export class WriteRepository {
   createTestPlan(input: { name: string; description?: string | null }) { return this.rpc("mcp_create_test_plan", { p_name: input.name, p_description: input.description ?? null }); }
   addTestPlanCases(id: string, caseIds: string[]) { return this.rpc("mcp_add_test_plan_cases", { p_test_plan_id: id, p_test_case_ids: caseIds }); }
   removeTestPlanCases(id: string, caseIds: string[]) { return this.rpc("mcp_remove_test_plan_cases", { p_test_plan_id: id, p_test_case_ids: caseIds }); }
-  approveTestPlan(id: string, approverId: string, explicitApproval: boolean) {
-    return this.rpc("mcp_approve_test_plan", { p_test_plan_id: id, p_approver_id: approverId, p_explicit_approval: explicitApproval });
-  }
   createTestRun(input: { testPlanId: string; name: string; notes?: string | null }) {
     return this.rpc("mcp_create_test_run", { p_test_plan_id: input.testPlanId, p_name: input.name, p_notes: input.notes ?? null });
   }

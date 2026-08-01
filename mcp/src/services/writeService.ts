@@ -22,11 +22,6 @@ export class WriteService {
   async createTestPlan(input: { name: string; description?: string | null }) { this.text(input.name, "name"); return marker(await this.repository.createTestPlan({ ...input, name: input.name.trim() })); }
   async addTestPlanCases(id: string, ids: string[]) { this.uuid(id, "testplan_id"); this.ids(ids); return marker(await this.repository.addTestPlanCases(id, [...new Set(ids)])); }
   async removeTestPlanCases(id: string, ids: string[]) { this.uuid(id, "testplan_id"); this.ids(ids); return marker(await this.repository.removeTestPlanCases(id, [...new Set(ids)])); }
-  async approveTestPlan(id: string, approverId: string, explicitApproval: boolean) {
-    this.uuid(id, "testplan_id"); this.uuid(approverId, "approver_id");
-    if (explicitApproval !== true) throw invalid("explicit_approval must be true for API-token approval");
-    return this.repository.approveTestPlan(id, approverId, explicitApproval);
-  }
   async createTestRun(input: { testPlanId: string; name: string; notes?: string | null }) {
     this.uuid(input.testPlanId, "testplan_id"); this.text(input.name, "name");
     return this.repository.createTestRun({ ...input, name: input.name.trim() });

@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785552148.10554,
-    "ast_hash": "98db8991fd9e527c77a9e4c3ccd75a2e",
+    "mtime": 1785553551.9059913,
+    "ast_hash": "9a773a9b66a8a9780b95594229c6bec0",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785553158.496009,
-    "ast_hash": "40fd989bdf1a9f5c6ad197c7e9c0fe7f",
+    "mtime": 1785553584.879326,
+    "ast_hash": "569f81858566de5290d8fede259688c1",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -885,8 +885,8 @@
     "semantic_hash": ""
   },
   "frontend/src/components/ai/AiTestCaseGeneratorDialog.tsx": {
-    "mtime": 1785552754.267702,
-    "ast_hash": "d022e1901492f1448b25e419d254796a",
+    "mtime": 1785553475.089049,
+    "ast_hash": "3837e17b92ee9e9beb55a4663dbda4ec",
     "semantic_hash": ""
   },
   "frontend/src/components/test-runs/TestRunAnalysisPanel.tsx": {
@@ -925,8 +925,8 @@
     "semantic_hash": "e7c8baeedd2d2368d85155d34680eb5d"
   },
   "frontend/src/hooks/useAiTestCaseGenerator.ts": {
-    "mtime": 1785552754.1077125,
-    "ast_hash": "9e0f50a2d2f55a7198aa768fbc3e2999",
+    "mtime": 1785553474.0479884,
+    "ast_hash": "b1065cc58163c08fe16a346a06a847ad",
     "semantic_hash": ""
   },
   "frontend/src/hooks/useTestRunAnalysis.ts": {
@@ -960,8 +960,8 @@
     "semantic_hash": "8cde620ac59f54107b1f582281182707"
   },
   "frontend/src/services/aiTestCaseService.ts": {
-    "mtime": 1785552753.9427238,
-    "ast_hash": "e21a4396fa9811183cae4d5ca970652f",
+    "mtime": 1785553472.9829266,
+    "ast_hash": "56c08a5e73386c240fa73696495a2801",
     "semantic_hash": ""
   },
   "frontend/src/services/aiTestRunAnalysisService.ts": {
@@ -975,8 +975,8 @@
     "semantic_hash": "2ec5cf5a9b5a12f2b08d71611e76085b"
   },
   "frontend/src/types/aiTestCase.ts": {
-    "mtime": 1785552753.7587366,
-    "ast_hash": "4529e42730f9babe8b697763764a2aee",
+    "mtime": 1785553472.0898747,
+    "ast_hash": "508c07f517c15ff1ad875b9a0bdadc1f",
     "semantic_hash": ""
   },
   "frontend/src/types/aiTestRunAnalysis.ts": {

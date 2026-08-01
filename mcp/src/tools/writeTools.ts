@@ -20,11 +20,6 @@ export const createWriteToolRegistrar = (session: ProjectSession, service: Write
   server.registerTool("testmanager.testplan.create", { description: "Create a test plan in draft/review-only state.", inputSchema: { name: z.string().min(1), description: z.string().nullable().optional() }, annotations }, async (a) => run(a, () => service.createTestPlan(a)));
   server.registerTool("testmanager.testplan.add_cases", { description: "Add project test cases to a draft plan.", inputSchema: { testplan_id: z.string().uuid(), testcase_ids: z.array(z.string().uuid()).min(1).max(100) }, annotations }, async (a) => run(a, () => service.addTestPlanCases(a.testplan_id, a.testcase_ids)));
   server.registerTool("testmanager.testplan.remove_cases", { description: "Remove cases from a draft plan scope.", inputSchema: { testplan_id: z.string().uuid(), testcase_ids: z.array(z.string().uuid()).min(1).max(100) }, annotations }, async (a) => run(a, () => service.removeTestPlanCases(a.testplan_id, a.testcase_ids)));
-  server.registerTool("testmanager.testplan.approve", {
-    description: "Approve a draft test plan through an explicit human gate. The approver must be an active TestManager user with project access.",
-    inputSchema: { testplan_id: z.string().uuid(), approver_id: z.string().uuid().describe("Profile ID of the human who explicitly approved the plan."), explicit_approval: z.literal(true).describe("Explicit confirmation that the named human approved this action.") },
-    annotations,
-  }, async (a) => run(a, () => service.approveTestPlan(a.testplan_id, a.approver_id, a.explicit_approval)));
   server.registerTool("testmanager.testrun.create", {
     description: "Create a new test run and seed a fresh not-run result for every case in the plan. This never overwrites an earlier run.",
     inputSchema: { testplan_id: z.string().uuid(), name: z.string().min(1), notes: z.string().nullable().optional() }, annotations,

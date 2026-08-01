@@ -2040,3 +2040,14 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperbarui checklist E2E-06. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test` (5/5 test), dan `cd frontend && npm run lint` (tujuh warning existing di luar scope).
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.637 node dan 5.442 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-07 audit dan penutupan bypass approval AI
+
+- Menjalankan `graphify query` lalu mengaudit jalur AI/MCP, service, repository, RPC Supabase, review UI, dan audit trigger sesuai gate wajib Section 11.2 `FEATURE_BACKLOG.md`.
+- Audit menemukan dua bypass: tool `testmanager.testplan.approve` mengizinkan agent meminjam `approver_id` manusia dengan flag konfirmasi, serta RPC `mcp_create_test_cases`/`mcp_duplicate_test_case` menyimpan hasil agent langsung berstatus `active` walaupun service menandai respons sebagai `draft`/`review_only`.
+- Menghapus approval Test Plan dari seluruh layer MCP (tool, service, repository, test, dan dokumentasi). Migration `schema_072_e2e07_close_approval_bypass.sql` mencabut fungsi RPC approval lama, sehingga API token tidak mempunyai jalur untuk mengaktifkan Test Plan.
+- Migration yang sama mengganti RPC create/duplicate Test Case agar selalu menyimpan `status = 'draft'`, `source = 'ai'`, dan `ai_batch_id`; constraint database mencegah draf AI menjadi aktif tanpa keputusan review.
+- Menambahkan trigger database yang hanya menerima transisi keputusan review dengan sesi user terautentikasi serta selalu mengisi `reviewed_by = auth.uid()` dan `reviewed_at`. Trigger audit `test_cases` yang sudah ada kemudian mencatat actor yang sama pada `audit_logs.changed_by` dan snapshot field review pada `new_data`, sehingga approver tidak dapat kosong atau disuplai agent.
+- Migration hanya dibuat dan tidak dijalankan ke Supabase target. Tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd mcp && npm test` (20/20 suite), `cd mcp && npm run build`, `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), pencarian statis memastikan simbol/tool approval tidak tersisa di runtime selain migration historis dan migration pencabutannya, serta `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.640 node dan 5.440 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

@@ -89,10 +89,10 @@ signed download URL. Ikuti proses migration/deploy proyek; server tidak
 menjalankannya otomatis.
 
 Untuk tool tulis, jalankan `schema_051_mcp_write_test_cases_plans.sql`, lalu
-`schema_052_mcp_testplan_approval.sql`. `testmanager.testplan.approve` hanya
-menerima `approver_id` user aktif yang memiliki akses project dan
-`explicit_approval: true`. RPC memvalidasi gate tersebut kembali dan mencatat
-approver di audit log; API token tidak dianggap sebagai approver manusia.
+migration hardening terbaru. MCP hanya dapat membuat Test Case AI dan Test Plan
+sebagai draf. Approval tidak diekspos sebagai tool agent; review Test Case AI
+hanya dilakukan oleh user terautentikasi di UI dan identitas reviewer dicatat
+pada `reviewed_by` serta `audit_logs`.
 
 Workflow Issue MCP memerlukan migration `schema_054_mcp_issue_workflow.sql` dan
 scope token `write:issues`. Tool `issue.create` selalu mewajibkan
