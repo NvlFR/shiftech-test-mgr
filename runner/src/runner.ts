@@ -14,6 +14,16 @@ import { registerSecret, redactSecrets } from './security.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+const RUNNER_TOKEN_REJECTED_MESSAGE =
+  'Token runner ditolak server karena sudah dicabut, dirotasi, atau tidak valid. Hubungkan ulang runner dengan token baru.';
+
+export function isRunnerTokenRejected(error: unknown): boolean {
+  return error instanceof ApiError
+    && (error.status === 401
+      || error.status === 403
+      || error.message.includes('INVALID_RUNNER_TOKEN'));
+}
+
 class JobLogStreamer {
   private sequence = 0;
   private pending: Array<{ stream: JobLogStream; content: string }> = [];
@@ -60,8 +70,9 @@ export class Runner {
     private readonly config: RunnerConfig,
     private readonly executor: RunnerExecutorAdapter = new PlaywrightLocalExecutor(),
     private readonly artifactStorage: ArtifactStorageAdapter = SupabaseStorageAdapter.fromConfig(config),
+    api?: AutomationApi,
   ) {
-    this.api = new AutomationApi(config);
+    this.api = api ?? new AutomationApi(config);
   }
 
   stop(): void {
@@ -105,8 +116,8 @@ export class Runner {
       const hb = await this.api.heartbeat();
       log.info('Runner authenticated', { agentId: hb.agent_id, active: hb.active });
     } catch (err) {
-      if (err instanceof ApiError && err.status >= 400 && err.status < 500) {
-        throw new Error(`Runner token rejected by server: ${err.message}`);
+      if (isRunnerTokenRejected(err)) {
+        throw new Error(RUNNER_TOKEN_REJECTED_MESSAGE);
       }
       log.warn('Initial heartbeat failed, will keep retrying', { error: (err as Error).message });
     }
@@ -184,6 +195,10 @@ export class Runner {
         });
         log.info('Reported job', { jobId: job.id, result: outcome.result, serverStatus: report.status, requeued: report.requeued, artifacts: artifacts.length });
       } catch (err) {
+        if (isRunnerTokenRejected(err)) {
+          this.stop();
+          throw new Error(RUNNER_TOKEN_REJECTED_MESSAGE);
+        }
         log.error('Poll/execute cycle failed', { error: (err as Error).message });
         await sleep(this.config.pollIntervalMs);
       }

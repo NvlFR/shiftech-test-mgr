@@ -2609,3 +2609,16 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menampilkan batas kepercayaan yang sama pada dialog pembuatan runner dan dialog penyimpanan token di UI Automation agar pengguna melihatnya selama setup.
 - Menambahkan regresi CLI untuk memastikan kedua pesan keamanan selalu ditampilkan tanpa mengekspos bootstrap code atau runner token.
 - Verifikasi lulus: `cd runner && npm test` (14/14 berkas test) dan `cd frontend && npm run build`. Build frontend tetap memunculkan warning ukuran chunk yang sudah ada; tidak ada migration, perubahan data target, secret/token, commit, atau push.
+
+## 2026-08-01 — BOOT-06 pencabutan/rotasi token berlaku pada poll berikutnya
+
+- Runner kini mengenali penolakan kredensial dari status HTTP autentikasi maupun marker `INVALID_RUNNER_TOKEN` yang dikembalikan RPC polling Supabase.
+- Saat token dicabut, dirotasi, atau tidak valid pada poll, runner langsung menghentikan heartbeat dan loop polling, lalu keluar dengan pesan yang meminta operator menghubungkan ulang runner; error autentikasi tidak lagi di-retry tanpa batas.
+- Menambahkan test regresi yang membuktikan penolakan token pada poll pertama hanya memanggil poll satu kali dan menghasilkan pesan berhenti yang jelas.
+- Verifikasi lulus: `cd runner && npm test` (15/15 berkas test) dan `cd frontend && npm run build`; build frontend hanya menampilkan warning ukuran chunk yang sudah ada. `graphify update .` juga dijalankan dan tidak menemukan perubahan topologi graph. Tidak ada migration yang dijalankan, perubahan data target, secret/token, commit, atau push.
+
+## 2026-08-01 — DIST-01 paket distribusi runner
+
+- Mengubah identitas paket runner menjadi `@testmanager/runner` dan menambahkan allow-list tarball `files: ["dist"]`, executable `tm-runner`, batas Node.js `>=20`, publikasi scoped package berakses publik, serta build otomatis melalui `prepublishOnly`.
+- Menyelaraskan metadata root pada `runner/package-lock.json` dengan metadata paket distribusi.
+- Verifikasi lulus: build TypeScript, seluruh 15 test runner, dan `npm pack --dry-run --json`; tarball hanya berisi `package.json`, `README.md`, serta output `dist`, tanpa `.env`, log, test, example project, atau artifact runtime.
