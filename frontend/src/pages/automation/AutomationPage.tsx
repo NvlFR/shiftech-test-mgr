@@ -38,7 +38,7 @@ export function AutomationPage() {
   const toast = useRef<Toast>(null);
   const { session } = useAuthContext();
   const { canEditContent, canManageSettings, loading: roleLoading } = useProjectRole(projectId);
-  const { runners, scripts, jobs, loading, error, reload } = useAutomation(projectId ?? null);
+  const { runners, scripts, jobs, loading, error, reload, runLocally } = useAutomation(projectId ?? null);
   const { testPlans } = useTestPlans(projectId ?? null);
   const { environments } = useEnvironments(projectId ?? null);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -61,6 +61,12 @@ export function AutomationPage() {
   const [enqueueMaxAttempts, setEnqueueMaxAttempts] = useState(1);
   const [enqueueBrowser, setEnqueueBrowser] = useState<AutomationBrowser>('chromium');
   const [enqueueDeviceProfile, setEnqueueDeviceProfile] = useState<string | null>(null);
+  const [localScript, setLocalScript] = useState<AutomationScript | null>(null);
+  const [localPlanId, setLocalPlanId] = useState<string | null>(null);
+  const [localName, setLocalName] = useState('');
+  const [localBrowser, setLocalBrowser] = useState<AutomationBrowser>('chromium');
+  const [localDeviceProfile, setLocalDeviceProfile] = useState<string | null>(null);
+  const [localRunning, setLocalRunning] = useState(false);
 
   useEffect(() => {
     if (!projectId) { setTestCases([]); return; }
@@ -111,6 +117,16 @@ export function AutomationPage() {
   async function cancelJob(row: AutomationJob) {
     try { await automationService.cancelJob(row.id); await reload(); }
     catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal cancel job' }); }
+  }
+  async function startLocalRun() {
+    if (!localScript || !localPlanId) return;
+    setLocalRunning(true);
+    try {
+      const result = await runLocally({ testPlanId: localPlanId, testCaseId: localScript.testCaseId, name: localName, browser: localBrowser, deviceProfile: localDeviceProfile });
+      setLocalScript(null); setLocalPlanId(null); setLocalName(''); setLocalBrowser('chromium'); setLocalDeviceProfile(null);
+      toast.current?.show({ severity: 'success', summary: `Test Run ${result.runCode} dibuat`, detail: 'Satu Test Case siap diambil Local Runner' });
+    } catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal menjalankan Test Case' }); }
+    finally { setLocalRunning(false); }
   }
   async function openArtifact(a: AutomationJob['artifacts'][number]) {
     // Uploaded artifacts are private in Storage: mint a signed URL on click.
@@ -167,7 +183,10 @@ export function AutomationPage() {
           <Column header="Test Case" body={(r: AutomationScript) => caseLabel(r.testCaseId)} />
           <Column field="scriptRef" header="Script" />
           <Column header="Label" body={(r: AutomationScript) => r.runnerLabels.length ? r.runnerLabels.map((l) => <Tag key={l} value={l} className="mr-1" />) : <span className="text-color-secondary">-</span>} />
-          <Column header="Aksi" body={(r: AutomationScript) => <Button text size="small" severity="danger" icon="pi pi-trash" onClick={() => deleteScript(r)} />} />
+          <Column header="Aksi" body={(r: AutomationScript) => <div className="flex gap-1">
+            <Button text size="small" icon="pi pi-play" label="Run locally" tooltip="Jalankan hanya Test Case ini di Local Runner" onClick={() => setLocalScript(r)} />
+            <Button text size="small" severity="danger" icon="pi pi-trash" tooltip="Hapus mapping" onClick={() => deleteScript(r)} />
+          </div>} />
         </DataTable>
       </TabPanel>
 
@@ -224,6 +243,17 @@ export function AutomationPage() {
         <label htmlFor="enq-max">Max attempts per job<InputNumber id="enq-max" className="w-full" value={enqueueMaxAttempts} onValueChange={(e) => setEnqueueMaxAttempts(e.value ?? 1)} min={1} max={10} showButtons /></label>
         <small className="text-color-secondary">Hanya Test Case yang punya mapping script yang di-antrekan. Sisanya tetap <code>not_run</code> untuk tes manual.</small>
         <Button label="Enqueue" onClick={enqueue} disabled={!enqueuePlanId} />
+      </div>
+    </Dialog>
+
+    <Dialog header={`Run locally${localScript ? ` — ${caseLabel(localScript.testCaseId)}` : ''}`} visible={!!localScript} onHide={() => !localRunning && setLocalScript(null)} style={{ width: '32rem' }} closable={!localRunning}>
+      <div className="flex flex-column gap-3">
+        <Message severity="info" text="Hanya Test Case ini yang dibuatkan job. Local Runner online dengan label yang sesuai akan mengambilnya." />
+        <label htmlFor="local-plan">Test Plan<Dropdown id="local-plan" className="w-full" value={localPlanId} options={testPlans.map((p) => ({ label: `${p.code} — ${p.name}`, value: p.id }))} onChange={(e) => setLocalPlanId(e.value)} placeholder="Pilih Test Plan yang memuat Test Case" /></label>
+        <label htmlFor="local-name">Nama Run (opsional)<InputText id="local-name" className="w-full" value={localName} onChange={(e) => setLocalName(e.target.value)} /></label>
+        <label htmlFor="local-browser">Browser<Dropdown id="local-browser" className="w-full" value={localBrowser} options={['chromium', 'firefox', 'webkit']} onChange={(e) => setLocalBrowser(e.value as AutomationBrowser)} /></label>
+        <label htmlFor="local-device">Device profile<Dropdown id="local-device" className="w-full" value={localDeviceProfile} options={[{ label: 'Desktop', value: null }, { label: 'Pixel 7', value: 'Pixel 7' }, { label: 'iPhone 13', value: 'iPhone 13' }, { label: 'iPad (gen 7)', value: 'iPad (gen 7)' }]} onChange={(e) => setLocalDeviceProfile(e.value)} /></label>
+        <Button label="Run locally" icon="pi pi-play" onClick={startLocalRun} disabled={!localPlanId} loading={localRunning} />
       </div>
     </Dialog>
   </div>;

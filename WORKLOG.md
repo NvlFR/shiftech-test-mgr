@@ -1,5 +1,35 @@
 # Worklog
 
+## 2026-08-01 — 37 task baru masuk antrean Codex
+
+- Menambahkan 37 task ke `scripts/codex-loop/queue.md` dari Section 12, 13, dan 14
+  `FEATURE_BACKLOG.md`. Antrean 36 → 73 task tersisa.
+- Blok H (10) — Adapter pattern & jahitan bersama: `packages/agent-core`,
+  `TransportAdapter`/`ExecutorAdapter`/`ArtifactStorageAdapter`/`AuthAdapter`/
+  `RepoAdapter`, konfigurasi terpadu, logging + redaksi rahasia, heartbeat seragam.
+- Blok I (6) — Bootstrap code & setup anti-bocor: tabel `agent_bootstrap_codes`,
+  `runner init --code`, permission 0600, trust repo eksplisit, peringatan eksekusi
+  kode, pencabutan token berlaku seketika.
+- Blok J (5) — Distribusi: paket `@testmanager/runner`, tarball + SHA256, matriks
+  versi runner↔server, catatan networking Docker, guard CI nol runtime dependency.
+- Blok K (9) — Halaman "Connect your agent": kerangka, panel MCP, feature groups,
+  langkah + copy, skills pack, prompt starter, bootstrap satu perintah, keamanan,
+  kualitas UI.
+- Blok L (7) — Runner UI/UX: wizard onboarding, status runner, penjelasan job tidak
+  terambil, papan job, mapping script, diagnostik, responsif.
+- Blok H sengaja ditempatkan sebelum Blok K dan L: halaman Connect dan Runner UI
+  keduanya menempel pada kontrak koneksi, jadi kontraknya harus jadi lebih dulu.
+- **ADM-02 dikoreksi** — teks lama menyuruh "tolak `script_ref` di luar
+  `TM_PROJECT_DIR`", padahal itu tidak cukup: `npx playwright test` memuat
+  `playwright.config.ts` (kode Node biasa) sebelum satu test pun berjalan.
+  Task diubah menjadi trust di level repo, bukan level file.
+- Penulisan dilakukan saat driver sedang berjalan di task #61. Task baru
+  di-append di ujung Antrean (driver mengambil dari atas) dan penulisan dilakukan
+  saat Codex sedang mid-task, sehingga tidak bertabrakan dengan `move_task`.
+  Diverifikasi setelahnya: driver tetap hidup, hitungan Selesai (60) dan Diblokir
+  (1) tidak berubah, dan task berikutnya tetap PW-11 seperti sebelum penulisan.
+
+
 ## 2026-08-01 — Arsitektur & distribusi Local Agent (runner + MCP)
 
 Hasil diskusi arsitektur runner. Ditulis ke `FEATURE_BACKLOG.md`.
@@ -1826,3 +1856,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Kegagalan URL invalid, protokol/kredensial URL, HTTP non-sukses, timeout, DNS, koneksi ditolak/diputus, serta host/jaringan tidak terjangkau dilaporkan sebagai hasil `blocked` dengan pesan spesifik. URL hanya dicatat sebagai origin agar path/query sensitif tidak masuk live log.
 - Menambahkan unit test untuk skip URL kosong, respons sukses, status HTTP error, URL invalid, DNS, dan timeout; memperbarui checklist Section 9.5. Tidak menambah dependency atau migrasi, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (7/7 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+
+## 2026-08-01 — PW-12 Run locally satu Test Case
+
+- Menjalankan `graphify query` sebelum menelusuri alur UI automation dan runner, lalu mengikuti scope Section 9.1 `FEATURE_BACKLOG.md` serta arsitektur runner outbound-only.
+- Menambahkan tombol **Run locally** pada setiap Test Case yang sudah memiliki mapping script, dengan dialog pemilihan Test Plan, browser, device profile, dan nama run opsional.
+- Menambahkan alur Page → Hook → Service → Repository → Supabase untuk membuat satu Test Run, satu Test Result, dan tepat satu job automation; Test Case wajib menjadi anggota plan dan memiliki mapping script.
+- Menambahkan migration `schema_064_pw12_run_single_locally.sql` dengan validasi project/plan/case, permission editor, browser/device, audit event, dan grant RPC terautentikasi. Migrasi hanya dibuat dan tidak dijalankan ke target Supabase.
+- Memperbarui checklist PW-12 Section 9.1. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada) dan `git diff --check`.

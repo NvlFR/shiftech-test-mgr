@@ -63,6 +63,11 @@ export const automationService = {
     if (!['chromium', 'firefox', 'webkit'].includes(input.browser)) throw new Error('Browser tidak didukung');
     return automationRepository.enqueue({ ...input, deviceProfile: input.deviceProfile?.trim() || null, maxAttempts });
   },
+  runLocally(input: { projectId: string; testPlanId: string; testCaseId: string; name?: string; browser: AutomationBrowser; deviceProfile?: string | null }) {
+    if (!input.projectId || !input.testPlanId || !input.testCaseId) throw new Error('Project, Test Plan, dan Test Case wajib dipilih');
+    if (!['chromium', 'firefox', 'webkit'].includes(input.browser)) throw new Error('Browser tidak didukung');
+    return automationRepository.runLocally({ ...input, name: input.name?.trim() || undefined, deviceProfile: input.deviceProfile?.trim() || null });
+  },
   cancelJob(id: string) {
     if (!id) throw new Error('Job tidak valid');
     return automationRepository.cancelJob(id);

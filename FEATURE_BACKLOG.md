@@ -471,7 +471,7 @@ MCP tool yang menargetkan runner lokal.
       per step.
 - [ ] `--watch` — re-run otomatis saat file test berubah (loop authoring cepat).
 - [ ] Pilih browser & device profile saat run (`chromium|firefox|webkit`, emulasi mobile).
-- [ ] Jalankan **satu test case saja** dari UI TestManager ("Run locally") tanpa
+- [x] Jalankan **satu test case saja** dari UI TestManager ("Run locally") tanpa
       harus lewat antrean job penuh.
 
 ### 9.2 Authoring & codegen

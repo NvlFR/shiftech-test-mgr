@@ -4,6 +4,7 @@ import type {
   AutomationEnqueueResponse,
   AutomationJob,
   AutomationJobLog,
+  AutomationLocalRunResponse,
   AutomationRunner,
   AutomationRunnerSecret,
   AutomationScript,
@@ -88,6 +89,15 @@ export const automationRepository = {
     });
     if (error) throw error;
     return { runId: data.run_id, runCode: data.run_code, jobCount: data.job_count };
+  },
+
+  async runLocally(input: { projectId: string; testPlanId: string; testCaseId: string; name?: string; browser: string; deviceProfile?: string | null }): Promise<AutomationLocalRunResponse> {
+    const { data, error } = await supabase.rpc('run_automation_test_case_locally', {
+      p_project_id: input.projectId, p_test_plan_id: input.testPlanId, p_test_case_id: input.testCaseId,
+      p_name: input.name ?? null, p_browser: input.browser, p_device_profile: input.deviceProfile ?? null,
+    });
+    if (error) throw error;
+    return { runId: data.run_id, runCode: data.run_code, jobId: data.job_id };
   },
 
   async cancelJob(id: string): Promise<void> {

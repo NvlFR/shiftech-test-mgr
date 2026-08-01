@@ -403,6 +403,7 @@ export interface AutomationJobLog {
 }
 
 export interface AutomationEnqueueResponse { runId: string; runCode: string; jobCount: number; }
+export interface AutomationLocalRunResponse { runId: string; runCode: string; jobId: string; }
 
 export type TestResultStatus = 'pass' | 'fail' | 'skip' | 'blocked' | 'not_run';
 

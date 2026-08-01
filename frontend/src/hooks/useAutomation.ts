@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { automationService } from '../services/automationService';
 import type { AutomationJob, AutomationRunner, AutomationScript } from '../types/domain';
+import type { AutomationBrowser } from '../types/domain';
 
 export function useAutomation(projectId: string | null) {
   const [runners, setRunners] = useState<AutomationRunner[]>([]);
@@ -27,5 +28,12 @@ export function useAutomation(projectId: string | null) {
   }, [projectId]);
 
   useEffect(() => { void reload(); }, [reload]);
-  return { runners, scripts, jobs, loading, error, reload };
+  const runLocally = useCallback(async (input: { testPlanId: string; testCaseId: string; name?: string; browser: AutomationBrowser; deviceProfile?: string | null }) => {
+    if (!projectId) throw new Error('Project wajib dipilih');
+    const result = await automationService.runLocally({ projectId, ...input });
+    await reload();
+    return result;
+  }, [projectId, reload]);
+
+  return { runners, scripts, jobs, loading, error, reload, runLocally };
 }
