@@ -1616,6 +1616,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Mengecualikan `graphify-out/.rebuild.lock` karena merupakan file lock sementara, serta mempertahankan perubahan `mcp/` dan `FEATURE_BACKLOG.md` di working tree karena berada di luar cakupan permintaan.
 - Verifikasi sebelum commit: `git diff --check` untuk cakupan commit.
 
+## 2026-08-01 — Posisi loading Home dan eksekusi seed
+
+- Menjalankan `graphify query` untuk menelusuri `HomePage`, state loading dashboard, dan layout terkait.
+- Memusatkan `ProgressSpinner` loading awal Home secara horizontal dan vertikal di area konten dengan PrimeFlex, serta menambahkan label aksesibilitas `Memuat dashboard`.
+- Verifikasi build frontend, pembaruan Graphify, rekonsiliasi migration history, dan eksekusi `supabase/seed.sql` dicatat setelah proses selesai.
+
 ## 2026-08-01 — MCP-17 audit tool destruktif
 
 - Menjalankan `graphify query` sebelum menelusuri registrasi tool MCP dan mengaudit katalog terhadap guardrail Section 8.3 `FEATURE_BACKLOG.md`.
@@ -1638,3 +1644,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Seluruh nilai konfigurasi menggunakan placeholder; dokumentasi menegaskan token hanya berasal dari environment/secret manager, scope minimum, RLS dan project isolation, read-only, human gate, audit/rate limit, signed URL, serta TLS/firewall untuk HTTP/SSE.
 - Verifikasi lulus: dua contoh JSON berhasil di-parse, katalog dokumentasi cocok dengan 42 registrasi tool aktual, `cd mcp && npm run build`, dan `git diff --check`. `graphify update .` juga dijalankan; tidak ada source code untuk diekstrak ulang karena perubahan hanya dokumentasi, sedangkan watcher melaporkan batasan sandbox `EPERM`.
 - Tidak mengubah kode, dependency, atau database; tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-08-01 — PW-01 mode headed dan slow-mo runner
+
+- Menjalankan `graphify query` sebelum menelusuri runner dan mengikuti keputusan mode eksekusi lokal pada Section 9.1 `FEATURE_BACKLOG.md`.
+- Menambahkan flag runner `--headed` dan `--slow-mo=<milidetik>`/`--slow-mo <milidetik>`, beserta default env `TM_PLAYWRIGHT_HEADED` dan `TM_PLAYWRIGHT_SLOW_MO_MS`.
+- Menambahkan override per job melalui field payload opsional `headed` dan `slow_mo_ms`; nilai job mengalahkan default runner, sedangkan slow-mo tanpa pilihan headed eksplisit otomatis menjalankan browser terlihat.
+- Executor meneruskan `--headed` ke Playwright CLI dan nilai slow-mo efektif ke proses Playwright lewat `TM_PLAYWRIGHT_SLOW_MO_MS`. Dokumentasi menjelaskan konfigurasi `use.launchOptions.slowMo` karena Playwright Test tidak menyediakan flag CLI slow-mo.
+- Menambahkan validasi integer non-negatif, dokumentasi `.env`/CLI, dan unit test precedence serta parsing opsi.
+- Verifikasi lulus: `cd runner && npm test` (3/3 test file, termasuk build TypeScript). Tidak menjalankan migration, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

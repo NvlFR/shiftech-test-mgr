@@ -39,6 +39,10 @@ cp .env.example .env      # isi TM_SUPABASE_URL, TM_SUPABASE_ANON_KEY, TM_RUNNER
 npm install               # hanya devDependency (TypeScript); runner tanpa runtime deps
 npm run build
 npm start
+# Browser terlihat untuk semua job pada sesi runner ini:
+npm start -- --headed
+# Browser terlihat dengan delay 250 ms per operasi:
+npm start -- --slow-mo=250
 ```
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
@@ -77,6 +81,21 @@ tidak pernah dibaca untuk dikirim maupun dimasukkan ke payload server pusat.
 Lihat [`.env.example`](.env.example) untuk daftar lengkap dan penjelasan tiap
 variabel (URL server, token, direktori project, interval poll/heartbeat, timeout,
 dan opsi artifact).
+
+Mode interaktif dapat dijadikan default melalui `TM_PLAYWRIGHT_HEADED=true` dan
+`TM_PLAYWRIGHT_SLOW_MO_MS=<milidetik>`. Nilai `headed`/`slow_mo_ms` pada payload
+job memiliki prioritas lebih tinggi. Karena Playwright Test tidak menyediakan
+flag CLI `--slow-mo`, project Playwright perlu meneruskan env runner ini:
+
+```ts
+export default defineConfig({
+  use: {
+    launchOptions: {
+      slowMo: Number(process.env.TM_PLAYWRIGHT_SLOW_MO_MS || 0),
+    },
+  },
+});
+```
 
 ## Label / routing
 

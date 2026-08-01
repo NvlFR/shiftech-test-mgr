@@ -13,6 +13,22 @@ export interface ExecutionOutcome {
   artifacts: CollectedArtifact[];
 }
 
+export interface ExecutionMode {
+  headed: boolean;
+  slowMoMs: number;
+}
+
+export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): ExecutionMode {
+  const slowMoMs = job.slow_mo_ms == null ? config.slowMoMs : job.slow_mo_ms;
+  if (!Number.isInteger(slowMoMs) || slowMoMs < 0) {
+    throw new Error('slow_mo_ms pada job harus berupa integer milidetik >= 0');
+  }
+  return {
+    headed: job.headed ?? (slowMoMs > 0 ? true : config.headed),
+    slowMoMs,
+  };
+}
+
 // Run one Playwright spec in an isolated per-job output directory. We invoke the
 // Playwright CLI (no library import) so this runner has zero runtime deps and
 // works against whatever Playwright version the project under test uses.
@@ -26,6 +42,13 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
     return Promise.resolve({ result: 'blocked', errorMessage: 'script_ref berada di luar root repository', artifacts: [] });
   }
 
+  let executionMode: ExecutionMode;
+  try {
+    executionMode = resolveExecutionMode(config, job);
+  } catch (error) {
+    return Promise.resolve({ result: 'blocked', errorMessage: (error as Error).message, artifacts: [] });
+  }
+
   const jobOutputDir = join(config.artifactDir, job.id);
   mkdirSync(jobOutputDir, { recursive: true });
 
@@ -36,11 +59,15 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
     `--output=${jobOutputDir}`,
     '--trace=on',
     '--reporter=list',
+    ...(executionMode.headed ? ['--headed'] : []),
   ];
 
   return new Promise<ExecutionOutcome>((resolve) => {
-    log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt });
-    const child = spawn(cmd ?? 'npx', args, { cwd: projectDir, env: process.env });
+    log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode });
+    const child = spawn(cmd ?? 'npx', args, {
+      cwd: projectDir,
+      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs) },
+    });
 
     let stdout = '';
     let stderr = '';

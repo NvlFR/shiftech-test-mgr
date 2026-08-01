@@ -94,7 +94,11 @@ export function HomePage() {
   }
 
   if (loading && !stats) {
-    return <ProgressSpinner />;
+    return (
+      <div className="flex align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
+        <ProgressSpinner aria-label="Memuat dashboard" />
+      </div>
+    );
   }
 
   if (error && !stats) {

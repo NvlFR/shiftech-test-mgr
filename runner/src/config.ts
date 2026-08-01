@@ -8,12 +8,19 @@ export interface RunnerConfig {
   projectDir: string;
   repositoryCacheDir: string;
   playwrightCmd: string;
+  headed: boolean;
+  slowMoMs: number;
   pollIntervalMs: number;
   heartbeatIntervalMs: number;
   jobTimeoutMs: number;
   artifactDir: string;
   artifactBaseUrl: string | null;
   artifactUpload: boolean;
+}
+
+export interface RunnerCliOptions {
+  headed?: boolean;
+  slowMoMs?: number;
 }
 
 // Minimal zero-dependency .env loader. Existing process.env always wins so that
@@ -48,7 +55,45 @@ function intEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-export function loadConfig(envPath = '.env'): RunnerConfig {
+function nonNegativeIntEnv(name: string, fallback: number): number {
+  const value = process.env[name];
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function boolEnv(name: string, fallback: boolean): boolean {
+  const value = process.env[name]?.trim().toLowerCase();
+  if (!value) return fallback;
+  if (['1', 'true', 'yes', 'on'].includes(value)) return true;
+  if (['0', 'false', 'no', 'off'].includes(value)) return false;
+  return fallback;
+}
+
+export function parseCliOptions(args: string[]): RunnerCliOptions {
+  const options: RunnerCliOptions = {};
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (argument === '--headed') {
+      options.headed = true;
+      continue;
+    }
+    if (argument === '--slow-mo' || argument?.startsWith('--slow-mo=')) {
+      const raw = argument === '--slow-mo' ? args[++index] : argument.slice('--slow-mo='.length);
+      const value = Number(raw);
+      if (!raw || !Number.isInteger(value) || value < 0) {
+        throw new Error('--slow-mo harus berupa integer milidetik >= 0');
+      }
+      options.slowMoMs = value;
+      options.headed = true;
+      continue;
+    }
+    throw new Error(`Unknown runner option: ${argument}`);
+  }
+  return options;
+}
+
+export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}): RunnerConfig {
   loadDotEnv(resolve(process.cwd(), envPath));
   const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
   if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
@@ -61,6 +106,8 @@ export function loadConfig(envPath = '.env'): RunnerConfig {
     projectDir: resolve(projectDir),
     repositoryCacheDir: resolve(process.cwd(), process.env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
     playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
+    headed: cliOptions.headed ?? boolEnv('TM_PLAYWRIGHT_HEADED', false),
+    slowMoMs: cliOptions.slowMoMs ?? nonNegativeIntEnv('TM_PLAYWRIGHT_SLOW_MO_MS', 0),
     pollIntervalMs: intEnv('TM_POLL_INTERVAL_SECONDS', 5) * 1000,
     heartbeatIntervalMs: intEnv('TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,
     jobTimeoutMs: intEnv('TM_JOB_TIMEOUT_SECONDS', 900) * 1000,

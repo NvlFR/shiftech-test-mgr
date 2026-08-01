@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { loadConfig } from './config.js';
+import { loadConfig, parseCliOptions } from './config.js';
 import { Runner } from './runner.js';
 import { log } from './logger.js';
 
 async function main(): Promise<void> {
-  const config = loadConfig();
+  const config = loadConfig('.env', parseCliOptions(process.argv.slice(2)));
   const runner = new Runner(config);
 
   const shutdown = (signal: string) => {

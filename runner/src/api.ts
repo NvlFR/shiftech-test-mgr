@@ -11,6 +11,8 @@ export interface AutomationJob {
   script_ref: string;
   attempt: number;
   max_attempts: number;
+  headed?: boolean;
+  slow_mo_ms?: number | null;
   repository: JobRepository | null;
 }
 

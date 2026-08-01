@@ -220,9 +220,9 @@
     "semantic_hash": "b801578d5377ece9c1f1be859687d9f3"
   },
   "frontend/src/pages/home/HomePage.tsx": {
-    "mtime": 1785524254.810165,
-    "ast_hash": "2e42a015f67ea0943b04c67efd601a34",
-    "semantic_hash": "2e42a015f67ea0943b04c67efd601a34"
+    "mtime": 1785544378.4413633,
+    "ast_hash": "afcb00b701b76cfa07012a5ee4343e96",
+    "semantic_hash": ""
   },
   "frontend/src/pages/issues/IssueDetailPage.tsx": {
     "mtime": 1785534568.886606,
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785543610.6159413,
-    "ast_hash": "ec6f6ecc99d10efdbfb7ea22e3b21ad0",
+    "mtime": 1785544379.5226147,
+    "ast_hash": "b6d5a319d2298fab671b69559ff9ddee",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1075,8 +1075,8 @@
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785537225.9974248,
-    "ast_hash": "eee006c19faf20d94e1b3317ad87552b",
+    "mtime": 1785544266.8255258,
+    "ast_hash": "60cc3c3d71fba51bd8fbbb7318111a09",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
@@ -1085,19 +1085,19 @@
     "semantic_hash": "139ed5da4a90c9a2a569fa0b8bd453c4"
   },
   "runner/src/config.ts": {
-    "mtime": 1785537344.5460238,
-    "ast_hash": "a91afbaa322e7c1e89cb2a465388c53d",
+    "mtime": 1785544266.1775212,
+    "ast_hash": "efdd21d4daa319e5adea300fa87a8ded",
     "semantic_hash": ""
   },
   "runner/src/executor.ts": {
-    "mtime": 1785537318.3767729,
-    "ast_hash": "437f2935c2cb44f83396768f911ce93f",
+    "mtime": 1785544267.158528,
+    "ast_hash": "563905d0d380252d543714ed26fdb149",
     "semantic_hash": ""
   },
   "runner/src/index.ts": {
-    "mtime": 1785029947.1791506,
-    "ast_hash": "c00b6edff14f78e44b636472b4342a42",
-    "semantic_hash": "c00b6edff14f78e44b636472b4342a42"
+    "mtime": 1785544266.5075235,
+    "ast_hash": "3d7d5969f32a7b5bee4e711a81f91436",
+    "semantic_hash": ""
   },
   "runner/src/logger.ts": {
     "mtime": 1785029947.179752,
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785537344.9490125,
-    "ast_hash": "96d3055de109e4883bad5e40ac87e597",
+    "mtime": 1785544267.8165329,
+    "ast_hash": "ab2299a91d9d89d15b9741c803b12684",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -3132,6 +3132,16 @@
   "mcp/src/server.ts": {
     "mtime": 1785543363.5152342,
     "ast_hash": "7fe73f7d02eab99c43130aa252432ad4",
+    "semantic_hash": ""
+  },
+  "docs/MCP_SERVER.md": {
+    "mtime": 1785543989.5719793,
+    "ast_hash": "cbf4ee3858a26fb745104968fb5ea9e4",
+    "semantic_hash": ""
+  },
+  "runner/test/executionMode.test.mjs": {
+    "mtime": 1785544268.0895348,
+    "ast_hash": "2ab62e02422c1329df04176864f8a763",
     "semantic_hash": ""
   }
 }
