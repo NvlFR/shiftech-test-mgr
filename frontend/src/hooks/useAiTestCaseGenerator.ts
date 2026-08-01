@@ -60,6 +60,10 @@ export function useAiTestCaseGenerator() {
     aiTestCaseService.findPotentialDuplicates(draft, existing)
   ), []);
 
+  const buildCsvPreview = useCallback((drafts: Array<AiTestCaseDraft & { moduleName?: string }>, existing: TestCaseWithDetails[]) => (
+    aiTestCaseService.buildCsvPreview(drafts, existing)
+  ), []);
+
   const reset = useCallback(() => {
     setResult(null);
     setSource(null);
@@ -78,6 +82,7 @@ export function useAiTestCaseGenerator() {
     generate,
     saveDraft,
     findDuplicates,
+    buildCsvPreview,
     reset,
   };
 }

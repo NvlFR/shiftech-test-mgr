@@ -19,6 +19,7 @@ function mockResult(request: AiTestCaseGenerationRequest): AiTestCaseGenerationR
     ] as const).map((scenario) => ({
       requirementRef: firstLine.slice(0, 500),
       scenarioType: scenario.scenarioType,
+      module: '',
       title: scenario.title,
       objective: `Memastikan requirement berikut berjalan sesuai tujuan: ${firstLine}`,
       preconditions: 'Pengguna memiliki akses yang diperlukan dan data uji tersedia.',
@@ -26,6 +27,7 @@ function mockResult(request: AiTestCaseGenerationRequest): AiTestCaseGenerationR
       expectedResult: scenario.expectedResult,
       priority: 'medium',
       tags: ['AI-draft'],
+      targetRole: '',
       notes: 'Draf dari mock provider. Review sebelum disimpan.',
       scenarios: includeScenarios ? ['Alur utama dengan input valid', 'Pengguna mengulangi aksi setelah berhasil'] : [],
       edgeCases: includeEdgeCases ? ['Input kosong atau hanya spasi', 'Koneksi terputus saat aksi diproses'] : [],

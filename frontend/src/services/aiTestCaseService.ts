@@ -1,8 +1,8 @@
 import { aiTestCaseRepository } from '../repositories/aiTestCaseRepository';
-import { validateAiTestCaseDraft } from '../helpers/aiTestCaseParser';
+import { AiTestCaseSchema, validateAiTestCaseDraft } from '../helpers/aiTestCaseParser';
 import { testCaseService } from './testCaseService';
 import { aiRepository } from '../repositories/aiRepository';
-import type { AiDuplicateCandidate, AiTestCaseDraft, AiTestCaseGenerationRequest, AiTestCaseGenerationResult, AiTestCaseSaveInput } from '../types/aiTestCase';
+import type { AiDuplicateCandidate, AiTestCaseCsvPreview, AiTestCaseDraft, AiTestCaseGenerationRequest, AiTestCaseGenerationResult, AiTestCaseSaveInput } from '../types/aiTestCase';
 import type { TestCaseWithDetails } from '../types/domain';
 
 function tokens(value: string) {
@@ -15,6 +15,12 @@ function similarity(left: string, right: string) {
   if (!a.size || !b.size) return 0;
   const intersection = [...a].filter((token) => b.has(token)).length;
   return intersection / (a.size + b.size - intersection);
+}
+
+const CSV_COLUMNS = ['Module', 'Title', 'Objective', 'Preconditions', 'Steps', 'Expected Result', 'Priority', 'Tags', 'Target Role', 'requirement_ref'];
+
+function csvCell(value: string) {
+  return `"${value.replace(/"/g, '""')}"`;
 }
 
 export const aiTestCaseService = {
@@ -42,6 +48,36 @@ export const aiTestCaseService = {
       .filter((candidate) => candidate.confidence >= 0.45)
       .sort((left, right) => right.confidence - left.confidence)
       .slice(0, 3);
+  },
+
+  buildCsvPreview(
+    drafts: Array<AiTestCaseDraft & { moduleName?: string }>,
+    existing: TestCaseWithDetails[],
+  ): AiTestCaseCsvPreview {
+    const rows = drafts.map((draft, index) => {
+      const validation = AiTestCaseSchema.safeParse(draft);
+      const problems = validation.success
+        ? this.findPotentialDuplicates(draft, existing).map((candidate) => `Kemungkinan duplikat ${candidate.testCase.code} (${Math.round(candidate.confidence * 100)}%).`)
+        : validation.error.issues.map((issue) => issue.message);
+      return {
+        rowNumber: index + 2,
+        draft,
+        moduleName: draft.moduleName ?? draft.module,
+        status: (!validation.success ? 'invalid' : problems.length ? 'warning' : 'valid') as 'valid' | 'warning' | 'invalid',
+        problems,
+      };
+    });
+    const csvRows = rows.map(({ draft, moduleName }) => [
+      moduleName, draft.title, draft.objective, draft.preconditions, draft.steps,
+      draft.expectedResult, draft.priority, draft.tags.join(','), draft.targetRole,
+      draft.requirementRef,
+    ].map(csvCell).join(','));
+    return {
+      rows,
+      csv: [CSV_COLUMNS.join(','), ...csvRows].join('\r\n'),
+      invalidCount: rows.filter((row) => row.status === 'invalid').length,
+      warningCount: rows.filter((row) => row.status === 'warning').length,
+    };
   },
 
   async approveAndSave(input: AiTestCaseSaveInput) {

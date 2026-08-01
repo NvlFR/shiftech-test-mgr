@@ -24,6 +24,7 @@ export interface AiTestCaseGenerationRequest {
 export interface AiTestCaseDraft {
   requirementRef: string;
   scenarioType: 'happy_path' | 'negative' | 'edge_case';
+  module: string;
   title: string;
   objective: string;
   preconditions: string;
@@ -31,9 +32,25 @@ export interface AiTestCaseDraft {
   expectedResult: string;
   priority: TestCasePriority;
   tags: string[];
+  targetRole: string;
   notes: string;
   scenarios: string[];
   edgeCases: string[];
+}
+
+export interface AiTestCaseCsvPreviewRow {
+  rowNumber: number;
+  draft: AiTestCaseDraft;
+  moduleName: string;
+  status: 'valid' | 'warning' | 'invalid';
+  problems: string[];
+}
+
+export interface AiTestCaseCsvPreview {
+  rows: AiTestCaseCsvPreviewRow[];
+  csv: string;
+  invalidCount: number;
+  warningCount: number;
 }
 
 export interface AiTestCaseGenerationResult {

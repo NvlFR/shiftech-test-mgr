@@ -1950,3 +1950,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - CSV deterministik menambahkan `requirement_ref` pada setiap baris agar sumber requirement langsung dapat ditelusuri.
 - Menambahkan test kontrak dan parser untuk cakupan kategori wajib, traceability, alias snake_case, dan output CSV. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build`, `cd frontend && npm test -- --run` (4/4 test), dan `git diff --check`. Test Deno tidak dijalankan karena runtime Deno tidak tersedia di workspace.
+
+## 2026-08-01 — E2E-03 preview CSV hasil AI
+
+- Menjalankan `graphify query` sebelum menelusuri generator Test Case AI, kontrak CSV, alur simpan, serta keputusan Section 11.1 `FEATURE_BACKLOG.md`.
+- Menambahkan preview CSV berbentuk tabel pada dialog generator AI dengan kolom utama template import dan `requirement_ref`, status per baris, serta penanda visual untuk error validasi dan peringatan kandidat duplikat.
+- Menambahkan serializer CSV deterministik di service, tombol unduh dari hasil preview, dan gate yang memblokir impor selama masih ada baris tidak valid. Impor dengan kandidat duplikat tetap membutuhkan konfirmasi manusia yang sudah ada.
+- Mempertahankan field `module` dan `targetRole` dari respons AI pada parser frontend agar preview dan unduhan sesuai kontrak CSV gateway. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run` (5/5 test), dan `cd frontend && npm run lint` (hanya warning existing di file di luar scope).
+- `graphify update .` sudah dijalankan; incremental rebuild melaporkan `Operation not permitted`, sementara cache statistik Graphify tetap diperbarui. Source aplikasi dan graph lama tetap tersedia.

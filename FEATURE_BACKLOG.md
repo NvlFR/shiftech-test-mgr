@@ -628,7 +628,7 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
       `steps`, `expected_result`, `priority`, `module`, `tags`).
 - [ ] Sertakan skenario negatif & edge case, bukan hanya happy path.
 - [ ] Setiap baris membawa `requirement_ref` supaya traceability langsung terbentuk.
-- [ ] Preview CSV di UI sebelum diunduh/diimpor.
+- [x] Preview CSV di UI sebelum diunduh/diimpor.
 
 ### 11.2 Tahap 2 — Import & review manusia (gate wajib)
 

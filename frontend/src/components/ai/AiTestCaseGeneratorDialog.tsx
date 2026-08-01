@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Checkbox } from 'primereact/checkbox';
@@ -9,10 +9,12 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Message } from 'primereact/message';
 import { MultiSelect } from 'primereact/multiselect';
 import { Tag } from 'primereact/tag';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useAiTestCaseGenerator } from '../../hooks/useAiTestCaseGenerator';
 import { toAiTestCaseSource } from '../../helpers/aiTestCaseParser';
-import type { AiTestCaseDraft } from '../../types/aiTestCase';
+import type { AiTestCaseCsvPreviewRow, AiTestCaseDraft } from '../../types/aiTestCase';
 import type { Module, Tag as TagEntity, TestCaseWithDetails } from '../../types/domain';
 import { TEST_CASE_PRIORITY_LABEL } from '../../helpers/statusLabels';
 
@@ -35,6 +37,7 @@ const maxCaseOptions = [5, 10, 20, 50].map((value) => ({ value, label: `${value}
 
 export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, existingTestCases, onHide, onSaved }: Props) {
   const generator = useAiTestCaseGenerator();
+  const { buildCsvPreview } = generator;
   const [requirement, setRequirement] = useState('');
   const [includeScenarios, setIncludeScenarios] = useState(true);
   const [includeEdgeCases, setIncludeEdgeCases] = useState(true);
@@ -42,6 +45,13 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
   const [fileName, setFileName] = useState<string | null>(null);
   const [reviewDrafts, setReviewDrafts] = useState<ReviewDraft[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const csvPreview = useMemo(() => buildCsvPreview(
+    reviewDrafts.map((draft) => ({
+      ...draft,
+      moduleName: modules.find((module) => module.id === draft.moduleId)?.name ?? draft.module,
+    })),
+    existingTestCases,
+  ), [buildCsvPreview, existingTestCases, modules, reviewDrafts]);
 
   useEffect(() => {
     if (generator.result) setReviewDrafts(generator.result.drafts.map((draft) => ({ ...draft, moduleId: null })));
@@ -86,6 +96,10 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
   }
 
   function handleApprove() {
+    if (csvPreview.invalidCount > 0) {
+      setSaveError(`Perbaiki ${csvPreview.invalidCount} baris bermasalah sebelum mengimpor.`);
+      return;
+    }
     const warnings = reviewDrafts.flatMap((draft) => generator.findDuplicates(draft, existingTestCases));
     if (warnings.length) {
       confirmDialog({
@@ -98,6 +112,16 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
       return;
     }
     void persistDrafts();
+  }
+
+  function downloadCsv() {
+    const blob = new Blob([csvPreview.csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ai-test-case-draft-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   function handleClose() {
@@ -139,6 +163,27 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
           {(generator.error || saveError) && <Message severity="error" text={generator.error ?? saveError ?? ''} />}
           {generator.result && <small className="text-color-secondary">Provider: {generator.result.provider}{generator.result.model ? ` · Model: ${generator.result.model}` : ''}</small>}
 
+          {reviewDrafts.length > 0 && <div className="flex flex-column gap-2">
+            <div className="flex align-items-center justify-content-between gap-2 flex-wrap">
+              <div><h3 className="m-0">Preview CSV</h3><small className="text-color-secondary">Periksa seluruh baris sebelum mengunduh atau mengimpor.</small></div>
+              <div className="flex gap-2">
+                {csvPreview.invalidCount > 0 && <Tag value={`${csvPreview.invalidCount} error`} severity="danger" />}
+                {csvPreview.warningCount > 0 && <Tag value={`${csvPreview.warningCount} peringatan`} severity="warning" />}
+                {!csvPreview.invalidCount && !csvPreview.warningCount && <Tag value="Semua baris siap" severity="success" />}
+              </div>
+            </div>
+            <DataTable value={csvPreview.rows} size="small" paginator rows={5} dataKey="rowNumber" scrollable scrollHeight="22rem" emptyMessage="Belum ada hasil AI" rowClassName={(row: AiTestCaseCsvPreviewRow) => row.status === 'invalid' ? 'surface-100 text-red-700' : row.status === 'warning' ? 'surface-100 text-yellow-700' : ''}>
+              <Column field="rowNumber" header="Baris" style={{ width: '5rem' }} />
+              <Column header="Status" style={{ width: '8rem' }} body={(row: AiTestCaseCsvPreviewRow) => <Tag value={row.status === 'invalid' ? 'Error' : row.status === 'warning' ? 'Peringatan' : 'Siap'} severity={row.status === 'invalid' ? 'danger' : row.status === 'warning' ? 'warning' : 'success'} />} />
+              <Column field="moduleName" header="Module" />
+              <Column header="Title" body={(row: AiTestCaseCsvPreviewRow) => row.draft.title || <span className="p-error">Kosong</span>} />
+              <Column header="Priority" body={(row: AiTestCaseCsvPreviewRow) => TEST_CASE_PRIORITY_LABEL[row.draft.priority]} />
+              <Column header="Tags" body={(row: AiTestCaseCsvPreviewRow) => row.draft.tags.join(', ') || '-'} />
+              <Column header="requirement_ref" body={(row: AiTestCaseCsvPreviewRow) => row.draft.requirementRef || <span className="p-error">Kosong</span>} />
+              <Column header="Masalah" body={(row: AiTestCaseCsvPreviewRow) => row.problems.length ? row.problems.join(' ') : '-'} style={{ minWidth: '18rem' }} />
+            </DataTable>
+          </div>}
+
           {reviewDrafts.map((draft, index) => {
             const duplicates = generator.findDuplicates(draft, existingTestCases);
             return (
@@ -169,7 +214,8 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
 
           <div className="flex justify-content-end gap-2">
             <Button label="Batal" text onClick={handleClose} />
-            <Button label="Setujui & Simpan Semua" icon="pi pi-check" loading={generator.saving} disabled={!reviewDrafts.length} onClick={handleApprove} />
+            <Button label="Unduh CSV" icon="pi pi-download" outlined disabled={!reviewDrafts.length} onClick={downloadCsv} />
+            <Button label="Impor Semua" icon="pi pi-upload" loading={generator.saving} disabled={!reviewDrafts.length || csvPreview.invalidCount > 0} onClick={handleApprove} />
           </div>
         </div>
       </Dialog>

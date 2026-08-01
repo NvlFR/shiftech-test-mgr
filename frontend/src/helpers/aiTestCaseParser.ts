@@ -10,6 +10,7 @@ const MAX_SOURCE_CHARS = 30_000;
 export const AiTestCaseSchema = z.object({
   requirementRef: z.string().trim().min(1, 'Referensi requirement wajib diisi').max(500),
   scenarioType: z.enum(['happy_path', 'negative', 'edge_case']),
+  module: z.string().trim().max(200),
   title: z.string().trim().min(1, 'Judul test case wajib diisi').max(200),
   objective: z.string().trim().max(2_000),
   preconditions: z.string().trim().max(4_000),
@@ -17,6 +18,7 @@ export const AiTestCaseSchema = z.object({
   expectedResult: z.string().trim().min(1, 'Hasil yang diharapkan wajib diisi').max(4_000),
   priority: z.enum(PRIORITIES),
   tags: z.array(z.string().trim().min(1).max(60)).max(20),
+  targetRole: z.string().trim().max(200),
   notes: z.string().trim().max(4_000),
   scenarios: z.array(z.string().trim().min(1).max(500)).max(20),
   edgeCases: z.array(z.string().trim().min(1).max(500)).max(20),
@@ -70,6 +72,7 @@ function normalizeCandidate(candidate: unknown): Record<string, unknown> {
   return {
     requirementRef: asText(value.requirementRef ?? value.requirement_ref),
     scenarioType: asText(value.scenarioType ?? value.scenario_type),
+    module: asText(value.module),
     title: asText(value.title ?? value.judul ?? value.name),
     objective: asText(value.objective ?? value.tujuan),
     preconditions: asText(value.preconditions ?? value.precondition ?? value.prasyarat),
@@ -77,6 +80,7 @@ function normalizeCandidate(candidate: unknown): Record<string, unknown> {
     expectedResult: asText(value.expectedResult ?? value.expected_result ?? value.expected ?? value.hasilYangDiharapkan),
     priority: normalizePriority(value.priority ?? value.prioritas),
     tags: asList(value.tags ?? value.tag ?? value.labels),
+    targetRole: asText(value.targetRole ?? value.target_role),
     notes: asText(value.notes ?? value.note ?? value.catatan),
     scenarios: asList(value.scenarios ?? value.scenario ?? value.testScenarios),
     edgeCases: asList(value.edgeCases ?? value.edge_cases ?? value.edge),
