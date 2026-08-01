@@ -513,7 +513,7 @@ tertaut ke `test_result`:
 - [ ] **Step-through** dari UI: kirim perintah next/continue ke runner lokal (channel
       lokal, tetap outbound-only ke server).
 - [ ] Retry manual satu test dari halaman Test Result tanpa membuat run baru.
-- [ ] Sanity check sebelum run: cek base URL reachable dari mesin runner, laporkan
+- [x] Sanity check sebelum run: cek base URL reachable dari mesin runner, laporkan
       jelas kalau tidak (bukan gagal generik).
 
 ---

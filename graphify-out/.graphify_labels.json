@@ -204,5 +204,19 @@
   "202": "environmentMetadata.test.mjs",
   "203": "react-dom",
   "204": "zod",
-  "207": "schema_060_fix_test_runs_rls_recursion.sql"
+  "205": "cicdRepository.ts",
+  "206": "TestResultDetailPage.tsx",
+  "207": "schema_060_fix_test_runs_rls_recursion.sql",
+  "208": "AppMenu.tsx",
+  "209": "useEnvironments.ts",
+  "210": "14. Distribusi & arsitektur Local Agent",
+  "211": "NotificationPanel.tsx",
+  "212": "useProfile.ts",
+  "213": "useActivity.ts",
+  "214": "primereact",
+  "215": "react-markdown",
+  "216": "@supabase/supabase-js",
+  "217": "@tanstack/react-query",
+  "218": "zod",
+  "219": "baseUrlSanityCheck.test.mjs"
 }

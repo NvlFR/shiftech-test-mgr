@@ -1,5 +1,52 @@
 # Worklog
 
+## 2026-08-01 — Arsitektur & distribusi Local Agent (runner + MCP)
+
+Hasil diskusi arsitektur runner. Ditulis ke `FEATURE_BACKLOG.md`.
+
+**Keputusan yang diambil:**
+
+- Runner dan MCP server **tetap dua proses untuk sekarang**, disatukan jadi satu
+  **Local Agent** nanti. Alasan pemisahan: target deploy pertama adalah
+  self-hosted dan backend custom belum ada. Kriteria penyatuan ditulis di 14.5.
+- **Adapter pattern wajib** (Section 14.1): `TransportAdapter`, `ExecutorAdapter`,
+  `ArtifactStorageAdapter`, `AuthAdapter`, `RepoAdapter`. Tidak boleh ada
+  pemanggilan Supabase langsung di luar adapter, supaya backend custom bisa masuk
+  tanpa membongkar isi runner/mcp.
+- Distribusi lewat **npm/npx** sebagai jalur utama (14.3), tarball self-hosted +
+  SHA256 untuk instance tertutup, Docker untuk mesin bersama, binary
+  tertandatangani ditunda sampai ada permintaan nyata. `curl | bash` tidak dipakai
+  selama belum ada penandatanganan rilis.
+- **Bootstrap code menggantikan token** pada perintah setup (14.4): sekali pakai,
+  umur 10 menit, hanya berwenang menukar diri jadi runner token. Runner token asli
+  dibuat di mesin lokal, ditulis dengan permission 0600, tidak pernah tampil di
+  layar/clipboard/prompt/riwayat shell.
+- Section 12.8 baru: **bootstrap runner lewat agent** — prompt di halaman Connect
+  menghasilkan satu perintah `npx @testmanager/runner init --code <CODE>`, dan
+  halaman berpindah sendiri ke "Runner terhubung" saat heartbeat pertama masuk.
+
+**Temuan yang dicatat sebagai keputusan teknis (Section 16):**
+
+- Kepercayaan harus di **level repo, bukan level file**: `npx playwright test`
+  memuat `playwright.config.ts` (kode Node biasa) sebelum satu test pun berjalan,
+  jadi validasi `script_ref` saja tidak pernah cukup. Ini mengoreksi asumsi pada
+  task ADM-02 di antrean Codex.
+- **Nol runtime dependency runner** dinaikkan statusnya jadi keputusan keamanan,
+  bukan kerapian — setiap dependency adalah pintu masuk supply chain ke mesin
+  developer pengguna.
+- Local runner tetap diperlukan walau nanti ada cloud runner: browser tidak bisa
+  dijalankan dari halaman web, jadi pengujian `localhost` selalu menuntut proses
+  di mesin pengguna.
+
+**Urutan implementasi diperbarui:** adapter pattern (15) dan bootstrap code (16)
+didahulukan sebelum halaman Connect (17) dan Runner UI (18), karena kedua UI itu
+menempel pada kontrak koneksi — kalau kontraknya berubah setelah UI jadi, dua-duanya
+dibongkar ulang. Penyatuan Local Agent jadi langkah terakhir (24).
+
+Renumber: Urutan implementasi 14→15, Catatan keputusan teknis 15→16.
+Belum ada perubahan kode pada sesi ini — dokumentasi/perencanaan saja.
+
+
 ## 2026-08-01 — Backlog: halaman "Connect your agent" + Runner UI/UX
 
 - `FEATURE_BACKLOG.md` Section 12 baru — **Halaman "Connect your agent"**, meniru
@@ -1771,3 +1818,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (6/6 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm run lint` (hanya tujuh warning lama di luar file scope), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.533 node dan 5.255 edge; terdapat warning tujuh file konfigurasi/hasil test tanpa node, tanpa kegagalan proses.
+
+## 2026-08-01 — PW-11 sanity check base URL automation runner
+
+- Menjalankan `graphify query` sebelum menelusuri alur runner dan mengikuti scope sanity check pada Section 9.5 `FEATURE_BACKLOG.md`.
+- Menambahkan sanity check sebelum proses Playwright dibuat: base URL HTTP/HTTPS divalidasi dan diakses dari mesin runner dengan timeout 10 detik; base URL kosong tetap didukung untuk job yang tidak memiliki environment URL.
+- Kegagalan URL invalid, protokol/kredensial URL, HTTP non-sukses, timeout, DNS, koneksi ditolak/diputus, serta host/jaringan tidak terjangkau dilaporkan sebagai hasil `blocked` dengan pesan spesifik. URL hanya dicatat sebagai origin agar path/query sensitif tidak masuk live log.
+- Menambahkan unit test untuk skip URL kosong, respons sukses, status HTTP error, URL invalid, DNS, dan timeout; memperbarui checklist Section 9.5. Tidak menambah dependency atau migrasi, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (7/7 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.

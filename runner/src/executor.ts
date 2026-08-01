@@ -5,6 +5,7 @@ import type { RunnerConfig } from './config.js';
 import type { AutomationJob, JobLogStream, JobResult } from './api.js';
 import { collectArtifacts, type CollectedArtifact } from './artifacts.js';
 import { log } from './logger.js';
+import { checkBaseUrlReachable } from './baseUrlSanityCheck.js';
 
 export interface ExecutionOutcome {
   result: JobResult;
@@ -43,14 +44,14 @@ export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): 
 // Run one Playwright spec in an isolated per-job output directory. We invoke the
 // Playwright CLI (no library import) so this runner has zero runtime deps and
 // works against whatever Playwright version the project under test uses.
-export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir, onLog?: (stream: JobLogStream, content: string) => void): Promise<ExecutionOutcome> {
+export async function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir, onLog?: (stream: JobLogStream, content: string) => void): Promise<ExecutionOutcome> {
   if (isAbsolute(job.script_ref)) {
-    return Promise.resolve({ result: 'blocked', errorMessage: 'script_ref harus berupa path relatif di repository', artifacts: [] });
+    return { result: 'blocked', errorMessage: 'script_ref harus berupa path relatif di repository', artifacts: [] };
   }
   const resolvedScript = resolve(projectDir, job.script_ref);
   const relativeScript = relative(projectDir, resolvedScript);
   if (!relativeScript || relativeScript.startsWith('..') || isAbsolute(relativeScript)) {
-    return Promise.resolve({ result: 'blocked', errorMessage: 'script_ref berada di luar root repository', artifacts: [] });
+    return { result: 'blocked', errorMessage: 'script_ref berada di luar root repository', artifacts: [] };
   }
 
   let executionMode: ExecutionMode;
@@ -59,8 +60,14 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
     executionMode = resolveExecutionMode(config, job);
     executionTarget = resolveExecutionTarget(job);
   } catch (error) {
-    return Promise.resolve({ result: 'blocked', errorMessage: (error as Error).message, artifacts: [] });
+    return { result: 'blocked', errorMessage: (error as Error).message, artifacts: [] };
   }
+
+  const sanityCheck = await checkBaseUrlReachable(job.base_url);
+  if (!sanityCheck.reachable) {
+    return { result: 'blocked', errorMessage: sanityCheck.errorMessage, artifacts: [] };
+  }
+  if (job.base_url?.trim()) onLog?.('system', `Base URL ${new URL(job.base_url).origin} dapat dijangkau\n`);
 
   const jobOutputDir = join(config.artifactDir, job.id);
   mkdirSync(jobOutputDir, { recursive: true });
