@@ -84,11 +84,13 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
     }
   }
 
-  async function persistDrafts() {
+  async function persistDrafts(acknowledgedDraftIndexes: Set<number>) {
     setSaveError(null);
     try {
       const batchId = crypto.randomUUID();
-      for (const draft of reviewDrafts) await generator.saveDraft(projectId, draft, draft.moduleId, batchId);
+      for (const [index, draft] of reviewDrafts.entries()) {
+        await generator.saveDraft(projectId, draft, draft.moduleId, batchId, acknowledgedDraftIndexes.has(index));
+      }
       await onSaved();
       onHide();
     } catch (reason) {
@@ -96,23 +98,31 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
     }
   }
 
-  function handleApprove() {
+  async function handleApprove() {
     if (csvPreview.invalidCount > 0) {
       setSaveError(`Perbaiki ${csvPreview.invalidCount} baris bermasalah sebelum mengimpor.`);
       return;
     }
-    const warnings = reviewDrafts.flatMap((draft) => generator.findDuplicates(draft, existingTestCases));
+    let duplicateResults;
+    try {
+      duplicateResults = await Promise.all(reviewDrafts.map((draft) => generator.detectDuplicates(projectId, draft)));
+    } catch (reason) {
+      setSaveError(reason instanceof Error ? reason.message : 'Gagal memeriksa duplikat test case.');
+      return;
+    }
+    const warnings = duplicateResults.flat();
     if (warnings.length) {
+      const acknowledgedDraftIndexes = new Set(duplicateResults.flatMap((duplicates, index) => duplicates.length ? [index] : []));
       confirmDialog({
         header: 'Kemungkinan duplikat',
         message: `${warnings.length} kemungkinan test case duplikat ditemukan. Tetap simpan sebagai test case baru?`,
         acceptLabel: 'Tetap Simpan',
         rejectLabel: 'Kembali Review',
-        accept: () => { void persistDrafts(); },
+        accept: () => { void persistDrafts(acknowledgedDraftIndexes); },
       });
       return;
     }
-    void persistDrafts();
+    void persistDrafts(new Set());
   }
 
   function downloadCsv() {
@@ -216,7 +226,7 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
           <div className="flex justify-content-end gap-2">
             <Button label="Batal" text onClick={handleClose} />
             <Button label="Unduh CSV" icon="pi pi-download" outlined disabled={!reviewDrafts.length} onClick={downloadCsv} />
-            <Button label="Simpan sebagai Draf" icon="pi pi-upload" loading={generator.saving} disabled={!reviewDrafts.length || csvPreview.invalidCount > 0} onClick={handleApprove} />
+            <Button label="Simpan sebagai Draf" icon="pi pi-upload" loading={generator.saving} disabled={!reviewDrafts.length || csvPreview.invalidCount > 0} onClick={() => { void handleApprove(); }} />
           </div>
         </div>
       </Dialog>

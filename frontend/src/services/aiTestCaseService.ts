@@ -49,6 +49,12 @@ export const aiTestCaseService = {
       .slice(0, 3);
   },
 
+  async detectPotentialDuplicates(projectId: string, draft: AiTestCaseDraft): Promise<AiDuplicateCandidate[]> {
+    if (!projectId) throw new Error('Project wajib dipilih.');
+    const existing = await testCaseService.listByProjectWithDetails(projectId);
+    return this.findPotentialDuplicates(validateAiTestCaseDraft(draft), existing);
+  },
+
   buildCsvPreview(
     drafts: Array<AiTestCaseDraft & { moduleName?: string }>,
     existing: TestCaseWithDetails[],
@@ -81,6 +87,10 @@ export const aiTestCaseService = {
 
   async approveAndSave(input: AiTestCaseSaveInput) {
     const draft = validateAiTestCaseDraft(input.draft);
+    const duplicates = await this.detectPotentialDuplicates(input.projectId, draft);
+    if (duplicates.length && !input.duplicateAcknowledged) {
+      throw new Error('Kandidat duplikat harus ditinjau dan dikonfirmasi sebelum menyimpan draf AI.');
+    }
     const testCase = await testCaseService.create({
       projectId: input.projectId,
       moduleId: input.moduleId,

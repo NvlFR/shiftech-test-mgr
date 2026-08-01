@@ -71,4 +71,5 @@ export interface AiTestCaseSaveInput {
   moduleId: string | null;
   draft: AiTestCaseDraft;
   batchId: string;
+  duplicateAcknowledged: boolean;
 }

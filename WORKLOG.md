@@ -1,5 +1,53 @@
 # Worklog
 
+## 2026-08-01 — Notifikasi Telegram codex-loop + konvensi DataTable
+
+**Notifikasi Telegram (agar loop bisa ditinggal pergi):**
+
+- `scripts/codex-loop/run.sh.next` — versi run.sh dengan fungsi `notify()` berbasis
+  curl ke Telegram Bot API. Aktif hanya bila `TELEGRAM_BOT_TOKEN` dan
+  `TELEGRAM_CHAT_ID` terisi; kalau tidak, senyap total dan loop tetap jalan.
+- Titik notifikasi: loop mulai, task selesai, task diblokir, task dipecah, loop
+  selesai, dan **driver mati mendadak** (lewat `trap ... EXIT`). Yang terakhir yang
+  paling penting saat ditinggal — tanpa itu, loop yang mati dini hari baru
+  ketahuan keesokan harinya.
+- Sengaja tanpa `parse_mode`: isi pesan memuat potongan kode dan pesan error yang
+  mudah membuat Telegram menolak pesan karena markup tidak valid.
+- Kredensial dibaca dari `scripts/codex-loop/.env` (folder sudah di-gitignore);
+  ditambahkan `.env.example` berisi cara memperoleh token dan chat id.
+- `scripts/codex-loop/apply-update.sh` — skrip pergantian aman. **run.sh yang
+  sedang berjalan tidak boleh ditimpa**: bash membaca skrip bertahap dari disk
+  sambil menjalankannya, sehingga menimpanya dapat membuat bash mengeksekusi
+  potongan byte yang salah. Skrip melakukan STOP rapi → tunggu → cadangkan →
+  tukar → jalankan lagi.
+- Patch dikerjakan pada salinan `run.sh.next`, bukan pada `run.sh` yang sedang
+  berjalan. Diverifikasi driver tetap hidup dan tidak tersentuh.
+
+**Konvensi PrimeReact DataTable (AGENTS.md):**
+
+- Error TS2769 "No overload matches this call" pada `DataTable` sudah muncul
+  berulang: `ProjectTestPlanTab.tsx` (diperbaiki manual 2026-07-31) dan
+  `AiTestCaseReviewPage.tsx` pada task E2E-05. Codex memperbaikinya sendiri di
+  percobaan kedua setelah gate menolak regresi 0→2 error.
+- Karena berulang, akar penyebabnya ditulis sebagai konvensi di `AGENTS.md`:
+  `DataTableProps` memakai discriminated union, sehingga `selectionMode`,
+  bentuk `selection`, dan tipe event `onSelectionChange` harus konsisten.
+  `selectionMode` tidak boleh `undefined` (pakai `null`), dan selection berbentuk
+  array wajib memakai `DataTableSelectionMultipleChangeEvent<T[]>`.
+  Dilarang menambal dengan `as unknown as T[]`.
+- Ini mencegah pengulangan pada task Blok K dan L yang banyak membuat DataTable.
+
+**Catatan penggunaan token (diukur dari 62 log sesi):**
+
+- Total terpakai 5,49 juta token; rata-rata 88.500/task, median 89.900,
+  rentang 40.400–143.200. Durasi 6 jam 12 menit, ~6 menit/task.
+- Proyeksi sisa antrean: ~6,5 juta token (~7,3 jam), atau ~7,1 juta dengan
+  overhead retry. Total proyek diperkirakan ~12 juta token.
+- `auth_mode` Codex = `chatgpt`, sehingga batasnya berupa rate limit langganan
+  (jendela 5 jam + kuota mingguan), bukan tagihan per token. Angka di atas
+  kemungkinan batas atas karena memuat cached input token.
+
+
 ## 2026-08-01 — E2E-05 perbaikan gate verifikasi DataTable
 
 - Memperbaiki overload TypeScript PrimeReact pada tabel review batch AI dengan mendeklarasikan `selectionMode="multiple"` langsung pada `DataTable` dan menghapus type assertion array yang keliru pada `onSelectionChange`.
@@ -1983,3 +2031,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test` (5/5 test), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.623 node dan 5.400 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-06 deteksi duplikat sebelum simpan draf AI
+
+- Menjalankan `graphify query` sebelum menelusuri alur generator, hook, service, repository Test Case, dan keputusan Section 11.2 `FEATURE_BACKLOG.md`.
+- Deteksi duplikat kini memuat ulang test case project melalui `testCaseService` dan repository sebelum dialog konfirmasi, sehingga tidak bergantung pada snapshot daftar di UI.
+- `aiTestCaseService.approveAndSave()` mengulang pemeriksaan tepat sebelum create dan menolak penyimpanan kandidat duplikat yang belum diakui manusia; acknowledgement diteruskan per draf agar tidak menjadi bypass untuk seluruh batch.
+- Memperbarui checklist E2E-06. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test` (5/5 test), dan `cd frontend && npm run lint` (tujuh warning existing di luar scope).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.637 node dan 5.442 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

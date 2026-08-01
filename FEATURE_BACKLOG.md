@@ -634,7 +634,7 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 
 - [ ] Import CSV masuk sebagai draft dengan penanda `source = ai`, bukan langsung aktif.
 - [ ] Halaman review: bulk approve/reject/edit, target **5–10 menit** untuk satu batch.
-- [ ] Deteksi duplikat terhadap test case yang sudah ada sebelum menyimpan.
+- [x] Deteksi duplikat terhadap test case yang sudah ada sebelum menyimpan.
 - [ ] **Tidak ada jalur bypass**: AI tidak bisa menandai test case sebagai approved,
       dan tidak bisa meng-approve Test Plan. Approver tercatat di audit log.
 

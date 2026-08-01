@@ -47,14 +47,18 @@ export function useAiTestCaseGenerator() {
     }
   }, [source]);
 
-  const saveDraft = useCallback(async (projectId: string, draft: AiTestCaseDraft, moduleId: string | null, batchId: string) => {
+  const saveDraft = useCallback(async (projectId: string, draft: AiTestCaseDraft, moduleId: string | null, batchId: string, duplicateAcknowledged: boolean) => {
     setSaving(true);
     try {
-      return await aiTestCaseService.approveAndSave({ projectId, draft, moduleId, batchId });
+      return await aiTestCaseService.approveAndSave({ projectId, draft, moduleId, batchId, duplicateAcknowledged });
     } finally {
       setSaving(false);
     }
   }, []);
+
+  const detectDuplicates = useCallback((projectId: string, draft: AiTestCaseDraft) => (
+    aiTestCaseService.detectPotentialDuplicates(projectId, draft)
+  ), []);
 
   const findDuplicates = useCallback((draft: AiTestCaseDraft, existing: TestCaseWithDetails[]) => (
     aiTestCaseService.findPotentialDuplicates(draft, existing)
@@ -81,6 +85,7 @@ export function useAiTestCaseGenerator() {
     setFileSource,
     generate,
     saveDraft,
+    detectDuplicates,
     findDuplicates,
     buildCsvPreview,
     reset,
