@@ -34,6 +34,8 @@ import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { useScreenSize } from '../../hooks/useScreenSize';
+import { useProjectBreadcrumbItems } from '../../hooks/useProjectBreadcrumbItems';
+import { useTabQueryParam } from '../../hooks/useTabQueryParam';
 import { parseTestCaseExcel, type ImportedTestCaseRow } from '../../helpers/testCaseExcel';
 import { downloadTestCaseImportTemplate } from '../../helpers/excelExporter';
 import type {
@@ -83,6 +85,7 @@ const ISSUE_STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
 const ISSUE_PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (
   ['low', 'medium', 'high', 'critical'] as const
 ).map((v) => ({ label: ISSUE_PRIORITY_LABEL[v], value: v }));
+const PROJECT_TAB_NAMES = ['test-plans', 'test-cases', 'test-runs', 'issues'] as const;
 
 type TestRunWithSummary = TestRun & {
   testPlanId: string;
@@ -145,12 +148,17 @@ export function ProjectDetailPage() {
   const [issues, setIssues] = useState<IssueWithDetails[]>([]);
   const [approvedUsers, setApprovedUsers] = useState<Profile[]>([]);
   const [tabLoading, setTabLoading] = useState<Record<number, boolean>>({});
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [activeTabIndex, setActiveTabIndex] = useTabQueryParam(PROJECT_TAB_NAMES);
   const [customRunDialogOpen, setCustomRunDialogOpen] = useState(false);
   const [customRunName, setCustomRunName] = useState('');
   const [customRunCaseIds, setCustomRunCaseIds] = useState<string[]>([]);
   const [customRunError, setCustomRunError] = useState<string | null>(null);
   const [customRunSaving, setCustomRunSaving] = useState(false);
+  const projectBreadcrumbItems = useProjectBreadcrumbItems(
+    project?.name,
+    project?.ownerId,
+    id ? `/projects/${id}` : undefined,
+  );
 
   async function openCustomRunDialog() {
     if (id && testCases.length === 0) {
@@ -241,8 +249,6 @@ export function ProjectDetailPage() {
     const cached = projectCache.get(id);
     setProject(cached ?? null);
     setProjectLoading(!cached);
-    setActiveTabIndex(0);
-
     projectService.getById(id).then((result) => {
       if (result) projectCache.set(id, result);
       setProject(result);
@@ -778,7 +784,7 @@ export function ProjectDetailPage() {
       <Breadcrumb
         items={[
           { label: 'Projects', path: '/' },
-          { label: project.name, path: `/projects/${id}` }
+          ...projectBreadcrumbItems,
         ]}
       />
 

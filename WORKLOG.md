@@ -2174,3 +2174,119 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm test -- --run` (7/7 test) dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
 - `git diff --check` lulus. `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.662 node dan 5.476 edge; warning tujuh file tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-01 infrastruktur test frontend
+
+- Menambahkan `jsdom`, `@testing-library/react`, dan provider coverage V8 sebagai devDependency frontend.
+- Menambahkan `vitest.config.ts` dengan environment `jsdom`, setup file bersama untuk cleanup DOM setelah setiap test, dan konfigurasi coverage V8.
+- Menambahkan skrip `npm run test:coverage`; skrip `npm test` tetap mencakup seluruh berkas test yang ada.
+- Verifikasi lulus: `cd frontend && npm test` (2 berkas, 7/7 test), `cd frontend && npm run test:coverage` (7/7 test dan laporan coverage berhasil), serta `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+- Instalasi npm melaporkan tiga kerentanan high severity pada dependency tree; tidak menjalankan `npm audit fix --force` karena berpotensi mengubah versi secara breaking dan berada di luar scope TEST-01.
+- `graphify update .` berhasil menyinkronkan perubahan kode menjadi 2.683 node dan 5.495 edge. Pemanggilan kedua setelah hanya menambah ignore coverage tidak menemukan perubahan AST dan proses watch berakhir dengan warning sandbox `Operation not permitted`; graph hasil pemanggilan pertama tetap tersinkron.
+
+## 2026-08-01 — TEST-02 utilitas test bersama frontend
+
+- Menambahkan factory deterministik dengan dukungan `overrides` untuk Project, Module, Tag, TestCase, TestPlan, TestRun, TestResult, Issue, dan Profile di `frontend/src/test/`.
+- Menambahkan mock Supabase client reusable yang mendukung query chain thenable, terminal `single`/`maybeSingle`, RPC, auth, storage, functions, pengaturan respons per tabel, dan inspeksi spy query.
+- Menambahkan barrel export utilitas test serta mendokumentasikan lokasi, pola nama berkas, nama factory, dan penggunaan mock Supabase di `AGENTS.md`.
+- Verifikasi lulus: `cd frontend && npm run build` (hanya warning ukuran chunk yang sudah dikenal), `npm test -- --run` (7/7 test), `npm run lint` (tujuh warning existing di luar scope), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.704 node dan 5.528 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-03 invariant penyimpanan hasil dan summary Test Run
+
+- Menjalankan `graphify query` sebelum menelusuri alur Test Plan, Test Case, Test Run, dan Test Result, lalu mengikuti invariant CLAUDE.md serta Section 16.3 `FEATURE_BACKLOG.md`.
+- Menambahkan test service-level dengan repository mock yang membuktikan `testRunService.start()` hanya meneruskan ID Test Case untuk membuat seed `test_results`; status eksekusi tidak ditulis ke `test_cases` maupun junction `test_plan_cases`.
+- Menambahkan test yang membuktikan `testRunService.getWithResults()` membaca ulang `test_results` dan menghitung summary/progress terbaru pada setiap pemanggilan, tanpa menyimpan summary atau progress melalui repository Test Run.
+- Tidak menambah dependency atau migration, tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test -- --run src/services/testRunService.test.ts` (2/2 test) dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.707 node dan 5.536 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-04 invariant re-run dan completion manual Test Run
+
+- Menjalankan `graphify query` sebelum menelusuri service dan test Test Run, lalu mengikuti invariant `CLAUDE.md` serta Section 16.3 `FEATURE_BACKLOG.md`.
+- Menambahkan test service-level dengan repository mock yang membuktikan setiap pemanggilan ulang `testRunService.start()` membuat Test Run berbeda, membuat seed Test Result untuk ID run baru, dan tidak mengubah run sebelumnya.
+- Menambahkan test yang membuktikan summary dengan progress 100% tidak mengubah status run; status `completed` hanya diteruskan ke repository melalui aksi eksplisit `testRunService.complete()`.
+- Tidak menambah dependency atau migration, tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test -- --run src/services/testRunService.test.ts` (4/4 test), `cd frontend && npm test -- --run` (11/11 test), dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.708 node dan 5.537 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-05 invariant Issue FAIL, relasi 1:many, dan tester terdaftar
+
+- Menjalankan `graphify query` sebelum menelusuri service Issue, Test Run, Test Result, dan Profile, lalu mengikuti invariant `CLAUDE.md` serta Section 16.3 `FEATURE_BACKLOG.md`.
+- Menambahkan test service-level dengan repository mock yang membuktikan Issue ditolak untuk status Test Result selain `fail`, sedangkan dua Issue berbeda dapat merujuk Test Result FAIL yang sama tanpa membatasi relasi menjadi 1:1.
+- Menambahkan test yang membuktikan pencatatan Test Result memvalidasi `testerId` melalui `profiles`, meneruskan ID profile terdaftar, dan menolak identitas berupa teks bebas sebelum repository Test Result dipanggil.
+- Menambahkan guard minimal pada `testRunService.recordResult()` untuk memastikan tester ditemukan melalui `profileRepository`, tetap mengikuti alur Service → Repository → Supabase.
+- Tidak menambah dependency atau migration, tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test -- --run src/services/issueService.test.ts src/services/testRunService.test.ts` (12/12 test), `cd frontend && npm test -- --run` (18/18 test), dan `cd frontend && npm run build` (hanya warning ukuran chunk Vite yang sudah ada).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.709 node dan 5.541 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-06 invariant RBAC dan approval AI/agent
+
+- Menjalankan `graphify query` sebelum menelusuri route guard, service AI Test Case, dan permukaan tool MCP, lalu mengikuti Section 16.3 `FEATURE_BACKLOG.md`.
+- Menambahkan test route guard terparameterisasi untuk seluruh kelompok route modul yang membuktikan user `pending` selalu dialihkan ke halaman pending dan tidak merender konten terlindungi.
+- Menambahkan test service-level dengan dependency mock yang membuktikan hasil AI selalu diteruskan sebagai Test Case `draft` bersumber `ai` dan tidak memanggil aksi review/approval.
+- Mempertegas test registrasi tool agent MCP yang membuktikan tidak tersedia tool approval Test Case maupun Test Plan.
+- Tidak mengubah implementasi produksi, dependency, atau migration; tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test` (5 berkas, 35/35 test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), serta `cd mcp && npm test` (20/20 test).
+
+## 2026-08-01 — TEST-07 unit test mapper frontend
+
+- Menjalankan `graphify query` sebelum menelusuri mapper dan mengikuti Section 16.4 `FEATURE_BACKLOG.md`.
+- Menambahkan unit test berdampingan untuk seluruh 45 mapper yang diekspor oleh `frontend/src/helpers/mappers.ts`, dengan guard daftar ekspor agar mapper baru tidak luput dari suite.
+- Test membuktikan konversi row Supabase `snake_case` ke domain `camelCase` mempertahankan nilai, termasuk field nullable, fallback field opsional/array, konversi number/boolean, relasi nested, snapshot Test Result, attachment URL, dan bentuk summary dashboard.
+- Tidak mengubah implementasi produksi, dependency, atau migration; tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test -- --run src/helpers/mappers.test.ts` (42/42 test), `cd frontend && npm run test:coverage -- --run src/helpers/mappers.test.ts` (100% statement/function/line dan 84,16% branch coverage untuk `mappers.ts`), `cd frontend && npm test -- --run` (6 berkas, 77/77 test), serta `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+## 2026-08-01 — TEST-08 unit test formatter, status label, dan kode entity
+
+- Menjalankan `graphify query` sebelum menelusuri helper dan schema pembentukan kode, lalu mengikuti Section 16.4 `FEATURE_BACKLOG.md`.
+- Menambahkan unit test `dateFormatter` untuk locale Indonesia, presisi menit, offset zona waktu, serta input tanggal tidak valid.
+- Menambahkan test menyeluruh untuk seluruh ekspor `statusLabels`, seluruh pasangan label/severity, dan kesetaraan key agar nilai domain tidak kehilangan representasi UI.
+- Menambahkan contract-level unit test untuk pembentukan kode entity pada `schema_entity_codes.sql`: prefix MOD/TC/TP/TR, sequence awal dan increment atomik, padding empat digit dan nilai di atas 9999, scope project/prefix, guard null/string kosong, preservasi kode eksplisit, lookup project Test Run, serta unique scope tiap entity.
+- Tidak mengubah implementasi produksi, dependency, atau migration; tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test -- --run src/helpers/dateFormatter.test.ts src/helpers/statusLabels.test.ts src/helpers/entityCodes.test.ts` (30/30 test), `cd frontend && npm test -- --run` (107/107 test), dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+- `graphify update .` telah dijalankan, tetapi incremental watch berakhir dengan warning sandbox `Operation not permitted` setelah melaporkan tidak ada pembaruan AST yang dapat diproses; graph lama tidak ditimpa.
+
+## 2026-08-01 — TEST-09 unit test validasi service layer
+
+- Menjalankan `graphify query` sebelum menelusuri service dan mengikuti Section 16.4 `FEATURE_BACKLOG.md`.
+- Menambahkan unit test berdampingan untuk `testCaseService`, `testPlanService`, `testRunService`, dan `issueService` yang membuktikan input kosong, nama/judul di atas 255 karakter, enum runtime tidak dikenal, serta aturan bisnis domain ditolak dengan pesan yang jelas sebelum repository melakukan mutasi.
+- Menambahkan guard service-level untuk batas 255 karakter dan allowlist enum pada jalur tulis terkait; validasi tetap berada di service dan tidak dipindahkan ke repository.
+- Aturan bisnis yang dicakup meliputi Test Case detail wajib memiliki step, aktivasi Test Plan wajib melalui approval eksplisit, hasil pada Test Run completed tidak dapat diubah, Issue wajib merujuk Test Result yang ada dan berstatus FAIL, serta invariant tester terdaftar yang sudah ada tetap terverifikasi.
+- Tidak menambah dependency atau migration, tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: test terarah empat service (28/28), seluruh frontend test (123/123), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `cd frontend && npm run lint` (tujuh warning existing di luar scope).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.746 node dan 5.591 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-10 smoke test build dan runtime boot
+
+- Menambahkan `scripts/codex-loop/smoke.sh` yang executable: build frontend, memilih port dynamic/private secara acak, menjalankan `vite preview` dengan `--strictPort`, menunggu readiness melalui `fetch`, lalu memuat aplikasi memakai Chromium headless.
+- Smoke gate memastikan elemen `#root` berisi hasil render, menggagalkan boot saat browser melaporkan error console/runtime fatal, serta selalu mematikan preview server dan membersihkan direktori sementara melalui trap.
+- Verifikasi `bash -n scripts/codex-loop/smoke.sh` dan build frontend lulus. Eksekusi smoke penuh tertahan sandbox sesi ini karena operasi listen localhost ditolak dengan `EPERM`; skrip berhenti non-zero dan membersihkan proses sesuai desain.
+
+## 2026-08-01 — TEST-11 component test review AI dan approval Test Plan
+
+- Menjalankan `graphify query` sebelum menelusuri halaman, hook, dan service terkait, lalu mengikuti batas Section 16.5 `FEATURE_BACKLOG.md`.
+- Menambahkan component test `AiTestCaseReviewPage` yang membuktikan approve dan reject meneruskan seluruh ID batch beserta keputusan yang benar, serta edit draf meneruskan field hasil review manusia dan tag melalui hook.
+- Menambahkan component test `TestPlanDetailPage` yang membuktikan perubahan status draft menjadi active wajib memanggil `testPlanService.approve(id, true)` dan menampilkan metadata explicit approval dari hasil service.
+- Test menggunakan mock pada boundary hook/service dan komponen UI yang relevan; tidak mengakses Supabase target, tidak mengubah implementasi produksi, dependency, atau migration.
+- Verifikasi lulus: `cd frontend && npm run build` (hanya warning ukuran chunk Vite yang sudah ada) dan `cd frontend && npm test` (13 berkas, 127/127 test).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.756 node dan 5.613 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-12 component test pencatatan hasil dan pembuatan Issue
+
+- Menjalankan `graphify query` sebelum menelusuri halaman Test Run dan mengikuti batas alur kritis Section 16.5 `FEATURE_BACKLOG.md`.
+- Menambahkan component test `TestRunDetailPage` yang membuktikan pencatatan hasil meneruskan Test Result ID, tester terdaftar, status, serta catatan yang sudah dinormalisasi ke `testRunService.recordResult`, kemudian memuat ulang summary run.
+- Menambahkan component test yang membuktikan aksi pembuatan Issue hanya tersedia pada Test Result FAIL, mengisi nilai awal dari Test Case, mempertahankan relasi `testResultId`, meneruskan isian ke `issueService.create`, dan membuka daftar Issue run setelah berhasil.
+- Test memakai mock pada boundary hook/service dan komponen UI; tidak mengakses Supabase target, tidak mengubah implementasi produksi, dependency, atau migration.
+- Verifikasi lulus: test terarah `TestRunDetailPage.test.tsx` (2/2), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `cd frontend && npm run lint` (tujuh warning existing di luar scope).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.762 node dan 5.628 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-13 audit hook yatim
+
+- Menjalankan `graphify query` sebelum menelusuri empat hook yatim dan mengikuti keputusan Section 16.7 `FEATURE_BACKLOG.md` untuk memakai atau menghapus artefak yang tidak terpakai.
+- Mempertahankan dan memakai `useModules` pada `TestPlanDetailPage` karena pemuatan daftar module merupakan data lifecycle halaman dan seharusnya melalui Hook → Service → Repository, bukan state/effect duplikat di page.
+- Mempertahankan dan memakai `useProjectBreadcrumbItems` pada `ProjectDetailPage` agar breadcrumb project dapat menampilkan konteks owner untuk project milik user lain tanpa menduplikasi query profile.
+- Mempertahankan dan memakai `useStoredState` pada `useProjectPins` karena pin project adalah preferensi browser yang memang disimpan di `localStorage`; implementasi parsing dan persistensi duplikat dihapus.
+- Mempertahankan dan memakai `useTabQueryParam` pada `ProjectDetailPage` agar tab aktif mempunyai deep-link melalui parameter `tab` dan state tab manual yang redundan dihapus.
+- Tidak menghapus keempat hook karena masing-masing mempunyai consumer yang jelas dan sesuai tanggung jawabnya; tidak mengubah database, dependency, atau migration, serta tidak menjalankan migration ke Supabase target.
+- Verifikasi lulus: `cd frontend && npm run build` (hanya warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run src/pages/test-plans/TestPlanDetailPage.test.tsx` (1/1 test), serta seluruh empat hook terkonfirmasi memiliki import consumer melalui `rg`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.763 node dan 5.637 edge; warning tujuh source tanpa node tidak menggagalkan proses.

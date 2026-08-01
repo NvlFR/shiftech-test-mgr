@@ -26,6 +26,7 @@ dist-ssr
 
 # Vite build cache
 frontend/.vite/
+frontend/coverage/
 
 # Playwright MCP browser artifacts
 .playwright-mcp/

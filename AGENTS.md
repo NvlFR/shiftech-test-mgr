@@ -130,6 +130,20 @@ bergantung pada fungsi/tabel dari file sebelumnya).
 
 ## Coding Conventions
 
+### Test
+
+- Letakkan unit/integration test berdampingan dengan source yang diuji memakai
+  nama `{sourceName}.test.ts` atau `{ComponentName}.test.tsx`.
+- Letakkan utilitas yang dipakai lintas test di `frontend/src/test/`; import
+  factory domain dan mock Supabase dari barrel `src/test`.
+- Gunakan awalan `make` untuk factory domain (contoh `makeProject`) dan berikan
+  variasi data melalui parameter `overrides`, bukan mengubah fixture bersama.
+- Gunakan `createMockSupabaseClient()` untuk mock boundary Supabase. Atur respons
+  tabel dengan `setTableResult()` dan periksa chain query lewat
+  `getTableQuery()`; jangan mengakses Supabase target dari test.
+- Nama `describe` menyebut unit yang diuji, sedangkan nama `it`/`test` menjelaskan
+  perilaku atau invariant yang dibuktikan.
+
 ### Naming
 
 - Bahasa Inggris untuk semua kode: variable, function, class, file, tabel, kolom

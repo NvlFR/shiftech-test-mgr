@@ -22,14 +22,14 @@ import { useTestRuns } from '../../hooks/useTestRuns';
 import { testPlanService } from '../../services/testPlanService';
 import { testCaseService } from '../../services/testCaseService';
 import { testRunService } from '../../services/testRunService';
-import { moduleService } from '../../services/moduleService';
 import { tagService } from '../../services/tagService';
-import type { Module, Tag as TagEntity, TestCase, TestCasePriority, TestPlan, TestPlanCaseWithDetails, TestPlanStatus, TestRun, TestRunStatus } from '../../types/domain';
+import type { Tag as TagEntity, TestCase, TestCasePriority, TestPlan, TestPlanCaseWithDetails, TestPlanStatus, TestRun, TestRunStatus } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { useEnvironments } from '../../hooks/useEnvironments';
+import { useModules } from '../../hooks/useModules';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import {
   TEST_PLAN_STATUS_LABEL,
@@ -68,6 +68,7 @@ export function TestPlanDetailPage() {
   const { testRuns, loading: runsLoading, reload: reloadRuns } = useTestRuns(id ?? null);
   const { canEditContent, canDeleteContent, canRunTests } = useProjectRole(testPlan?.projectId);
   const { environments } = useEnvironments(testPlan?.projectId ?? null);
+  const { modules } = useModules(testPlan?.projectId ?? null);
 
   // Source-new exposes plan metadata editing from the detail header. Keep the
   // existing local status action and add the same additive edit flow here.
@@ -121,7 +122,6 @@ export function TestPlanDetailPage() {
   const [caseModuleFilter, setCaseModuleFilter] = useState<string | null>(null);
   const [caseTagFilter, setCaseTagFilter] = useState<string | null>(null);
   const [selectedCases, setSelectedCases] = useState<TestPlanCaseWithDetails[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
   const [tags, setTags] = useState<TagEntity[]>([]);
 
   const filteredCases = useMemo(() => {
@@ -170,7 +170,6 @@ export function TestPlanDetailPage() {
 
   useEffect(() => {
     if (testPlan) {
-      moduleService.listByProject(testPlan.projectId).then(setModules);
       tagService.listByProject(testPlan.projectId).then(setTags);
     }
   }, [testPlan]);

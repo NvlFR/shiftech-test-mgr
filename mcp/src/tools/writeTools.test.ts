@@ -16,5 +16,7 @@ test("registers MCP write tools without an AI approval bypass", () => {
     "testmanager.testrun.create", "testmanager.testrun.record_result", "testmanager.testrun.complete",
     "testmanager.issue.create", "testmanager.issue.comment", "testmanager.issue.update_status", "testmanager.issue.detect_duplicate",
   ]);
+  assert.equal(names.includes("testmanager.testcase.approve"), false);
+  assert.equal(names.includes("testmanager.testplan.approve"), false);
   assert.equal(names.some((name) => name.includes("approve")), false);
 });

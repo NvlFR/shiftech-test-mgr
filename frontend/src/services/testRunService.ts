@@ -3,9 +3,18 @@ import { testResultRepository } from '../repositories/testResultRepository';
 import { testCaseRepository } from '../repositories/testCaseRepository';
 import { projectRepositoryLinkRepository } from '../repositories/projectRepositoryLinkRepository';
 import { testPlanRepository } from '../repositories/testPlanRepository';
+import { profileRepository } from '../repositories/profileRepository';
 import { calculateTestRunSummary } from '../helpers/testRunSummary';
 import type { TestResultStatus, TestRunStatus } from '../types/domain';
 import type { TestRunFilters } from '../repositories/testRunRepository';
+
+const MAX_NAME_LENGTH = 255;
+const VALID_RESULT_STATUSES: readonly TestResultStatus[] = ['pass', 'fail', 'skip', 'blocked', 'not_run'];
+
+function validateRunName(name: string) {
+  if (!name.trim()) throw new Error('Nama test run tidak boleh kosong');
+  if (name.trim().length > MAX_NAME_LENGTH) throw new Error(`Nama test run maksimal ${MAX_NAME_LENGTH} karakter`);
+}
 
 export const testRunService = {
   listByPlan(testPlanId: string, filters?: TestRunFilters) {
@@ -73,7 +82,7 @@ export const testRunService = {
   // test_results as 'not_run' — later edits to the plan's case list don't retroactively
   // change what this run covers, matching how a real regression cycle has a fixed scope.
   async start(testPlanId: string, name: string, options: { code?: string; environmentId?: string | null; browser?: string; device?: string; buildVersion?: string; release?: string; repositoryId?: string | null; branch?: string; commitSha?: string } = {}) {
-    if (!name.trim()) throw new Error('Nama test run tidak boleh kosong');
+    validateRunName(name);
 
     const [planCases, plan, repository] = await Promise.all([
       testCaseRepository.findCasesForPlan(testPlanId),
@@ -103,7 +112,7 @@ export const testRunService = {
   },
 
   async startCustom(projectId: string, testCaseIds: string[], name: string, options: { browser?: string; device?: string } = {}) {
-    if (!name.trim()) throw new Error('Nama test run tidak boleh kosong');
+    validateRunName(name);
     if (!testCaseIds.length) throw new Error('Pilih minimal satu test case');
     const run = await testRunRepository.createCustom({ projectId, name: name.trim(), browser: options.browser?.trim(), device: options.device?.trim() });
     try {
@@ -117,7 +126,7 @@ export const testRunService = {
   },
 
   rename(id: string, input: { name: string; code: string }) {
-    if (!input.name.trim()) throw new Error('Nama test run tidak boleh kosong');
+    validateRunName(input.name);
     if (!input.code.trim()) throw new Error('Kode test run tidak boleh kosong');
     return testRunRepository.update(id, { name: input.name.trim(), code: input.code.trim() });
   },
@@ -164,6 +173,7 @@ export const testRunService = {
   },
 
   async recordResult(id: string, testerId: string, status: TestResultStatus, notes: string | null) {
+    if (!VALID_RESULT_STATUSES.includes(status)) throw new Error('Status hasil test tidak dikenal');
     // A completed run is frozen — results must not change silently. Reopen it first (manual action,
     // mirroring the manual-completion product decision) before recording again.
     const context = await testResultRepository.findExecutionContext(id);
@@ -171,6 +181,8 @@ export const testRunService = {
     if (context.runStatus === 'completed') {
       throw new Error('Test run sudah selesai — buka kembali (reopen) untuk mencatat hasil');
     }
+    const tester = await profileRepository.findById(testerId);
+    if (!tester) throw new Error('Tester harus user yang terdaftar');
     return testResultRepository.recordResult(id, { status, testerId, notes });
   },
 

@@ -2,6 +2,14 @@ import { testPlanRepository } from '../repositories/testPlanRepository';
 import { testCaseRepository } from '../repositories/testCaseRepository';
 import type { TestPlan } from '../types/domain';
 
+const MAX_NAME_LENGTH = 255;
+const VALID_STATUSES: readonly TestPlan['status'][] = ['draft', 'active', 'completed', 'archived'];
+
+function validateName(name: string) {
+  if (!name.trim()) throw new Error('Nama test plan tidak boleh kosong');
+  if (name.trim().length > MAX_NAME_LENGTH) throw new Error(`Nama test plan maksimal ${MAX_NAME_LENGTH} karakter`);
+}
+
 // Service layer: business rules, validation, orchestration across repositories.
 // Pages/components call services — never repositories directly.
 
@@ -15,9 +23,7 @@ export const testPlanService = {
   },
 
   async create(input: { projectId: string; name: string; description?: string; code?: string }): Promise<TestPlan> {
-    if (!input.name.trim()) {
-      throw new Error('Nama test plan tidak boleh kosong');
-    }
+    validateName(input.name);
     return testPlanRepository.create({
       projectId: input.projectId,
       name: input.name.trim(),
@@ -28,7 +34,7 @@ export const testPlanService = {
 
   createApprovedFromReviewedCases(input: { projectId: string; name: string; description?: string; testCaseIds: string[]; explicitApproval: boolean }): Promise<TestPlan> {
     if (!input.projectId) throw new Error('Project wajib dipilih');
-    if (!input.name.trim()) throw new Error('Nama test plan tidak boleh kosong');
+    validateName(input.name);
     if (!input.testCaseIds.length) throw new Error('Pilih minimal satu test case yang lolos review');
     if (input.explicitApproval !== true) throw new Error('Persetujuan Test Plan harus diberikan secara eksplisit');
     return testPlanRepository.createApprovedFromReviewedCases({
@@ -41,12 +47,12 @@ export const testPlanService = {
   },
 
   rename(id: string, name: string) {
-    if (!name.trim()) throw new Error('Nama test plan tidak boleh kosong');
+    validateName(name);
     return testPlanRepository.update(id, { name: name.trim() });
   },
 
   update(id: string, input: { name: string; description?: string; code?: string }) {
-    if (!input.name.trim()) throw new Error('Nama test plan tidak boleh kosong');
+    validateName(input.name);
     return testPlanRepository.update(id, {
       name: input.name.trim(),
       description: input.description?.trim() || null,
@@ -55,6 +61,7 @@ export const testPlanService = {
   },
 
   changeStatus(id: string, status: TestPlan['status']) {
+    if (!VALID_STATUSES.includes(status)) throw new Error('Status test plan tidak dikenal');
     if (status === 'active') throw new Error('Gunakan aksi approval eksplisit untuk mengaktifkan Test Plan');
     return testPlanRepository.update(id, { status });
   },

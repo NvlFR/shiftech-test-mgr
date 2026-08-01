@@ -5,6 +5,27 @@ import { testCaseStepService } from './testCaseStepService';
 import type { ImportedTestCaseRow } from '../helpers/testCaseExcel';
 import type { TestCase, TestCaseFilters, TestCaseWithDetails } from '../types/domain';
 
+const MAX_TITLE_LENGTH = 255;
+const VALID_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
+const VALID_STATUSES = ['draft', 'active', 'archived'] as const;
+const VALID_SOURCES = ['manual', 'ai'] as const;
+const VALID_STEP_TYPES = ['simple', 'detailed'] as const;
+
+function validateTestCaseInput(input: {
+  title: string;
+  priority?: TestCase['priority'];
+  status?: TestCase['status'];
+  source?: TestCase['source'];
+  stepType?: TestCase['stepType'];
+}) {
+  if (!input.title.trim()) throw new Error('Judul test case tidak boleh kosong');
+  if (input.title.trim().length > MAX_TITLE_LENGTH) throw new Error(`Judul test case maksimal ${MAX_TITLE_LENGTH} karakter`);
+  if (input.priority && !VALID_PRIORITIES.includes(input.priority)) throw new Error('Prioritas test case tidak dikenal');
+  if (input.status && !VALID_STATUSES.includes(input.status)) throw new Error('Status test case tidak dikenal');
+  if (input.source && !VALID_SOURCES.includes(input.source)) throw new Error('Sumber test case tidak dikenal');
+  if (input.stepType && !VALID_STEP_TYPES.includes(input.stepType)) throw new Error('Tipe langkah test case tidak dikenal');
+}
+
 export const testCaseService = {
   listByProject(projectId: string) {
     return testCaseRepository.findAllByProject(projectId);
@@ -90,7 +111,7 @@ export const testCaseService = {
     tagNames?: string[];
     detailedSteps?: { action: string; expectedResult?: string }[];
   }): Promise<TestCase> {
-    if (!input.title.trim()) throw new Error('Judul test case tidak boleh kosong');
+    validateTestCaseInput(input);
     const stepType = input.stepType ?? 'simple';
     if (stepType === 'simple') {
       if (!input.steps.trim()) throw new Error('Langkah pengujian tidak boleh kosong');
