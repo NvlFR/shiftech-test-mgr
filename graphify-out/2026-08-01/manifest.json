@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785551405.6777072,
-    "ast_hash": "02e7b68c7586e27667d4d20cb16922e5",
+    "mtime": 1785551658.2380261,
+    "ast_hash": "06585d009c4bd0b641082da4f8c9609a",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -895,9 +895,9 @@
     "semantic_hash": "89b9ece1a681fcc8974883705441d1d4"
   },
   "frontend/src/helpers/aiTestCaseParser.ts": {
-    "mtime": 1785028390.0933588,
-    "ast_hash": "ede4d69cbae2225bf4125ec6172fad18",
-    "semantic_hash": "ede4d69cbae2225bf4125ec6172fad18"
+    "mtime": 1785551612.9787507,
+    "ast_hash": "aa5837990ea8fd6aaebe068b72f169a5",
+    "semantic_hash": ""
   },
   "frontend/src/helpers/aiTestRunAnalysisSchema.ts": {
     "mtime": 1785028003.1961367,
@@ -940,9 +940,9 @@
     "semantic_hash": "560d7407f527a65386357428132ae87c"
   },
   "frontend/src/repositories/aiTestCaseRepository.ts": {
-    "mtime": 1785028072.5368767,
-    "ast_hash": "0c3d8b1b323d8f4f0b882aa79b45495c",
-    "semantic_hash": "0c3d8b1b323d8f4f0b882aa79b45495c"
+    "mtime": 1785551613.125745,
+    "ast_hash": "81839304c3ffc40e450850fdfdf6196c",
+    "semantic_hash": ""
   },
   "frontend/src/repositories/aiTestRunAnalysisRepository.ts": {
     "mtime": 1785028775.2090516,
@@ -975,9 +975,9 @@
     "semantic_hash": "2ec5cf5a9b5a12f2b08d71611e76085b"
   },
   "frontend/src/types/aiTestCase.ts": {
-    "mtime": 1785028015.5542793,
-    "ast_hash": "4cb6601ffda03d2032293863bfea3b57",
-    "semantic_hash": "4cb6601ffda03d2032293863bfea3b57"
+    "mtime": 1785551612.843756,
+    "ast_hash": "ca8bf51fa1d9be5b3bee51aed754a504",
+    "semantic_hash": ""
   },
   "frontend/src/types/aiTestRunAnalysis.ts": {
     "mtime": 1785028157.6546419,
@@ -985,18 +985,18 @@
     "semantic_hash": "220ec31c2e5c884f2a4e64e09595394c"
   },
   "supabase/functions/ai-gateway/contract.test.ts": {
-    "mtime": 1785551209.8963382,
-    "ast_hash": "1435002bc07aaa490a583eaed837d1fc",
+    "mtime": 1785551588.1007004,
+    "ast_hash": "eb1c953ce82b4649851b651a5de3f1e0",
     "semantic_hash": ""
   },
   "supabase/functions/ai-gateway/contract.ts": {
-    "mtime": 1785551359.7584853,
-    "ast_hash": "d0eef1322a44bb102dff046fcb68bb2b",
+    "mtime": 1785551587.6517177,
+    "ast_hash": "f323905af56bc22a5332182c9147c2e8",
     "semantic_hash": ""
   },
   "supabase/functions/ai-gateway/handler.ts": {
-    "mtime": 1785551351.3728106,
-    "ast_hash": "fb4f51a31216fc8f1fc17da35d942c3b",
+    "mtime": 1785551587.8127115,
+    "ast_hash": "fab206e55d1c1f1f0fc676e807c4fc55",
     "semantic_hash": ""
   },
   "supabase/functions/ai-gateway/index.ts": {
@@ -1005,9 +1005,9 @@
     "semantic_hash": "85562b654814f8aaadba31c4479fede5"
   },
   "supabase/functions/ai-gateway/providers.ts": {
-    "mtime": 1785028680.145903,
-    "ast_hash": "26530a1783488a0d430f9bf366dabda4",
-    "semantic_hash": "26530a1783488a0d430f9bf366dabda4"
+    "mtime": 1785551587.9647057,
+    "ast_hash": "73184fa29cd5102577279a3460c9417a",
+    "semantic_hash": ""
   },
   "supabase/functions/ai-gateway/security.ts": {
     "mtime": 1785123268.5292065,
@@ -1030,9 +1030,9 @@
     "semantic_hash": "d72f78a93ce99e63d28bb1bc9d6d63e8"
   },
   "frontend/src/helpers/aiIntegration.test.ts": {
-    "mtime": 1785029157.476497,
-    "ast_hash": "eb35cd398c8b17dc561e462ce0bbdb35",
-    "semantic_hash": "eb35cd398c8b17dc561e462ce0bbdb35"
+    "mtime": 1785551613.2647398,
+    "ast_hash": "2ce4acc36f29cc77506ad29ff2e4d727",
+    "semantic_hash": ""
   },
   "frontend/src/hooks/useAutomation.ts": {
     "mtime": 1785550874.125856,
