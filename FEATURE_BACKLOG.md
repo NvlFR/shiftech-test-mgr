@@ -379,7 +379,7 @@ AI Agent (Claude/Cursor)  ──MCP──▶  TestManager MCP Server  ──RPC/
 ### 8.1 Fondasi MCP server
 
 - [ ] Scaffold `mcp/` — Node 20+, TypeScript, MCP SDK, transport **stdio** (dev lokal).
-- [ ] Transport **HTTP/SSE** untuk pemakaian remote/self-hosted.
+- [x] Transport **HTTP/SSE** untuk pemakaian remote/self-hosted.
 - [ ] Autentikasi: API token TestManager (reuse tabel token P2) atau Supabase JWT.
       Token disimpan di env (`TM_API_TOKEN`), tidak pernah di argumen tool.
 - [ ] **Project scoping wajib**: satu sesi MCP terikat pada satu `project_id`;

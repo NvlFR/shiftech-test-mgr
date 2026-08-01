@@ -1,8 +1,8 @@
 # TestManager MCP Server
 
-Fondasi MCP server TestManager berbasis Node.js 20+, TypeScript, dan transport
-stdio. Server mengautentikasi API token saat startup dan hanya membuka sesi jika
-token aktif terikat ke `TM_PROJECT_ID`.
+Fondasi MCP server TestManager berbasis Node.js 20+, TypeScript, transport stdio,
+Streamable HTTP, dan HTTP/SSE kompatibel. Semua mode mengautentikasi API token
+saat startup dan hanya membuka sesi jika token aktif terikat ke `TM_PROJECT_ID`.
 
 ## Persyaratan
 
@@ -32,6 +32,9 @@ Git. Jangan menaruh token pada argumen tool atau menyimpannya di source code.
 | `TM_API_TOKEN` | Ya | API token TestManager untuk autentikasi. |
 | `TM_PROJECT_ID` | Ya | Project yang mengikat satu sesi MCP. |
 | `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only dan membuat tool tulis tidak diregistrasikan; `0` atau kosong menonaktifkannya. |
+| `TM_MCP_TRANSPORT` | Tidak | `stdio` (default) atau `http`. |
+| `TM_MCP_HTTP_HOST` | Tidak | Alamat listen mode HTTP; default aman `127.0.0.1`. Gunakan `0.0.0.0` hanya di balik firewall/reverse proxy. |
+| `TM_MCP_HTTP_PORT` | Tidak | Port mode HTTP; default `3000`. |
 | `TM_MCP_RATE_LIMIT` | Tidak | Maksimum pemanggilan per tool dan API token dalam satu window; default `120`, maksimum `10000`. |
 | `TM_MCP_RATE_LIMIT_WINDOW_SECONDS` | Tidak | Durasi window rate limit dalam detik; default `60`, maksimum `86400`. |
 | `TM_MCP_RERUN_FAILED_MAX_TESTS` | Tidak | Ambang aman regression selektif; default `25`, rentang `1`–`500`. Di atas ambang, tool meminta konfirmasi manusia. |
@@ -51,8 +54,21 @@ Node.js 20 dapat memuat file env tanpa dependency tambahan:
 node --env-file=.env dist/index.js
 ```
 
-Server berkomunikasi melalui stdin/stdout. Jangan menulis log biasa ke stdout
-karena dapat merusak frame protokol MCP.
+Mode default berkomunikasi melalui stdin/stdout. Jangan menulis log biasa ke
+stdout karena dapat merusak frame protokol MCP.
+
+Untuk remote/self-hosted, set `TM_MCP_TRANSPORT=http`. Endpoint yang tersedia:
+
+- Streamable HTTP modern: `GET`, `POST`, dan `DELETE` pada `/mcp`.
+- HTTP/SSE kompatibel: `GET /sse` dan `POST /messages?sessionId=...`.
+- Health check tanpa data sensitif: `GET /health`.
+
+Mode HTTP memakai autentikasi dan project scope yang sama dengan stdio:
+`TM_API_TOKEN`, `TM_PROJECT_ID`, dan JWT opsional tetap dibaca hanya dari env,
+bukan dari URL, header client, atau argumen tool. Karena satu proses mewakili satu
+project-scoped identity, jangan mengeksposnya sebagai endpoint multi-tenant.
+Terminasi TLS dan pembatasan akses jaringan wajib dilakukan di reverse proxy atau
+platform hosting; bind default hanya ke loopback.
 
 Token hanya dibaca dari `TM_API_TOKEN`, tidak menjadi argumen tool. Setiap tool
 yang ditambahkan wajib memakai `ProjectSession.assertToolArguments()` dan query

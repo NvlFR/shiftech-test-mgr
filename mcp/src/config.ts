@@ -9,6 +9,9 @@ export interface ServerConfig {
   repositoryCacheDir: string;
   toolRateLimit: number;
   toolRateLimitWindowSeconds: number;
+  transport?: "stdio" | "http";
+  httpHost?: string;
+  httpPort?: number;
 }
 
 const requiredEnv = (
@@ -65,4 +68,13 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ServerConfig =
   repositoryCacheDir: env.TM_MCP_REPOSITORY_CACHE_DIR?.trim() || "/tmp/testmanager-mcp-repositories",
   toolRateLimit: parseBoundedInteger(env.TM_MCP_RATE_LIMIT?.trim(), "TM_MCP_RATE_LIMIT", 120, 10_000),
   toolRateLimitWindowSeconds: parseBoundedInteger(env.TM_MCP_RATE_LIMIT_WINDOW_SECONDS?.trim(), "TM_MCP_RATE_LIMIT_WINDOW_SECONDS", 60, 86_400),
+  transport: (() => {
+    const value = env.TM_MCP_TRANSPORT?.trim() || "stdio";
+    if (value !== "stdio" && value !== "http") {
+      throw new Error("Environment variable TM_MCP_TRANSPORT must be stdio or http");
+    }
+    return value;
+  })(),
+  httpHost: env.TM_MCP_HTTP_HOST?.trim() || "127.0.0.1",
+  httpPort: parseBoundedInteger(env.TM_MCP_HTTP_PORT?.trim(), "TM_MCP_HTTP_PORT", 3000, 65_535),
 });
