@@ -134,6 +134,7 @@ export const ISSUE_PRIORITY_SEVERITY: Record<IssuePriority, TagSeverity> = {
 };
 
 export const ISSUE_STATUS_LABEL: Record<IssueStatus, string> = {
+  draft: 'Draft',
   backlog: 'Backlog',
   open: 'Terbuka',
   in_progress: 'Dikerjakan',
@@ -145,6 +146,7 @@ export const ISSUE_STATUS_LABEL: Record<IssueStatus, string> = {
 };
 
 export const ISSUE_STATUS_SEVERITY: Record<IssueStatus, TagSeverity> = {
+  draft: 'secondary',
   backlog: 'secondary',
   open: 'danger',
   in_progress: 'warning',

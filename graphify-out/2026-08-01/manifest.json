@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785554381.8974788,
-    "ast_hash": "b3f95bfa9080457113ee3e7d9cc2ccc8",
+    "mtime": 1785555589.6508508,
+    "ast_hash": "f9cebc62370614e1cd4c8fb0bcf00fc7",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785555243.9901423,
-    "ast_hash": "5f3afda929e5d76574ffb2e30c485151",
+    "mtime": 1785555620.3936934,
+    "ast_hash": "58178231635504c64e03742d41ee12b6",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -905,8 +905,8 @@
     "semantic_hash": "8820a581c2b83f33638e707ce56d776f"
   },
   "frontend/src/helpers/aiValidators.ts": {
-    "mtime": 1785555100.768818,
-    "ast_hash": "0c467dc9dc94a467925e805912ade0aa",
+    "mtime": 1785555476.5540395,
+    "ast_hash": "9040f36b47abd209331adaf627598425",
     "semantic_hash": ""
   },
   "frontend/src/helpers/testRunSummary.ts": {
@@ -955,8 +955,8 @@
     "semantic_hash": "03157fb1f7f1312cfb49cdf12f916952"
   },
   "frontend/src/services/aiIssueService.ts": {
-    "mtime": 1785555115.0551157,
-    "ast_hash": "5f52ddf846a67b96382b4a1d92617d5f",
+    "mtime": 1785555525.3193152,
+    "ast_hash": "d3e4956e5e070065973dcd7483b48c5e",
     "semantic_hash": ""
   },
   "frontend/src/services/aiTestCaseService.ts": {
@@ -970,8 +970,8 @@
     "semantic_hash": "e41065a4fd6ccc0e7b1e505b08bbdc07"
   },
   "frontend/src/types/ai.ts": {
-    "mtime": 1785555100.490872,
-    "ast_hash": "5895649be877a7574fef52ffeb3d49fb",
+    "mtime": 1785555476.411001,
+    "ast_hash": "f63fe6b2614d5331dcc77d0a4de5717c",
     "semantic_hash": ""
   },
   "frontend/src/types/aiTestCase.ts": {
@@ -1030,8 +1030,8 @@
     "semantic_hash": "d72f78a93ce99e63d28bb1bc9d6d63e8"
   },
   "frontend/src/helpers/aiIntegration.test.ts": {
-    "mtime": 1785551933.762596,
-    "ast_hash": "509e6f6564394c82715597bd58e1d161",
+    "mtime": 1785555525.6133733,
+    "ast_hash": "9a71c41fd6281d02f57af34ab2bc074d",
     "semantic_hash": ""
   },
   "frontend/src/hooks/useAutomation.ts": {
@@ -1065,9 +1065,9 @@
     "semantic_hash": "f51c4acf355a7e45ee67783fa3d67506"
   },
   "frontend/src/components/ai/AiIssueDraftDialog.tsx": {
-    "mtime": 1785033473.4378278,
-    "ast_hash": "11e962e0d2bc75a358e24b0b267b3527",
-    "semantic_hash": "11e962e0d2bc75a358e24b0b267b3527"
+    "mtime": 1785555476.8391163,
+    "ast_hash": "dc4feb186497d0534f27f9e95c4691d4",
+    "semantic_hash": ""
   },
   "runner/package.json": {
     "mtime": 1785536335.3372912,

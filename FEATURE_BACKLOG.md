@@ -662,7 +662,7 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
       error, tautan ke semua artifact, environment + commit SHA.
 - [x] Duplicate detection dijalankan lebih dulu: kalau kandidat duplikat ditemukan,
       AI menambah **komentar pada Issue lama** alih-alih membuat Issue baru.
-- [ ] Issue hasil AI berstatus draft sampai diverifikasi manusia (konsisten Section 4).
+- [x] Issue hasil AI berstatus draft sampai diverifikasi manusia (konsisten Section 4).
 
 ### 11.6 Tahap 6 — Developer memperbaiki
 

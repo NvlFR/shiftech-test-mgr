@@ -45,6 +45,30 @@ export const issueService = {
     });
   },
 
+  async createAiDraft(input: {
+    testResultId: string;
+    title: string;
+    description?: string;
+    actualResult?: string;
+    expectedResult?: string;
+    priority?: IssuePriority;
+  }) {
+    if (!input.title.trim()) throw new Error('Judul issue tidak boleh kosong');
+    const context = await testResultRepository.findExecutionContext(input.testResultId);
+    if (!context) throw new Error('Test result tidak ditemukan');
+    if (context.resultStatus !== 'fail') throw new Error('Issue hanya bisa dibuat untuk hasil yang FAIL');
+    return issueRepository.create({
+      testResultId: input.testResultId,
+      title: input.title.trim(),
+      description: input.description?.trim() || null,
+      actualResult: input.actualResult?.trim() || null,
+      expectedResult: input.expectedResult?.trim() || null,
+      priority: input.priority ?? 'medium',
+      status: 'draft',
+      assignedTo: null,
+    });
+  },
+
   update(
     id: string,
     input: { title: string; description?: string; actualResult?: string; expectedResult?: string; priority: IssuePriority; type?: IssueType; targetRoleId?: string | null; externalLinks?: ExternalLink[] },

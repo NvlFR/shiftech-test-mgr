@@ -482,7 +482,7 @@ export interface TestResultWithDetails extends TestResult {
 }
 
 export type IssuePriority = 'low' | 'medium' | 'high' | 'critical';
-export type IssueStatus = 'backlog' | 'open' | 'in_progress' | 'resolved' | 'verified' | 'closed' | 'rejected' | 'duplicate';
+export type IssueStatus = 'draft' | 'backlog' | 'open' | 'in_progress' | 'resolved' | 'verified' | 'closed' | 'rejected' | 'duplicate';
 export type IssueType = 'bug' | 'feature' | 'improvement' | 'task';
 export interface ExternalLink { label: string; url: string; }
 

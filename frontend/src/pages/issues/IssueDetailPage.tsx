@@ -31,7 +31,7 @@ import {
 } from '../../helpers/statusLabels';
 
 const STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
-  ['backlog', 'open', 'in_progress', 'resolved', 'verified', 'closed', 'rejected', 'duplicate'] as const
+  ['draft', 'backlog', 'open', 'in_progress', 'resolved', 'verified', 'closed', 'rejected', 'duplicate'] as const
 ).map((v) => ({ label: ISSUE_STATUS_LABEL[v], value: v }));
 
 type IssueDetail = IssueWithDetails & { projectId: string | null };

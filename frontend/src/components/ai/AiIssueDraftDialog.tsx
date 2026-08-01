@@ -51,7 +51,7 @@ export function AiIssueDraftDialog({ visible, projectId, result, onHide, onSaved
   return (
     <Dialog header="Draft Issue dengan AI" visible={visible} onHide={onHide} modal style={{ width: 'min(52rem, 96vw)' }}>
       <div className="flex flex-column gap-3">
-        <Message severity="info" text="Draft wajib direview. Jika duplicate terdeteksi, kegagalan baru akan ditambahkan sebagai komentar pada Issue lama." />
+        <Message severity="info" text="Draft wajib direview. Issue baru tetap berstatus Draft sampai manusia memverifikasinya melalui perubahan status. Jika duplicate terdeteksi, kegagalan baru akan ditambahkan sebagai komentar pada Issue lama." />
         {(workflow.error || message) && <Message severity="error" text={workflow.error ?? message ?? ''} />}
         {workflow.loading && <p className="m-0 text-color-secondary">Menyusun draft dan memeriksa kemungkinan duplicate…</p>}
         {draft && <>
@@ -67,7 +67,7 @@ export function AiIssueDraftDialog({ visible, projectId, result, onHide, onSaved
             </div>
           ))}
           {duplicates.length > 0 && <div className="surface-100 border-round p-3 flex flex-column gap-2"><span className="font-medium">Kemungkinan duplicate</span><small className="text-color-secondary">Kandidat dengan confidence tertinggi akan menerima komentar baru setelah review.</small>{duplicates.map((candidate, index) => <div className="flex align-items-center gap-2" key={candidate.issueId}><Tag value={`${Math.round(candidate.confidence * 100)}%`} severity={candidate.confidence >= 0.85 ? 'danger' : 'warning'} /><span className="text-sm"><strong>{candidate.issueCode}</strong> — {candidate.issueTitle}. {candidate.reason}{index === 0 ? ' (target komentar)' : ''}</span></div>)}<div className="flex align-items-center gap-2"><input id="ai-duplicate-ack" type="checkbox" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} /><label htmlFor="ai-duplicate-ack">Saya sudah meninjau kandidat duplicate.</label></div></div>}
-          <div className="flex justify-content-end gap-2"><Button label="Batal" text onClick={onHide} /><Button label={duplicates.length > 0 ? 'Review & Tambah Komentar' : 'Review & Simpan Issue'} icon="pi pi-check" loading={workflow.loading} disabled={duplicates.length > 0 && !acknowledged} onClick={() => { void save(); }} /></div>
+          <div className="flex justify-content-end gap-2"><Button label="Batal" text onClick={onHide} /><Button label={duplicates.length > 0 ? 'Review & Tambah Komentar' : 'Review & Simpan Draft'} icon="pi pi-check" loading={workflow.loading} disabled={duplicates.length > 0 && !acknowledged} onClick={() => { void save(); }} /></div>
         </>}
       </div>
     </Dialog>

@@ -2082,3 +2082,14 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run` (6/6 test), `cd frontend && npm run lint` (tujuh warning existing di file di luar scope), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.655 node dan 5.468 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-12 gate draft Issue hasil AI
+
+- Menjalankan `graphify query` sebelum menelusuri alur Issue AI dan mengikuti keputusan Section 4 serta Section 11.5 `FEATURE_BACKLOG.md`.
+- Menambahkan status Issue `draft` pada domain, label/filter UI, dan migration aditif `schema_074_e2e12_ai_issue_draft.sql`; migration hanya dibuat dan tidak dijalankan ke Supabase target.
+- Alur AI kini memakai operasi service khusus yang memvalidasi Test Result `FAIL` dan selalu menyimpan Issue baru sebagai `draft`. Pencatatan approval prematur saat draft disimpan dihapus; manusia dapat memverifikasi dengan mengubah status melalui UI.
+- Migration menambah status `draft` ke constraint database dan trigger yang menolak transisi keluar dari draft tanpa sesi user terautentikasi.
+- Menambahkan regression test yang membuktikan `issueService.createAiDraft()` mengirim dan mengembalikan status `draft`.
+- Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm test -- --run` (7/7 test) dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+- `git diff --check` lulus. `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.662 node dan 5.476 edge; warning tujuh file tanpa node tidak menggagalkan proses.

@@ -173,7 +173,7 @@ export const aiIssueService = {
       return existingIssue;
     }
 
-    const issue = await issueService.create({
+    const issue = await issueService.createAiDraft({
       testResultId: draft.testResultId,
       title: draft.title,
       description: formatDraftMetadata(draft),
@@ -181,7 +181,6 @@ export const aiIssueService = {
       expectedResult: draft.expectedResult,
       priority: toIssuePriority(draft.priority),
     });
-    await aiRepository.recordApproval({ projectId: input.projectId, targetType: 'issue', targetId: issue.id });
     return issue;
   },
 };
