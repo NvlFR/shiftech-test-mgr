@@ -266,10 +266,7 @@
   "264": "testResultStepRepository.ts",
   "265": "logging.test.mjs",
   "266": "@tanstack/react-query",
-  "267": "zod",
-  "268": "typescript",
   "269": "schema_085_boot01_agent_bootstrap_codes.sql",
-  "270": "useAiIssueWorkflow.ts",
   "271": "api.test.mjs",
   "272": "supabaseStorageAdapter.test.mjs"
 }

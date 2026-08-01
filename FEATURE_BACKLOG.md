@@ -1029,7 +1029,7 @@ jadi kebocoran token.
 - [ ] **Bootstrap code**, bukan token, yang ditampilkan dan ditempel:
       sekali pakai, berumur pendek (default 10 menit), hanya berwenang menukar diri
       menjadi runner token, dan mati begitu dipakai.
-- [ ] Runner token asli **dibuat di sisi mesin lokal** hasil penukaran bootstrap
+- [x] Runner token asli **dibuat di sisi mesin lokal** hasil penukaran bootstrap
       code, lalu ditulis ke file konfigurasi dengan permission `0600`. Token tidak
       pernah muncul di layar, di prompt, di clipboard, maupun di riwayat shell.
 - [ ] Alasan desain ini ditulis eksplisit: perintah yang ditempel masuk ke
@@ -1038,7 +1038,7 @@ jadi kebocoran token.
       yang sudah kedaluwarsa.
 - [x] Redaksi terpusat: token, bootstrap code, dan kredensial repo di-mask di
       seluruh log runner, MCP, dan output error — termasuk saat crash.
-- [ ] `.env` runner masuk `.gitignore` bawaan template, dan runner menolak jalan
+- [x] `.env` runner masuk `.gitignore` bawaan template, dan runner menolak jalan
       kalau file konfigurasinya world-readable.
 - [ ] Token per runner dapat dicabut dan dirotasi dari UI; pencabutan langsung
       berlaku pada poll berikutnya.

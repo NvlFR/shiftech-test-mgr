@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtemp, readFile, stat } from 'node:fs/promises';
+import { chmod, mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseCliInput } from '../dist/config.js';
+import { loadConfig, parseCliInput } from '../dist/config.js';
 import { bootstrapRunner } from '../dist/init.js';
 
 test('command init hanya menerima bootstrap code eksplisit', () => {
@@ -43,4 +43,29 @@ test('init menukar code, menulis config 0600, lalu mengirim heartbeat tanpa meng
   assert.doesNotMatch(output, new RegExp(token));
   assert.doesNotMatch(output, new RegExp(code));
   assert.match(output, /Runner Aman.*project-1/);
+});
+
+test('runner menolak file config yang dapat dibaca group atau user lain', async (t) => {
+  if (process.platform === 'win32') {
+    t.skip('POSIX file permissions tidak tersedia di Windows');
+    return;
+  }
+
+  const root = await mkdtemp(join(tmpdir(), 'tm-runner-config-'));
+  const configPath = join(root, '.env');
+  await writeFile(configPath, [
+    'TM_SUPABASE_URL=https://example.test',
+    'TM_SUPABASE_ANON_KEY=anon-public',
+    'TM_RUNNER_TOKEN=tm_private',
+    `TM_PROJECT_DIR=${root}`,
+    `TM_TRUSTED_REPOSITORIES=${root}`,
+    '',
+  ].join('\n'), { mode: 0o600 });
+
+  assert.doesNotThrow(() => loadConfig(configPath));
+  await chmod(configPath, 0o644);
+  assert.throws(
+    () => loadConfig(configPath),
+    /Agent config must be private \(chmod 600\)/,
+  );
 });

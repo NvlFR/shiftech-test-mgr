@@ -2587,3 +2587,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Setelah konfigurasi tersimpan, runner mengirim heartbeat pertama melalui `heartbeat_local_agent`; output sukses hanya memuat nama runner dan project, tanpa bootstrap code atau runner token.
 - Menambahkan test parser dan alur bootstrap yang memverifikasi urutan redeem → config → heartbeat, format token, permission file, dan tidak adanya secret pada stdout.
 - Verifikasi lulus: `cd runner && npm test` (13/13 suite), `npm run typecheck`, dan `git diff --check` untuk berkas runner terkait. Tidak ada migration yang dijalankan, data target diubah, secret dicatat, commit, atau push.
+
+## 2026-08-01 — BOOT-03 permission konfigurasi runner
+
+- Memastikan bootstrap runner menulis `.env` dengan permission POSIX `0600` dan loader runner menolak konfigurasi yang memiliki bit akses group/world.
+- Menambahkan regresi permission yang membuktikan konfigurasi `0600` diterima dan konfigurasi world-readable `0644` ditolak sebelum runner berjalan.
+- Memperluas `.gitignore` bawaan runner agar `.env` dan seluruh varian `.env.*` diabaikan, dengan pengecualian eksplisit untuk template aman `.env.example`.
+- Memperbarui checklist Section 14.4 untuk butir penyimpanan token lokal dan perlindungan `.env` yang kini lengkap.
+- Verifikasi lulus: `cd runner && npm test` (13/13 suite), pemeriksaan aturan gitignore, dan `git diff --check`. Tidak ada migration, perubahan data target, secret/token, commit, atau push.
