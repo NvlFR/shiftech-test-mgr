@@ -7,12 +7,15 @@ import { runCodegen } from './codegen.js';
 import { runScriptSync } from './sync.js';
 import { runInit } from './init.js';
 import { registerEnvironmentSecrets } from './security.js';
+import { formatCrash, installCrashHandlers } from '@testmanager/agent-core';
+
+installCrashHandlers(log);
 
 async function main(): Promise<void> {
   registerEnvironmentSecrets();
   const cli = parseCliInput(process.argv.slice(2));
   if (cli.command === 'init') {
-    process.exitCode = await runInit(cli.initDirectory);
+    process.exitCode = await runInit(cli.initCode!);
     return;
   }
   if (cli.command === 'codegen') {
@@ -42,6 +45,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  log.error('Fatal error', { error: err instanceof Error ? err.message : String(err) });
-  process.exit(1);
+  log.error('Fatal error', formatCrash(err));
+  process.exitCode = 1;
 });

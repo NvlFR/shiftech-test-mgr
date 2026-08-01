@@ -7,6 +7,7 @@ import test from "node:test";
 import { promisify } from "node:util";
 
 import type { ServerConfig } from "../config.js";
+import { transportFor } from "../helpers/transportTestHelper.js";
 import { RepoRepository } from "../repositories/repoRepository.js";
 import { RepoService } from "./repoService.js";
 
@@ -27,7 +28,7 @@ const fixture = async () => {
   await run("git", ["-C", root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "-qm", "change"]);
   const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: "token", projectId: "11111111-1111-4111-8111-111111111111", readonly: true, rerunFailedMaxTests: 25, repositoryCacheDir: join(root, "cache"), toolRateLimit: 120, toolRateLimitWindowSeconds: 60 };
   const fetchImpl: typeof fetch = async () => new Response(JSON.stringify([{ id: REPOSITORY_ID, name: "App", source_type: "local_path", url_or_path: root, default_branch: "main", subdirectory: "app", credential: null }]), { status: 200, headers: { "Content-Type": "application/json" } });
-  return { service: new RepoService(new RepoRepository(config, fetchImpl)), base };
+  return { service: new RepoService(new RepoRepository(config, transportFor(fetchImpl))), base };
 };
 
 test("repo tools list, read, search, and diff within configured subdirectory", async () => {

@@ -50,7 +50,7 @@ const byteLength = (value: unknown): number =>
   Buffer.byteLength(JSON.stringify(value), "utf8");
 
 const toolResponse = (envelope: SuccessEnvelope<unknown> | ErrorEnvelope, isError = false): ToolResponse => ({
-  content: [{ type: "text", text: JSON.stringify(envelope) }],
+  content: [{ type: "text", text: JSON.stringify(redactValue(envelope)) }],
   ...(isError ? { isError: true as const } : {}),
 });
 
@@ -144,7 +144,7 @@ export const errorResponse = (error: unknown): ToolResponse => {
         hint: "Retry once. If the error persists, ask an administrator to inspect the MCP server logs.",
       };
 
-  return toolResponse({ error: detail }, true);
+  return toolResponse({ error: redactValue(detail) as ErrorDetail }, true);
 };
 
 export const withErrorHandling = async (
@@ -156,3 +156,4 @@ export const withErrorHandling = async (
     return errorResponse(error);
   }
 };
+import { redactValue } from "@testmanager/agent-core";

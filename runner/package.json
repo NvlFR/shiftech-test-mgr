@@ -17,6 +17,9 @@
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "@testmanager/agent-core": "file:../packages/agent-core"
+  },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "typescript": "^5.7.0"

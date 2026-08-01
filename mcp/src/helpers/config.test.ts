@@ -32,3 +32,7 @@ test("loadConfig accepts HTTP transport settings", () => {
 test("loadConfig rejects unknown transport", () => {
   assert.throws(() => loadConfig({ ...baseEnv, TM_MCP_TRANSPORT: "websocket" }), /must be stdio or http/);
 });
+
+test("loadConfig rejects unknown TM_ variables", () => {
+  assert.throws(() => loadConfig({ ...baseEnv, TM_MCP_TRANSPROT: "stdio" }), /Unknown TestManager environment variable: TM_MCP_TRANSPROT/);
+});

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { RunnerTokenAuth } from "@testmanager/agent-core";
 
 import type { ServerConfig } from "../config.js";
+import { transportFor } from "../helpers/transportTestHelper.js";
 import { AuthRepository, AuthenticationError } from "../repositories/authRepository.js";
 import { AuthService, ProjectScopeError } from "./authService.js";
 
@@ -20,6 +22,11 @@ const config: ServerConfig = {
   toolRateLimitWindowSeconds: 60,
 };
 
+const authRepository = (fetchMock: typeof fetch): AuthRepository => new AuthRepository(
+  transportFor(fetchMock),
+  new RunnerTokenAuth({ token: config.apiToken, subject: config.projectId }),
+);
+
 test("authenticates from config and binds the session to the token project", async () => {
   const calls: Array<{ url: string; init?: RequestInit }> = [];
   const fetchMock: typeof fetch = async (input, init) => {
@@ -31,7 +38,7 @@ test("authenticates from config and binds the session to the token project", asy
     }]), { status: 200, headers: { "Content-Type": "application/json" } });
   };
 
-  const session = await new AuthService(config, new AuthRepository(config, fetchMock)).createSession();
+  const session = await new AuthService(config, authRepository(fetchMock)).createSession();
 
   assert.equal(session.projectId, PROJECT_ID);
   assert.deepEqual([...session.scopes], ["read:project"]);
@@ -47,7 +54,7 @@ test("rejects a token belonging to another project", async () => {
   }]), { status: 200, headers: { "Content-Type": "application/json" } });
 
   await assert.rejects(
-    new AuthService(config, new AuthRepository(config, fetchMock)).createSession(),
+    new AuthService(config, authRepository(fetchMock)).createSession(),
     ProjectScopeError,
   );
 });
@@ -58,7 +65,7 @@ test("rejects nested cross-project tool arguments", async () => {
     project_id: PROJECT_ID,
     scopes: ["read:project"],
   }]), { status: 200, headers: { "Content-Type": "application/json" } });
-  const session = await new AuthService(config, new AuthRepository(config, fetchMock)).createSession();
+  const session = await new AuthService(config, authRepository(fetchMock)).createSession();
 
   assert.throws(
     () => session.assertToolArguments({ filter: { project_id: OTHER_PROJECT_ID } }),
@@ -71,7 +78,7 @@ test("does not expose upstream response or token when authentication fails", asy
   const fetchMock: typeof fetch = async () => new Response(`invalid ${config.apiToken}`, { status: 401 });
 
   await assert.rejects(
-    new AuthService(config, new AuthRepository(config, fetchMock)).createSession(),
+    new AuthService(config, authRepository(fetchMock)).createSession(),
     (error: unknown) => error instanceof AuthenticationError && !error.message.includes(config.apiToken),
   );
 });

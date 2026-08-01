@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { ServerConfig } from "../config.js";
+import { transportFor } from "../helpers/transportTestHelper.js";
 import { GovernanceRepository, GovernanceRepositoryError } from "./governanceRepository.js";
 
 const config: ServerConfig = {
@@ -11,10 +12,10 @@ const config: ServerConfig = {
 
 test("begin mengirim metadata governance tanpa payload tool", async () => {
   let body: Record<string, unknown> = {};
-  const repository = new GovernanceRepository(config, async (_input, init) => {
+  const repository = new GovernanceRepository(config, transportFor(async (_input, init) => {
     body = JSON.parse(String(init?.body));
     return new Response(JSON.stringify([{ audit_id: "22222222-2222-4222-8222-222222222222", allowed: true }]), { status: 200 });
-  });
+  }));
   const result = await repository.beginToolCall("testmanager.project.list");
   assert.equal(result.allowed, true);
   assert.deepEqual(body, {
@@ -26,6 +27,6 @@ test("begin mengirim metadata governance tanpa payload tool", async () => {
 });
 
 test("upstream error tidak membocorkan response", async () => {
-  const repository = new GovernanceRepository(config, async () => new Response("raw sensitive payload", { status: 500 }));
+  const repository = new GovernanceRepository(config, transportFor(async () => new Response("raw sensitive payload", { status: 500 })));
   await assert.rejects(repository.beginToolCall("testmanager.project.list"), GovernanceRepositoryError);
 });

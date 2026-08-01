@@ -253,6 +253,10 @@ export function mapNotificationRow(row: any): Notification {
     commentId: row.comment_id ?? null,
     commentTargetType: row.comment?.target_type ?? null,
     commentTargetId: row.comment?.target_id ?? null,
+    testCaseId: row.test_case_id ?? null,
+    testRunId: row.test_run_id ?? null,
+    automationJobId: row.automation_job_id ?? null,
+    projectId: row.project_id ?? null,
     kind: row.kind,
     message: row.message,
     readAt: row.read_at,
@@ -516,5 +520,11 @@ export function mapTestPlanScheduleRow(row: any): TestPlanSchedule {
 }
 export function mapRetentionCleanupPreviewRow(row: any) { return { projectId: row.project_id ?? null, attachmentCutoff: row.attachment_cutoff, testAttachmentCount: Number(row.test_attachment_count ?? 0), issueAttachmentCount: Number(row.issue_attachment_count ?? 0) }; }
 export function mapRetentionCleanupResultRow(row: any) { return { cutoff: row.cutoff, testAttachments: Number(row.test_attachments ?? 0), issueAttachments: Number(row.issue_attachments ?? 0) }; }
-export function mapRestorePreviewRow(row: any) { return { valid: Boolean(row.valid), projectName: row.project_name ?? '', modules: Number(row.modules ?? 0), tags: Number(row.tags ?? 0), testCases: Number(row.test_cases ?? 0), testPlans: Number(row.test_plans ?? 0), testRuns: Number(row.test_runs ?? 0), testResults: Number(row.test_results ?? 0), issues: Number(row.issues ?? 0), attachments: Number(row.attachments ?? 0) }; }
-export function mapRestoreResultRow(row: any) { return { projectId: row.project_id, inserted: Number(row.inserted ?? 0), skipped: Number(row.skipped ?? 0) }; }
+export function mapRestorePreviewRow(row: any) { return { valid: Boolean(row.valid), projectName: row.project_name ?? '', modules: Number(row.modules ?? 0), tags: Number(row.tags ?? 0), testCases: Number(row.test_cases ?? 0), testPlans: Number(row.test_plans ?? 0), testRuns: Number(row.test_runs ?? 0), testResults: Number(row.test_results ?? 0), issues: Number(row.issues ?? 0), attachments: Number(row.attachments ?? 0), storageObjects: Number(row.storage_objects ?? 0) }; }
+export function mapRestoreResultRow(row: any) { return { projectId: row.project_id, inserted: Number(row.inserted ?? 0), skipped: Number(row.skipped ?? 0), storageRestored: Number(row.storage_restored ?? 0), storageSkipped: Number(row.storage_skipped ?? 0) }; }
+export function mapOperationalHealth(payload: any) {
+  return { checkedAt: payload.checked_at, components: (payload.components ?? []).map((item: any) => ({ name: item.name, label: item.label, status: item.status, summary: item.summary, details: item.details ?? {} })) };
+}
+export function mapOperationalErrorLogRow(row: any) {
+  return { id: Number(row.id), source: row.source, severity: row.severity, code: row.code ?? null, message: row.message, projectId: row.project_id ?? null, resourceType: row.resource_type ?? null, resourceId: row.resource_id ?? null, context: row.context ?? {}, occurredAt: row.occurred_at, resolvedAt: row.resolved_at ?? null };
+}

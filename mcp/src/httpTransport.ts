@@ -4,6 +4,7 @@ import { createServer, type IncomingMessage, type Server as HttpServer, type Ser
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+import type { TransportAdapter } from "@testmanager/agent-core";
 
 import type { ServerConfig } from "./config.js";
 import type { ProjectSession } from "./services/authService.js";
@@ -35,7 +36,7 @@ export interface RunningHttpTransport {
   close(): Promise<void>;
 }
 
-export const startHttpTransport = async (config: ServerConfig, session: ProjectSession): Promise<RunningHttpTransport> => {
+export const startHttpTransport = async (config: ServerConfig, session: ProjectSession, centralTransport: TransportAdapter): Promise<RunningHttpTransport> => {
   const transports = new Map<string, RemoteTransport>();
   const servers = new Set<ReturnType<typeof createMcpServer>>();
 
@@ -62,7 +63,7 @@ export const startHttpTransport = async (config: ServerConfig, session: ProjectS
               transports.set(id, transport!);
             },
           });
-          const mcpServer = createMcpServer(config, session);
+          const mcpServer = createMcpServer(config, session, centralTransport);
           servers.add(mcpServer);
           transport.onclose = () => {
             if (transport?.sessionId) transports.delete(transport.sessionId);
@@ -82,7 +83,7 @@ export const startHttpTransport = async (config: ServerConfig, session: ProjectS
       if (url.pathname === "/sse" && req.method === "GET") {
         const transport = new SSEServerTransport("/messages", res);
         transports.set(transport.sessionId, transport);
-        const mcpServer = createMcpServer(config, session);
+        const mcpServer = createMcpServer(config, session, centralTransport);
         servers.add(mcpServer);
         transport.onclose = () => {
           transports.delete(transport.sessionId);

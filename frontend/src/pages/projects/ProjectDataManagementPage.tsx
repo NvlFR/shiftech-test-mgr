@@ -68,7 +68,7 @@ export function ProjectDataManagementPage() {
   function restore() {
     if (!id || !restoreData || !restorePreview) return;
     confirmDialog({ header: 'Konfirmasi Restore', message: `Restore ${restorePreview.testCases} test case dan histori terkait ke project ini? Data existing akan dilewati (mode aman).`, icon: 'pi pi-exclamation-triangle', acceptLabel: 'Restore', rejectLabel: 'Batal', acceptClassName: 'p-button-warning', accept: async () => {
-      try { const result = await backupRetentionService.restore(id, restoreData); toast.current?.show({ severity: 'success', summary: 'Restore selesai', detail: `${result.inserted} data masuk, ${result.skipped} dilewati.` }); setRestoreData(null); setRestorePreview(null); setRestoreFile(null); }
+      try { const result = await backupRetentionService.restore(id, restoreData); toast.current?.show({ severity: 'success', summary: 'Restore selesai', detail: `${result.inserted} data masuk, ${result.skipped} dilewati; ${result.storageRestored} object Storage dipulihkan, ${result.storageSkipped} sudah ada.` }); setRestoreData(null); setRestorePreview(null); setRestoreFile(null); }
       catch (error) { toast.current?.show({ severity: 'error', summary: 'Restore gagal', detail: error instanceof Error ? error.message : 'Error' }); }
     } });
   }
@@ -88,10 +88,10 @@ export function ProjectDataManagementPage() {
     <Card><TabView>
       {!isGlobal && <TabPanel header="Backup / Restore">
         <div className="flex flex-column gap-3">
-          <p className="text-color-secondary">Backup berisi konfigurasi, test run/result/issue, dan metadata attachment. File Storage tidak diunduh; password, token, dan secret tidak pernah diekspor.</p>
+          <p className="text-color-secondary">Backup berisi konfigurasi, test run/result/issue, metadata attachment, dan object binary Storage. Password, token, dan secret tidak pernah diekspor.</p>
           <Button label="Ekspor Backup JSON" icon="pi pi-download" onClick={downloadBackup} className="align-self-start" />
           <div className="flex flex-column gap-2"><label htmlFor="restore-file">File backup JSON untuk preview/restore</label><input id="restore-file" type="file" accept="application/json,.json" onChange={(e) => void inspectRestore(e.target.files?.[0] ?? null)} /></div>
-          {restoreFile && restorePreview && <div className="surface-100 p-3 border-round"><p className="mt-0">Backup <strong>{restorePreview.projectName}</strong> valid. {restorePreview.testCases} test case, {restorePreview.testRuns} run, {restorePreview.testResults} result, {restorePreview.issues} issue, {restorePreview.attachments} metadata attachment.</p><Button label="Restore ke Project Ini" icon="pi pi-upload" severity="warning" onClick={restore} /></div>}
+          {restoreFile && restorePreview && <div className="surface-100 p-3 border-round"><p className="mt-0">Backup <strong>{restorePreview.projectName}</strong> valid. {restorePreview.testCases} test case, {restorePreview.testRuns} run, {restorePreview.testResults} result, {restorePreview.issues} issue, {restorePreview.attachments} attachment, dan {restorePreview.storageObjects} object Storage.</p><Button label="Restore ke Project Ini" icon="pi pi-upload" severity="warning" onClick={restore} /></div>}
         </div>
       </TabPanel>}
       <TabPanel header="Retensi & Cleanup">

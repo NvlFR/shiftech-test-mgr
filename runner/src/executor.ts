@@ -1,12 +1,7 @@
-import { spawn } from 'node:child_process';
-import { mkdirSync, statSync, writeFileSync } from 'node:fs';
-import { isAbsolute, join, relative, resolve } from 'node:path';
 import type { RunnerConfig } from './config.js';
 import type { AutomationJob, JobLogStream, JobResult, StepCommand } from './api.js';
-import { collectArtifacts, type CollectedArtifact } from './artifacts.js';
-import { log } from './logger.js';
-import { checkBaseUrlReachable } from './baseUrlSanityCheck.js';
-import { assertPathInsideRepository, childProcessEnvironment, parseAllowedPlaywrightCommand, redactSecrets, SecretRedactorStream } from './security.js';
+import type { CollectedArtifact } from './artifacts.js';
+import type { ExecutorAdapter } from '@testmanager/agent-core';
 
 export interface ExecutionOutcome {
   result: JobResult;
@@ -20,6 +15,16 @@ export interface ExecutionMode {
   slowMoMs: number;
   pauseOnFailure: boolean;
 }
+
+export interface RunnerExecutionRequest {
+  config: RunnerConfig;
+  job: AutomationJob;
+  projectDir: string;
+  onLog?: (stream: JobLogStream, content: string) => void;
+  subscribeCommands?: (deliver: (command: StepCommand) => void) => () => void;
+}
+
+export type RunnerExecutorAdapter = ExecutorAdapter<RunnerExecutionRequest, ExecutionOutcome>;
 
 const SUPPORTED_BROWSERS = ['chromium', 'firefox', 'webkit'] as const;
 export interface ExecutionTarget { browser: (typeof SUPPORTED_BROWSERS)[number]; deviceProfile: string | null; }
@@ -42,126 +47,4 @@ export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): 
     slowMoMs,
     pauseOnFailure: job.pause_on_failure ?? false,
   };
-}
-
-// Run one Playwright spec in an isolated per-job output directory. We invoke the
-// Playwright CLI (no library import) so this runner has zero runtime deps and
-// works against whatever Playwright version the project under test uses.
-export async function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir, onLog?: (stream: JobLogStream, content: string) => void, subscribeCommands?: (deliver: (command: StepCommand) => void) => () => void): Promise<ExecutionOutcome> {
-  if (isAbsolute(job.script_ref)) {
-    return { result: 'blocked', errorMessage: 'script_ref harus berupa path relatif di repository', artifacts: [] };
-  }
-  const resolvedScript = resolve(projectDir, job.script_ref);
-  const relativeScript = relative(projectDir, resolvedScript);
-  if (!relativeScript || relativeScript.startsWith('..') || isAbsolute(relativeScript)) {
-    return { result: 'blocked', errorMessage: 'script_ref berada di luar root repository', artifacts: [] };
-  }
-  try {
-    assertPathInsideRepository(projectDir, resolvedScript);
-    if (!statSync(resolvedScript).isFile() || !/\.(?:spec|test)\.(?:[cm]?[jt]sx?)$/i.test(relativeScript)) {
-      throw new Error('script_ref harus menunjuk file test Playwright yang didukung');
-    }
-  } catch (error) {
-    return { result: 'blocked', errorMessage: (error as Error).message, artifacts: [] };
-  }
-
-  let executionMode: ExecutionMode;
-  let executionTarget: ExecutionTarget;
-  try {
-    executionMode = resolveExecutionMode(config, job);
-    executionTarget = resolveExecutionTarget(job);
-  } catch (error) {
-    return { result: 'blocked', errorMessage: (error as Error).message, artifacts: [] };
-  }
-
-  const sanityCheck = await checkBaseUrlReachable(job.base_url);
-  if (!sanityCheck.reachable) {
-    return { result: 'blocked', errorMessage: sanityCheck.errorMessage, artifacts: [] };
-  }
-  if (job.base_url?.trim()) onLog?.('system', `Base URL ${new URL(job.base_url).origin} dapat dijangkau\n`);
-
-  const jobOutputDir = join(config.artifactDir, job.id);
-  mkdirSync(jobOutputDir, { recursive: true });
-
-  let invocation;
-  try { invocation = parseAllowedPlaywrightCommand(config.playwrightCmd); }
-  catch (error) { return { result: 'blocked', errorMessage: (error as Error).message, artifacts: [] }; }
-  const cmd = invocation.command;
-  const baseArgs = invocation.args;
-  const args = [
-    ...baseArgs,
-    relativeScript,
-    `--output=${jobOutputDir}`,
-    '--trace=retain-on-failure',
-    '--reporter=list',
-    `--browser=${executionTarget.browser}`,
-    ...(executionMode.headed ? ['--headed'] : []),
-  ];
-
-  return new Promise<ExecutionOutcome>((resolve) => {
-    log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode, ...executionTarget });
-    const child = spawn(cmd ?? 'npx', args, {
-      cwd: projectDir,
-      env: childProcessEnvironment({ TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '', TM_PAUSE_ON_FAILURE: executionMode.pauseOnFailure ? '1' : '0', TM_STEP_CONTROL_CHANNEL: 'stdin-jsonl' }),
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    const unsubscribeCommands = subscribeCommands?.((command) => {
-      if (!child.stdin.destroyed) {
-        child.stdin.write(`${JSON.stringify({ type: 'step-control', command })}\n`);
-        onLog?.('system', `Perintah step-through "${command}" diteruskan ke channel lokal.\n`);
-      }
-    });
-
-    let stdout = '';
-    let stderr = '';
-    const stdoutRedactor = new SecretRedactorStream();
-    const stderrRedactor = new SecretRedactorStream();
-    let settled = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    child.stdout.on('data', (chunk: Buffer) => {
-      const content = stdoutRedactor.write(chunk.toString()); stdout += content; if (content) onLog?.('stdout', content);
-      if (executionMode.pauseOnFailure && content.includes('[TM_PAUSE_ON_FAILURE]') && timer) {
-        clearTimeout(timer);
-        timer = null;
-        onLog?.('system', 'Job gagal dan dijeda untuk inspeksi lokal; tekan Resume di Playwright Inspector.\n');
-      }
-    });
-    child.stderr.on('data', (chunk: Buffer) => { const content = stderrRedactor.write(chunk.toString()); stderr += content; if (content) onLog?.('stderr', content); });
-
-    timer = setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      child.kill('SIGKILL');
-      finalize('blocked', `Job timed out after ${config.jobTimeoutMs / 1000}s`);
-    }, config.jobTimeoutMs);
-
-    function finalize(result: JobResult, errorMessage?: string): void {
-      unsubscribeCommands?.();
-      const finalStdout = stdoutRedactor.flush();
-      const finalStderr = stderrRedactor.flush();
-      stdout += finalStdout;
-      stderr += finalStderr;
-      if (finalStdout) onLog?.('stdout', finalStdout);
-      if (finalStderr) onLog?.('stderr', finalStderr);
-      const logPath = join(jobOutputDir, 'runner-output.log');
-      try { writeFileSync(logPath, redactSecrets(`$ ${cmd} ${args.join(' ')}\n\n[stdout]\n${stdout}\n[stderr]\n${stderr}\n`), { mode: 0o600 }); } catch { /* best effort */ }
-      const artifacts = collectArtifacts(jobOutputDir);
-      resolve({ result, errorMessage, notes: errorMessage ? undefined : 'Automation run selesai', artifacts });
-    }
-
-    child.on('error', (err) => {
-      if (settled) return;
-      settled = true;
-      if (timer) clearTimeout(timer);
-      finalize('blocked', `Failed to spawn Playwright: ${err.message}`);
-    });
-
-    child.on('close', (code) => {
-      if (settled) return;
-      settled = true;
-      if (timer) clearTimeout(timer);
-      if (code === 0) finalize('pass');
-      else finalize('fail', `Playwright exited with code ${code}`);
-    });
-  });
 }

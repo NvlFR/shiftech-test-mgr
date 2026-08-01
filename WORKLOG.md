@@ -2461,3 +2461,129 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Service memvalidasi Project dan membatasi ukuran feed 1–100 entri; mapper dan unit test diperbarui untuk payload audit.
 - Verifikasi lulus: `cd frontend && npm run build`; `cd frontend && npm test -- --run src/helpers/mappers.test.ts` (46/46); `cd frontend && npm run lint` (delapan warning existing di luar scope).
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.906 node dan 5.968 edge; warning tujuh source tanpa node tidak menggagalkan update.
+
+## 2026-08-01 — ADM-06 Notification center
+
+- Menelusuri notification center melalui Graphify dan mengikuti scope Section 6 `FEATURE_BACKLOG.md`.
+- Menambahkan migration manual `schema_082_adm06_notification_center.sql` (tidak dijalankan ke Supabase target) untuk notifikasi assignment Test Case/Test Run, perubahan status terkait, dan hasil terminal automation; notifikasi tetap recipient-scoped oleh RLS yang sudah ada.
+- Memperluas domain, mapper, repository, service, hook, dan panel notifikasi dengan target navigasi baru, ikon per jenis, serta invalidasi cache melalui Supabase Realtime di samping polling fallback.
+- Verifikasi: `cd frontend && npm run build` lulus dengan warning ukuran chunk existing; unit test mapper sempat mendeteksi expected shape lama lalu diperbarui sesuai kontrak domain baru.
+- `graphify update .` sudah dijalankan tetapi rebuild ditolak environment dengan `Operation not permitted`; source code dan migration tetap dapat diverifikasi secara lokal.
+- Gate akhir percobaan ulang lulus: `npm run build`, mapper test 46/46, dan `npm run lint` (delapan warning existing di luar scope); checklist Notification center di `FEATURE_BACKLOG.md` ditandai selesai.
+- Percobaan ulang `graphify update .` berhasil menyinkronkan graph menjadi 2.911 node dan 5.974 edge; warning tujuh source tanpa node tidak menggagalkan update.
+## 2026-08-01 — ADM-07 Observability dan monitoring
+
+- Menambahkan migration `schema_083_adm07_observability.sql`: tabel error operasional dengan RLS admin, redaksi credential, trigger kegagalan automation/webhook, serta RPC health check worker, queue, Storage, dan integrasi.
+- Menambahkan alur frontend lengkap domain/mapper → repository → service → hook → halaman admin `/admin/observability`, termasuk ringkasan health, filter, pencarian log, dan menu khusus admin.
+- Migration tidak dijalankan ke Supabase target sesuai batasan task.
+- Verifikasi: `npm run build` lulus; `npm run lint` lulus dengan warning lama di luar scope (warning hook observability sudah diperbaiki); `git diff --check` lulus; `graphify update .` dijalankan.
+- Gate percobaan ulang menambahkan coverage untuk kedua mapper observability; `npm test -- --run src/helpers/mappers.test.ts` lulus 48/48 setelah invariant daftar ekspor diperbarui.
+
+## 2026-08-01 — ADM-08 Backup/restore binary Storage
+
+- Melengkapi backup Project format versi 2 dengan payload base64 object binary dari bucket privat `test-attachments` dan `issue-attachments`; secret, token, dan credential tetap tidak masuk backup.
+- Restore memvalidasi bucket, path, MIME type, ukuran, base64, duplikasi, dan kecocokan dengan metadata attachment sebelum memulihkan metadata lalu mengunggah object yang belum ada. Backup metadata-only versi 1 tetap kompatibel.
+- Mempertahankan layering: page memakai service, service mengorkestrasi metadata dan binary, repository menjadi satu-satunya akses RPC serta Supabase Storage. Tidak ada migration yang ditambahkan atau dijalankan ke target.
+- Verifikasi lulus: `cd frontend && npm test -- --run src/services/backupRetentionService.test.ts src/helpers/mappers.test.ts` (2 file, 52 test), `cd frontend && npm run build`, dan `git diff --check`. Build hanya memberi warning ukuran chunk existing.
+- Gate percobaan ulang memperketat kontrak backup: hanya format resmi versi 1/2 yang diterima, versi 1 wajib metadata-only, versi 2 wajib membawa tepat satu binary (maksimal 10 MB) untuk setiap metadata attachment. Unit test regresi ditambahkan untuk versi asing dan binary v2 yang tidak lengkap.
+- Verifikasi ulang lulus: unit test service + mapper 54/54, `npm run build`, dan `git diff --check`; build hanya memberi warning ukuran chunk existing. `graphify update .` berhasil menyinkronkan graph menjadi 2.947 node dan 6.054 edge dengan warning tujuh source tanpa node.
+
+## 2026-08-01 — AGENT-01 kontrak adapter agent-core
+
+- Menambahkan paket TypeScript bersama `packages/agent-core` dengan nol runtime dependency dan output ESM beserta declaration.
+- Mendefinisikan serta mendokumentasikan kontrak `TransportAdapter`, `ExecutorAdapter`, `ArtifactStorageAdapter`, `AuthAdapter`, dan `RepoAdapter` sesuai Section 14.1 `FEATURE_BACKLOG.md`; belum menambahkan implementasi provider.
+- Kontrak menjaga secret tetap di boundary auth, hasil eksekusi dan transport tetap provider-agnostic, artifact memakai binary Web API netral, serta akses repository memiliki lifecycle prepare/read/release dan kewajiban workspace containment.
+- Verifikasi lulus: `npm run build`, `npm run typecheck`, dan `git diff --check -- packages/agent-core`. Lockfile dibuat secara offline; tidak ada migration, perubahan data, commit, push, atau secret/token.
+
+## 2026-08-01 — AGENT-02 Supabase RPC transport
+
+- Mengimplementasikan `SupabaseRpcTransport` dan `SupabaseRpcError` di `packages/agent-core` sebagai satu-satunya boundary HTTP untuk Supabase PostgREST RPC runner.
+- Merefactor `runner/src/api.ts` agar seluruh operasi automation RPC didelegasikan melalui `TransportAdapter`, dengan format URL, header anon, payload, parsing respons, dan error/status yang tetap kompatibel.
+- Menambahkan dependency lokal runner ke `@testmanager/agent-core` dan test regresi untuk delegasi RPC, format request Supabase, serta normalisasi error dengan body maksimum 300 karakter.
+- Verifikasi lulus: build dan typecheck `packages/agent-core`; build, typecheck, dan 11 test runner. Pemeriksaan source memastikan endpoint `/rest/v1/rpc` dan pemanggilan `fetch` RPC hanya berada di implementasi adapter. Tidak ada migration, perubahan data, commit, push, atau secret/token.
+- Gate percobaan ulang lulus dengan hasil yang sama; `git diff --check` bersih dan `graphify update .` mengonfirmasi tidak ada perubahan topologi graph. Daftar serah-terima dibatasi hanya ke berkas AGENT-02 yang benar-benar disentuh.
+
+## 2026-08-01 — AGENT-03 MCP memakai TransportAdapter bersama
+
+- Merefactor seluruh repository di `mcp/` agar RPC, autentikasi, penandatanganan artifact, dan AI gateway didelegasikan melalui satu instance `TransportAdapter` dari `packages/agent-core`; tidak ada pemanggilan Supabase/`fetch` langsung tersisa di source runtime MCP.
+- Memperluas request transport dengan jenis operasi `rpc`/`function`, sehingga `SupabaseRpcTransport` tetap menjadi satu-satunya boundary HTTP untuk PostgREST RPC maupun Supabase Edge Functions.
+- Menambahkan dependency workspace lokal `@testmanager/agent-core` pada MCP dan memperbarui test agar seluruh mock HTTP juga melewati implementasi adapter yang sama.
+- Verifikasi lulus: build dan typecheck `packages/agent-core`; build serta seluruh 20 test MCP; audit source runtime MCP tidak menemukan `fetch`, endpoint Supabase, header `apikey`, atau pemanggilan client Supabase di luar adapter.
+- Tidak ada migration yang dijalankan, data yang diubah, secret/token yang dicatat, commit, atau push.
+
+## 2026-08-01 — AGENT-04 ExecutorAdapter dan PlaywrightLocalExecutor
+
+- Membuat kontrak `ExecutorAdapter` bersama mendukung tipe request/result implementasi tanpa mengikat pemanggil pada detail Playwright maupun cloud executor tertentu.
+- Memindahkan seluruh logika eksekusi Playwright lokal dari `runner/src/executor.ts` ke `PlaywrightLocalExecutor`, termasuk validasi path/target/mode, base URL sanity check, spawn CLI, live log dan step command, timeout, redaksi log, pengumpulan artifact, serta cancel proses aktif.
+- Menginjeksi `RunnerExecutorAdapter` ke `Runner` dengan `PlaywrightLocalExecutor` sebagai default, sehingga implementasi executor dapat diganti tanpa mengubah siklus polling/reporting runner.
+- Menambahkan test untuk penolakan script di luar repository dan idempotensi cancel job yang tidak aktif.
+- Verifikasi lulus: build `packages/agent-core`; build dan seluruh 12 test runner. Tidak ada migration, perubahan data target, commit, push, atau secret/token.
+
+## 2026-08-01 — AGENT-05 ArtifactStorageAdapter dan SupabaseStorageAdapter
+
+- Mengimplementasikan `SupabaseStorageAdapter` untuk signing melalui Edge Function dan upload signed URL Supabase Storage di balik kontrak bersama `ArtifactStorageAdapter`.
+- Merefactor `runner/src/upload.ts` menjadi orkestrator provider-agnostic yang hanya membaca file, menentukan MIME type, memanggil adapter, dan memetakan descriptor ke payload report.
+- Menginjeksi artifact storage ke `Runner`, dengan `SupabaseStorageAdapter` sebagai default, sehingga provider storage dapat diganti tanpa mengubah siklus eksekusi/reporting.
+- Menambahkan test delegasi upload dan test implementasi Supabase untuk signing, PUT binary, metadata descriptor, serta respons signing invalid.
+- Verifikasi lulus: `cd runner && npm run build && npm test` (13/13 test). Tidak ada migration, perubahan data target, commit, push, atau secret/token.
+- Gate percobaan ulang lulus untuk build dan typecheck `packages/agent-core`, typecheck runner, seluruh 13 test runner, serta `git diff --check`. `graphify update .` sudah dijalankan, tetapi rebuild watcher ditolak environment dengan `Operation not permitted`; source graph tidak diubah oleh percobaan tersebut.
+
+## 2026-08-01 — AGENT-06 AuthAdapter dan RunnerTokenAuth
+
+- Mengimplementasikan `RunnerTokenAuth` tanpa runtime dependency di `packages/agent-core`, dengan proof RPC yang terenkapsulasi, identity aman untuk log/telemetri, validasi input, serta invalidasi credential dalam memori.
+- Memperluas auth context dan `SupabaseRpcTransport` agar credential body digabungkan di boundary transport, sehingga caller runner/MCP tidak lagi menyisipkan token secara manual ke payload operasi.
+- Merefactor runner `AutomationApi` dan autentikasi MCP agar memakai implementasi `AuthAdapter` yang sama tanpa mengubah format `p_token` maupun mekanisme validasi/pencabutan server yang sudah ada.
+- Menambahkan unit test untuk kerahasiaan identity dan invalidasi token, serta memperbarui test integrasi runner/MCP. Tidak ada secret yang dicatat, migration yang dijalankan, perubahan data target, commit, atau push.
+- Verifikasi lulus: seluruh test `packages/agent-core` (1 suite), runner (13 suite), dan MCP (20 suite); `cd frontend && npm run build`; serta `git diff --check` untuk berkas scope. Build frontend hanya memberi warning ukuran chunk existing.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 3.077 node dan 6.241 edge; warning tujuh source tanpa node tidak menggagalkan update.
+
+## 2026-08-01 — AGENT-07 RepoAdapter bersama untuk runner dan MCP
+
+- Mengimplementasikan `LocalPathRepo` dan `GitCloneRepo` di `packages/agent-core` berdasarkan kontrak `RepoAdapter`, termasuk validasi root Git/path absolut, containment workspace, operasi list/read, cache clone, checkout/update deterministik, dan URL HTTP(S) tanpa credential.
+- Memusatkan pembuatan header autentikasi Git di `GitCloneRepo`; credential di-resolve saat runtime dan tidak dimasukkan ke URL maupun argumen command.
+- Merefactor persiapan repository runner dan repository MCP untuk memakai implementasi adapter bersama tersebut, sehingga duplikasi validasi URL, clone/update, cache, dan auth Git di kedua proses dihapus tanpa mengubah kontrak tool `repo.*`.
+- Menambahkan test adapter untuk containment dan kerahasiaan credential, serta menyesuaikan test runner dengan strategi fetch/reset bersama.
+- Verifikasi lulus: seluruh test `packages/agent-core` (2 suite), runner (13 suite), dan MCP (20 suite). Tidak ada migration, perubahan data target, commit, push, atau secret/token yang dicatat.
+
+## 2026-08-01 — AGENT-08 konfigurasi runner dan MCP bersama
+
+- Menambahkan satu allow-list dan skema env `TM_*`, loader `.env`, serta validator bersama di `packages/agent-core`; validator menolak nama `TM_*` yang tidak dikenal dan nilai invalid dengan pesan yang menyebut variabel terkait.
+- Merefactor konfigurasi runner dan MCP agar keduanya memakai `loadAgentEnv()` yang sama. Perintah runner interaktif tetap tidak membutuhkan credential server, tetapi seluruh nilai yang diberikan tetap divalidasi.
+- Mempertahankan prioritas environment proses terhadap file `.env` dan pemeriksaan permission private untuk file konfigurasi tanpa menambah runtime dependency.
+- Menambahkan test skema bersama dan regresi typo env pada MCP. Tidak ada migration, perubahan data target, secret/token, commit, atau push.
+- Verifikasi lulus: seluruh test `packages/agent-core` (3 suite), runner (13 suite), dan MCP (20 suite).
+
+## 2026-08-01 — AGENT-09 logging terpadu dan redaksi rahasia terpusat
+
+- Menambahkan logger bersama di `packages/agent-core` dengan format konsisten, registry rahasia terpusat, sanitasi object/Error/circular value, URL berkredensial, header autentikasi, nilai base64, dan stream lintas chunk.
+- Merefactor runner agar logger serta redaksi output Playwright memakai implementasi bersama; memasang boundary crash global untuk `uncaughtException` dan `unhandledRejection` agar error fatal ikut di-mask.
+- Menambahkan logger MCP ke stderr agar tidak merusak protokol stdio, registrasi kredensial repo saat di-resolve, sanitasi envelope respons/error tool, serta penanganan startup dan crash global melalui boundary yang sama.
+- Menambahkan test yang membuktikan runner token, bootstrap code, dan kredensial repository tidak muncul pada log normal, metadata, error/crash, base64, field sensitif, maupun stream terpotong.
+- Verifikasi lulus: seluruh test `packages/agent-core` (4 suite), runner (13 suite), dan MCP (20 suite). Tidak ada migration, perubahan data target, commit, push, atau secret/token yang dicatat.
+- Gate percobaan ulang menambahkan regresi pada envelope MCP untuk membuktikan runner token, bootstrap code, dan kredensial repository selalu teredaksi sebelum serialisasi respons. Verifikasi akhir lulus: agent-core 4/4, runner 13/13, MCP 20/20, build frontend, dan `git diff --check` pada berkas AGENT-09.
+## 2026-08-01 — AGENT-10 heartbeat dan versioning Local Agent
+
+- Menambahkan kontrak `AgentHeartbeatPayload` terpusat di `@testmanager/agent-core` dengan identitas tunggal `testmanager-agent`, versi `0.1.0`, proses asal, dan capabilities.
+- Runner dan MCP kini memakai RPC `heartbeat_local_agent` dengan bentuk payload yang sama; MCP mengirim heartbeat periodik dan runner tetap memperbarui status automation runner melalui RPC baru.
+- Menambahkan `schema_084_agent10_unified_heartbeat.sql` untuk validasi payload/token runner atau API token serta penyimpanan telemetri kedua proses di `local_agent_heartbeats`. Migration tidak dijalankan ke target Supabase.
+- Metadata versi MCP memakai konstanta rilis bersama; versi paket runner dan MCP diverifikasi sama-sama `0.1.0`.
+- Verifikasi lulus: test `agent-core`, test runner, test MCP, pemeriksaan kesamaan versi paket, dan build frontend.
+- `graphify update .` sudah dijalankan sesuai aturan, tetapi rebuild watcher ditolak environment dengan `Operation not permitted`; kegagalan sinkronisasi graph ini tidak memengaruhi source atau hasil build/test.
+- Percobaan ulang gate driver lulus: agent-core 4/4, runner 13/13, MCP 21/21, build frontend, kesamaan versi paket `0.1.0`, dan `git diff --check`; daftar serah-terima dibatasi pada berkas AGENT-10 yang benar-benar berubah menurut git.
+
+## 2026-08-01 — BOOT-01 bootstrap code runner sekali pakai
+
+- Menambahkan migration `schema_085_boot01_agent_bootstrap_codes.sql` untuk bootstrap code project-scoped yang hanya menyimpan hash SHA-256, kedaluwarsa default 10 menit, dan hanya dapat dipakai sekali.
+- Menambahkan RPC `issue_agent_bootstrap_code` khusus anggota project serta `redeem_agent_bootstrap_code` untuk menukar code dengan runner token yang dibuat lokal; token mentah tidak disimpan atau dikembalikan oleh RPC redeem.
+- Menambahkan RLS/grant minimum: anggota project dapat menerbitkan melalui RPC authenticated, sedangkan redeem tersedia untuk Local Agent melalui role `anon` dan mengunci code secara atomik sebelum membuat runner.
+- Migration tidak dijalankan ke Supabase target dan tidak ada secret/token yang dicatat.
+- Verifikasi statis lulus (`git diff --check` dan audit kontrak hash/expiry/RLS/redeem atomik). `graphify update .` sudah dijalankan, tetapi watcher environment menolak rebuild dengan `Operation not permitted`; tidak ada Supabase/Postgres lokal yang digunakan.
+- Verifikasi ulang gate driver lulus: kontrak hash-only, expiry default 10 menit, project membership, penguncian redeem sekali pakai, dan penyimpanan hash runner token terdeteksi; `git diff --check` bersih. `graphify update .` berhasil menyinkronkan graph menjadi 3.139 node dan 6.344 edge.
+
+## 2026-08-01 — BOOT-02 CLI bootstrap Local Runner
+
+- Mengubah subcommand runner menjadi `init --code <CODE>` dan memvalidasi bentuk bootstrap code sekali pakai sebelum akses jaringan.
+- Runner membuat token secara lokal, mendaftarkannya ke redactor, menukar bootstrap code melalui RPC `redeem_agent_bootstrap_code`, lalu menulis konfigurasi `.env` secara atomik dengan permission `0600`.
+- Setelah konfigurasi tersimpan, runner mengirim heartbeat pertama melalui `heartbeat_local_agent`; output sukses hanya memuat nama runner dan project, tanpa bootstrap code atau runner token.
+- Menambahkan test parser dan alur bootstrap yang memverifikasi urutan redeem → config → heartbeat, format token, permission file, dan tidak adanya secret pada stdout.
+- Verifikasi lulus: `cd runner && npm test` (13/13 suite), `npm run typecheck`, dan `git diff --check` untuk berkas runner terkait. Tidak ada migration yang dijalankan, data target diubah, secret dicatat, commit, atau push.

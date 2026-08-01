@@ -16,19 +16,12 @@ export class WriteRepositoryError extends Error {
 }
 
 export class WriteRepository {
-  constructor(private readonly config: ServerConfig, private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly config: ServerConfig, private readonly transport: TransportAdapter) {}
 
   private async rpc(name: string, body: Record<string, unknown>): Promise<unknown> {
-    let response: Response;
     try {
-      response = await this.fetchImpl(`${this.config.supabaseUrl}/rest/v1/rpc/${name}`, {
-        method: "POST", headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey,
-          Authorization: `Bearer ${this.config.supabaseAnonKey}` },
-        body: JSON.stringify({ p_token: this.config.apiToken, p_project_id: this.config.projectId, ...body }),
-      });
+      return (await this.transport.request({ operation: name, body: { p_token: this.config.apiToken, p_project_id: this.config.projectId, ...body } })).data;
     } catch { throw new WriteRepositoryError(); }
-    if (!response.ok) throw new WriteRepositoryError();
-    return response.json();
   }
 
   createTestCases(cases: TestCaseWriteInput[]) { return this.rpc("mcp_create_test_cases", { p_cases: cases.map(toCaseRow) }); }
@@ -53,17 +46,15 @@ export class WriteRepository {
   duplicateIssueCandidates() { return this.rpc("mcp_issue_duplicate_candidates", {}); }
   async detectDuplicate(draft: DuplicateIssueDraft, candidates: unknown[]) {
     if (!this.config.supabaseAccessToken) throw new WriteRepositoryError();
-    let response: Response;
     try {
-      response = await this.fetchImpl(`${this.config.supabaseUrl}/functions/v1/ai-gateway`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey, Authorization: `Bearer ${this.config.supabaseAccessToken}` },
-        body: JSON.stringify({ action: "duplicate_issue_detection", projectId: this.config.projectId, draft, candidates }),
-      });
+      const payload = (await this.transport.request<{ data?: unknown }>({
+        operation: "ai-gateway",
+        kind: "function",
+        auth: { headers: { Authorization: `Bearer ${this.config.supabaseAccessToken}` } },
+        body: { action: "duplicate_issue_detection", projectId: this.config.projectId, draft, candidates },
+      })).data;
+      return payload.data ?? payload;
     } catch { throw new WriteRepositoryError(); }
-    if (!response.ok) throw new WriteRepositoryError();
-    const payload = await response.json() as { data?: unknown };
-    return payload.data ?? payload;
   }
 }
 
@@ -79,3 +70,4 @@ const toCaseRow = (input: TestCaseChanges): Record<string, unknown> => {
   if (input.notes !== undefined) row.notes = input.notes;
   return row;
 };
+import type { TransportAdapter } from "@testmanager/agent-core";

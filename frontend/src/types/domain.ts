@@ -444,6 +444,25 @@ export interface AutomationJobLog {
   createdAt: string;
 }
 
+// --- Admin observability ---
+export type OperationalHealthStatus = 'healthy' | 'warning' | 'down';
+export type OperationalSource = 'worker' | 'queue' | 'storage' | 'integration';
+export interface OperationalHealthComponent { name: OperationalSource; label: string; status: OperationalHealthStatus; summary: string; details: Record<string, unknown>; }
+export interface OperationalHealth { checkedAt: string; components: OperationalHealthComponent[]; }
+export interface OperationalErrorLog {
+  id: number;
+  source: OperationalSource;
+  severity: 'warning' | 'error' | 'critical';
+  code: string | null;
+  message: string;
+  projectId: string | null;
+  resourceType: string | null;
+  resourceId: string | null;
+  context: Record<string, unknown>;
+  occurredAt: string;
+  resolvedAt: string | null;
+}
+
 export interface AutomationEnqueueResponse { runId: string; runCode: string; jobCount: number; }
 export interface AutomationLocalRunResponse { runId: string; runCode: string; jobId: string; }
 
@@ -610,7 +629,11 @@ export interface Notification {
   commentId: string | null;
   commentTargetType: CommentTargetType | null;
   commentTargetId: string | null;
-  kind: 'issue_assigned' | 'issue_status_changed' | 'comment_mentioned';
+  testCaseId: string | null;
+  testRunId: string | null;
+  automationJobId: string | null;
+  projectId: string | null;
+  kind: 'issue_assigned' | 'issue_status_changed' | 'comment_mentioned' | 'test_case_assigned' | 'test_case_status_changed' | 'test_run_assigned' | 'test_run_status_changed' | 'automation_completed';
   message: string;
   readAt: string | null;
   createdAt: string;
@@ -735,5 +758,13 @@ export interface DashboardReport {
 export interface RetentionPolicy { id: string; projectId: string | null; retentionDays: number; attachmentRetentionDays: number | null; enabled: boolean; createdBy: string | null; createdAt: string; updatedAt: string; }
 export interface RetentionCleanupPreview { projectId: string | null; attachmentCutoff: string; testAttachmentCount: number; issueAttachmentCount: number; }
 export interface RetentionCleanupResult { testAttachments: number; issueAttachments: number; cutoff: string; }
-export interface RestorePreview { valid: boolean; projectName: string; modules: number; tags: number; testCases: number; testPlans: number; testRuns: number; testResults: number; issues: number; attachments: number; }
-export interface RestoreResult { projectId: string; inserted: number; skipped: number; }
+export interface RestorePreview { valid: boolean; projectName: string; modules: number; tags: number; testCases: number; testPlans: number; testRuns: number; testResults: number; issues: number; attachments: number; storageObjects: number; }
+export interface RestoreResult { projectId: string; inserted: number; skipped: number; storageRestored: number; storageSkipped: number; }
+
+export interface BackupStorageObject {
+  bucket: 'test-attachments' | 'issue-attachments';
+  path: string;
+  mimeType: string;
+  sizeBytes: number;
+  base64: string;
+}

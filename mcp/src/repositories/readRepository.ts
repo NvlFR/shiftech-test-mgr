@@ -27,25 +27,14 @@ export class ReadRepositoryError extends Error {
 }
 
 export class ReadRepository {
-  constructor(private readonly config: ServerConfig, private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly config: ServerConfig, private readonly transport: TransportAdapter) {}
 
   private async rpc(name: string, body: Record<string, unknown>): Promise<unknown> {
-    let response: Response;
     try {
-      response = await this.fetchImpl(`${this.config.supabaseUrl}/rest/v1/rpc/${name}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: this.config.supabaseAnonKey,
-          Authorization: `Bearer ${this.config.supabaseAnonKey}`,
-        },
-        body: JSON.stringify({ p_token: this.config.apiToken, p_project_id: this.config.projectId, ...body }),
-      });
+      return (await this.transport.request({ operation: name, body: { p_token: this.config.apiToken, p_project_id: this.config.projectId, ...body } })).data;
     } catch {
       throw new ReadRepositoryError();
     }
-    if (!response.ok) throw new ReadRepositoryError();
-    return response.json();
   }
 
   async listProjects(): Promise<Project[]> {
@@ -115,11 +104,13 @@ export class ReadRepository {
   async getRequirement(id: string): Promise<RequirementDetail | null> { const rows = await this.rpc("mcp_get_requirement", { p_requirement_id: id }) as unknown[]; return rows[0] ? mapRequirementDetailRow(rows[0]) : null; }
   async getRequirementCoverage(): Promise<RequirementCoverage> { const rows = await this.rpc("mcp_requirement_coverage", {}) as unknown[]; return mapRequirementCoverageRow(rows[0]); }
   async getArtifactUrl(bucket: string, path: string, expiresIn: number): Promise<ArtifactUrl> {
-    let response: Response;
-    try { response = await this.fetchImpl(`${this.config.supabaseUrl}/functions/v1/automation-artifacts`, { method: "POST", headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey },
-      body: JSON.stringify({ token: this.config.apiToken, action: "download", bucket, path, expires_in: expiresIn }) }); } catch { throw new ReadRepositoryError(); }
-    if (!response.ok) throw new ReadRepositoryError();
-    const value = await response.json() as { bucket: string; path: string; url: string; expiresIn: number };
-    return value;
+    try {
+      return (await this.transport.request<ArtifactUrl>({
+        operation: "automation-artifacts",
+        kind: "function",
+        body: { token: this.config.apiToken, action: "download", bucket, path, expires_in: expiresIn },
+      })).data;
+    } catch { throw new ReadRepositoryError(); }
   }
 }
+import type { TransportAdapter } from "@testmanager/agent-core";

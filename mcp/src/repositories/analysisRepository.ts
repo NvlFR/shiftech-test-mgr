@@ -7,18 +7,12 @@ export class AnalysisRepositoryError extends Error {
 }
 
 export class AnalysisRepository {
-  constructor(private readonly config: ServerConfig, private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly config: ServerConfig, private readonly transport: TransportAdapter) {}
 
   private async rpc(name: string, body: Record<string, unknown>): Promise<unknown> {
-    let response: Response;
     try {
-      response = await this.fetchImpl(`${this.config.supabaseUrl}/rest/v1/rpc/${name}`, {
-        method: "POST", headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey, Authorization: `Bearer ${this.config.supabaseAnonKey}` },
-        body: JSON.stringify({ p_token: this.config.apiToken, p_project_id: this.config.projectId, ...body }),
-      });
+      return (await this.transport.request({ operation: name, body: { p_token: this.config.apiToken, p_project_id: this.config.projectId, ...body } })).data;
     } catch { throw new AnalysisRepositoryError(); }
-    if (!response.ok) throw new AnalysisRepositoryError();
-    return response.json();
   }
 
   async runSummary(testRunId: string): Promise<AnalysisRunSummary | null> {
@@ -34,3 +28,4 @@ export class AnalysisRepository {
     return rows.map(mapRetestSuggestionRow);
   }
 }
+import type { TransportAdapter } from "@testmanager/agent-core";

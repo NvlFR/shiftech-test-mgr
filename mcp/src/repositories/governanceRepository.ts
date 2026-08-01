@@ -11,7 +11,7 @@ export class GovernanceRepositoryError extends Error {
 }
 
 export class GovernanceRepository {
-  constructor(private readonly config: ServerConfig, private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly config: ServerConfig, private readonly transport: TransportAdapter) {}
 
   async beginToolCall(toolName: string): Promise<BeginToolCallResult> {
     const rows = await this.call<BeginToolCallRow[]>("mcp_begin_tool_call", {
@@ -31,16 +31,9 @@ export class GovernanceRepository {
   }
 
   private async call<T = unknown>(rpc: string, body: Record<string, unknown>): Promise<T> {
-    let response: Response;
     try {
-      response = await this.fetchImpl(`${this.config.supabaseUrl}/rest/v1/rpc/${rpc}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", apikey: this.config.supabaseAnonKey, Authorization: `Bearer ${this.config.supabaseAnonKey}` },
-        body: JSON.stringify(body),
-      });
+      return (await this.transport.request<T, Record<string, unknown>>({ operation: rpc, body })).data;
     } catch { throw new GovernanceRepositoryError(); }
-    if (!response.ok) throw new GovernanceRepositoryError();
-    const text = await response.text();
-    return (text ? JSON.parse(text) : undefined) as T;
   }
 }
+import type { TransportAdapter } from "@testmanager/agent-core";

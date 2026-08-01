@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { notificationService } from '../services/notificationService';
 import { queryKeys } from './queryKeys';
@@ -27,6 +28,15 @@ export function useNotifications() {
       queryClient.invalidateQueries({ queryKey: queryKeys.notificationsUnreadCount() }),
     ]);
   };
+  useEffect(() => {
+    if (!userId) return;
+    return notificationService.subscribe(userId, () => {
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.notifications() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.notificationsUnreadCount() }),
+      ]);
+    });
+  }, [userId, queryClient]);
   const markReadMutation = useMutation({ mutationFn: notificationService.markRead, onSuccess: invalidate });
   const markAllReadMutation = useMutation({
     mutationFn: () => notificationService.markAllRead(userId!),

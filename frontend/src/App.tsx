@@ -30,6 +30,7 @@ import { ProjectDataManagementPage } from './pages/projects/ProjectDataManagemen
 import { DashboardReportPage } from './pages/dashboard/DashboardReportPage';
 import { TeamsPage } from './pages/teams/TeamsPage';
 import { ProjectTeamsPage } from './pages/teams/ProjectTeamsPage';
+import { ObservabilityPage } from './pages/admin/ObservabilityPage';
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
             <Route path="/users" element={<UserManagementPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
             <Route path="/teams" element={<TeamsPage />} />
+            <Route path="/admin/observability" element={<ObservabilityPage />} />
           </Route>
         </Route>
       </Route>

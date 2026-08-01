@@ -12,26 +12,28 @@ const config = {
   runnerToken: 'runner-token',
 };
 
-test('meng-upload seluruh bundle dan mengembalikan metadata Storage', async (t) => {
+test('mendelegasikan penyimpanan ke adapter dan mengembalikan metadata artifact', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'tm-upload-'));
   const localPath = join(dir, 'failure.png');
   writeFileSync(localPath, 'image');
-  const calls = [];
-  t.mock.method(globalThis, 'fetch', async (url, init) => {
-    calls.push({ url: String(url), init });
-    if (calls.length === 1) return new Response(JSON.stringify({ bucket: 'automation-artifacts', uploads: [{ name: 'failure.png', path: 'project/job/failure.png', uploadUrl: 'https://upload.test/signed' }] }), { status: 200 });
-    return new Response('', { status: 200 });
-  });
+  const requests = [];
+  const storage = {
+    async store(request) {
+      requests.push(request);
+      return { id: 'project/job/failure.png', name: request.name, contentType: request.contentType, size: request.content.byteLength, metadata: { bucket: 'automation-artifacts', path: 'project/job/failure.png' } };
+    },
+    async retrieve() { throw new Error('not used'); },
+    async delete() {},
+  };
 
-  const result = await uploadArtifacts(config, 'job', [{ type: 'screenshot', name: 'failure.png', localPath }]);
+  const result = await uploadArtifacts(config, storage, 'job', [{ type: 'screenshot', name: 'failure.png', localPath }]);
   assert.deepEqual(result, [{ type: 'screenshot', name: 'failure.png', url: 'project/job/failure.png', path: 'project/job/failure.png', bucket: 'automation-artifacts' }]);
-  assert.equal(calls.length, 2);
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].contentType, 'image/png');
+  assert.deepEqual(requests[0].metadata, { jobId: 'job', artifactType: 'screenshot' });
 });
 
-test('menolak metadata signing parsial agar bundle tidak tertaut setengah', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({ bucket: 'automation-artifacts', uploads: [] }), { status: 200 }));
-  await assert.rejects(
-    uploadArtifacts(config, 'job', [{ type: 'trace', name: 'trace.zip', localPath: '/tmp/not-read.zip' }]),
-    /seluruh bundle/,
-  );
+test('tidak memanggil adapter saat tidak ada artifact', async () => {
+  const storage = { store() { throw new Error('unexpected'); } };
+  assert.deepEqual(await uploadArtifacts(config, storage, 'job', []), []);
 });

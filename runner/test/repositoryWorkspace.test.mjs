@@ -28,7 +28,7 @@ test('clone private repository memakai token hanya melalui environment Git', asy
 
   assert.equal(result.projectDir, join(cacheDir, repository.id));
   assert.deepEqual(calls[0].args, [
-    'clone', '--branch', 'main', '--single-branch', '--', repository.url_or_path, join(cacheDir, repository.id),
+    'clone', '--no-tags', '--single-branch', '--branch', 'main', '--', repository.url_or_path, join(cacheDir, repository.id),
   ]);
   assert.equal(calls[0].args.join(' ').includes(token), false);
   assert.equal(JSON.stringify(calls[0].env).includes(token), false);
@@ -50,7 +50,7 @@ test('repository cache yang sudah ada di-pull sebelum eksekusi', async () => {
 
   assert.equal(result.projectDir, join(repositoryRoot, 'e2e'));
   assert.deepEqual(calls.map((args) => args.slice(2, 4)), [
-    ['remote', 'set-url'], ['checkout', 'develop'], ['pull', '--ff-only'],
+    ['remote', 'set-url'], ['fetch', '--quiet'], ['checkout', '--quiet'], ['reset', '--quiet'],
   ]);
 });
 

@@ -1,6 +1,6 @@
-import { readFileSync, existsSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
-import { assertPrivateConfigFile, parseAllowedPlaywrightCommand, parseTrustedRepositories, registerEnvironmentSecrets, registerSecret } from './security.js';
+import { loadAgentEnv } from '@testmanager/agent-core';
+import { parseAllowedPlaywrightCommand, parseTrustedRepositories, registerEnvironmentSecrets, registerSecret } from './security.js';
 
 export interface RunnerConfig {
   supabaseUrl: string;
@@ -31,7 +31,7 @@ export interface RunnerCliInput {
   options: RunnerCliOptions;
   playwrightArgs: string[];
   codegenUrl?: string;
-  initDirectory?: string;
+  initCode?: string;
 }
 
 export interface InteractiveRunnerConfig {
@@ -40,48 +40,22 @@ export interface InteractiveRunnerConfig {
   trustedRepositories: string[];
 }
 
-// Minimal zero-dependency .env loader. Existing process.env always wins so that
-// container/CI env vars override the file.
-function loadDotEnv(path: string): void {
-  if (!existsSync(path)) return;
-  assertPrivateConfigFile(path);
-  for (const raw of readFileSync(path, 'utf8').split('\n')) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const eq = line.indexOf('=');
-    if (eq === -1) continue;
-    const key = line.slice(0, eq).trim();
-    if (key in process.env) continue;
-    let value = line.slice(eq + 1).trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
-    }
-    process.env[key] = value;
-  }
-}
-
-function required(name: string): string {
-  const value = process.env[name];
-  if (!value || !value.trim()) throw new Error(`Missing required env var: ${name}`);
-  return value.trim();
-}
-
-function intEnv(name: string, fallback: number): number {
-  const value = process.env[name];
+function intEnv(env: NodeJS.ProcessEnv, name: string, fallback: number): number {
+  const value = env[name];
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function nonNegativeIntEnv(name: string, fallback: number): number {
-  const value = process.env[name];
+function nonNegativeIntEnv(env: NodeJS.ProcessEnv, name: string, fallback: number): number {
+  const value = env[name];
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
-function boolEnv(name: string, fallback: boolean): boolean {
-  const value = process.env[name]?.trim().toLowerCase();
+function boolEnv(env: NodeJS.ProcessEnv, name: string, fallback: boolean): boolean {
+  const value = env[name]?.trim().toLowerCase();
   if (!value) return fallback;
   if (['1', 'true', 'yes', 'on'].includes(value)) return true;
   if (['0', 'false', 'no', 'off'].includes(value)) return false;
@@ -114,8 +88,9 @@ export function parseCliOptions(args: string[]): RunnerCliOptions {
 export function parseCliInput(args: string[]): RunnerCliInput {
   const command = args[0];
   if (command === 'init') {
-    if (args.length > 2 || args[1]?.startsWith('-')) throw new Error('Usage: runner init [directory]');
-    return { command, options: {}, playwrightArgs: [], initDirectory: args[1] };
+    const code = args[1] === '--code' ? args[2]?.trim() : undefined;
+    if (!code || args.length !== 3) throw new Error('Usage: runner init --code <CODE>');
+    return { command, options: {}, playwrightArgs: [], initCode: code };
   }
   if (command === 'sync') {
     if (args.length > 1) throw new Error('Usage: runner sync');
@@ -139,43 +114,43 @@ export function parseCliInput(args: string[]): RunnerCliInput {
 }
 
 export function loadInteractiveConfig(envPath = '.env'): InteractiveRunnerConfig {
-  loadDotEnv(resolve(process.cwd(), envPath));
-  registerEnvironmentSecrets();
-  const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
-  if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
+  const env = loadAgentEnv({ process: 'runner', envPath: resolve(process.cwd(), envPath), requireProcessValues: false });
+  registerEnvironmentSecrets(env);
+  const projectDir = env.TM_PROJECT_DIR?.trim() || process.cwd();
+  if (env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
     throw new Error('TM_PROJECT_DIR must be an absolute path');
   }
   const config = {
     projectDir: resolve(projectDir),
-    playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
-    trustedRepositories: parseTrustedRepositories(process.env.TM_TRUSTED_REPOSITORIES),
+    playwrightCmd: env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
+    trustedRepositories: parseTrustedRepositories(env.TM_TRUSTED_REPOSITORIES),
   };
   parseAllowedPlaywrightCommand(config.playwrightCmd);
   return config;
 }
 
 export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}): RunnerConfig {
-  loadDotEnv(resolve(process.cwd(), envPath));
-  registerEnvironmentSecrets();
-  const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
-  if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
+  const env = loadAgentEnv({ process: 'runner', envPath: resolve(process.cwd(), envPath) });
+  registerEnvironmentSecrets(env);
+  const projectDir = env.TM_PROJECT_DIR?.trim() || process.cwd();
+  if (env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
     throw new Error('TM_PROJECT_DIR must be an absolute path');
   }
   const config = {
-    supabaseUrl: required('TM_SUPABASE_URL').replace(/\/+$/, ''),
-    supabaseAnonKey: required('TM_SUPABASE_ANON_KEY'),
-    runnerToken: required('TM_RUNNER_TOKEN'),
+    supabaseUrl: env.TM_SUPABASE_URL!.trim().replace(/\/+$/, ''),
+    supabaseAnonKey: env.TM_SUPABASE_ANON_KEY!.trim(),
+    runnerToken: env.TM_RUNNER_TOKEN!.trim(),
     projectDir: resolve(projectDir),
-    repositoryCacheDir: resolve(process.cwd(), process.env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
-    playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
-    trustedRepositories: parseTrustedRepositories(process.env.TM_TRUSTED_REPOSITORIES),
-    headed: cliOptions.headed ?? boolEnv('TM_PLAYWRIGHT_HEADED', false),
-    slowMoMs: cliOptions.slowMoMs ?? nonNegativeIntEnv('TM_PLAYWRIGHT_SLOW_MO_MS', 0),
-    pollIntervalMs: intEnv('TM_POLL_INTERVAL_SECONDS', 5) * 1000,
-    heartbeatIntervalMs: intEnv('TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,
-    jobTimeoutMs: intEnv('TM_JOB_TIMEOUT_SECONDS', 900) * 1000,
-    artifactDir: resolve(process.cwd(), process.env.TM_ARTIFACT_DIR?.trim() || './artifacts'),
-    artifactUpload: (process.env.TM_ARTIFACT_UPLOAD?.trim().toLowerCase() ?? 'true') !== 'false',
+    repositoryCacheDir: resolve(process.cwd(), env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
+    playwrightCmd: env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
+    trustedRepositories: parseTrustedRepositories(env.TM_TRUSTED_REPOSITORIES),
+    headed: cliOptions.headed ?? boolEnv(env, 'TM_PLAYWRIGHT_HEADED', false),
+    slowMoMs: cliOptions.slowMoMs ?? nonNegativeIntEnv(env, 'TM_PLAYWRIGHT_SLOW_MO_MS', 0),
+    pollIntervalMs: intEnv(env, 'TM_POLL_INTERVAL_SECONDS', 5) * 1000,
+    heartbeatIntervalMs: intEnv(env, 'TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,
+    jobTimeoutMs: intEnv(env, 'TM_JOB_TIMEOUT_SECONDS', 900) * 1000,
+    artifactDir: resolve(process.cwd(), env.TM_ARTIFACT_DIR?.trim() || './artifacts'),
+    artifactUpload: (env.TM_ARTIFACT_UPLOAD?.trim().toLowerCase() ?? 'true') !== 'false',
   };
   parseAllowedPlaywrightCommand(config.playwrightCmd);
   registerSecret(config.supabaseAnonKey);

@@ -1,84 +1,75 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { basename, resolve } from 'node:path';
+import { randomBytes } from 'node:crypto';
+import { chmod, rename, rm, writeFile } from 'node:fs/promises';
+import { hostname } from 'node:os';
+import { resolve } from 'node:path';
+import { loadAgentEnv, type TransportAdapter } from '@testmanager/agent-core';
+import { BootstrapApi } from './api.js';
+import { registerEnvironmentSecrets, registerSecret } from './security.js';
 
-const scaffoldFiles = (projectName: string): Record<string, string> => ({
-  'package.json': `${JSON.stringify({
-    name: projectName,
-    version: '1.0.0',
-    private: true,
-    type: 'module',
-    scripts: { test: 'playwright test', 'test:ui': 'playwright test --ui' },
-    devDependencies: { '@playwright/test': '^1.49.0' },
-  }, null, 2)}\n`,
-  'playwright.config.ts': `import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './tests',
-  fullyParallel: true,
-  reporter: 'html',
-  use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-    trace: 'retain-on-failure',
-  },
-});
-`,
-  'tests/example.spec.ts': `import { expect, test } from '@playwright/test';
-
-test('halaman utama dapat dibuka', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveTitle(/.+/);
-});
-`,
-  '.gitignore': `node_modules/
-playwright-report/
-test-results/
-artifacts/
-.env
-`,
-});
-
-function safePackageName(directory: string): string {
-  const normalized = basename(directory).toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
-  return normalized || 'playwright-tests';
+export interface BootstrapInitOptions {
+  env?: NodeJS.ProcessEnv;
+  configPath?: string;
+  cwd?: string;
+  transport?: TransportAdapter;
+  stdout?: Pick<NodeJS.WriteStream, 'write'>;
 }
 
-export async function scaffoldPlaywrightProject(directory = '.'): Promise<string> {
-  const target = resolve(process.cwd(), directory);
-  const files = scaffoldFiles(safePackageName(target));
-  await mkdir(target, { recursive: true });
+function requiredConnectionValue(env: Record<string, string | undefined>, name: 'TM_SUPABASE_URL' | 'TM_SUPABASE_ANON_KEY'): string {
+  const value = env[name]?.trim();
+  if (!value) throw new Error(`${name} wajib tersedia untuk menjalankan init`);
+  return value;
+}
 
-  const conflicts: string[] = [];
-  for (const path of Object.keys(files)) {
-    try {
-      await readFile(resolve(target, path));
-      conflicts.push(path);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
-    }
-  }
-  if (conflicts.length > 0) {
-    throw new Error(`Init dibatalkan agar tidak menimpa file yang sudah ada: ${conflicts.join(', ')}`);
-  }
+function serializeConfig(supabaseUrl: string, supabaseAnonKey: string, runnerToken: string, projectDir: string): string {
+  return [
+    `TM_SUPABASE_URL=${supabaseUrl}`,
+    `TM_SUPABASE_ANON_KEY=${supabaseAnonKey}`,
+    `TM_RUNNER_TOKEN=${runnerToken}`,
+    `TM_PROJECT_DIR=${projectDir}`,
+    `TM_TRUSTED_REPOSITORIES=${projectDir}`,
+    '',
+  ].join('\n');
+}
 
-  const written: string[] = [];
+async function writePrivateConfig(path: string, content: string): Promise<void> {
+  const temporaryPath = `${path}.${process.pid}.tmp`;
   try {
-    for (const [path, content] of Object.entries(files)) {
-      const output = resolve(target, path);
-      await mkdir(resolve(output, '..'), { recursive: true });
-      await writeFile(output, content, { encoding: 'utf8', flag: 'wx' });
-      written.push(output);
-    }
+    await writeFile(temporaryPath, content, { encoding: 'utf8', mode: 0o600, flag: 'wx' });
+    await chmod(temporaryPath, 0o600);
+    await rename(temporaryPath, path);
+    await chmod(path, 0o600);
   } catch (error) {
-    await Promise.all(written.map((path) => rm(path, { force: true })));
+    await rm(temporaryPath, { force: true });
     throw error;
   }
-  return target;
 }
 
-export async function runInit(directory?: string): Promise<number> {
-  const target = await scaffoldPlaywrightProject(directory);
-  process.stdout.write(`Project Playwright dibuat di ${target}\n\nBerikutnya:\n  cd ${target}\n  npm install\n  npx playwright install\n  npm test\n`);
+export async function bootstrapRunner(code: string, options: BootstrapInitOptions = {}): Promise<void> {
+  if (!/^tmb_[0-9a-f]{48}$/.test(code)) throw new Error('Bootstrap code tidak valid');
+  const cwd = resolve(options.cwd ?? process.cwd());
+  const configPath = resolve(options.configPath ?? resolve(cwd, '.env'));
+  const sourceEnv = options.env ?? process.env;
+  const env = loadAgentEnv({ process: 'runner', env: sourceEnv, envPath: configPath, requireProcessValues: false });
+  registerEnvironmentSecrets(env);
+  registerSecret(code);
+
+  const supabaseUrl = requiredConnectionValue(env, 'TM_SUPABASE_URL').replace(/\/+$/, '');
+  const supabaseAnonKey = requiredConnectionValue(env, 'TM_SUPABASE_ANON_KEY');
+  const runnerToken = `tm_${randomBytes(36).toString('base64url')}`;
+  registerSecret(runnerToken);
+
+  const api = new BootstrapApi({ supabaseUrl, supabaseAnonKey }, options.transport);
+  const runner = await api.redeem(code, runnerToken, `Local Runner (${hostname()})`);
+  await writePrivateConfig(configPath, serializeConfig(supabaseUrl, supabaseAnonKey, runnerToken, cwd));
+  await api.heartbeat(runnerToken);
+
+  (options.stdout ?? process.stdout).write(
+    `Runner ${runner.name} tersambung ke project ${runner.project_id}.\n` +
+    'Peringatan: runner menjalankan kode dari repository yang dipercaya di mesin ini.\n',
+  );
+}
+
+export async function runInit(code: string): Promise<number> {
+  await bootstrapRunner(code);
   return 0;
 }

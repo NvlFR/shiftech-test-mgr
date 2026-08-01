@@ -1,4 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { LOCAL_AGENT_VERSION, type TransportAdapter } from "@testmanager/agent-core";
 
 import type { ServerConfig } from "./config.js";
 import { AnalysisRepository } from "./repositories/analysisRepository.js";
@@ -21,15 +22,15 @@ import { createRepoToolRegistrar } from "./tools/repoTools.js";
 import { installToolGovernance, registerTools, toolRegistry } from "./tools/registry.js";
 import { createWriteToolRegistrar } from "./tools/writeTools.js";
 
-export const createMcpServer = (config: ServerConfig, session: ProjectSession): McpServer => {
-  const readService = new ReadService(session, new ReadRepository(config));
-  const writeService = new WriteService(new WriteRepository(config));
-  const repoService = new RepoService(new RepoRepository(config));
-  const automationService = new AutomationService(new AutomationRepository(config), repoService);
-  const analysisService = new AnalysisService(new AnalysisRepository(config));
-  const server = new McpServer({ name: "testmanager", version: "0.1.0" });
+export const createMcpServer = (config: ServerConfig, session: ProjectSession, transport: TransportAdapter): McpServer => {
+  const readService = new ReadService(session, new ReadRepository(config, transport));
+  const writeService = new WriteService(new WriteRepository(config, transport));
+  const repoService = new RepoService(new RepoRepository(config, transport));
+  const automationService = new AutomationService(new AutomationRepository(config, transport), repoService);
+  const analysisService = new AnalysisService(new AnalysisRepository(config, transport));
+  const server = new McpServer({ name: "testmanager", version: LOCAL_AGENT_VERSION });
 
-  installToolGovernance(server, new GovernanceService(new GovernanceRepository(config)));
+  installToolGovernance(server, new GovernanceService(new GovernanceRepository(config, transport)));
   registerTools(server, {
     read: [...toolRegistry.read, createReadToolRegistrar(session, readService), createAutomationReadToolRegistrar(session, automationService), createRepoToolRegistrar(session, repoService), createAnalysisToolRegistrar(session, analysisService)],
     write: [...toolRegistry.write, createWriteToolRegistrar(session, writeService), createAutomationWriteToolRegistrar(session, automationService)],

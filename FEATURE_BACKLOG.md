@@ -99,10 +99,13 @@ Update 2026-07-26: seluruh migration s/d `schema_028` SUDAH diterapkan ke Supaba
 target. Webhook HTTP dispatcher + HMAC signing SUDAH terpasang (`schema_028`,
 dispatcher in-database via `pg_net`/`pgcrypto`, secret store = Supabase Vault,
 scheduler `pg_cron`) dan terverifikasi end-to-end. CI/CD "kirim status balik ke
-pipeline" berjalan sinkron via response `ingest_cicd_test_run`. Backup/restore
-masih metadata-only (belum binary Storage) — satu-satunya sisa P2.
+pipeline" berjalan sinkron via response `ingest_cicd_test_run`.
 
-Catatan implementasi 2026-07-22: migration `schema_021_p2_backup_retention.sql` dan UI project/admin sudah dibuat; status tetap belum `[x]` sampai migration dijalankan serta RPC, RLS, dan Storage diverifikasi pada Supabase target. Backup/restore saat ini memulihkan metadata attachment, bukan object binary Storage.
+Update 2026-08-01 (ADM-08): backup format versi 2 menyertakan object binary dari
+bucket attachment dan restore memulihkannya setelah metadata. Backup versi 1
+metadata-only tetap dapat dipulihkan untuk kompatibilitas.
+
+Catatan implementasi 2026-07-22: migration `schema_021_p2_backup_retention.sql` dan UI project/admin sudah dibuat; migration, RPC, RLS, dan Storage kemudian diverifikasi pada Supabase target. Binary Storage dilengkapi oleh ADM-08 tanpa migration baru.
 
 ## 4. AI Integration
 
@@ -244,9 +247,9 @@ RLS aktif, `get_advisors` 0 ERROR. Detail server-side:
   - Mengelompokkan user dan mengatur akses team per Project.
 - [x] Activity feed per Project.
   - Timeline aktivitas penting dalam satu Project.
-- [ ] Notification center.
+- [x] Notification center.
   - Pusat notifikasi untuk assignment, mention, perubahan status, dan hasil automation.
-- [ ] Observability dan monitoring.
+- [x] Observability dan monitoring.
   - Health check worker, queue, storage, dan integrasi.
   - Log error yang mudah ditelusuri admin.
 
@@ -966,9 +969,9 @@ ini syarat supaya backend custom nanti bisa masuk tanpa membongkar isi.
       `PlaywrightLocalExecutor` (sekarang) → `CloudExecutor` (kalau cloud runner jadi).
 - [ ] **`ArtifactStorageAdapter`** — tempat menyimpan bukti.
       `SupabaseStorage` (sekarang) → `S3`/`MinIO`/`BackendUpload`.
-- [ ] **`AuthAdapter`** — cara runner membuktikan identitas.
+- [x] **`AuthAdapter`** — cara runner membuktikan identitas.
       `RunnerTokenAuth` (sekarang) → OAuth device flow / mTLS (kalau jadi SaaS).
-- [ ] **`RepoAdapter`** — cara membaca source (Section 10).
+- [x] **`RepoAdapter`** — cara membaca source (Section 10).
       `LocalPathRepo` · `GitCloneRepo` — dipakai bersama oleh runner dan MCP.
 - [ ] Kontrak adapter didefinisikan di satu paket bersama (`packages/agent-core`
       atau sejenis) yang diimpor `runner/` dan `mcp/`, sehingga saat disatukan
@@ -979,12 +982,12 @@ ini syarat supaya backend custom nanti bisa masuk tanpa membongkar isi.
 
 Yang harus sudah dipakai bareng oleh `runner/` dan `mcp/` sebelum penyatuan:
 
-- [ ] Konfigurasi: satu skema env dengan prefix `TM_`, satu loader, satu validator.
+- [x] Konfigurasi: satu skema env dengan prefix `TM_`, satu loader, satu validator.
 - [ ] Identitas: satu format token dan satu mekanisme pencabutan.
-- [ ] Logging: format sama, dengan **redaksi rahasia terpusat** (14.4).
-- [ ] Telemetri/heartbeat: satu bentuk payload, sehingga server melihat satu jenis
+- [x] Logging: format sama, dengan **redaksi rahasia terpusat** (14.4).
+- [x] Telemetri/heartbeat: satu bentuk payload, sehingga server melihat satu jenis
       "agent" walau saat ini datang dari dua proses.
-- [ ] Versioning: `runner/` dan `mcp/` dirilis dengan nomor versi yang sama.
+- [x] Versioning: `runner/` dan `mcp/` dirilis dengan nomor versi yang sama.
 
 ### 14.3 Cara install
 
@@ -1033,7 +1036,7 @@ jadi kebocoran token.
       `~/.bash_history`, dan halaman Connect akan di-screenshot lalu dibagikan.
       Dua hal itu membocorkan token permanen, tapi tidak membocorkan bootstrap code
       yang sudah kedaluwarsa.
-- [ ] Redaksi terpusat: token, bootstrap code, dan kredensial repo di-mask di
+- [x] Redaksi terpusat: token, bootstrap code, dan kredensial repo di-mask di
       seluruh log runner, MCP, dan output error — termasuk saat crash.
 - [ ] `.env` runner masuk `.gitignore` bawaan template, dan runner menolak jalan
       kalau file konfigurasinya world-readable.

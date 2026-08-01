@@ -9,6 +9,11 @@ const NOTIFICATION_KIND_ICON: Record<Notification['kind'], string> = {
   issue_assigned: 'pi-user-edit',
   issue_status_changed: 'pi-sync',
   comment_mentioned: 'pi-at',
+  test_case_assigned: 'pi-user-plus',
+  test_case_status_changed: 'pi-sync',
+  test_run_assigned: 'pi-play-circle',
+  test_run_status_changed: 'pi-sync',
+  automation_completed: 'pi-bolt',
 };
 
 function iconForKind(kind: Notification['kind']): string {

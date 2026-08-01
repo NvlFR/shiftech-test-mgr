@@ -1,7 +1,8 @@
 import { execFile } from 'node:child_process';
-import { existsSync, mkdirSync, realpathSync } from 'node:fs';
-import { isAbsolute, join, normalize, relative, resolve } from 'node:path';
+import { existsSync, realpathSync } from 'node:fs';
+import { isAbsolute, normalize, relative, resolve } from 'node:path';
 import { promisify } from 'node:util';
+import { GitCloneRepo, LocalPathRepo } from '@testmanager/agent-core';
 import type { JobRepository } from './api.js';
 import type { RunnerConfig } from './config.js';
 import { inspectLocalRepository, type LocalRepositoryMetadata } from './localRepository.js';
@@ -9,23 +10,11 @@ import { assertTrustedRepository, registerSecret } from './security.js';
 
 const execFileAsync = promisify(execFile);
 
-type GitCommand = (args: string[], env: NodeJS.ProcessEnv) => Promise<void>;
+type GitCommand = (args: readonly string[], env: NodeJS.ProcessEnv) => Promise<void>;
 type InspectRepository = (repositoryPath: string) => LocalRepositoryMetadata;
 
-async function runGit(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
-  await execFileAsync('git', args, { env, maxBuffer: 1024 * 1024 });
-}
-
-function gitEnvironment(token: string | null): NodeJS.ProcessEnv {
-  if (!token) return { ...process.env, GIT_TERMINAL_PROMPT: '0' };
-  const authorization = Buffer.from(`x-access-token:${token}`, 'utf8').toString('base64');
-  return {
-    ...process.env,
-    GIT_TERMINAL_PROMPT: '0',
-    GIT_CONFIG_COUNT: '1',
-    GIT_CONFIG_KEY_0: 'http.extraHeader',
-    GIT_CONFIG_VALUE_0: `Authorization: Basic ${authorization}`,
-  };
+async function runGit(args: readonly string[], env: NodeJS.ProcessEnv): Promise<void> {
+  await execFileAsync('git', [...args], { env, maxBuffer: 1024 * 1024 });
 }
 
 function resolveSubdirectory(repositoryRoot: string, subdirectory: string | null): string {
@@ -52,14 +41,22 @@ export async function prepareJobRepository(
   gitCommand: GitCommand = runGit,
   inspectRepository: InspectRepository = inspectLocalRepository,
 ): Promise<{ projectDir: string; metadata: LocalRepositoryMetadata }> {
+  const adapterGit = async (path: string, args: readonly string[]): Promise<string> => {
+    const inspected = inspectRepository(path);
+    if (args[0] === 'rev-parse' && args[1] === '--show-toplevel') return inspected.path;
+    if (args[0] === 'rev-parse' && args[1] === 'HEAD') return inspected.commitSha;
+    return '';
+  };
   if (!repository) {
-    const metadata = inspectRepository(config.projectDir);
+    const workspace = await new LocalPathRepo({ git: adapterGit }).prepare({ source: config.projectDir });
+    const metadata = inspectRepository(workspace.rootPath);
     assertTrustedRepository(metadata.path, config.trustedRepositories);
     return { projectDir: config.projectDir, metadata };
   }
 
   if (repository.source_type === 'local_path') {
-    const metadata = inspectRepository(repository.url_or_path);
+    const workspace = await new LocalPathRepo({ git: adapterGit }).prepare({ source: repository.url_or_path });
+    const metadata = inspectRepository(workspace.rootPath);
     assertTrustedRepository(metadata.path, config.trustedRepositories);
     return {
       projectDir: resolveSubdirectory(repository.url_or_path, repository.subdirectory),
@@ -67,40 +64,21 @@ export async function prepareJobRepository(
     };
   }
 
-  let repositoryUrl: URL;
-  try {
-    repositoryUrl = new URL(repository.url_or_path);
-  } catch {
-    throw new Error('Remote repository harus menggunakan URL HTTP(S)');
-  }
-  if (!['http:', 'https:'].includes(repositoryUrl.protocol)) {
-    throw new Error('Remote repository harus menggunakan URL HTTP(S)');
-  }
-  if (repositoryUrl.username || repositoryUrl.password) {
-    throw new Error('Credential tidak boleh disimpan di URL repository');
-  }
   if (repository.source_type === 'github_private' && !repository.token) {
     throw new Error('Credential private repository tidak tersedia');
   }
 
-  mkdirSync(config.repositoryCacheDir, { recursive: true });
-  const repositoryRoot = join(config.repositoryCacheDir, repository.id);
-  const branch = repository.default_branch || 'main';
-  const env = gitEnvironment(repository.token);
   registerSecret(repository.token);
-
-  if (!existsSync(join(repositoryRoot, '.git'))) {
-    await gitCommand(['clone', '--branch', branch, '--single-branch', '--', repository.url_or_path, repositoryRoot], env);
-  } else {
-    await gitCommand(['-C', repositoryRoot, 'remote', 'set-url', 'origin', repository.url_or_path], env);
-    await gitCommand(['-C', repositoryRoot, 'checkout', branch], env);
-    await gitCommand(['-C', repositoryRoot, 'pull', '--ff-only', 'origin', branch], env);
-  }
-
-  const metadata = inspectRepository(repositoryRoot);
+  const workspace = await new GitCloneRepo({
+    cacheDir: config.repositoryCacheDir,
+    credentialResolver: async () => repository.token,
+    command: gitCommand,
+    git: adapterGit,
+  }).prepare({ source: repository.url_or_path, revision: repository.default_branch || 'main', credentialsRef: repository.id });
+  const metadata = inspectRepository(workspace.rootPath);
   assertTrustedRepository(metadata.path, config.trustedRepositories);
   return {
-    projectDir: resolveSubdirectory(repositoryRoot, repository.subdirectory),
+    projectDir: resolveSubdirectory(workspace.rootPath, repository.subdirectory),
     metadata,
   };
 }

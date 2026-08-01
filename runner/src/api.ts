@@ -1,3 +1,11 @@
+import {
+  SupabaseRpcError,
+  SupabaseRpcTransport,
+  RunnerTokenAuth,
+  createAgentHeartbeat,
+  type AuthAdapter,
+  type TransportAdapter,
+} from '@testmanager/agent-core';
 import type { RunnerConfig } from './config.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
 
@@ -79,49 +87,90 @@ export interface CodegenTestCaseStep {
   expected_result: string | null;
 }
 
-export class ApiError extends Error {
-  constructor(message: string, readonly status: number) {
-    super(message);
-    this.name = 'ApiError';
+export { SupabaseRpcError as ApiError };
+
+export interface BootstrapConnectionConfig {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+}
+
+export interface RedeemedRunner {
+  id: string;
+  project_id: string;
+  name: string;
+  labels: string[];
+}
+
+/** API boundary used only while exchanging a short-lived bootstrap code. */
+export class BootstrapApi {
+  private readonly transport: TransportAdapter;
+
+  constructor(config: BootstrapConnectionConfig, transport?: TransportAdapter) {
+    this.transport = transport ?? new SupabaseRpcTransport(config);
+  }
+
+  async redeem(code: string, runnerToken: string, runnerName: string): Promise<RedeemedRunner> {
+    const response = await this.transport.request<{ runner: RedeemedRunner }>({
+      operation: 'redeem_agent_bootstrap_code',
+      body: {
+        p_code: code,
+        p_runner_token: runnerToken,
+        p_runner_name: runnerName,
+        p_runner_labels: ['local', 'playwright'],
+      },
+    });
+    return response.data.runner;
+  }
+
+  async heartbeat(runnerToken: string): Promise<void> {
+    const auth = new RunnerTokenAuth({ token: runnerToken, subject: 'automation-runner' });
+    await this.transport.request({
+      operation: 'heartbeat_local_agent',
+      body: { p_payload: createAgentHeartbeat('runner', ['execute', 'artifacts', 'repository']) },
+      auth: await auth.getAuthContext(),
+    });
   }
 }
 
 // The automation RPCs are granted to anon; the runner token in the body is the
 // real credential. Outbound HTTPS only — the local machine never opens a port.
 export class AutomationApi {
-  constructor(private readonly config: RunnerConfig) {}
+  private readonly transport: TransportAdapter;
+  private readonly auth: AuthAdapter;
 
-  private async rpc<T>(fn: string, params: Record<string, unknown>): Promise<T> {
-    const res = await fetch(`${this.config.supabaseUrl}/rest/v1/rpc/${fn}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: this.config.supabaseAnonKey,
-        Authorization: `Bearer ${this.config.supabaseAnonKey}`,
-      },
-      body: JSON.stringify(params),
+  constructor(config: RunnerConfig, transport?: TransportAdapter, auth?: AuthAdapter) {
+    this.transport = transport ?? new SupabaseRpcTransport({
+      supabaseUrl: config.supabaseUrl,
+      supabaseAnonKey: config.supabaseAnonKey,
     });
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      throw new ApiError(`RPC ${fn} failed (${res.status}): ${text.slice(0, 300)}`, res.status);
-    }
-    return (await res.json()) as T;
+    this.auth = auth ?? new RunnerTokenAuth({
+      token: config.runnerToken,
+      subject: 'automation-runner',
+    });
   }
 
-  heartbeat(): Promise<{ runner_id: string; active: boolean; last_seen_at: string }> {
-    return this.rpc('heartbeat_automation_runner', { p_token: this.config.runnerToken });
+  private async rpc<T>(fn: string, params: Record<string, unknown>): Promise<T> {
+    const response = await this.transport.request<T>({
+      operation: fn,
+      body: params,
+      auth: await this.auth.getAuthContext(),
+    });
+    return response.data;
+  }
+
+  heartbeat(): Promise<{ agent_id: string; active: boolean; last_seen_at: string }> {
+    return this.rpc('heartbeat_local_agent', {
+      p_payload: createAgentHeartbeat('runner', ['execute', 'artifacts', 'repository']),
+    });
   }
 
   async poll(): Promise<AutomationJob | null> {
-    const data = await this.rpc<{ job: AutomationJob | null }>('poll_automation_job', {
-      p_token: this.config.runnerToken,
-    });
+    const data = await this.rpc<{ job: AutomationJob | null }>('poll_automation_job', {});
     return data.job ?? null;
   }
 
   report(jobId: string, payload: ReportPayload): Promise<{ job_id: string; status: string; requeued: boolean }> {
     return this.rpc('report_automation_job', {
-      p_token: this.config.runnerToken,
       p_job_id: jobId,
       p_payload: payload,
     });
@@ -129,7 +178,6 @@ export class AutomationApi {
 
   appendLog(jobId: string, attempt: number, sequence: number, stream: JobLogStream, content: string): Promise<{ job_id: string; sequence: number }> {
     return this.rpc('append_automation_job_log', {
-      p_token: this.config.runnerToken,
       p_job_id: jobId,
       p_attempt: attempt,
       p_sequence: sequence,
@@ -140,19 +188,17 @@ export class AutomationApi {
 
   async pollCommands(jobId: string): Promise<AutomationJobCommand[]> {
     const data = await this.rpc<{ commands: AutomationJobCommand[] }>('poll_automation_job_commands', {
-      p_token: this.config.runnerToken,
       p_job_id: jobId,
     });
     return data.commands ?? [];
   }
 
   listCodegenTestCases(): Promise<CodegenTestCase[]> {
-    return this.rpc('list_runner_codegen_test_cases', { p_token: this.config.runnerToken });
+    return this.rpc('list_runner_codegen_test_cases', {});
   }
 
   attachCodegenScript(testCaseId: string, scriptRef: string): Promise<{ test_case_id: string; script_ref: string }> {
     return this.rpc('attach_runner_codegen_script', {
-      p_token: this.config.runnerToken,
       p_test_case_id: testCaseId,
       p_script_ref: scriptRef,
     });

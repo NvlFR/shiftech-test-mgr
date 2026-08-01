@@ -1,8 +1,11 @@
 import { AutomationApi, ApiError, type JobLogStream, type StepCommand } from './api.js';
 import type { RunnerConfig } from './config.js';
-import { executeJob } from './executor.js';
+import type { RunnerExecutorAdapter } from './executor.js';
+import { PlaywrightLocalExecutor } from './playwrightLocalExecutor.js';
 import { collectEnvironmentMetadata } from './environmentMetadata.js';
 import { uploadArtifacts } from './upload.js';
+import { SupabaseStorageAdapter } from './supabaseStorageAdapter.js';
+import type { ArtifactStorageAdapter } from '@testmanager/agent-core';
 import { hasCompleteFailureBundle } from './artifacts.js';
 import { log } from './logger.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
@@ -53,7 +56,11 @@ export class Runner {
   private stopping = false;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 
-  constructor(private readonly config: RunnerConfig) {
+  constructor(
+    private readonly config: RunnerConfig,
+    private readonly executor: RunnerExecutorAdapter = new PlaywrightLocalExecutor(),
+    private readonly artifactStorage: ArtifactStorageAdapter = SupabaseStorageAdapter.fromConfig(config),
+  ) {
     this.api = new AutomationApi(config);
   }
 
@@ -96,7 +103,7 @@ export class Runner {
     // Fail fast if the token is invalid so operators get a clear error on boot.
     try {
       const hb = await this.api.heartbeat();
-      log.info('Runner authenticated', { runnerId: hb.runner_id, active: hb.active });
+      log.info('Runner authenticated', { agentId: hb.agent_id, active: hb.active });
     } catch (err) {
       if (err instanceof ApiError && err.status >= 400 && err.status < 500) {
         throw new Error(`Runner token rejected by server: ${err.message}`);
@@ -121,13 +128,13 @@ export class Runner {
           registerSecret(job.repository?.token);
           workspace = await prepareJobRepository(this.config, job.repository);
           logStreamer.push('system', `Menjalankan ${job.script_ref}\n`);
-          outcome = await executeJob(
-            this.config,
+          outcome = await this.executor.execute({
+            config: this.config,
             job,
-            workspace.projectDir,
-            (stream, content) => logStreamer.push(stream, content),
-            (deliver) => this.subscribeJobCommands(job.id, deliver),
-          );
+            projectDir: workspace.projectDir,
+            onLog: (stream, content) => logStreamer.push(stream, content),
+            subscribeCommands: (deliver) => this.subscribeJobCommands(job.id, deliver),
+          });
         } catch (error) {
           outcome = {
             result: 'blocked' as const,
@@ -142,7 +149,7 @@ export class Runner {
           if (outcome.result === 'fail' && !hasCompleteFailureBundle(outcome.artifacts)) {
             throw new Error('Bundle bukti kegagalan tidak lengkap (screenshot, video, trace, console, HAR, dan DOM wajib tersedia)');
           }
-          artifacts = await uploadArtifacts(this.config, job.id, outcome.artifacts);
+          artifacts = await uploadArtifacts(this.config, this.artifactStorage, job.id, outcome.artifacts);
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Upload bundle artifact gagal';
           const report = await this.api.report(job.id, {

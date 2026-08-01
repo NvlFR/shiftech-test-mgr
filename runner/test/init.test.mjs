@@ -1,39 +1,46 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseCliInput } from '../dist/config.js';
-import { scaffoldPlaywrightProject } from '../dist/init.js';
+import { bootstrapRunner } from '../dist/init.js';
 
-test('command init menerima paling banyak satu direktori tanpa opsi', () => {
-  assert.deepEqual(parseCliInput(['init']), { command: 'init', options: {}, playwrightArgs: [], initDirectory: undefined });
-  assert.deepEqual(parseCliInput(['init', 'e2e']), { command: 'init', options: {}, playwrightArgs: [], initDirectory: 'e2e' });
-  assert.throws(() => parseCliInput(['init', 'one', 'two']), /Usage/);
-  assert.throws(() => parseCliInput(['init', '--force']), /Usage/);
+test('command init hanya menerima bootstrap code eksplisit', () => {
+  const code = `tmb_${'a'.repeat(48)}`;
+  assert.deepEqual(parseCliInput(['init', '--code', code]), { command: 'init', options: {}, playwrightArgs: [], initCode: code });
+  assert.throws(() => parseCliInput(['init']), /Usage/);
+  assert.throws(() => parseCliInput(['init', code]), /Usage/);
+  assert.throws(() => parseCliInput(['init', '--code', code, 'extra']), /Usage/);
 });
 
-test('init membuat project Playwright minimal dengan kebijakan artifact kegagalan', async () => {
+test('init menukar code, menulis config 0600, lalu mengirim heartbeat tanpa mengekspos token', async () => {
   const root = await mkdtemp(join(tmpdir(), 'tm-runner-init-'));
-  const target = join(root, 'my-e2e');
-  assert.equal(await scaffoldPlaywrightProject(target), target);
+  const code = `tmb_${'b'.repeat(48)}`;
+  const calls = [];
+  const transport = { async request(request) {
+    calls.push(request);
+    if (request.operation === 'redeem_agent_bootstrap_code') {
+      return { data: { runner: { id: 'runner-1', project_id: 'project-1', name: 'Runner Aman', labels: [] } } };
+    }
+    return { data: { active: true } };
+  } };
+  let output = '';
+  await bootstrapRunner(code, {
+    cwd: root,
+    env: { TM_SUPABASE_URL: 'https://example.test', TM_SUPABASE_ANON_KEY: 'anon-public' },
+    transport,
+    stdout: { write(value) { output += value; return true; } },
+  });
 
-  const pkg = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'));
-  assert.equal(pkg.private, true);
-  assert.equal(pkg.devDependencies['@playwright/test'], '^1.49.0');
-  assert.equal(pkg.scripts.test, 'playwright test');
-  const config = await readFile(join(target, 'playwright.config.ts'), 'utf8');
-  assert.match(config, /screenshot: 'only-on-failure'/);
-  assert.match(config, /video: 'retain-on-failure'/);
-  assert.match(config, /trace: 'retain-on-failure'/);
-  assert.match(await readFile(join(target, '.gitignore'), 'utf8'), /^node_modules\//);
-  assert.match(await readFile(join(target, 'tests/example.spec.ts'), 'utf8'), /page\.goto\('\/'\)/);
-});
-
-test('init membatalkan seluruh scaffold sebelum menimpa file existing', async () => {
-  const target = await mkdtemp(join(tmpdir(), 'tm-runner-init-conflict-'));
-  await writeFile(join(target, 'package.json'), '{"keep":true}\n');
-  await assert.rejects(scaffoldPlaywrightProject(target), /tidak menimpa.*package\.json/);
-  assert.equal(await readFile(join(target, 'package.json'), 'utf8'), '{"keep":true}\n');
-  await assert.rejects(readFile(join(target, 'playwright.config.ts')), /ENOENT/);
+  assert.deepEqual(calls.map((call) => call.operation), ['redeem_agent_bootstrap_code', 'heartbeat_local_agent']);
+  const token = calls[0].body.p_runner_token;
+  assert.match(token, /^tm_[A-Za-z0-9_-]{48}$/);
+  assert.equal(calls[1].auth.body.p_token, token);
+  const config = await readFile(join(root, '.env'), 'utf8');
+  assert.match(config, new RegExp(`TM_RUNNER_TOKEN=${token}`));
+  assert.equal((await stat(join(root, '.env'))).mode & 0o777, 0o600);
+  assert.doesNotMatch(output, new RegExp(token));
+  assert.doesNotMatch(output, new RegExp(code));
+  assert.match(output, /Runner Aman.*project-1/);
 });

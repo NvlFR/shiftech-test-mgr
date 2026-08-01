@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { registerSecret } from "@testmanager/agent-core";
 
 import {
   DEFAULT_PAGE_SIZE,
@@ -89,4 +90,19 @@ test("enforces the same size limit for non-paginated responses", () => {
     () => successResponse({ chunk: "x".repeat(MAX_RESPONSE_BYTES) }),
     (error: unknown) => error instanceof McpToolError && error.code === "RESPONSE_TOO_LARGE",
   );
+});
+
+test("redacts registered secrets from every MCP response envelope", () => {
+  const runnerToken = "runner-token-response-fixture";
+  const bootstrapCode = "bootstrap-code-response-fixture";
+  const repositoryCredential = "repository-credential-response-fixture";
+  for (const secret of [runnerToken, bootstrapCode, repositoryCredential]) registerSecret(secret);
+
+  const response = successResponse({ runnerToken, bootstrapCode, repositoryCredential });
+  const serialized = response.content[0]?.text ?? "";
+
+  for (const secret of [runnerToken, bootstrapCode, repositoryCredential]) {
+    assert.equal(serialized.includes(secret), false);
+  }
+  assert.match(serialized, /\[REDACTED\]/);
 });

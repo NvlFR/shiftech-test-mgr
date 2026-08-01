@@ -40,4 +40,12 @@ export const notificationRepository = {
     const { error } = await supabase.from('notifications').delete().eq('recipient_id', userId);
     if (error) throw error;
   },
+
+  subscribe(userId: string, onChange: () => void): () => void {
+    const channel = supabase
+      .channel(`notifications:${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onChange)
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  },
 };

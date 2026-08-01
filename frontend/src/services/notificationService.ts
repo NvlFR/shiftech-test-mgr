@@ -15,6 +15,10 @@ export const notificationService = {
   markAllRead(userId: string) { return notificationRepository.markAllRead(requireId(userId, 'User')); },
   remove(id: string) { return notificationRepository.remove(requireId(id, 'Notification')); },
   clearAll(userId: string) { return notificationRepository.removeAll(requireId(userId, 'User')); },
+  subscribe(userId: string, onChange: () => void) {
+    if (typeof onChange !== 'function') throw new Error('Handler notifikasi wajib diisi.');
+    return notificationRepository.subscribe(requireId(userId, 'User'), onChange);
+  },
   getNavigationPath(notification: Notification): string | null {
     if (notification.issueId) return `/issues/${notification.issueId}`;
     if (notification.commentTargetType === 'issue' && notification.commentTargetId) {
@@ -22,6 +26,11 @@ export const notificationService = {
     }
     if (notification.commentTargetType === 'test_case' && notification.commentTargetId) {
       return `/test-cases/${notification.commentTargetId}`;
+    }
+    if (notification.testRunId) return `/test-runs/${notification.testRunId}`;
+    if (notification.testCaseId) return `/test-cases/${notification.testCaseId}`;
+    if (notification.kind === 'automation_completed' && notification.projectId) {
+      return `/projects/${notification.projectId}/automation`;
     }
     return null;
   },
