@@ -32,6 +32,8 @@ export interface JobRepository {
 
 export type JobResult = 'pass' | 'fail' | 'blocked' | 'skip';
 export type JobLogStream = 'stdout' | 'stderr' | 'system';
+export type StepCommand = 'next' | 'continue';
+export interface AutomationJobCommand { id: number; command: StepCommand; requested_at: string; }
 
 export interface EnvironmentMetadata {
   browser: 'chromium' | 'firefox' | 'webkit';
@@ -134,6 +136,14 @@ export class AutomationApi {
       p_stream: stream,
       p_content: content,
     });
+  }
+
+  async pollCommands(jobId: string): Promise<AutomationJobCommand[]> {
+    const data = await this.rpc<{ commands: AutomationJobCommand[] }>('poll_automation_job_commands', {
+      p_token: this.config.runnerToken,
+      p_job_id: jobId,
+    });
+    return data.commands ?? [];
   }
 
   listCodegenTestCases(): Promise<CodegenTestCase[]> {

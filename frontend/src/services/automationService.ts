@@ -1,5 +1,5 @@
 import { automationRepository } from '../repositories/automationRepository';
-import type { AutomationBrowser, AutomationRunnerSecret } from '../types/domain';
+import type { AutomationBrowser, AutomationRunnerSecret, AutomationStepCommand } from '../types/domain';
 
 function createToken(): string {
   const bytes = new Uint8Array(32);
@@ -71,6 +71,11 @@ export const automationService = {
   cancelJob(id: string) {
     if (!id) throw new Error('Job tidak valid');
     return automationRepository.cancelJob(id);
+  },
+  sendStepCommand(jobId: string, command: AutomationStepCommand) {
+    if (!jobId) throw new Error('Job tidak valid');
+    if (!['next', 'continue'].includes(command)) throw new Error('Perintah step-through tidak valid');
+    return automationRepository.sendStepCommand(jobId, command);
   },
   getArtifactSignedUrl(bucket: string, path: string) {
     if (!bucket || !path) throw new Error('Artifact tidak valid');

@@ -107,6 +107,11 @@ export const automationRepository = {
     if (error) throw error;
   },
 
+  async sendStepCommand(jobId: string, command: 'next' | 'continue'): Promise<void> {
+    const { error } = await supabase.rpc('send_automation_job_command', { p_job_id: jobId, p_command: command });
+    if (error) throw error;
+  },
+
   // Artifacts live in a private bucket; project members read via a short-lived
   // signed URL (RLS on storage.objects gates access by project).
   async getArtifactSignedUrl(bucket: string, path: string): Promise<string> {

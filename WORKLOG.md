@@ -1922,3 +1922,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan unit test resolusi execution mode dan dokumentasi kewajiban spec mengimpor fixture observability. Tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (9/9 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.596 node dan 5.353 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — PW-19 step-through UI ke Local Runner
+
+- Menjalankan `graphify query` sebelum menelusuri alur Automation UI, queue job, runner lokal, dan keputusan Section 9.5 `FEATURE_BACKLOG.md`.
+- Menambahkan migration `schema_069_pw19_step_commands.sql` berisi command queue `next`/`continue`, RPC UI yang memvalidasi hak edit dan status job, serta RPC polling terautentikasi runner-token. Migration hanya dibuat dan tidak dijalankan ke target Supabase.
+- Menambahkan tombol **Next** dan **Continue** pada job berstatus running melalui alur Page → Hook → Service → Repository → Supabase.
+- Local Runner mengambil perintah lewat polling HTTPS outbound, lalu meneruskannya ke proses Playwright melalui channel lokal stdin JSONL dengan `TM_STEP_CONTROL_CHANNEL=stdin-jsonl`; runner tetap tidak membuka port atau koneksi inbound.
+- Memperbarui dokumentasi kontrak channel runner dan checklist PW-19. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (9/9 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.607 node dan 5.372 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

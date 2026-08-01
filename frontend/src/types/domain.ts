@@ -319,6 +319,7 @@ export interface CicdIngestResponse { runId: string; runCode: string; status: Te
 // server. The server only stores mappings, enqueues jobs, and records results.
 export type AutomationJobStatus = 'queued' | 'running' | 'passed' | 'failed' | 'canceled';
 export type AutomationBrowser = 'chromium' | 'firefox' | 'webkit';
+export type AutomationStepCommand = 'next' | 'continue';
 
 export interface AutomationRunner {
   id: string;

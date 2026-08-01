@@ -510,7 +510,7 @@ tertaut ke `test_result`:
 
 - [x] **Pause & inspect**: job bisa di-set `pauseOnFailure` — browser tetap terbuka di
       mesin lokal supaya tester bisa memeriksa state saat itu juga.
-- [ ] **Step-through** dari UI: kirim perintah next/continue ke runner lokal (channel
+- [x] **Step-through** dari UI: kirim perintah next/continue ke runner lokal (channel
       lokal, tetap outbound-only ke server).
 - [x] Retry manual satu test dari halaman Test Result tanpa membuat run baru.
 - [x] Sanity check sebelum run: cek base URL reachable dari mesin runner, laporkan

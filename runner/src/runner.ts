@@ -1,4 +1,4 @@
-import { AutomationApi, ApiError, type JobLogStream } from './api.js';
+import { AutomationApi, ApiError, type JobLogStream, type StepCommand } from './api.js';
 import type { RunnerConfig } from './config.js';
 import { executeJob } from './executor.js';
 import { collectEnvironmentMetadata } from './environmentMetadata.js';
@@ -69,6 +69,25 @@ export class Runner {
     this.heartbeatTimer = setInterval(() => void beat(), this.config.heartbeatIntervalMs);
   }
 
+  private subscribeJobCommands(jobId: string, onCommand: (command: StepCommand) => void): () => void {
+    let stopped = false;
+    let polling = false;
+    const poll = async () => {
+      if (stopped || polling) return;
+      polling = true;
+      try {
+        const commands = await this.api.pollCommands(jobId);
+        if (stopped) return;
+        commands.forEach(({ command }) => onCommand(command));
+      } catch (error) {
+        log.warn('Step command poll failed', { jobId, error: (error as Error).message });
+      } finally { polling = false; }
+    };
+    void poll();
+    const timer = setInterval(() => void poll(), this.config.pollIntervalMs);
+    return () => { stopped = true; clearInterval(timer); };
+  }
+
   async start(): Promise<void> {
     log.info('Runner workspace ready', { repositoryCacheDir: this.config.repositoryCacheDir });
 
@@ -99,7 +118,13 @@ export class Runner {
         try {
           workspace = await prepareJobRepository(this.config, job.repository);
           logStreamer.push('system', `Menjalankan ${job.script_ref}\n`);
-          outcome = await executeJob(this.config, job, workspace.projectDir, (stream, content) => logStreamer.push(stream, content));
+          outcome = await executeJob(
+            this.config,
+            job,
+            workspace.projectDir,
+            (stream, content) => logStreamer.push(stream, content),
+            (deliver) => this.subscribeJobCommands(job.id, deliver),
+          );
         } catch (error) {
           outcome = {
             result: 'blocked' as const,

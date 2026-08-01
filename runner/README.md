@@ -186,6 +186,20 @@ runner; timeout tetap berlaku normal sebelum terjadi kegagalan. Karena pause dip
 spec yang ingin memakai opsi ini wajib mengimpor `test` dari fixture
 `observability.ts` seperti contoh project runner.
 
+## Step-through control channel
+
+Saat sebuah job berstatus `running`, UI dapat mengirim perintah `next` atau
+`continue`. Runner mengambil command queue lewat polling HTTPS outbound yang sama,
+lalu meneruskannya ke stdin proses Playwright sebagai satu JSON per baris:
+
+```json
+{"type":"step-control","command":"next"}
+```
+
+Child process menerima `TM_STEP_CONTROL_CHANNEL=stdin-jsonl`. Fixture/helper
+Playwright proyek under test dapat membaca channel ini untuk mengendalikan pause
+antar-step. Runner tidak membuka port lokal maupun koneksi inbound dari server.
+
 ## Docker
 
 ```bash

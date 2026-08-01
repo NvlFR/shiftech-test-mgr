@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { automationService } from '../services/automationService';
-import type { AutomationJob, AutomationRunner, AutomationScript } from '../types/domain';
+import type { AutomationJob, AutomationRunner, AutomationScript, AutomationStepCommand } from '../types/domain';
 import type { AutomationBrowser } from '../types/domain';
 
 export function useAutomation(projectId: string | null) {
@@ -35,5 +35,9 @@ export function useAutomation(projectId: string | null) {
     return result;
   }, [projectId, reload]);
 
-  return { runners, scripts, jobs, loading, error, reload, runLocally };
+  const sendStepCommand = useCallback(async (jobId: string, command: AutomationStepCommand) => {
+    await automationService.sendStepCommand(jobId, command);
+  }, []);
+
+  return { runners, scripts, jobs, loading, error, reload, runLocally, sendStepCommand };
 }

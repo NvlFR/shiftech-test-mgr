@@ -39,7 +39,7 @@ export function AutomationPage() {
   const toast = useRef<Toast>(null);
   const { session } = useAuthContext();
   const { canEditContent, canManageSettings, loading: roleLoading } = useProjectRole(projectId);
-  const { runners, scripts, jobs, loading, error, reload, runLocally } = useAutomation(projectId ?? null);
+  const { runners, scripts, jobs, loading, error, reload, runLocally, sendStepCommand } = useAutomation(projectId ?? null);
   const { testPlans } = useTestPlans(projectId ?? null);
   const { environments } = useEnvironments(projectId ?? null);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -120,6 +120,12 @@ export function AutomationPage() {
   async function cancelJob(row: AutomationJob) {
     try { await automationService.cancelJob(row.id); await reload(); }
     catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal cancel job' }); }
+  }
+  async function controlJob(row: AutomationJob, command: 'next' | 'continue') {
+    try {
+      await sendStepCommand(row.id, command);
+      toast.current?.show({ severity: 'info', summary: command === 'next' ? 'Perintah Next dikirim' : 'Perintah Continue dikirim', detail: 'Runner lokal akan mengambil perintah melalui koneksi outbound.' });
+    } catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal mengirim perintah step-through' }); }
   }
   async function startLocalRun() {
     if (!localScript || !localPlanId) return;
@@ -205,6 +211,10 @@ export function AutomationPage() {
           <Column field="errorMessage" header="Error" body={(r: AutomationJob) => r.errorMessage ?? '-'} />
           <Column header="Aksi" body={(r: AutomationJob) => <div className="flex gap-1">
             <Button text size="small" icon="pi pi-file" tooltip="Lihat live log" onClick={() => setLogJob(r)} />
+            {r.status === 'running' && canEditContent && <>
+              <Button text size="small" icon="pi pi-step-forward" label="Next" tooltip="Jalankan satu langkah berikutnya" onClick={() => controlJob(r, 'next')} />
+              <Button text size="small" icon="pi pi-forward" label="Continue" tooltip="Lanjutkan tanpa berhenti di setiap langkah" onClick={() => controlJob(r, 'continue')} />
+            </>}
             {r.status === 'queued' && canEditContent && <Button text size="small" icon="pi pi-times" tooltip="Cancel" onClick={() => cancelJob(r)} />}
           </div>} />
         </DataTable>

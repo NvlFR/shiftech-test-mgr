@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import type { RunnerConfig } from './config.js';
-import type { AutomationJob, JobLogStream, JobResult } from './api.js';
+import type { AutomationJob, JobLogStream, JobResult, StepCommand } from './api.js';
 import { collectArtifacts, type CollectedArtifact } from './artifacts.js';
 import { log } from './logger.js';
 import { checkBaseUrlReachable } from './baseUrlSanityCheck.js';
@@ -46,7 +46,7 @@ export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): 
 // Run one Playwright spec in an isolated per-job output directory. We invoke the
 // Playwright CLI (no library import) so this runner has zero runtime deps and
 // works against whatever Playwright version the project under test uses.
-export async function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir, onLog?: (stream: JobLogStream, content: string) => void): Promise<ExecutionOutcome> {
+export async function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir, onLog?: (stream: JobLogStream, content: string) => void, subscribeCommands?: (deliver: (command: StepCommand) => void) => () => void): Promise<ExecutionOutcome> {
   if (isAbsolute(job.script_ref)) {
     return { result: 'blocked', errorMessage: 'script_ref harus berupa path relatif di repository', artifacts: [] };
   }
@@ -89,7 +89,14 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
     log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode, ...executionTarget });
     const child = spawn(cmd ?? 'npx', args, {
       cwd: projectDir,
-      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '', TM_PAUSE_ON_FAILURE: executionMode.pauseOnFailure ? '1' : '0' },
+      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '', TM_PAUSE_ON_FAILURE: executionMode.pauseOnFailure ? '1' : '0', TM_STEP_CONTROL_CHANNEL: 'stdin-jsonl' },
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    const unsubscribeCommands = subscribeCommands?.((command) => {
+      if (!child.stdin.destroyed) {
+        child.stdin.write(`${JSON.stringify({ type: 'step-control', command })}\n`);
+        onLog?.('system', `Perintah step-through "${command}" diteruskan ke channel lokal.\n`);
+      }
     });
 
     let stdout = '';
@@ -114,6 +121,7 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
     }, config.jobTimeoutMs);
 
     function finalize(result: JobResult, errorMessage?: string): void {
+      unsubscribeCommands?.();
       const logPath = join(jobOutputDir, 'runner-output.log');
       try { writeFileSync(logPath, `$ ${cmd} ${args.join(' ')}\n\n[stdout]\n${stdout}\n[stderr]\n${stderr}\n`); } catch { /* best effort */ }
       const artifacts = collectArtifacts(jobOutputDir);
