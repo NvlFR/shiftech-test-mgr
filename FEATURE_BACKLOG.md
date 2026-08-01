@@ -482,7 +482,7 @@ MCP tool yang menargetkan runner lokal.
       sebagai checklist saat codegen, lalu simpan script hasil rekaman.
 - [x] Sinkronisasi dua arah: script baru di repo terdeteksi → tawarkan mapping ke
       Test Case yang belum ter-automate.
-- [ ] Scaffold project Playwright baru (`runner init`) kalau tester belum punya.
+- [x] Scaffold project Playwright baru (`runner init`) kalau tester belum punya.
 
 ### 9.3 Observability saat gagal (paket bukti lengkap)
 

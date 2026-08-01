@@ -1,16 +1,16 @@
 # Graph Report - shiftech-test-mgr  (2026-08-01)
 
 ## Corpus Check
-- 412 files · ~252,226 words
+- 414 files · ~252,970 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2583 nodes · 5336 edges · 212 communities (172 shown, 40 thin omitted)
+- 2590 nodes · 5347 edges · 225 communities (179 shown, 46 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `00e69f3b`
+- Built from commit: `3482a391`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -170,6 +170,8 @@
 - ProjectSettingsPage.tsx
 - 4. Scope — Modul
 - 2026-07-31 — FIX-00b error TypeScript ProjectDetailPage
+- useProjectBreadcrumbItems.ts
+- AppLayout.tsx
 - package.json
 - RepoRepository
 - react-dom
@@ -191,6 +193,16 @@
 - ServerConfig
 - api.ts
 - 14. Distribusi & arsitektur Local Agent
+- useNotifications.ts
+- AppMenu.tsx
+- interactive.ts
+- TestSuiteDialog.tsx
+- dashboardRepository.ts
+- package.json
+- useAiAssistant
+- primeflex
+- react-markdown
+- @tanstack/react-query
 
 ## God Nodes (most connected - your core abstractions)
 1. `react` - 86 edges
@@ -198,15 +210,13 @@
 3. `useAuthContext()` - 45 edges
 4. `Worklog` - 39 edges
 5. `supabase` - 36 edges
-6. `2026-07-31 — MCP-08 write test case/test plan tools` - 30 edges
+6. `2026-07-31 — MCP-08 write test case/test plan tools` - 31 edges
 7. `ServerConfig` - 29 edges
 8. `useProjectRole()` - 28 edges
 9. `createReadToolRegistrar()` - 26 edges
 10. `WriteService` - 25 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `useAiAssistant()` --indirect_call--> `query()`  [INFERRED]
-  frontend/src/hooks/useAiAssistant.ts → supabase/functions/ai-gateway/handler.ts
 - `runWatch()` --indirect_call--> `resolve()`  [INFERRED]
   runner/src/interactive.ts → frontend/src/hooks/useTheme.tsx
 - `completeWithRetry()` --indirect_call--> `resolve()`  [INFERRED]
@@ -215,11 +225,13 @@
   frontend/src/pages/projects/ProjectSettingsPage.tsx → supabase/functions/ai-gateway/handler.ts
 - `ProjectTestCaseTab()` --indirect_call--> `query()`  [INFERRED]
   frontend/src/pages/projects/ProjectTestCaseTab.tsx → supabase/functions/ai-gateway/handler.ts
+- `useAiAssistant()` --indirect_call--> `query()`  [INFERRED]
+  frontend/src/hooks/useAiAssistant.ts → supabase/functions/ai-gateway/handler.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (212 total, 40 thin omitted)
+## Communities (225 total, 46 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.10
@@ -234,32 +246,32 @@ Cohesion: 0.04
 Nodes (52): 2026-07-22, 2026-07-22 — Sub-agent 1: P2 Dashboard Trend dan Reporting, 2026-07-22 — Sub-agent 5: Security, RLS, migration review, integration QA, 2026-07-26 — Audit potensi bug (read-only, tanpa perubahan kode), 2026-07-26 — Benchmark penghematan token Graphify, 2026-07-26 — Fix bug #3: paginasi agregasi (batas 1000 baris PostgREST), 2026-07-26 — Fix bug #5, #6, #7 (footgun hook + business rule), 2026-07-26 — Fix bug hasil audit (HIGH + race guard) (+44 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.18
-Nodes (20): boolEnv(), intEnv(), InteractiveRunnerConfig, loadConfig(), loadDotEnv(), loadInteractiveConfig(), nonNegativeIntEnv(), parseCliInput() (+12 more)
+Cohesion: 0.21
+Nodes (16): boolEnv(), intEnv(), loadConfig(), loadDotEnv(), loadInteractiveConfig(), nonNegativeIntEnv(), parseCliInput(), parseCliOptions() (+8 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.14
-Nodes (20): STATUS_OPTIONS, TestPlanDialog(), TestPlanDialogProps, BulkActionsBar(), BulkActionsBarProps, TEST_PLAN_STATUS_LABEL, TEST_PLAN_STATUS_SEVERITY, useTestPlanDetail() (+12 more)
+Cohesion: 0.13
+Nodes (22): STATUS_OPTIONS, TestPlanDialog(), TestPlanDialogProps, BulkActionsBar(), BulkActionsBarProps, PageHeader(), PageHeaderProps, TEST_PLAN_STATUS_LABEL (+14 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.06
 Nodes (32): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+24 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (57): JsonRecord, mapAnalysisRunSummaryRow(), mapFlakyCandidateRow(), mapIssueDetailRow(), mapIssueSummaryRow(), mapProjectRow(), mapRequirementCoverageRow(), mapRequirementDetailRow() (+49 more)
+Cohesion: 0.11
+Nodes (53): JsonRecord, mapAnalysisRunSummaryRow(), mapFlakyCandidateRow(), mapIssueDetailRow(), mapIssueSummaryRow(), mapProjectRow(), mapRequirementCoverageRow(), mapRequirementDetailRow() (+45 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.11
-Nodes (28): useIntegrations(), eventOptions, IntegrationsPage(), scopeOptions, integrationRepository, allowedEvents, integrationService, testResultService (+20 more)
+Cohesion: 0.17
+Nodes (17): mapApiTokenRow(), mapWebhookDeliveryRow(), mapWebhookRow(), useIntegrations(), eventOptions, IntegrationsPage(), scopeOptions, integrationRepository (+9 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.14
-Nodes (17): TestSuiteDialog(), ProfileViewProps, dataTablePaginatorProps, dataTablePaginatorTemplate, FilterToolbar(), FilterToolbarProps, RowActionsMenu(), RowActionsMenuProps (+9 more)
+Cohesion: 0.15
+Nodes (15): TestSuiteDialog(), dataTablePaginatorProps, dataTablePaginatorTemplate, FilterToolbar(), FilterToolbarProps, RowActionsMenu(), RowActionsMenuProps, SearchInput() (+7 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.16
-Nodes (8): AutomationEnqueueInput, AutomationRepository, AutomationRepositoryError, AutomationRerunFailedInput, AutomationService, invalid(), isConfirmationRequired(), normalizeLabels()
+Cohesion: 0.15
+Nodes (9): AutomationEnqueueInput, AutomationRepository, AutomationRepositoryError, AutomationRerunFailedInput, config, AutomationService, invalid(), isConfirmationRequired() (+1 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.11
@@ -267,7 +279,7 @@ Nodes (22): riskLabel, riskSeverity, TestRunAnalysisPanel(), TestRunAnalysisPane
 
 ### Community 11 - "Community 11"
 Cohesion: 0.10
-Nodes (16): DuplicateIssueDraft, IssuePriority, IssueStatus, IssueWriteInput, TestCaseChanges, TestCaseWriteInput, TestResultWriteStatus, toCaseRow() (+8 more)
+Nodes (17): DuplicateIssueDraft, IssuePriority, IssueStatus, IssueWriteInput, config, TestCaseChanges, TestCaseWriteInput, TestResultWriteStatus (+9 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.14
@@ -286,32 +298,32 @@ Cohesion: 0.08
 Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.11
-Nodes (32): App(), AdminRoute(), ProtectedRoute(), ProfileView(), formatDate(), AuthContext, AuthContextValue, AuthProvider() (+24 more)
+Cohesion: 0.15
+Nodes (25): AiAssistantPanel(), AdminRoute(), ProtectedRoute(), ImportCasesDialog(), formatDate(), useAiAssistant(), useAuthContext(), useBackupRetention() (+17 more)
 
 ### Community 17 - "What You Must Do When Invoked"
-Cohesion: 0.18
-Nodes (9): mapTestSuiteItemRow(), mapTestSuiteItemStepRow(), mapTestSuiteRow(), SuiteItemInput, testSuiteRepository, ItemInput, TestSuiteItem, TestSuiteItemStep (+1 more)
+Cohesion: 0.08
+Nodes (35): byteLength(), ErrorDetail, ErrorEnvelope, errorResponse(), paginatedResponse(), PaginationInput, PaginationMeta, SuccessEnvelope (+27 more)
 
 ### Community 18 - "3. Konsep Test Management"
 Cohesion: 0.10
-Nodes (23): DescribableActivityEntry, describeSystemEvent(), EVENT_TYPE_LABEL, STATUS_LABEL_BY_ENTITY, statusLabel(), ACTIVITY_ENTITY_LABEL, ACTIVITY_ENTITY_ROUTE, ActivityEntityType (+15 more)
+Nodes (24): ProfileViewProps, DescribableActivityEntry, describeSystemEvent(), EVENT_TYPE_LABEL, STATUS_LABEL_BY_ENTITY, statusLabel(), ACTIVITY_ENTITY_LABEL, ACTIVITY_ENTITY_ROUTE (+16 more)
 
 ### Community 19 - "2026-07-22"
 Cohesion: 0.12
 Nodes (17): 1.1 Architectural Style, 1.2 Kenapa layer ini dan bukan "fetch langsung di komponen"?, 1. System Architecture, 2.1 Repository (`repositories/*.ts`), 2.2 Service (`services/*.ts`), 2.3 Helper (`src/helpers/*.ts`), 2.4 Hook / Composable (`src/hooks/*.ts`), 2.5 Component & Page (`src/components/`, `src/pages/`) (+9 more)
 
 ### Community 20 - "ARCHITECTURE — TestManager (shiftech-test-mgr)"
-Cohesion: 0.07
-Nodes (37): AppMenu(), AppMenuitem(), AppMenuSeparator(), MenuItemModel, exportDashboardReportToExcel(), exportDashboardReportToPdf(), safeName(), mapDashboardReportRunRow() (+29 more)
+Cohesion: 0.13
+Nodes (22): AppMenu(), AppMenuitem(), AppMenuSeparator(), MenuItemModel, exportDashboardReportToExcel(), exportDashboardReportToPdf(), safeName(), useDashboardReport() (+14 more)
 
 ### Community 21 - "Feature Backlog — TestManager"
-Cohesion: 0.13
-Nodes (21): mapAutomationJobLogRow(), mapAutomationJobRow(), mapAutomationRunnerRow(), mapAutomationScriptRow(), useAutomation(), useAutomationJobLogs(), useTestPlans(), AutomationPage() (+13 more)
+Cohesion: 0.14
+Nodes (20): mapAutomationJobLogRow(), mapAutomationJobRow(), mapAutomationRunnerRow(), mapAutomationScriptRow(), useAutomation(), useAutomationJobLogs(), AutomationPage(), jobSeverity (+12 more)
 
 ### Community 22 - "Architecture"
-Cohesion: 0.09
-Nodes (20): supabase, mapEnvironmentRow(), mapNotificationRow(), mapTestCaseStepRow(), commentRepository, environmentRepository, moduleRepository, notificationRepository (+12 more)
+Cohesion: 0.07
+Nodes (44): supabase, mapActivityEventRow(), mapCommentMentionRow(), mapCommentRow(), mapEnvironmentRow(), mapIssueRow(), mapModuleRow(), mapProfileRow() (+36 more)
 
 ### Community 23 - "AttachmentPanel.tsx"
 Cohesion: 0.13
@@ -322,24 +334,24 @@ Cohesion: 0.09
 Nodes (21): AnalysisOutputSchema, AnalysisRequest, AssistantOutputSchema, AssistantRequest, DuplicateOutputSchema, DuplicateRequest, ErrorEnvelope, GatewayRequest (+13 more)
 
 ### Community 25 - "ProjectSettingsPage.tsx"
-Cohesion: 0.08
-Nodes (25): dependencies, @hookform/resolvers, jspdf-autotable, primeflex, primeicons, react, react-hook-form, react-markdown (+17 more)
+Cohesion: 0.12
+Nodes (17): dependencies, jspdf, jspdf-autotable, primeflex, primereact, react, react-router-dom, remark-gfm (+9 more)
 
 ### Community 26 - "TestCaseDetailPage.tsx"
 Cohesion: 0.09
 Nodes (27): TestSuiteDialogMode, TestSuiteDialogProps, VISIBILITY_OPTIONS, AttachmentPanel(), AttachmentPanelProps, formatFileSize(), CharacterCount(), CharacterCountProps (+19 more)
 
 ### Community 27 - "statusLabels.ts"
-Cohesion: 0.10
-Nodes (24): IssueDialog(), IssueDialogProps, PageHeader(), PageHeaderProps, ISSUE_PRIORITY_SEVERITY, TEST_RESULT_STATUS_LABEL, TEST_RESULT_STATUS_SEVERITY, TEST_RUN_STATUS_SEVERITY (+16 more)
+Cohesion: 0.13
+Nodes (15): IssueDialog(), IssueDialogProps, ISSUE_PRIORITY_LABEL, ISSUE_PRIORITY_SEVERITY, TEST_RUN_STATUS_SEVERITY, useTestRunAnalysis(), useTestRunDetail(), RESULT_FILTER_OPTIONS (+7 more)
 
 ### Community 28 - "schema_entity_codes.sql"
 Cohesion: 0.11
-Nodes (20): ApiError, AutomationJob, CodegenTestCaseStep, EnvironmentMetadata, JobRepository, ReportPayload, collectEnvironmentMetadata(), DEFAULT_VIEWPORT (+12 more)
+Nodes (21): ApiError, AutomationJob, CodegenTestCaseStep, EnvironmentMetadata, JobRepository, ReportPayload, collectEnvironmentMetadata(), DEFAULT_VIEWPORT (+13 more)
 
 ### Community 29 - "schema_test_management_v2.sql"
-Cohesion: 0.17
-Nodes (7): McpToolError, AnalysisRepository, AnalysisService, annotations, createAnalysisToolRegistrar(), limit, lookbackRuns
+Cohesion: 0.13
+Nodes (12): McpToolError, AnalysisRepository, AnalysisRepositoryError, config, AnalysisService, annotations, createAnalysisToolRegistrar(), limit (+4 more)
 
 ### Community 30 - "TASKS — TestManager (shiftech-test-mgr)"
 Cohesion: 0.10
@@ -374,8 +386,8 @@ Cohesion: 0.12
 Nodes (17): devDependencies, oxlint, @types/node, @types/react, @types/react-dom, typescript, vite, @vitejs/plugin-react (+9 more)
 
 ### Community 39 - "schema_auth.sql"
-Cohesion: 0.21
-Nodes (15): mapProjectRow(), ProjectContext, ProjectContextValue, STATUS_OPTIONS, ProjectOwnerFilter, ProjectPaginatedQuery, ProjectQuery, projectRepository (+7 more)
+Cohesion: 0.22
+Nodes (14): ImportCasesDialogProps, mapProjectRow(), STATUS_OPTIONS, ProjectOwnerFilter, ProjectPaginatedQuery, ProjectQuery, projectRepository, SORT_COLUMN (+6 more)
 
 ### Community 40 - "graphify reference: query, path, explain"
 Cohesion: 0.21
@@ -390,8 +402,8 @@ Cohesion: 0.22
 Nodes (8): Commands, Database (Supabase), Development, Dokumentasi Tambahan, Project Overview, Struktur repo, Wajib Menggunakan Graphify, Worklog Wajib
 
 ### Community 43 - "TestManager (shiftech-test-mgr)"
-Cohesion: 0.06
-Nodes (44): AppLayout(), AppLayoutInner(), AppSidebar(), AppSidebarMask(), AppTopbar(), BreadcrumbContext, BreadcrumbContextValue, BreadcrumbItem (+36 more)
+Cohesion: 0.23
+Nodes (11): MODE_ICON, ThemeToggle(), applyTheme(), getSystemPrefersDark(), resolve(), THEME_HREF, ThemeContext, ThemeContextValue (+3 more)
 
 ### Community 44 - "schema_013_p1_collaboration.sql"
 Cohesion: 0.20
@@ -414,7 +426,7 @@ Cohesion: 0.17
 Nodes (12): E01 — Fondasi Arsitektur, E02 — Modul Projects, E03 — Modul Test Cases, E04 — Modul Test Plans, E05 — Polish (opsional, sesuai kebutuhan validasi arsitektur), E06 — Auth & RBAC (Google Login + User Management), E07 — Project Lifecycle (search, filter, sort, status, hapus permanen, detail), E08 — Test Management v2 (Module, Tag, Test Run, Test Result, Issue) (+4 more)
 
 ### Community 49 - "AppTopbar.tsx"
-Cohesion: 0.12
+Cohesion: 0.13
 Nodes (18): mapProjectRepositoryRow(), projectMemberRepository, CreateProjectRepositoryInput, projectRepositoryLinkRepository, UpdateProjectRepositoryInput, CredentialAction, repositoryConnectionRepository, RepositoryConnectionResultRow (+10 more)
 
 ### Community 50 - "schema_project_lifecycle.sql"
@@ -426,8 +438,8 @@ Cohesion: 0.09
 Nodes (21): Automation, Catatan keamanan, Claude Desktop: `claude_desktop_config.json`, Daftar tool, Discovery dan read, Environment variable, Konfigurasi client, Persyaratan dan setup (+13 more)
 
 ### Community 52 - "testSuiteRepository.ts"
-Cohesion: 0.10
-Nodes (21): Breadcrumb(), BreadcrumbProps, PROJECT_MEMBER_ROLE_LABEL, PROJECT_STATUS_SEVERITY, useEnvironments(), useProjectRepositories(), useTestResultDetail(), MEMBER_ROLE_OPTIONS (+13 more)
+Cohesion: 0.18
+Nodes (14): PROJECT_MEMBER_ROLE_LABEL, PROJECT_STATUS_SEVERITY, useEnvironments(), useProjectRepositories(), MEMBER_ROLE_OPTIONS, ProjectSettingsPage(), REPOSITORY_SOURCE_LABEL, REPOSITORY_SOURCE_OPTIONS (+6 more)
 
 ### Community 53 - "graphify reference: commit hook and native CLAUDE.md integration"
 Cohesion: 0.20
@@ -438,8 +450,8 @@ Cohesion: 0.18
 Nodes (11): FEATURES — Status Checklist, Infrastruktur, Integrasi source-new (hasil akhir), Issues, Kode Entity (Module, Test Case, Test Plan, Test Run), Modules & Tags, Projects, Test Cases (+3 more)
 
 ### Community 55 - "issueAttachmentRepository.ts"
-Cohesion: 0.20
-Nodes (11): mapTestPlanRow(), mapTestRunAssignmentRow(), mapTestRunRow(), EMPTY_FILTERS, TestRunWithSummary, testPlanRepository, TestRunFilters, testRunRepository (+3 more)
+Cohesion: 0.11
+Nodes (22): mapNotificationRow(), commentRepository, notificationRepository, commentService, notificationService, testResultService, TEXT_ARTIFACT_TYPES, ActivityAction (+14 more)
 
 ### Community 56 - "graphify reference: commit hook and native CLAUDE.md integration"
 Cohesion: 0.29
@@ -466,8 +478,8 @@ Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
 
 ### Community 62 - "graphify reference: GitHub clone and cross-repo merge"
-Cohesion: 0.38
-Nodes (6): jspdf, exportTestRunsToExcel(), exportTestRunsToPdf(), fileName(), TestRunExportRow, jspdf
+Cohesion: 0.22
+Nodes (11): exportTestRunsToExcel(), exportTestRunsToPdf(), fileName(), TestRunExportRow, useDashboard(), ProjectContext, ProjectContextValue, ProjectProvider() (+3 more)
 
 ### Community 64 - "TODO — Sprint Board Aktif"
 Cohesion: 0.40
@@ -558,8 +570,8 @@ Cohesion: 0.33
 Nodes (6): 9.1 Mode eksekusi interaktif (sisi runner), 9.2 Authoring & codegen, 9.3 Observability saat gagal (paket bukti lengkap), 9.4 Viewer di aplikasi, 9.5 Interaktivitas terarah, 9. Playwright lokal yang lebih interaktif
 
 ### Community 89 - "AppTopbar.tsx"
-Cohesion: 0.23
-Nodes (11): mapCicdPipelineRow(), useCicdPipelines(), CicdIntegrationPage(), providerOptions, cicdRepository, cicdService, CicdIngestPayload, CicdIngestResponse (+3 more)
+Cohesion: 0.22
+Nodes (12): mapCicdPipelineRow(), useCicdPipelines(), useTestPlans(), CicdIntegrationPage(), providerOptions, cicdRepository, cicdService, CicdIngestPayload (+4 more)
 
 ### Community 91 - "ProjectsPage.tsx"
 Cohesion: 0.33
@@ -586,8 +598,8 @@ Cohesion: 0.40
 Nodes (5): 5. Automation dan Playwright, Model arsitektur — Local Runner (WAJIB dibaca dulu), Orkestrasi job (sisi server pusat), Playwright Local Runner (sisi mesin lokal), Skalabilitas & keamanan
 
 ### Community 98 - "csvImport.ts"
-Cohesion: 0.43
-Nodes (6): xlsx, normalizeHeader(), normalizePriority(), parseTestCaseExcel(), valueFrom(), xlsx
+Cohesion: 0.13
+Nodes (14): ProfileView(), Breadcrumb(), BreadcrumbItem, BreadcrumbProps, TEST_RESULT_STATUS_LABEL, TEST_RESULT_STATUS_SEVERITY, useProfileView(), useProjectBreadcrumbItems() (+6 more)
 
 ### Community 99 - "2026-07-31 — FIX-00b error TypeScript ProjectDetailPage"
 Cohesion: 0.14
@@ -642,8 +654,8 @@ Cohesion: 0.50
 Nodes (3): Batasan deployment, Ingest, Kontrak Integrasi CI/CD
 
 ### Community 115 - "smoke.spec.ts"
-Cohesion: 0.17
-Nodes (13): IssueEditor(), IssueEditorProps, IssueFormData, PRIORITY_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS, mapTestRoleRow(), testRoleRepository (+5 more)
+Cohesion: 0.21
+Nodes (11): mapTestPlanRow(), mapTestRunAssignmentRow(), mapTestRunRow(), EMPTY_FILTERS, TestRunWithSummary, testPlanRepository, TestRunFilters, testRunRepository (+3 more)
 
 ### Community 116 - "schema_026_automation_artifacts_storage.sql"
 Cohesion: 0.50
@@ -678,11 +690,11 @@ Cohesion: 0.39
 Nodes (5): mapIssueAttachmentRow(), issueAttachmentRepository, withSignedUrl(), issueAttachmentService, IssueAttachment
 
 ### Community 139 - "config.ts"
-Cohesion: 0.07
-Nodes (28): loadConfig(), parseBoundedInteger(), parseReadonly(), parseRerunFailedMaxTests(), requiredEnv(), ServerConfig, baseEnv, readJsonBody() (+20 more)
+Cohesion: 0.08
+Nodes (23): loadConfig(), parseBoundedInteger(), parseReadonly(), parseRerunFailedMaxTests(), requiredEnv(), ServerConfig, baseEnv, readJsonBody() (+15 more)
 
 ### Community 149 - "smoke.spec.ts"
-Cohesion: 0.20
+Cohesion: 0.17
 Nodes (5): AutomationApi, JobLogStream, JobLogStreamer, Runner, sleep()
 
 ### Community 161 - "3. Konsep Test Management"
@@ -690,12 +702,12 @@ Cohesion: 0.20
 Nodes (10): 3. Konsep Test Management, Issue, Kode Entity (Module, Test Case, Test Plan, Test Run), Module, Project, Tag, Test Case, Test Plan (+2 more)
 
 ### Community 162 - "2026-07-31 — SRC-08 sinkronisasi hooks-new"
-Cohesion: 0.07
-Nodes (30): 2026-07-31 — MCP-08 write test case/test plan tools, 2026-07-31 — MCP-09 gate manusia approval Test Plan, 2026-07-31 — MCP-11 workflow Issue, 2026-07-31 — MCP-12 tool Automation, 2026-07-31 — MCP-13 selective rerun failed, 2026-07-31 — MCP-15 tool analisis, 2026-07-31 — MCP-16 rate limit dan audit tool MCP, 2026-08-01 — Eksekusi seluruh migration melalui MCP Supabase (+22 more)
+Cohesion: 0.06
+Nodes (31): 2026-07-31 — MCP-08 write test case/test plan tools, 2026-07-31 — MCP-09 gate manusia approval Test Plan, 2026-07-31 — MCP-11 workflow Issue, 2026-07-31 — MCP-12 tool Automation, 2026-07-31 — MCP-13 selective rerun failed, 2026-07-31 — MCP-15 tool analisis, 2026-07-31 — MCP-16 rate limit dan audit tool MCP, 2026-08-01 — Eksekusi seluruh migration melalui MCP Supabase (+23 more)
 
 ### Community 165 - "useAuthContext"
-Cohesion: 0.15
-Nodes (19): JobResult, ReportArtifact, classifyArtifact(), collectArtifacts(), CollectedArtifact, hasCompleteFailureBundle(), REQUIRED_FAILURE_ARTIFACT_TYPES, walk() (+11 more)
+Cohesion: 0.16
+Nodes (18): JobResult, ReportArtifact, classifyArtifact(), collectArtifacts(), CollectedArtifact, hasCompleteFailureBundle(), REQUIRED_FAILURE_ARTIFACT_TYPES, walk() (+10 more)
 
 ### Community 167 - "2026-07-31 — SRC-04 penyelesaian notification center"
 Cohesion: 0.20
@@ -703,7 +715,7 @@ Nodes (10): 2026-07-31 — E03-T06 audit filter priority dan status Test Case, 2
 
 ### Community 169 - "ProjectDataManagementPage.tsx"
 Cohesion: 0.07
-Nodes (43): AiAssistantPanel(), Props, CustomTestRunDialog(), CustomTestRunDialogProps, ImportCasesDialog(), ImportCasesDialogProps, downloadTestCaseImportTemplate(), exportTestCasesToExcel() (+35 more)
+Nodes (46): xlsx, Props, CustomTestRunDialog(), CustomTestRunDialogProps, downloadTestCaseImportTemplate(), exportTestCasesToExcel(), exportTestCasesToPdf(), TEST_CASE_PRIORITY_LABEL (+38 more)
 
 ### Community 176 - "ProjectSettingsPage.tsx"
 Cohesion: 0.83
@@ -717,70 +729,94 @@ Nodes (15): 1. Latar Belakang & Tujuan, 2. Target Pengguna, 4.1 Projects, 4.2 Mo
 Cohesion: 0.22
 Nodes (8): 2026-07-31 — FIX-00a duplikasi domain TestCase, 2026-07-31 — FIX-00b error TypeScript ProjectDetailPage, 2026-07-31 — Integrasi compile-safe dialogs, notifications, dan profile, 2026-07-31 — Membuat task integrasi penuh source-new, 2026-07-31 — SRC-07 port helper source-new, 2026-07-31 — SRC-10 sinkronisasi repository source-new, 2026-07-31 — SRC-11 sinkronisasi business rule service source-new, 2026-07-31 — SRC-12 konsolidasi domain aktif
 
+### Community 182 - "useProjectBreadcrumbItems.ts"
+Cohesion: 0.26
+Nodes (6): UserHoverCard(), UserHoverCardProps, queryKeys, useProfile(), activityRepository, activityService
+
+### Community 183 - "AppLayout.tsx"
+Cohesion: 0.29
+Nodes (10): AppLayout(), AppLayoutInner(), AppSidebar(), AppSidebarMask(), isDesktop(), LayoutContext, LayoutContextValue, LayoutProvider() (+2 more)
+
 ### Community 184 - "package.json"
-Cohesion: 0.11
-Nodes (30): mapActivityEventRow(), mapApiTokenRow(), mapCommentMentionRow(), mapCommentRow(), mapIssueRow(), mapModuleRow(), mapProfileRow(), mapProjectMemberRow() (+22 more)
+Cohesion: 0.18
+Nodes (9): mapTestSuiteItemRow(), mapTestSuiteItemStepRow(), mapTestSuiteRow(), SuiteItemInput, testSuiteRepository, ItemInput, TestSuiteItem, TestSuiteItemStep (+1 more)
 
 ### Community 185 - "RepoRepository"
-Cohesion: 0.12
-Nodes (14): execFileAsync, ProjectRepositoryConfig, RepoRepository, RepoRepositoryError, RepositoryConfigRow, RepositorySourceType, RepoDiff, RepoService (+6 more)
+Cohesion: 0.13
+Nodes (11): execFileAsync, ProjectRepositoryConfig, RepoRepository, RepoRepositoryError, RepositoryConfigRow, RepositorySourceType, config, RepoDiff (+3 more)
 
 ### Community 188 - "NotificationPanel.tsx"
 Cohesion: 0.22
 Nodes (9): 12.1 Kerangka halaman, 12.2 Panel konfigurasi MCP, 12.3 Langkah bernomor + perintah siap salin, 12.4 Agent Skills pack, 12.5 Prompt starter, 12.6 Keamanan (jangan dilewat), 12.7 Kualitas UI, 12.8 Bootstrap runner lewat agent (satu perintah) (+1 more)
 
 ### Community 189 - "integrationRepository.ts"
-Cohesion: 0.52
-Nodes (6): codegenScriptRef(), createCodegenInvocation(), formatCodegenChecklist(), runCodegen(), selectTestCase(), waitForExit()
+Cohesion: 0.21
+Nodes (12): CodegenTestCase, codegenScriptRef(), createCodegenInvocation(), formatCodegenChecklist(), runCodegen(), selectTestCase(), waitForExit(), discoverPlaywrightScripts() (+4 more)
 
 ### Community 193 - "registry.ts"
-Cohesion: 0.12
-Nodes (17): BeginToolCallResult, BeginToolCallRow, GovernanceRepository, GovernanceRepositoryError, createMcpServer(), GovernanceService, ToolRateLimitError, createAutomationReadToolRegistrar() (+9 more)
+Cohesion: 0.15
+Nodes (12): BeginToolCallResult, BeginToolCallRow, GovernanceRepository, GovernanceRepositoryError, config, GovernanceService, ToolRateLimitError, installToolGovernance() (+4 more)
 
 ### Community 194 - "executor.ts"
-Cohesion: 0.18
-Nodes (10): name, private, scripts, build, dev, lint, preview, test (+2 more)
+Cohesion: 0.33
+Nodes (6): scripts, build, dev, lint, preview, test
 
 ### Community 196 - "package.json"
-Cohesion: 0.26
+Cohesion: 0.33
 Nodes (7): RunnerConfig, emit(), Level, log, MIME, SignResponse, uploadArtifacts()
 
 ### Community 198 - "dashboardRepository.ts"
 Cohesion: 0.29
 Nodes (7): 13.1 Onboarding runner, 13.2 Status runner yang terbaca, 13.3 Papan job, 13.4 Mapping script yang tidak membingungkan, 13.5 Diagnostik & troubleshooting, 13.6 Responsif & konsisten, 13. Runner UI/UX yang lebih ramah
 
+### Community 199 - "primeicons"
+Cohesion: 0.23
+Nodes (10): AppTopbar(), BreadcrumbContext, BreadcrumbContextValue, BreadcrumbItem, BreadcrumbProvider(), useBreadcrumbContext(), BreadcrumbCollapsed(), BreadcrumbTrail() (+2 more)
+
 ### Community 204 - "zod"
-Cohesion: 0.16
-Nodes (17): ActivityPanel(), TABLE_LABELS, BreadcrumbItem, CommentsPanel(), formatDateTime(), ISSUE_PRIORITY_LABEL, ISSUE_TYPE_LABEL, ISSUE_TYPE_SEVERITY (+9 more)
+Cohesion: 0.11
+Nodes (25): App(), ActivityPanel(), TABLE_LABELS, CommentsPanel(), formatDateTime(), ISSUE_TYPE_LABEL, ISSUE_TYPE_SEVERITY, useActivity() (+17 more)
 
 ### Community 206 - "ServerConfig"
-Cohesion: 0.08
-Nodes (32): byteLength(), ErrorDetail, ErrorEnvelope, errorResponse(), normalizePageSize(), paginatedResponse(), PaginationInput, PaginationMeta (+24 more)
-
-### Community 209 - "api.ts"
-Cohesion: 0.36
-Nodes (6): CodegenTestCase, discoverPlaywrightScripts(), IGNORED_DIRECTORIES, runScriptSync(), selectTestCase(), unmappedScripts()
+Cohesion: 0.13
+Nodes (7): normalizePageSize(), ReadRepository, decodeCursor(), ReadService, createReadToolRegistrar(), ArtifactUrl, Project
 
 ### Community 210 - "14. Distribusi & arsitektur Local Agent"
 Cohesion: 0.33
 Nodes (6): 14.1 Adapter pattern (wajib, ini yang bikin penyatuan nanti murah), 14.2 Jahitan bersama sejak sekarang, 14.3 Cara install, 14.4 Setup yang tidak membocorkan rahasia, 14.5 Kriteria penyatuan jadi satu Local Agent, 14. Distribusi & arsitektur Local Agent
 
+### Community 211 - "useNotifications.ts"
+Cohesion: 0.50
+Nodes (4): iconForKind(), NOTIFICATION_KIND_ICON, NotificationPanel(), NotificationPanelProps
+
+### Community 214 - "interactive.ts"
+Cohesion: 0.39
+Nodes (8): InteractiveRunnerConfig, RunnerCommand, createInteractiveInvocation(), InteractiveInvocation, runInteractiveCommand(), runWatch(), spawnPlaywright(), waitForExit()
+
+### Community 216 - "dashboardRepository.ts"
+Cohesion: 0.11
+Nodes (21): IssueEditor(), IssueEditorProps, IssueFormData, PRIORITY_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS, mapDashboardReportRunRow(), DashboardReportIssueRow (+13 more)
+
+### Community 217 - "package.json"
+Cohesion: 0.40
+Nodes (4): name, private, type, version
+
 ## Knowledge Gaps
-- **907 isolated node(s):** `supabase`, `$schema`, `typescript`, `oxc`, `react/rules-of-hooks` (+902 more)
+- **908 isolated node(s):** `supabase`, `$schema`, `typescript`, `oxc`, `react/rules-of-hooks` (+903 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **40 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **46 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Uuid` connect `testRunService.ts` to `Community 9`, `Community 11`, `AttachmentPanel.tsx`?**
   _High betweenness centrality (0.157) - this node is a cross-community bridge._
-- **Why does `query()` connect `Community 16` to `ProjectDataManagementPage.tsx`, `statusLabels.ts`, `testSuiteRepository.ts`, `graphify reference: extra exports and benchmark`?**
-  _High betweenness centrality (0.143) - this node is a cross-community bridge._
-- **Why does `react` connect `testSuiteRepository.ts` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 8`, `csvImport.ts`, `Community 10`, `Community 12`, `Community 16`, `ARCHITECTURE — TestManager (shiftech-test-mgr)`, `Feature Backlog — TestManager`, `Architecture`, `TestCaseDetailPage.tsx`, `statusLabels.ts`, `schema_auth.sql`, `ProjectDataManagementPage.tsx`, `TestManager (shiftech-test-mgr)`, `schema_project_roles.sql`, `AppTopbar.tsx`, `issueAttachmentRepository.ts`, `graphify reference: transcribe video and audio`, `csvImport.ts`, `react-dom`, `zod`, `AppTopbar.tsx`, `smoke.spec.ts`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+- **Why does `query()` connect `Community 16` to `ProjectDataManagementPage.tsx`, `graphify reference: extra exports and benchmark`, `testSuiteRepository.ts`?**
+  _High betweenness centrality (0.142) - this node is a cross-community bridge._
+- **Why does `react` connect `Community 4` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `csvImport.ts`, `Community 10`, `Community 12`, `Community 16`, `ARCHITECTURE — TestManager (shiftech-test-mgr)`, `Feature Backlog — TestManager`, `TestCaseDetailPage.tsx`, `statusLabels.ts`, `schema_auth.sql`, `ProjectDataManagementPage.tsx`, `TestManager (shiftech-test-mgr)`, `schema_project_roles.sql`, `AppTopbar.tsx`, `testSuiteRepository.ts`, `useProjectBreadcrumbItems.ts`, `AppLayout.tsx`, `issueAttachmentRepository.ts`, `graphify reference: transcribe video and audio`, `graphify reference: GitHub clone and cross-repo merge`, `primeicons`, `csvImport.ts`, `react-dom`, `zod`, `api.ts`, `dashboardRepository.ts`, `AppTopbar.tsx`, `csvImport.ts`, `smoke.spec.ts`?**
+  _High betweenness centrality (0.080) - this node is a cross-community bridge._
 - **What connects `supabase`, `$schema`, `typescript` to the rest of the system?**
-  _907 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _908 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.10077519379844961 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

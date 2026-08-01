@@ -53,6 +53,8 @@ npm start -- watch tests
 npm start -- codegen https://app-under-test.example
 # Deteksi script baru di repo dan tawarkan mapping ke Test Case manual:
 npm start -- sync
+# Buat project Playwright minimal baru di direktori ./e2e:
+npm start -- init e2e
 ```
 
 Subcommand `ui`, `debug`, dan `watch` berjalan langsung di `TM_PROJECT_DIR` dan
@@ -72,6 +74,12 @@ membandingkannya dengan `script_ref` yang sudah tersimpan. Setiap script baru
 ditawarkan satu per satu untuk dipetakan ke Test Case aktif yang belum memiliki
 automation. Direktori dependency, Git, report, hasil test, dan artifact diabaikan;
 isi source script tidak pernah dikirim ke server.
+
+`init [directory]` membuat `package.json`, `playwright.config.ts`, `.gitignore`,
+dan contoh test minimal. Subcommand ini tidak membutuhkan kredensial TestManager,
+tidak menjalankan instalasi otomatis, dan membatalkan proses bila salah satu file
+tujuan sudah ada agar project tester tidak tertimpa. Setelah init, jalankan
+`npm install`, `npx playwright install`, lalu `npm test` dari direktori tersebut.
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
 terhadap repository pada Test Run. Untuk `local_path`, runner menggunakan path

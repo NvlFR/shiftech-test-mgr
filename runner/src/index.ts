@@ -5,9 +5,14 @@ import { log } from './logger.js';
 import { runInteractiveCommand } from './interactive.js';
 import { runCodegen } from './codegen.js';
 import { runScriptSync } from './sync.js';
+import { runInit } from './init.js';
 
 async function main(): Promise<void> {
   const cli = parseCliInput(process.argv.slice(2));
+  if (cli.command === 'init') {
+    process.exitCode = await runInit(cli.initDirectory);
+    return;
+  }
   if (cli.command === 'codegen') {
     process.exitCode = await runCodegen(loadConfig(), cli.codegenUrl!);
     return;

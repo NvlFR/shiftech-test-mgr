@@ -1902,3 +1902,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperbarui README runner dan checklist PW-16. Tidak menambah dependency atau migration, tidak menjalankan migration ke target, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (8/8 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.583 node dan 5.336 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — PW-17 scaffold project Playwright lewat runner init
+
+- Menjalankan `graphify query` sebelum menelusuri CLI runner dan mengikuti scope Section 9.2 `FEATURE_BACKLOG.md`.
+- Menambahkan subcommand `runner init [directory]` yang membuat project Playwright minimal berisi `package.json`, konfigurasi Playwright, `.gitignore`, dan contoh test tanpa membutuhkan kredensial TestManager.
+- Scaffold mengaktifkan screenshot, video, dan trace saat gagal sesuai kebijakan artifact runner; instalasi dependency dan browser tetap menjadi langkah eksplisit agar runner mempertahankan nol runtime dependency.
+- Init memeriksa seluruh target lebih dulu, memakai exclusive file creation, dan membatalkan proses tanpa menimpa file project yang sudah ada. README runner dan checklist PW-17 diperbarui.
+- Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (9/9 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.590 node dan 5.347 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

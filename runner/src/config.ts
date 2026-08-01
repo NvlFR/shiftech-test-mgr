@@ -22,13 +22,14 @@ export interface RunnerCliOptions {
   slowMoMs?: number;
 }
 
-export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen' | 'sync';
+export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen' | 'sync' | 'init';
 
 export interface RunnerCliInput {
   command: RunnerCommand;
   options: RunnerCliOptions;
   playwrightArgs: string[];
   codegenUrl?: string;
+  initDirectory?: string;
 }
 
 export interface InteractiveRunnerConfig {
@@ -108,6 +109,10 @@ export function parseCliOptions(args: string[]): RunnerCliOptions {
 
 export function parseCliInput(args: string[]): RunnerCliInput {
   const command = args[0];
+  if (command === 'init') {
+    if (args.length > 2 || args[1]?.startsWith('-')) throw new Error('Usage: runner init [directory]');
+    return { command, options: {}, playwrightArgs: [], initDirectory: args[1] };
+  }
   if (command === 'sync') {
     if (args.length > 1) throw new Error('Usage: runner sync');
     return { command, options: {}, playwrightArgs: [] };
