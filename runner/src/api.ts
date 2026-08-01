@@ -8,6 +8,7 @@ import {
 } from '@testmanager/agent-core';
 import type { RunnerConfig } from './config.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
+import type { RunnerVersionPolicy } from './versionCompatibility.js';
 
 // Shapes returned by the server RPCs in supabase/schema_024_p3_automation.sql.
 export interface AutomationJob {
@@ -158,7 +159,7 @@ export class AutomationApi {
     return response.data;
   }
 
-  heartbeat(): Promise<{ agent_id: string; active: boolean; last_seen_at: string }> {
+  heartbeat(): Promise<{ agent_id: string; active: boolean; last_seen_at: string } & RunnerVersionPolicy> {
     return this.rpc('heartbeat_local_agent', {
       p_payload: createAgentHeartbeat('runner', ['execute', 'artifacts', 'repository']),
     });

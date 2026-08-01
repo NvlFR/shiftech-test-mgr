@@ -27,6 +27,11 @@ dist-ssr
 # Vite build cache
 frontend/.vite/
 frontend/coverage/
+frontend/public/runner/*.tgz
+frontend/public/runner/*.sha256
+frontend/public/runner/release.json
+scripts/.runner-release-staging/
+scripts/.runner-release-cache/
 
 # Playwright MCP browser artifacts
 .playwright-mcp/
@@ -40,5 +45,3 @@ scripts/codex-loop/
 *-new/
 *-new.ts
 *-new.tsx
-
-

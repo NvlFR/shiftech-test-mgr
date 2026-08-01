@@ -20,8 +20,8 @@
     "semantic_hash": "2c3c5f6271802130a3a78af7475ec878"
   },
   "frontend/src/App.tsx": {
-    "mtime": 1785572318.9301133,
-    "ast_hash": "0267ba3d3ef28ca97228b8ac55bfd8a2",
+    "mtime": 1785580243.782307,
+    "ast_hash": "306d5c92fecd0ef1cda2a60ec5aa4523",
     "semantic_hash": ""
   },
   "frontend/src/components/auth/AdminRoute.tsx": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785578746.7638652,
-    "ast_hash": "4fb14131ca23c15dc0594f37b2f34049",
+    "mtime": 1785580608.0692885,
+    "ast_hash": "ae94c162d442b77a9ed5bcc81deb1699",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785579385.9247046,
-    "ast_hash": "ec9822965d351ad65da3a2271937c9ad",
+    "mtime": 1785580719.5645456,
+    "ast_hash": "d371c34e16a9d6306e2d506012ac9dc4",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1070,13 +1070,13 @@
     "semantic_hash": "a6244bdcb32256e1651655464b7d9233"
   },
   "runner/package.json": {
-    "mtime": 1785573750.2757902,
-    "ast_hash": "0e76291625f3fc973bae322e53865d4f",
+    "mtime": 1785579987.4270267,
+    "ast_hash": "e234189c89fc4d114aa342844495282a",
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785578090.9002335,
-    "ast_hash": "4cb8aa494ed732eeb194c56d3689e555",
+    "mtime": 1785580607.6812947,
+    "ast_hash": "f7525a083945f85cbed70fb88d34dd1c",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
@@ -1105,8 +1105,8 @@
     "semantic_hash": ""
   },
   "runner/src/runner.ts": {
-    "mtime": 1785579355.4546819,
-    "ast_hash": "68d13b27a89da8d5a18d1dddb9c56288",
+    "mtime": 1785580651.080612,
+    "ast_hash": "43f7d47acae17f71d104adcaf3f31b06",
     "semantic_hash": ""
   },
   "runner/tsconfig.json": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785578746.4938855,
-    "ast_hash": "10a85536ea36063701ff813f2b7c06c5",
+    "mtime": 1785580243.9083047,
+    "ast_hash": "f54499d2de0b811120d07ba72bb55c1f",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -3590,8 +3590,8 @@
     "semantic_hash": ""
   },
   "runner/test/api.test.mjs": {
-    "mtime": 1785577298.3656936,
-    "ast_hash": "5b5b63adfe5b0adba41c980dc8a4c7fb",
+    "mtime": 1785580607.9372904,
+    "ast_hash": "45ade10ae39fdfb69a17b35ca2407425",
     "semantic_hash": ""
   },
   "mcp/src/helpers/transportTestHelper.ts": {
@@ -3700,8 +3700,53 @@
     "semantic_hash": ""
   },
   "runner/test/runnerTokenRevocation.test.mjs": {
-    "mtime": 1785579355.578678,
-    "ast_hash": "a6e4733f178a0c2d96df98765b747bd3",
+    "mtime": 1785580651.20761,
+    "ast_hash": "9246abafaf53364679868e64de4d5de0",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useRunnerDistribution.ts": {
+    "mtime": 1785579986.904037,
+    "ast_hash": "8c66be10b52d0722c738cbb650af61e1",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/runner/RunnerDistributionPage.tsx": {
+    "mtime": 1785579987.1470323,
+    "ast_hash": "c1bbd68772adc87bc12f40d42c06c35c",
+    "semantic_hash": ""
+  },
+  "frontend/src/repositories/runnerDistributionRepository.ts": {
+    "mtime": 1785579986.6390424,
+    "ast_hash": "5a2724ddc3613cc443dd6775615af198",
+    "semantic_hash": ""
+  },
+  "frontend/src/services/runnerDistributionService.ts": {
+    "mtime": 1785579986.7640398,
+    "ast_hash": "fe3116b584f4716afe17d9bf5a9c4596",
+    "semantic_hash": ""
+  },
+  "frontend/src/types/runnerDistribution.ts": {
+    "mtime": 1785579986.5110447,
+    "ast_hash": "9384506466c5529e722da4c1c5fe3c3f",
+    "semantic_hash": ""
+  },
+  "scripts/release-runner.mjs": {
+    "mtime": 1785580129.5783439,
+    "ast_hash": "473dd53219212944ada6f035c49dbc9f",
+    "semantic_hash": ""
+  },
+  "runner/src/versionCompatibility.ts": {
+    "mtime": 1785580662.5674322,
+    "ast_hash": "f5b7a7f6a1f05e39fecfb39428410303",
+    "semantic_hash": ""
+  },
+  "runner/test/versionCompatibility.test.mjs": {
+    "mtime": 1785580607.8092926,
+    "ast_hash": "22ca1d58e4bda1cac55b81118cf6869c",
+    "semantic_hash": ""
+  },
+  "supabase/schema_086_dist03_runner_version_compatibility.sql": {
+    "mtime": 1785580639.5727925,
+    "ast_hash": "640574738d51a0c151f1f1b2ac118944",
     "semantic_hash": ""
   }
 }

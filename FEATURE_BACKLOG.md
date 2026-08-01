@@ -1005,7 +1005,7 @@ project yang diuji, jadi paket yang didistribusikan tetap kecil.
 
 - [ ] Jalur `npx` didahulukan: tidak ada instalasi permanen, selalu versi terbaru,
       paling sedikit langkahnya.
-- [ ] Tarball self-hosted disajikan oleh instance itu sendiri beserta **SHA256**
+- [x] Tarball self-hosted disajikan oleh instance itu sendiri beserta **SHA256**
       yang ditampilkan di halaman Connect, supaya bisa diverifikasi.
 - [ ] **Tidak memakai `curl | bash`** selama belum ada penandatanganan rilis.
       Kalau nanti dipakai, wajib: domain sendiri, binary tertandatangani,
@@ -1014,7 +1014,7 @@ project yang diuji, jadi paket yang didistribusikan tetap kecil.
       dependency adalah pintu masuk supply chain ke mesin developer pelanggan.
       Penambahan dependency harus keputusan sadar dan tercatat.
 - [ ] Publikasi paket wajib memakai npm provenance + 2FA.
-- [ ] Catat matriks kompatibilitas versi runner ↔ versi server, dan runner
+- [x] Catat matriks kompatibilitas versi runner ↔ versi server, dan runner
       memperingatkan kalau tertinggal terlalu jauh.
 - [ ] Catatan Docker: dari dalam container, `localhost` adalah container itu
       sendiri. Untuk menguji aplikasi di host perlu `--network host` (Linux) atau

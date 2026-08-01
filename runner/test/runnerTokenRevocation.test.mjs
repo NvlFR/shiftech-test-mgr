@@ -24,7 +24,7 @@ test('Runner berhenti pada poll pertama setelah token dicabut dan tidak retry ta
   let pollCount = 0;
   const api = {
     async heartbeat() {
-      return { agent_id: 'runner-1', active: true, last_seen_at: 'now' };
+      return { agent_id: 'runner-1', active: true, last_seen_at: 'now', server_version: '0.1.0', minimum_supported_runner_version: '0.1.0' };
     },
     async poll() {
       pollCount += 1;
@@ -43,4 +43,18 @@ test('Runner berhenti pada poll pertama setelah token dicabut dan tidak retry ta
     /Token runner ditolak server karena sudah dicabut, dirotasi, atau tidak valid\. Hubungkan ulang runner dengan token baru\./,
   );
   assert.equal(pollCount, 1);
+});
+
+test('Runner menolak berjalan ketika versinya di bawah minimum server', async () => {
+  let pollCount = 0;
+  const api = {
+    async heartbeat() {
+      return { agent_id: 'runner-1', active: true, last_seen_at: 'now', server_version: '1.0.0', minimum_supported_runner_version: '0.2.0' };
+    },
+    async poll() { pollCount += 1; return null; },
+  };
+  const runner = new Runner(config, { async execute() {} }, { async store() {} }, api);
+
+  await assert.rejects(runner.start(), /Versi runner 0\.1\.0 tidak lagi didukung server.*0\.2\.0/);
+  assert.equal(pollCount, 0);
 });

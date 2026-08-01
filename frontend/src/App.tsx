@@ -31,12 +31,14 @@ import { DashboardReportPage } from './pages/dashboard/DashboardReportPage';
 import { TeamsPage } from './pages/teams/TeamsPage';
 import { ProjectTeamsPage } from './pages/teams/ProjectTeamsPage';
 import { ObservabilityPage } from './pages/admin/ObservabilityPage';
+import { RunnerDistributionPage } from './pages/runner/RunnerDistributionPage';
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/pending-approval" element={<PendingApprovalPage />} />
+      <Route path="/runner/install" element={<RunnerDistributionPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>

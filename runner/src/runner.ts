@@ -5,12 +5,13 @@ import { PlaywrightLocalExecutor } from './playwrightLocalExecutor.js';
 import { collectEnvironmentMetadata } from './environmentMetadata.js';
 import { uploadArtifacts } from './upload.js';
 import { SupabaseStorageAdapter } from './supabaseStorageAdapter.js';
-import type { ArtifactStorageAdapter } from '@testmanager/agent-core';
+import { LOCAL_AGENT_VERSION, type ArtifactStorageAdapter } from '@testmanager/agent-core';
 import { hasCompleteFailureBundle } from './artifacts.js';
 import { log } from './logger.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
 import { prepareJobRepository } from './repositoryWorkspace.js';
 import { registerSecret, redactSecrets } from './security.js';
+import { evaluateRunnerCompatibility, type RunnerVersionPolicy } from './versionCompatibility.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -65,6 +66,8 @@ export class Runner {
   private readonly api: AutomationApi;
   private stopping = false;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private compatibilityError: Error | null = null;
+  private warnedServerVersion: string | null = null;
 
   constructor(
     private readonly config: RunnerConfig,
@@ -82,11 +85,28 @@ export class Runner {
 
   private startHeartbeat(): void {
     const beat = async () => {
-      try { await this.api.heartbeat(); }
+      try { this.checkVersionCompatibility(await this.api.heartbeat()); }
       catch (err) { log.warn('Heartbeat failed', { error: (err as Error).message }); }
     };
     void beat();
     this.heartbeatTimer = setInterval(() => void beat(), this.config.heartbeatIntervalMs);
+  }
+
+  private checkVersionCompatibility(policy: RunnerVersionPolicy): void {
+    const compatibility = evaluateRunnerCompatibility(LOCAL_AGENT_VERSION, policy);
+    if (compatibility === 'unsupported') {
+      this.compatibilityError = new Error(
+        `Versi runner ${LOCAL_AGENT_VERSION} tidak lagi didukung server. Versi minimum yang didukung adalah ${policy.minimum_supported_runner_version}. Perbarui runner sebelum menjalankan job.`,
+      );
+      this.stop();
+    } else if (compatibility === 'outdated' && this.warnedServerVersion !== policy.server_version) {
+      this.warnedServerVersion = policy.server_version;
+      log.warn('Versi runner tertinggal dari server; perbarui runner sesegera mungkin', {
+        runnerVersion: LOCAL_AGENT_VERSION,
+        serverVersion: policy.server_version,
+        minimumSupportedRunnerVersion: policy.minimum_supported_runner_version,
+      });
+    }
   }
 
   private subscribeJobCommands(jobId: string, onCommand: (command: StepCommand) => void): () => void {
@@ -114,8 +134,11 @@ export class Runner {
     // Fail fast if the token is invalid so operators get a clear error on boot.
     try {
       const hb = await this.api.heartbeat();
+      this.checkVersionCompatibility(hb);
+      if (this.compatibilityError) throw this.compatibilityError;
       log.info('Runner authenticated', { agentId: hb.agent_id, active: hb.active });
     } catch (err) {
+      if (err === this.compatibilityError) throw err;
       if (isRunnerTokenRejected(err)) {
         throw new Error(RUNNER_TOKEN_REJECTED_MESSAGE);
       }
@@ -203,6 +226,7 @@ export class Runner {
         await sleep(this.config.pollIntervalMs);
       }
     }
+    if (this.compatibilityError) throw this.compatibilityError;
     log.info('Runner stopped');
   }
 }

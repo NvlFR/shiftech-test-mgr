@@ -14,7 +14,7 @@ test('AutomationApi delegates RPC operation and body to its transport', async ()
   const transport = {
     async request(request) {
       requests.push(request);
-      return { data: { agent_id: 'runner-1', active: true, last_seen_at: 'now' } };
+      return { data: { agent_id: 'runner-1', active: true, last_seen_at: 'now', server_version: '0.1.0', minimum_supported_runner_version: '0.1.0' } };
     },
   };
 
@@ -26,6 +26,7 @@ test('AutomationApi delegates RPC operation and body to its transport', async ()
     auth: { headers: {}, body: { p_token: 'runner-token' } },
   }]);
   assert.equal(result.agent_id, 'runner-1');
+  assert.equal(result.minimum_supported_runner_version, '0.1.0');
 });
 
 test('SupabaseRpcTransport preserves the runner RPC request format', async () => {

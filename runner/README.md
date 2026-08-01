@@ -4,6 +4,17 @@ CLI/agent yang menjalankan automation Playwright **di mesin lokal / on-prem**,
 lalu melapor ke server pusat TestManager. Ini bagian "Local Runner" dari
 Section 5 di [`../FEATURE_BACKLOG.md`](../FEATURE_BACKLOG.md).
 
+## Rilis self-hosted
+
+Dari root repository, jalankan `node scripts/release-runner.mjs` (atau
+`npm run release:self-hosted` dari folder `runner/`). Skrip membangun runner dan
+`agent-core`, lalu menghasilkan tarball, file `.sha256`, dan `release.json` di
+`frontend/public/runner/`.
+
+Setelah frontend dibangun dan di-deploy, halaman publik `/runner/install` menampilkan
+perintah `npm i -g <url>` dan SHA256. Endpoint unduhan berada di
+`/runner/tm-runner-<version>.tgz`; artefak hasil rilis tidak disimpan di Git.
+
 ## Kenapa runner terpisah?
 
 Server pusat (Supabase + frontend) yang di-deploy self-hosted **tidak menjalankan
@@ -222,13 +233,29 @@ antar-step. Runner tidak membuka port lokal maupun koneksi inbound dari server.
 
 ## Docker
 
+Docker **bukan jalur default untuk laptop tester**. Sesuai Section 14.3, gunakan
+`npx` atau instalasi npm global agar runner dan Playwright dapat mengakses
+aplikasi lokal secara langsung. Image Docker ditujukan terutama untuk mesin
+bersama atau lingkungan on-prem.
+
+Di dalam container, `localhost` menunjuk ke container itu sendiri, bukan ke host.
+Jika aplikasi under test berjalan di host, pilih konfigurasi jaringan yang sesuai:
+
+- Linux: tambahkan `--network host`, lalu URL seperti `http://localhost:3000`
+  akan mengarah ke service di host.
+- Docker Desktop (macOS/Windows): gunakan `host.docker.internal` pada URL aplikasi,
+  misalnya `http://host.docker.internal:3000`.
+
 ```bash
 docker build -t testmanager-local-runner .
+# Contoh Linux untuk mengakses aplikasi yang berjalan di host:
 docker run --rm --env-file .env \
+  --network host \
   -v /path/to/playwright-project:/project \
   -e TM_PROJECT_DIR=/project \
   testmanager-local-runner
 ```
 
 Base image `mcr.microsoft.com/playwright` sudah menyertakan browser + dependency
-OS-nya. Jalankan di jaringan yang sama dengan aplikasi under test.
+OS-nya. Pastikan `baseURL` atau URL target di project Playwright memakai alamat
+host yang benar untuk mode jaringan di atas.

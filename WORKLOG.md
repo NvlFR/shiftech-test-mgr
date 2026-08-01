@@ -2622,3 +2622,26 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Mengubah identitas paket runner menjadi `@testmanager/runner` dan menambahkan allow-list tarball `files: ["dist"]`, executable `tm-runner`, batas Node.js `>=20`, publikasi scoped package berakses publik, serta build otomatis melalui `prepublishOnly`.
 - Menyelaraskan metadata root pada `runner/package-lock.json` dengan metadata paket distribusi.
 - Verifikasi lulus: build TypeScript, seluruh 15 test runner, dan `npm pack --dry-run --json`; tarball hanya berisi `package.json`, `README.md`, serta output `dist`, tanpa `.env`, log, test, example project, atau artifact runtime.
+
+## 2026-08-01 — DIST-02 tarball dan endpoint rilis self-hosted
+
+- Menambahkan `scripts/release-runner.mjs` untuk membangun runner dan `agent-core`, men-stage paket mandiri tanpa dependency runtime eksternal, lalu menghasilkan tarball, checksum SHA256, dan metadata `release.json` di aset publik frontend.
+- Menambahkan halaman publik `/runner/install` melalui layering repository → service → hook → page; halaman menampilkan perintah instalasi berbasis origin instance, SHA256, serta tautan unduh tarball dan checksum.
+- Artefak rilis diabaikan Git, dokumentasi runner dan checklist Section 14.3 diperbarui.
+- Verifikasi lulus: `sha256sum -c`, audit isi bundled `@testmanager/agent-core`, instalasi global ke prefix sementara, `cd frontend && npm run build`, dan `npm run lint`. Lint hanya melaporkan warning lama; build hanya melaporkan warning ukuran chunk yang sudah ada. Tidak ada migration, akses Supabase target, secret/token, commit, atau push.
+- `graphify update .` berhasil menyinkronkan graph setelah penambahan source; percobaan incremental terakhir setelah perubahan path route tidak menemukan topologi baru dan watcher ditolak environment dengan `Operation not permitted`.
+
+## 2026-08-01 — DIST-03 kompatibilitas versi runner dan server
+
+- Runner mengirim versi melalui payload heartbeat bersama dan kini membaca `server_version` serta `minimum_supported_runner_version` dari respons server.
+- Menambahkan evaluasi versi tanpa dependency runtime: runner memperingatkan sekali per versi server bila tertinggal tetapi masih didukung, serta berhenti sebelum polling job bila versinya di bawah minimum.
+- Menambahkan migration `schema_086_dist03_runner_version_compatibility.sql` yang mencatat matriks server 0.1.x → runner minimum 0.1.0 dan mengembalikan kebijakan tersebut dari heartbeat. Migration tidak dijalankan ke Supabase target.
+- Menambahkan regresi kontrak API, klasifikasi kompatibilitas, validasi versi server, dan fail-closed sebelum polling.
+- Verifikasi lulus: seluruh 16 berkas test runner, build TypeScript runner, dan build frontend; frontend hanya memunculkan warning ukuran chunk yang sudah ada. `graphify update .` berhasil menyinkronkan graph menjadi 3.202 node dan 6.445 edge.
+
+## 2026-08-01 — DIST-04 networking Docker runner
+
+- Memperbarui dokumentasi runner untuk menegaskan bahwa Docker ditujukan bagi mesin bersama/on-prem, sedangkan `npx` atau npm global tetap menjadi jalur default laptop tester sesuai Section 14.3.
+- Mendokumentasikan bahwa `localhost` di dalam container menunjuk ke container sendiri, dengan `--network host` untuk Linux dan `host.docker.internal` untuk Docker Desktop saat aplikasi under test berjalan di host.
+- Menyelaraskan contoh dan komentar `runner/Dockerfile` dengan panduan networking tersebut.
+- Verifikasi lulus melalui `git diff --check`; `graphify update .` berhasil menyinkronkan graph menjadi 3.203 node dan 6.446 edge, dengan warning tujuh file non-source yang tidak menghasilkan node.

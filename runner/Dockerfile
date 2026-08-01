@@ -12,8 +12,12 @@ COPY src ./src
 RUN npm run build
 
 # The Playwright project under test is mounted at runtime, e.g.
-#   docker run --env-file .env -v /path/to/project:/project \
+#   docker run --env-file .env --network host -v /path/to/project:/project \
 #     -e TM_PROJECT_DIR=/project testmanager-local-runner
+# Docker is intended for shared/on-prem machines, not the default laptop setup;
+# prefer npx/npm there. Inside a container, localhost is the container itself.
+# Use --network host on Linux, or target host.docker.internal on Docker Desktop,
+# when the application under test runs on the host.
 ENV TM_PROJECT_DIR=/project
 
 CMD ["node", "dist/index.js"]
