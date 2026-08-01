@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { testResultService } from '../services/testResultService';
 import type { ScreenshotComparison, TestResultWithDetails, ViewableAutomationArtifact } from '../types/domain';
 
@@ -7,6 +7,7 @@ export function useTestResultDetail(testResultId: string | null) {
   const [artifacts, setArtifacts] = useState<ViewableAutomationArtifact[]>([]);
   const [screenshotComparison, setScreenshotComparison] = useState<ScreenshotComparison | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,5 +42,15 @@ export function useTestResultDetail(testResultId: string | null) {
     return () => { active = false; };
   }, [testResultId]);
 
-  return { result, artifacts, screenshotComparison, loading, error };
+  const retry = useCallback(async () => {
+    if (!testResultId) throw new Error('Test Result tidak valid');
+    setRetrying(true);
+    try {
+      return await testResultService.retryAutomation(testResultId);
+    } finally {
+      setRetrying(false);
+    }
+  }, [testResultId]);
+
+  return { result, artifacts, screenshotComparison, loading, error, retrying, retry };
 }

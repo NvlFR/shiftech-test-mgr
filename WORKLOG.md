@@ -1865,3 +1865,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_064_pw12_run_single_locally.sql` dengan validasi project/plan/case, permission editor, browser/device, audit event, dan grant RPC terautentikasi. Migrasi hanya dibuat dan tidak dijalankan ke target Supabase.
 - Memperbarui checklist PW-12 Section 9.1. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada) dan `git diff --check`.
+
+## 2026-08-01 — PW-13 retry manual satu Test Result
+
+- Menjalankan `graphify query` sebelum menelusuri alur Test Result dan automation job, lalu mengikuti scope interaktivitas terarah Section 9.5 `FEATURE_BACKLOG.md`.
+- Menambahkan tombol **Retry test** pada halaman detail Test Result dengan alur lengkap Page → Hook → Service → Repository → Supabase dan notifikasi hasil enqueue.
+- Menambahkan migration `schema_065_pw13_manual_test_retry.sql` untuk membuat job automation baru pada Test Run dan Test Result yang sama, memakai mapping script serta browser/device job sebelumnya, tanpa membuat Test Run baru atau mengubah status Test Run.
+- RPC memvalidasi permission `can_run_tests`, mapping script, dan menolak job retry ganda yang masih queued/running; lock pada Test Result mencegah enqueue ganda akibat request bersamaan. Job lama tetap dipertahankan sebagai histori dan hasil final runner tetap ditulis ke Test Result yang sama.
+- Memperbarui checklist PW-13 Section 9.5. Migration hanya dibuat dan tidak dijalankan ke target Supabase; tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada) dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.556 node dan 5.280 edge; terdapat warning tujuh file konfigurasi/hasil test tanpa node, tanpa kegagalan proses.

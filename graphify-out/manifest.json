@@ -340,8 +340,8 @@
     "semantic_hash": "027d049e966243f5f7b5318c5dfd8c59"
   },
   "frontend/src/repositories/testResultRepository.ts": {
-    "mtime": 1785547552.2843459,
-    "ast_hash": "657d08038d0f1f1575aaf3fc557813a9",
+    "mtime": 1785549016.5986712,
+    "ast_hash": "6523228ecbbc23d6de1c2991cb7a6a08",
     "semantic_hash": ""
   },
   "frontend/src/repositories/testRunRepository.ts": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785548755.900691,
-    "ast_hash": "95329cf6ef9f41bb86a6d8418f156a94",
+    "mtime": 1785549019.931015,
+    "ast_hash": "82e45b2ff810e5bf3b6424a3715b04d1",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785548756.163691,
-    "ast_hash": "2b06cfcd3439b6b4353284bf303f09d6",
+    "mtime": 1785549077.5272007,
+    "ast_hash": "9f2ef91d48d2cc978eb925656438a2b0",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -3195,18 +3195,18 @@
     "semantic_hash": ""
   },
   "frontend/src/hooks/useTestResultDetail.ts": {
-    "mtime": 1785547552.6003442,
-    "ast_hash": "873496ca360bcc6c601de31991e7bb11",
+    "mtime": 1785549018.2743409,
+    "ast_hash": "2114b0558da24a793e2480e8b3d0f050",
     "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestResultDetailPage.tsx": {
-    "mtime": 1785547583.2842016,
-    "ast_hash": "686d58cd18b1320ba1bd5d3ba08d061a",
+    "mtime": 1785549019.1921601,
+    "ast_hash": "69b37562eb39956430a290a25c7587da",
     "semantic_hash": ""
   },
   "frontend/src/services/testResultService.ts": {
-    "mtime": 1785547552.447345,
-    "ast_hash": "eaf9f4e4bfcc60244272d668e6dfe08b",
+    "mtime": 1785549017.380517,
+    "ast_hash": "69628e885a4aeb8d305f4e2faa84b5f0",
     "semantic_hash": ""
   },
   "frontend/src/hooks/useAutomationJobLogs.ts": {
@@ -3232,6 +3232,11 @@
   "supabase/schema_064_pw12_run_single_locally.sql": {
     "mtime": 1785548649.6926715,
     "ast_hash": "030b699962bb9d525efed26f7d887d88",
+    "semantic_hash": ""
+  },
+  "supabase/schema_065_pw13_manual_test_retry.sql": {
+    "mtime": 1785549036.129874,
+    "ast_hash": "2761f48c8a46fb6a95eb1d8aaf4465a8",
     "semantic_hash": ""
   }
 }

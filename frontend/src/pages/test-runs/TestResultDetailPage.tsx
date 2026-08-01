@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -6,6 +6,7 @@ import { Message } from 'primereact/message';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { Tag } from 'primereact/tag';
+import { Toast } from 'primereact/toast';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { TEST_RESULT_STATUS_LABEL, TEST_RESULT_STATUS_SEVERITY } from '../../helpers/statusLabels';
 import { useTestResultDetail } from '../../hooks/useTestResultDetail';
@@ -120,10 +121,21 @@ function ScreenshotDiffViewer({ comparison }: { comparison: ScreenshotComparison
 export function TestResultDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { result, artifacts, screenshotComparison, loading, error } = useTestResultDetail(id ?? null);
+  const toast = useRef<Toast>(null);
+  const { result, artifacts, screenshotComparison, loading, error, retrying, retry } = useTestResultDetail(id ?? null);
   const artifactsByType = useMemo(() => Object.fromEntries(TAB_TYPES.map(({ type }) => [type, artifacts.filter((artifact) => artifact.type === type)])), [artifacts]);
 
+  async function retryTest() {
+    try {
+      await retry();
+      toast.current?.show({ severity: 'success', summary: 'Retry masuk antrean', detail: 'Local Runner akan menjalankan ulang test ini pada Test Run yang sama.' });
+    } catch (retryError) {
+      toast.current?.show({ severity: 'error', summary: 'Retry gagal', detail: retryError instanceof Error ? retryError.message : 'Tidak dapat membuat job retry.' });
+    }
+  }
+
   return <div>
+    <Toast ref={toast} />
     <Breadcrumb items={[
       { label: 'Test Run', path: result ? `/test-runs/${result.testRunId}` : undefined },
       { label: result?.testCase.code ?? 'Test Result' },
@@ -136,6 +148,7 @@ export function TestResultDetailPage() {
         <div className="flex align-items-center flex-wrap gap-3">
           <Tag value={TEST_RESULT_STATUS_LABEL[result.status]} severity={TEST_RESULT_STATUS_SEVERITY[result.status]} />
           <span className="text-color-secondary">Tester: {result.tester?.fullName ?? result.tester?.email ?? '-'}</span>
+          <Button label="Retry test" icon="pi pi-refresh" size="small" outlined loading={retrying} onClick={() => void retryTest()} />
           <Button label="Kembali ke Test Run" icon="pi pi-arrow-left" size="small" text onClick={() => navigate(`/test-runs/${result.testRunId}`)} />
         </div>
         {result.notes && <p className="mb-0 white-space-pre-line">{result.notes}</p>}

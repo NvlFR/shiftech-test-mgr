@@ -11,6 +11,11 @@ function buildTraceViewerUrl(traceUrl: string): string {
 }
 
 export const testResultService = {
+  retryAutomation(id: string) {
+    if (!id) throw new Error('Test Result tidak valid');
+    return testResultRepository.retryAutomation(id);
+  },
+
   getById(id: string) {
     if (!id) throw new Error('Test Result tidak valid');
     return testResultRepository.findById(id);

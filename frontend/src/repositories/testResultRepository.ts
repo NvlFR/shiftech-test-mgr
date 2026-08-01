@@ -4,6 +4,12 @@ import { fetchAllRows } from './paginate';
 import type { AutomationArtifact, TestResult, TestResultScreenshotHistory, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
 
 export const testResultRepository = {
+  async retryAutomation(id: string): Promise<{ jobId: string; testResultId: string; testRunId: string }> {
+    const { data, error } = await supabase.rpc('retry_automation_test_result', { p_test_result_id: id });
+    if (error) throw error;
+    return { jobId: data.job_id, testResultId: data.test_result_id, testRunId: data.test_run_id };
+  },
+
   async findById(id: string): Promise<TestResultWithDetails | null> {
     const { data, error } = await supabase
       .from('test_results')
