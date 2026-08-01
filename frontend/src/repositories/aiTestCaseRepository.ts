@@ -12,18 +12,24 @@ function mockResult(request: AiTestCaseGenerationRequest): AiTestCaseGenerationR
     provider: 'mock',
     model: 'local-mock',
     promptVersion: 'frontend-mock-v1',
-    drafts: [{
-      title: `Validasi ${firstLine.slice(0, 150)}`,
+    drafts: ([
+      { scenarioType: 'happy_path', title: `Validasi ${firstLine.slice(0, 150)}`, steps: '1. Buka fitur terkait.\n2. Masukkan data sesuai requirement.\n3. Jalankan aksi utama.', expectedResult: 'Sistem memproses aksi dan menampilkan hasil sesuai requirement tanpa error.' },
+      { scenarioType: 'negative', title: `Tolak input invalid untuk ${firstLine.slice(0, 120)}`, steps: '1. Buka fitur terkait.\n2. Masukkan data invalid.\n3. Jalankan aksi utama.', expectedResult: 'Sistem menolak input dan menampilkan validasi yang jelas.' },
+      { scenarioType: 'edge_case', title: `Tangani nilai batas untuk ${firstLine.slice(0, 120)}`, steps: '1. Buka fitur terkait.\n2. Masukkan data pada nilai batas.\n3. Jalankan aksi utama.', expectedResult: 'Sistem menangani nilai batas secara konsisten tanpa error.' },
+    ] as const).map((scenario) => ({
+      requirementRef: firstLine.slice(0, 500),
+      scenarioType: scenario.scenarioType,
+      title: scenario.title,
       objective: `Memastikan requirement berikut berjalan sesuai tujuan: ${firstLine}`,
       preconditions: 'Pengguna memiliki akses yang diperlukan dan data uji tersedia.',
-      steps: '1. Buka fitur terkait.\n2. Masukkan data sesuai requirement.\n3. Jalankan aksi utama.',
-      expectedResult: 'Sistem memproses aksi dan menampilkan hasil sesuai requirement tanpa error.',
+      steps: scenario.steps,
+      expectedResult: scenario.expectedResult,
       priority: 'medium',
       tags: ['AI-draft'],
       notes: 'Draf dari mock provider. Review sebelum disimpan.',
       scenarios: includeScenarios ? ['Alur utama dengan input valid', 'Pengguna mengulangi aksi setelah berhasil'] : [],
       edgeCases: includeEdgeCases ? ['Input kosong atau hanya spasi', 'Koneksi terputus saat aksi diproses'] : [],
-    }],
+    })),
   };
 }
 

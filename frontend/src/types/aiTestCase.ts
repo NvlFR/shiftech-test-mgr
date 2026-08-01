@@ -22,6 +22,8 @@ export interface AiTestCaseGenerationRequest {
 }
 
 export interface AiTestCaseDraft {
+  requirementRef: string;
+  scenarioType: 'happy_path' | 'negative' | 'edge_case';
   title: string;
   objective: string;
   preconditions: string;

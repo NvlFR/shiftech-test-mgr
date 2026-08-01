@@ -14,7 +14,11 @@ Deno.test("schema menolak draft test case invalid", () => {
 
 Deno.test("mock provider menghasilkan kontrak generate", async () => {
   const raw = await new MockProvider().complete({ action: "generate_test_cases", prompt: JSON.stringify({ input: { requirement: "login" } }), timeoutMs: 1000 });
-  assertEquals(validateActionOutput("generate_test_cases", raw).testCases.length, 1);
+  const output = validateActionOutput("generate_test_cases", raw);
+  assertEquals(output.testCases.length, 3);
+  assert(output.testCases.every((testCase) => testCase.requirementRef === "login"));
+  assert(output.testCases.some((testCase) => testCase.scenarioType === "negative"));
+  assert(output.testCases.some((testCase) => testCase.scenarioType === "edge_case"));
 });
 
 Deno.test("generate menerima teks, file, dan referensi repository", () => {
@@ -26,13 +30,25 @@ Deno.test("generate menerima teks, file, dan referensi repository", () => {
 });
 
 Deno.test("CSV generate memakai kolom template import secara persis dan meng-escape nilai", () => {
-  const output = validateActionOutput("generate_test_cases", { testCases: [{ module: "Auth", title: "Login, valid", objective: "Verify", preconditions: "User", steps: "1. Click \"Login\"", expectedResult: "Dashboard", priority: "high", tags: ["smoke", "auth"], targetRole: "Admin" }] });
+  const base = { requirementRef: "REQ-LOGIN-01", module: "Auth", objective: "Verify", preconditions: "User", steps: "1. Click \"Login\"", expectedResult: "Dashboard", priority: "high", tags: ["smoke", "auth"], targetRole: "Admin" } as const;
+  const output = validateActionOutput("generate_test_cases", { testCases: [
+    { ...base, title: "Login, valid", scenarioType: "happy_path" },
+    { ...base, title: "Login invalid", scenarioType: "negative" },
+    { ...base, title: "Login boundary", scenarioType: "edge_case" },
+  ] });
   assert("testCases" in output);
   const csv = generateTestCasesCsv(output);
   assertEquals(csv.split("\r\n")[0], TEST_CASE_IMPORT_COLUMNS.join(","));
-  assertEquals(csv.split("\r\n").length, 2);
+  assertEquals(csv.split("\r\n").length, 4);
   assert(csv.includes('"Login, valid"'));
   assert(csv.includes('"1. Click ""Login"""'));
+  assert(csv.includes('"REQ-LOGIN-01"'));
+});
+
+Deno.test("schema generate menolak output tanpa negative, edge case, atau requirement ref", () => {
+  const base = { requirementRef: "REQ-1", scenarioType: "happy_path", title: "Login", objective: "Verify", preconditions: "User", steps: "1. Login", expectedResult: "Dashboard", priority: "high", tags: [] };
+  assertThrows(() => validateActionOutput("generate_test_cases", { testCases: [base] }));
+  assertThrows(() => validateActionOutput("generate_test_cases", { testCases: [{ ...base, scenarioType: "negative" }, { ...base, scenarioType: "edge_case", requirementRef: "" }] }));
 });
 
 Deno.test("redaction tidak meneruskan secret dan email", () => {

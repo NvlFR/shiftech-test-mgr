@@ -1,16 +1,16 @@
 # Graph Report - shiftech-test-mgr  (2026-08-01)
 
 ## Corpus Check
-- 416 files · ~256,010 words
+- 416 files · ~256,728 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2613 nodes · 5388 edges · 226 communities (180 shown, 46 thin omitted)
+- 2614 nodes · 5389 edges · 226 communities (180 shown, 46 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.66)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `80ade416`
+- Built from commit: `d18ea24a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -76,7 +76,7 @@
 - schema_project_members.sql
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
-- graphify reference: GitHub clone and cross-repo merge
+- useNotifications.ts
 - testCaseExcel.ts
 - TODO — Sprint Board Aktif
 - schema_issue_attachments.sql
@@ -127,7 +127,7 @@
 - schema_025_fix_pgcrypto_and_audit.sql
 - playwright.config.ts
 - broken.spec.ts
-- smoke.spec.ts
+- AppMenu.tsx
 - schema_026_automation_artifacts_storage.sql
 - react-dom
 - schema_027_fix_attachment_helper_grants.sql
@@ -171,7 +171,7 @@
 - 4. Scope — Modul
 - 2026-07-31 — FIX-00b error TypeScript ProjectDetailPage
 - useProjectBreadcrumbItems.ts
-- AppLayout.tsx
+- interactive.ts
 - package.json
 - RepoRepository
 - react-dom
@@ -189,12 +189,12 @@
 - testResultService.ts
 - environmentMetadata.test.mjs
 - AppTopbar.tsx
-- zod
+- requirementRepository.ts
 - ServerConfig
+- testResultStepRepository.ts
 - 14. Distribusi & arsitektur Local Agent
 - useRealtimeSync.ts
 - useAuthContext
-- interactive.ts
 - package.json
 - testResultService.ts
 - primeflex
@@ -211,7 +211,7 @@
 3. `useAuthContext()` - 45 edges
 4. `Worklog` - 39 edges
 5. `supabase` - 36 edges
-6. `2026-07-31 — MCP-08 write test case/test plan tools` - 34 edges
+6. `2026-07-31 — MCP-08 write test case/test plan tools` - 35 edges
 7. `ServerConfig` - 29 edges
 8. `useProjectRole()` - 28 edges
 9. `createReadToolRegistrar()` - 26 edges
@@ -336,7 +336,7 @@ Nodes (24): AnalysisOutputSchema, AnalysisRequest, AssistantOutputSchema, Assist
 
 ### Community 25 - "ProjectSettingsPage.tsx"
 Cohesion: 0.12
-Nodes (17): dependencies, jspdf-autotable, primeicons, primereact, react, react-hook-form, @supabase/supabase-js, @tanstack/react-query (+9 more)
+Nodes (17): dependencies, @hookform/resolvers, jspdf-autotable, primeicons, primereact, react, react-hook-form, @supabase/supabase-js (+9 more)
 
 ### Community 26 - "TestCaseDetailPage.tsx"
 Cohesion: 0.11
@@ -351,8 +351,8 @@ Cohesion: 0.11
 Nodes (21): AutomationJob, AutomationJobCommand, CodegenTestCaseStep, EnvironmentMetadata, JobRepository, ReportPayload, collectEnvironmentMetadata(), DEFAULT_VIEWPORT (+13 more)
 
 ### Community 29 - "schema_test_management_v2.sql"
-Cohesion: 0.47
-Nodes (4): mapTestResultStepRow(), testResultStepRepository, testResultStepService, TestResultStepStatus
+Cohesion: 0.16
+Nodes (13): ProfileView(), BreadcrumbItem, BreadcrumbProps, CommentsPanel(), AuthContext, AuthContextValue, useComments(), useProfileView() (+5 more)
 
 ### Community 30 - "TASKS — TestManager (shiftech-test-mgr)"
 Cohesion: 0.10
@@ -450,10 +450,6 @@ Nodes (10): 11.1 Tahap 1 — Requirement → Test Case CSV, 11.2 Tahap 2 — Imp
 Cohesion: 0.18
 Nodes (11): FEATURES — Status Checklist, Infrastruktur, Integrasi source-new (hasil akhir), Issues, Kode Entity (Module, Test Case, Test Plan, Test Run), Modules & Tags, Projects, Test Cases (+3 more)
 
-### Community 55 - "issueAttachmentRepository.ts"
-Cohesion: 0.29
-Nodes (6): iconForKind(), NOTIFICATION_KIND_ICON, NotificationPanel(), NotificationPanelProps, notificationService, Notification
-
 ### Community 56 - "graphify reference: commit hook and native CLAUDE.md integration"
 Cohesion: 0.29
 Nodes (8): audit_logs, notifications, notify_issue_changes(), record_test_case_version(), test_case_versions, test_cases, trg_issue_notifications, trg_test_case_version
@@ -478,9 +474,9 @@ Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only
 Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
 
-### Community 62 - "graphify reference: GitHub clone and cross-repo merge"
-Cohesion: 0.16
-Nodes (13): ProfileView(), BreadcrumbItem, BreadcrumbProps, CommentsPanel(), AuthContext, AuthContextValue, useComments(), useProfileView() (+5 more)
+### Community 62 - "useNotifications.ts"
+Cohesion: 0.29
+Nodes (6): iconForKind(), NOTIFICATION_KIND_ICON, NotificationPanel(), NotificationPanelProps, notificationService, Notification
 
 ### Community 64 - "TODO — Sprint Board Aktif"
 Cohesion: 0.40
@@ -654,9 +650,9 @@ Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphif
 Cohesion: 0.50
 Nodes (3): Batasan deployment, Ingest, Kontrak Integrasi CI/CD
 
-### Community 115 - "smoke.spec.ts"
+### Community 115 - "AppMenu.tsx"
 Cohesion: 0.39
-Nodes (8): InteractiveRunnerConfig, RunnerCommand, createInteractiveInvocation(), InteractiveInvocation, runInteractiveCommand(), runWatch(), spawnPlaywright(), waitForExit()
+Nodes (6): AppMenu(), AppMenuitem(), AppMenuSeparator(), MenuItemModel, readStoredPins(), useProjectPins()
 
 ### Community 116 - "schema_026_automation_artifacts_storage.sql"
 Cohesion: 0.50
@@ -691,8 +687,8 @@ Cohesion: 0.33
 Nodes (6): mapIssueAttachmentRow(), useIssueAttachments(), issueAttachmentRepository, withSignedUrl(), issueAttachmentService, IssueAttachment
 
 ### Community 139 - "config.ts"
-Cohesion: 0.07
-Nodes (26): loadConfig(), parseBoundedInteger(), parseReadonly(), parseRerunFailedMaxTests(), requiredEnv(), ServerConfig, baseEnv, body() (+18 more)
+Cohesion: 0.08
+Nodes (24): loadConfig(), parseBoundedInteger(), parseReadonly(), parseRerunFailedMaxTests(), requiredEnv(), ServerConfig, baseEnv, body() (+16 more)
 
 ### Community 149 - "smoke.spec.ts"
 Cohesion: 0.15
@@ -704,7 +700,7 @@ Nodes (10): 3. Konsep Test Management, Issue, Kode Entity (Module, Test Case, Te
 
 ### Community 162 - "2026-07-31 — SRC-08 sinkronisasi hooks-new"
 Cohesion: 0.06
-Nodes (34): 2026-07-31 — MCP-08 write test case/test plan tools, 2026-07-31 — MCP-09 gate manusia approval Test Plan, 2026-07-31 — MCP-11 workflow Issue, 2026-07-31 — MCP-12 tool Automation, 2026-07-31 — MCP-13 selective rerun failed, 2026-07-31 — MCP-15 tool analisis, 2026-07-31 — MCP-16 rate limit dan audit tool MCP, 2026-08-01 — E2E-01 generate Test Case CSV dari requirement (+26 more)
+Nodes (35): 2026-07-31 — MCP-08 write test case/test plan tools, 2026-07-31 — MCP-09 gate manusia approval Test Plan, 2026-07-31 — MCP-11 workflow Issue, 2026-07-31 — MCP-12 tool Automation, 2026-07-31 — MCP-13 selective rerun failed, 2026-07-31 — MCP-15 tool analisis, 2026-07-31 — MCP-16 rate limit dan audit tool MCP, 2026-08-01 — E2E-01 generate Test Case CSV dari requirement (+27 more)
 
 ### Community 165 - "useAuthContext"
 Cohesion: 0.16
@@ -734,9 +730,9 @@ Nodes (8): 2026-07-31 — FIX-00a duplikasi domain TestCase, 2026-07-31 — FIX-
 Cohesion: 0.14
 Nodes (13): supabase, mapEnvironmentRow(), mapNotificationRow(), mapTestCaseStepRow(), commentRepository, environmentRepository, moduleRepository, notificationRepository (+5 more)
 
-### Community 183 - "AppLayout.tsx"
-Cohesion: 0.32
-Nodes (7): mapRequirementLinkRow(), mapRequirementRow(), mapLink(), requirementRepository, Requirement, RequirementLink, RequirementWithLinks
+### Community 183 - "interactive.ts"
+Cohesion: 0.39
+Nodes (8): InteractiveRunnerConfig, RunnerCommand, createInteractiveInvocation(), InteractiveInvocation, runInteractiveCommand(), runWatch(), spawnPlaywright(), waitForExit()
 
 ### Community 185 - "RepoRepository"
 Cohesion: 0.13
@@ -770,9 +766,17 @@ Nodes (14): App(), MODE_ICON, ThemeToggle(), AuthProvider(), applyTheme(), getSy
 Cohesion: 0.23
 Nodes (10): AppTopbar(), BreadcrumbContext, BreadcrumbContextValue, BreadcrumbItem, BreadcrumbProvider(), useBreadcrumbContext(), BreadcrumbCollapsed(), BreadcrumbTrail() (+2 more)
 
+### Community 204 - "requirementRepository.ts"
+Cohesion: 0.32
+Nodes (7): mapRequirementLinkRow(), mapRequirementRow(), mapLink(), requirementRepository, Requirement, RequirementLink, RequirementWithLinks
+
 ### Community 206 - "ServerConfig"
-Cohesion: 0.19
-Nodes (3): ReadRepository, ArtifactUrl, Project
+Cohesion: 0.15
+Nodes (5): ReadRepository, ReadRepositoryError, config, ArtifactUrl, Project
+
+### Community 209 - "testResultStepRepository.ts"
+Cohesion: 0.47
+Nodes (4): mapTestResultStepRow(), testResultStepRepository, testResultStepService, TestResultStepStatus
 
 ### Community 210 - "14. Distribusi & arsitektur Local Agent"
 Cohesion: 0.33
@@ -785,10 +789,6 @@ Nodes (6): UserHoverCard(), UserHoverCardProps, queryKeys, useProfile(), activit
 ### Community 212 - "useAuthContext"
 Cohesion: 0.29
 Nodes (6): AdminRoute(), ProtectedRoute(), useAuthContext(), useProjectBreadcrumbItems(), LoginPage(), PendingApprovalPage()
-
-### Community 214 - "interactive.ts"
-Cohesion: 0.39
-Nodes (6): AppMenu(), AppMenuitem(), AppMenuSeparator(), MenuItemModel, readStoredPins(), useProjectPins()
 
 ### Community 215 - "package.json"
 Cohesion: 0.40
@@ -807,7 +807,7 @@ Cohesion: 0.52
 Nodes (6): codegenScriptRef(), createCodegenInvocation(), formatCodegenChecklist(), runCodegen(), selectTestCase(), waitForExit()
 
 ## Knowledge Gaps
-- **914 isolated node(s):** `supabase`, `$schema`, `typescript`, `oxc`, `react/rules-of-hooks` (+909 more)
+- **915 isolated node(s):** `supabase`, `$schema`, `typescript`, `oxc`, `react/rules-of-hooks` (+910 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **46 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -818,10 +818,10 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.167) - this node is a cross-community bridge._
 - **Why does `query()` connect `Community 8` to `Community 1`, `ProjectDataManagementPage.tsx`, `graphify reference: extra exports and benchmark`?**
   _High betweenness centrality (0.149) - this node is a cross-community bridge._
-- **Why does `react` connect `Community 16` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `csvImport.ts`, `Community 10`, `Community 12`, `3. Konsep Test Management`, `ARCHITECTURE — TestManager (shiftech-test-mgr)`, `Feature Backlog — TestManager`, `Architecture`, `TestCaseDetailPage.tsx`, `schema_auth.sql`, `ProjectDataManagementPage.tsx`, `TestManager (shiftech-test-mgr)`, `schema_project_roles.sql`, `AppTopbar.tsx`, `testSuiteRepository.ts`, `useProjectBreadcrumbItems.ts`, `graphify reference: transcribe video and audio`, `graphify reference: GitHub clone and cross-repo merge`, `useTheme.tsx`, `csvImport.ts`, `react-dom`, `AppTopbar.tsx`, `useRealtimeSync.ts`, `useAuthContext`, `interactive.ts`, `AppTopbar.tsx`, `csvImport.ts`?**
+- **Why does `react` connect `Community 16` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `csvImport.ts`, `Community 10`, `Community 12`, `3. Konsep Test Management`, `ARCHITECTURE — TestManager (shiftech-test-mgr)`, `Feature Backlog — TestManager`, `Architecture`, `TestCaseDetailPage.tsx`, `schema_test_management_v2.sql`, `schema_auth.sql`, `ProjectDataManagementPage.tsx`, `TestManager (shiftech-test-mgr)`, `schema_project_roles.sql`, `AppTopbar.tsx`, `testSuiteRepository.ts`, `useProjectBreadcrumbItems.ts`, `graphify reference: transcribe video and audio`, `useTheme.tsx`, `csvImport.ts`, `react-dom`, `AppTopbar.tsx`, `useRealtimeSync.ts`, `useAuthContext`, `AppTopbar.tsx`, `csvImport.ts`, `AppMenu.tsx`?**
   _High betweenness centrality (0.080) - this node is a cross-community bridge._
 - **What connects `supabase`, `$schema`, `typescript` to the rest of the system?**
-  _914 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _915 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.10077519379844961 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

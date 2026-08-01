@@ -51,17 +51,23 @@ export class MockProvider implements AiProvider {
     switch (request.action) {
       case "generate_test_cases":
         return {
-          testCases: [{
-            title: `Verify ${requirement.slice(0, 180)}`,
+          testCases: ([
+            { scenarioType: "happy_path", title: `Verify ${requirement.slice(0, 180)}`, steps: "1. Siapkan data valid sesuai requirement.\n2. Jalankan alur utama fitur.\n3. Amati hasil aktual.", expectedResult: "Fitur menghasilkan perilaku yang sesuai requirement tanpa error." },
+            { scenarioType: "negative", title: `Reject invalid input for ${requirement.slice(0, 150)}`, steps: "1. Siapkan data yang tidak valid.\n2. Jalankan aksi fitur.\n3. Amati validasi sistem.", expectedResult: "Sistem menolak input secara aman dan menampilkan validasi yang jelas." },
+            { scenarioType: "edge_case", title: `Handle boundary condition for ${requirement.slice(0, 140)}`, steps: "1. Siapkan data pada nilai batas.\n2. Jalankan aksi fitur.\n3. Amati hasil aktual.", expectedResult: "Sistem menangani nilai batas secara konsisten tanpa error." },
+          ] as const).map((scenario) => ({
+            requirementRef: requirement.slice(0, 500),
+            scenarioType: scenario.scenarioType,
+            title: scenario.title,
             objective: `Memastikan requirement terpenuhi: ${requirement.slice(0, 500)}`,
             preconditions: "Environment pengujian siap dan user memiliki akses yang diperlukan.",
-            steps: "1. Siapkan data sesuai requirement.\n2. Jalankan alur utama fitur.\n3. Amati hasil aktual.",
-            expectedResult: "Fitur menghasilkan perilaku yang sesuai requirement tanpa error.",
+            steps: scenario.steps,
+            expectedResult: scenario.expectedResult,
             priority: "medium",
             tags: ["ai-generated", "draft"],
             notes: "Draft dari mock provider; wajib direview sebelum disimpan.",
-          }],
-          scenarios: ["Alur utama dengan input valid."],
+          })),
+          scenarios: ["Alur utama dengan input valid.", "Input tidak valid ditolak."],
           edgeCases: ["Input kosong atau batas maksimum field."],
           provider: "mock", model: "mock-v1", promptVersion: "ai-gateway-v1",
         };

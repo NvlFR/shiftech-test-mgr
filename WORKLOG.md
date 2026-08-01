@@ -1941,3 +1941,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan kontrak field `module` dan `targetRole`, schema hint provider, serta test untuk semua tipe input dan kesamaan/escaping format CSV. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada) dan `git diff --check`. Test Deno tidak dijalankan karena runtime Deno maupun image Docker Deno tidak tersedia di workspace.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.613 node dan 5.388 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-02 negative, edge case, dan requirement traceability
+
+- Menjalankan `graphify query` sebelum menelusuri kontrak generate Test Case dan mengikuti keputusan Section 11.1 `FEATURE_BACKLOG.md`.
+- Menambahkan `scenarioType` (`happy_path`/`negative`/`edge_case`) dan `requirementRef` wajib pada setiap draft test case di kontrak AI Gateway serta parser frontend.
+- Validasi gateway dan frontend sekarang menolak batch generate yang tidak memiliki minimal satu skenario negatif dan satu edge case; prompt provider dan mock gateway/frontend juga menghasilkan ketiga kategori sebagai baris terpisah.
+- CSV deterministik menambahkan `requirement_ref` pada setiap baris agar sumber requirement langsung dapat ditelusuri.
+- Menambahkan test kontrak dan parser untuk cakupan kategori wajib, traceability, alias snake_case, dan output CSV. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build`, `cd frontend && npm test -- --run` (4/4 test), dan `git diff --check`. Test Deno tidak dijalankan karena runtime Deno tidak tersedia di workspace.

@@ -8,6 +8,8 @@ const MAX_SOURCE_BYTES = 2_000_000;
 const MAX_SOURCE_CHARS = 30_000;
 
 export const AiTestCaseSchema = z.object({
+  requirementRef: z.string().trim().min(1, 'Referensi requirement wajib diisi').max(500),
+  scenarioType: z.enum(['happy_path', 'negative', 'edge_case']),
   title: z.string().trim().min(1, 'Judul test case wajib diisi').max(200),
   objective: z.string().trim().max(2_000),
   preconditions: z.string().trim().max(4_000),
@@ -66,6 +68,8 @@ function normalizePriority(value: unknown): TestCasePriority {
 function normalizeCandidate(candidate: unknown): Record<string, unknown> {
   const value = (candidate && typeof candidate === 'object' ? candidate : {}) as Record<string, unknown>;
   return {
+    requirementRef: asText(value.requirementRef ?? value.requirement_ref),
+    scenarioType: asText(value.scenarioType ?? value.scenario_type),
     title: asText(value.title ?? value.judul ?? value.name),
     objective: asText(value.objective ?? value.tujuan),
     preconditions: asText(value.preconditions ?? value.precondition ?? value.prasyarat),
@@ -100,6 +104,9 @@ export function parseAiTestCaseResponse(value: unknown): AiTestCaseDraft[] {
     testCases: rawTestCases.map(normalizeCandidate),
   });
   if (!parsed.success) throw new AiTestCaseValidationError('Respons AI tidak memenuhi format test case.', parsed.error.issues);
+  if (!parsed.data.testCases.some((item) => item.scenarioType === 'negative') || !parsed.data.testCases.some((item) => item.scenarioType === 'edge_case')) {
+    throw new AiTestCaseValidationError('Respons AI wajib menyertakan skenario negatif dan edge case.');
+  }
   const commonScenarios = parsed.data.scenarios?.map(asText).filter(Boolean) ?? [];
   const commonEdgeCases = parsed.data.edgeCases?.map(asText).filter(Boolean) ?? [];
   return parsed.data.testCases.map((item) => ({

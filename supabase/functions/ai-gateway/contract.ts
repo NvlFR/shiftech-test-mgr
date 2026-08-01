@@ -81,6 +81,8 @@ export type ProviderAction = CanonicalAction;
 // slightly over-generated response is tolerated instead of failing the whole call.
 // Field names/enums the model must produce are conveyed via OUTPUT_SCHEMA_HINT below.
 export const TestCaseDraftSchema = z.object({
+  requirementRef: Text.min(1).max(500),
+  scenarioType: z.enum(["happy_path", "negative", "edge_case"]),
   module: Text.max(200).default(""),
   title: Text.min(1).max(300), objective: Text.max(4_000), preconditions: Text.max(4_000),
   steps: z.string().min(1).max(10_000), expectedResult: Text.min(1).max(4_000), priority: Priority,
@@ -91,6 +93,12 @@ export const TestCaseDraftSchema = z.object({
 export const GenerateOutputSchema = z.object({
   testCases: z.array(TestCaseDraftSchema).min(1).max(50), scenarios: z.array(Text).max(30).default([]), edgeCases: z.array(Text).max(30).default([]),
   provider: Text.max(100).optional(), model: Text.max(200).nullable().optional(), promptVersion: Text.max(100).nullable().optional(),
+}).superRefine((output, context) => {
+  for (const requiredType of ["negative", "edge_case"] as const) {
+    if (!output.testCases.some((testCase) => testCase.scenarioType === requiredType)) {
+      context.addIssue({ code: z.ZodIssueCode.custom, path: ["testCases"], message: `At least one ${requiredType} test case is required` });
+    }
+  }
 });
 
 export const AnalysisOutputSchema = z.object({
@@ -120,7 +128,7 @@ export type ActionOutput = z.infer<(typeof OutputSchemas)[keyof typeof OutputSch
 // real LLM providers (OpenAI/Gemini) emit contract-conforming JSON, not a guess.
 export const OUTPUT_SCHEMA_HINT: Record<CanonicalAction, unknown> = {
   generate_test_cases: {
-    testCases: [{ module: "string", title: "string", objective: "string", preconditions: "string", steps: "string (numbered)", expectedResult: "string", priority: "low|medium|high|critical", tags: ["string"], targetRole: "string", notes: "string", scenarios: ["string"], edgeCases: ["string"] }],
+    testCases: [{ requirementRef: "string copied or derived from the source requirement identifier", scenarioType: "happy_path|negative|edge_case", module: "string", title: "string", objective: "string", preconditions: "string", steps: "string (numbered)", expectedResult: "string", priority: "low|medium|high|critical", tags: ["string"], targetRole: "string", notes: "string", scenarios: ["string"], edgeCases: ["string"] }],
     scenarios: ["string"], edgeCases: ["string"],
   },
   test_run_analysis: {
@@ -167,7 +175,7 @@ export function requestInput(request: GatewayRequest): Record<string, unknown> {
   return { query: request.query, entityTypes: request.entityTypes, limit: request.limit };
 }
 
-export const TEST_CASE_IMPORT_COLUMNS = ["Module", "Title", "Objective", "Preconditions", "Steps", "Expected Result", "Priority", "Tags", "Target Role"] as const;
+export const TEST_CASE_IMPORT_COLUMNS = ["Module", "Title", "Objective", "Preconditions", "Steps", "Expected Result", "Priority", "Tags", "Target Role", "requirement_ref"] as const;
 
 function csvCell(value: string): string {
   return `"${value.replaceAll('"', '""')}"`;
@@ -184,6 +192,7 @@ export function generateTestCasesCsv(output: z.infer<typeof GenerateOutputSchema
     testCase.priority,
     testCase.tags.join(","),
     testCase.targetRole,
+    testCase.requirementRef,
   ].map(csvCell).join(","));
   return [TEST_CASE_IMPORT_COLUMNS.join(","), ...rows].join("\r\n");
 }

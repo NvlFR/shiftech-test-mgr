@@ -298,7 +298,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_package_dependencies_hookform_resolvers",
-      "community": 204,
+      "community": 25,
       "norm_label": "@hookform/resolvers"
     },
     {
@@ -308,7 +308,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "hookform_resolvers",
-      "community": 204,
+      "community": 25,
       "norm_label": "@hookform/resolvers"
     },
     {
@@ -338,7 +338,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_package_dependencies_tanstack_react_query",
-      "community": 25,
+      "community": 55,
       "norm_label": "@tanstack/react-query"
     },
     {
@@ -348,7 +348,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tanstack_react_query",
-      "community": 25,
+      "community": 55,
       "norm_label": "@tanstack/react-query"
     },
     {
@@ -1248,7 +1248,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_layout_appmenu",
-      "community": 214,
+      "community": 115,
       "norm_label": "appmenu.tsx"
     },
     {
@@ -1258,7 +1258,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_components_layout_appmenu_appmenu",
-      "community": 214,
+      "community": 115,
       "norm_label": "appmenu()"
     },
     {
@@ -1268,7 +1268,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_layout_appmenuitem",
-      "community": 214,
+      "community": 115,
       "norm_label": "appmenuitem.tsx"
     },
     {
@@ -1278,7 +1278,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_components_layout_appmenuitem_menuitemmodel",
-      "community": 214,
+      "community": 115,
       "norm_label": "menuitemmodel"
     },
     {
@@ -1288,7 +1288,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_components_layout_appmenuitem_appmenuitem",
-      "community": 214,
+      "community": 115,
       "norm_label": "appmenuitem()"
     },
     {
@@ -1298,7 +1298,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "frontend_src_components_layout_appmenuitem_appmenuseparator",
-      "community": 214,
+      "community": 115,
       "norm_label": "appmenuseparator()"
     },
     {
@@ -1508,7 +1508,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel",
-      "community": 55,
+      "community": 62,
       "norm_label": "notificationpanel.tsx"
     },
     {
@@ -1518,7 +1518,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_notification_kind_icon",
-      "community": 55,
+      "community": 62,
       "norm_label": "notification_kind_icon"
     },
     {
@@ -1528,7 +1528,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_iconforkind",
-      "community": 55,
+      "community": 62,
       "norm_label": "iconforkind()"
     },
     {
@@ -1538,7 +1538,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_notificationpanelprops",
-      "community": 55,
+      "community": 62,
       "norm_label": "notificationpanelprops"
     },
     {
@@ -1548,7 +1548,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "frontend_src_components_notifications_notificationpanel_notificationpanel",
-      "community": 55,
+      "community": 62,
       "norm_label": "notificationpanel()"
     },
     {
@@ -1578,7 +1578,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_components_profile_profileview_profileview",
-      "community": 62,
+      "community": 29,
       "norm_label": "profileview()"
     },
     {
@@ -1718,7 +1718,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb",
-      "community": 62,
+      "community": 29,
       "norm_label": "breadcrumb.tsx"
     },
     {
@@ -1728,7 +1728,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbitem",
-      "community": 62,
+      "community": 29,
       "norm_label": "breadcrumbitem"
     },
     {
@@ -1738,7 +1738,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_components_ui_breadcrumb_breadcrumbprops",
-      "community": 62,
+      "community": 29,
       "norm_label": "breadcrumbprops"
     },
     {
@@ -1878,7 +1878,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_commentspanel",
-      "community": 62,
+      "community": 29,
       "norm_label": "commentspanel.tsx"
     },
     {
@@ -1888,7 +1888,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_components_ui_commentspanel_commentspanel",
-      "community": 62,
+      "community": 29,
       "norm_label": "commentspanel()"
     },
     {
@@ -2385,7 +2385,7 @@
       "label": "AiTestCaseResponseSchema",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L23",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_aitestcaseresponseschema",
       "community": 0,
@@ -2395,7 +2395,7 @@
       "label": "AiTestCaseValidationResult",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationresult",
       "community": 0,
@@ -2405,7 +2405,7 @@
       "label": "AiTestCaseValidationError",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationerror",
       "community": 0,
@@ -2415,7 +2415,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L37",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationerror_constructor",
       "community": 0,
@@ -2425,7 +2425,7 @@
       "label": "asText()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L44",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_astext",
       "community": 0,
@@ -2435,7 +2435,7 @@
       "label": "asList()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L48",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_aslist",
       "community": 0,
@@ -2445,7 +2445,7 @@
       "label": "asSteps()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L53",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_assteps",
       "community": 0,
@@ -2455,7 +2455,7 @@
       "label": "normalizePriority()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L58",
+      "source_location": "L60",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_normalizepriority",
       "community": 0,
@@ -2465,7 +2465,7 @@
       "label": "normalizeCandidate()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L66",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
       "community": 0,
@@ -2475,7 +2475,7 @@
       "label": "unwrapResponse()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L82",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_unwrapresponse",
       "community": 0,
@@ -2485,7 +2485,7 @@
       "label": "parseAiTestCaseResponse()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L95",
+      "source_location": "L99",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_parseaitestcaseresponse",
       "community": 0,
@@ -2495,7 +2495,7 @@
       "label": "validateAiTestCaseDraft()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L112",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_validateaitestcasedraft",
       "community": 0,
@@ -2505,7 +2505,7 @@
       "label": "detectSourceType()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L118",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_detectsourcetype",
       "community": 0,
@@ -2515,7 +2515,7 @@
       "label": "parseRequirementFile()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L125",
+      "source_location": "L132",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_parserequirementfile",
       "community": 0,
@@ -2525,7 +2525,7 @@
       "label": "toAiTestCaseSource()",
       "file_type": "code",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L144",
+      "source_location": "L151",
       "_origin": "ast",
       "id": "frontend_src_helpers_aitestcaseparser_toaitestcasesource",
       "community": 0,
@@ -3308,7 +3308,7 @@
       "source_location": "L297",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maptestresultsteprow",
-      "community": 29,
+      "community": 209,
       "norm_label": "maptestresultsteprow()"
     },
     {
@@ -3358,7 +3358,7 @@
       "source_location": "L373",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maprequirementrow",
-      "community": 183,
+      "community": 204,
       "norm_label": "maprequirementrow()"
     },
     {
@@ -3368,7 +3368,7 @@
       "source_location": "L377",
       "_origin": "ast",
       "id": "frontend_src_helpers_mappers_maprequirementlinkrow",
-      "community": 183,
+      "community": 204,
       "norm_label": "maprequirementlinkrow()"
     },
     {
@@ -4228,7 +4228,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth",
-      "community": 62,
+      "community": 29,
       "norm_label": "useauth.tsx"
     },
     {
@@ -4238,7 +4238,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth_authcontextvalue",
-      "community": 62,
+      "community": 29,
       "norm_label": "authcontextvalue"
     },
     {
@@ -4248,7 +4248,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "frontend_src_hooks_useauth_authcontext",
-      "community": 62,
+      "community": 29,
       "norm_label": "authcontext"
     },
     {
@@ -4368,7 +4368,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_hooks_usecomments_usecomments",
-      "community": 62,
+      "community": 29,
       "norm_label": "usecomments()"
     },
     {
@@ -4548,7 +4548,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_usenotifications",
-      "community": 55,
+      "community": 62,
       "norm_label": "usenotifications.ts"
     },
     {
@@ -4588,7 +4588,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofileview",
-      "community": 62,
+      "community": 29,
       "norm_label": "useprofileview.ts"
     },
     {
@@ -4598,7 +4598,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofileview_useprofileview",
-      "community": 62,
+      "community": 29,
       "norm_label": "useprofileview()"
     },
     {
@@ -4608,7 +4608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprofiles",
-      "community": 62,
+      "community": 29,
       "norm_label": "useprofiles.ts"
     },
     {
@@ -4628,7 +4628,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectbreadcrumbitems",
-      "community": 62,
+      "community": 29,
       "norm_label": "useprojectbreadcrumbitems.ts"
     },
     {
@@ -4698,7 +4698,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectpins",
-      "community": 214,
+      "community": 115,
       "norm_label": "useprojectpins.tsx"
     },
     {
@@ -4708,7 +4708,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectpins_readstoredpins",
-      "community": 214,
+      "community": 115,
       "norm_label": "readstoredpins()"
     },
     {
@@ -4718,7 +4718,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_hooks_useprojectpins_useprojectpins",
-      "community": 214,
+      "community": 115,
       "norm_label": "useprojectpins()"
     },
     {
@@ -6238,7 +6238,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_users_userdetailpage",
-      "community": 62,
+      "community": 29,
       "norm_label": "userdetailpage.tsx"
     },
     {
@@ -6248,7 +6248,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_pages_users_userdetailpage_userdetailpage",
-      "community": 62,
+      "community": 29,
       "norm_label": "userdetailpage()"
     },
     {
@@ -6355,7 +6355,7 @@
       "label": "aiTestCaseRepository",
       "file_type": "code",
       "source_file": "frontend/src/repositories/aiTestCaseRepository.ts",
-      "source_location": "L30",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "frontend_src_repositories_aitestcaserepository_aitestcaserepository",
       "community": 0,
@@ -6878,7 +6878,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_profilerepository",
-      "community": 62,
+      "community": 29,
       "norm_label": "profilerepository.ts"
     },
     {
@@ -6888,7 +6888,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_profilerepository_profilerepository",
-      "community": 62,
+      "community": 29,
       "norm_label": "profilerepository"
     },
     {
@@ -7068,7 +7068,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_requirementrepository",
-      "community": 183,
+      "community": 204,
       "norm_label": "requirementrepository.ts"
     },
     {
@@ -7078,7 +7078,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "frontend_src_repositories_requirementrepository_maplink",
-      "community": 183,
+      "community": 204,
       "norm_label": "maplink()"
     },
     {
@@ -7088,7 +7088,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_repositories_requirementrepository_requirementrepository",
-      "community": 183,
+      "community": 204,
       "norm_label": "requirementrepository"
     },
     {
@@ -7198,7 +7198,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_repositories_testresultsteprepository",
-      "community": 29,
+      "community": 209,
       "norm_label": "testresultsteprepository.ts"
     },
     {
@@ -7208,7 +7208,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_repositories_testresultsteprepository_testresultsteprepository",
-      "community": 29,
+      "community": 209,
       "norm_label": "testresultsteprepository"
     },
     {
@@ -7808,7 +7808,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_notificationservice",
-      "community": 55,
+      "community": 62,
       "norm_label": "notificationservice.ts"
     },
     {
@@ -7818,7 +7818,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_services_notificationservice_requireid",
-      "community": 55,
+      "community": 62,
       "norm_label": "requireid()"
     },
     {
@@ -7828,7 +7828,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "frontend_src_services_notificationservice_notificationservice",
-      "community": 55,
+      "community": 62,
       "norm_label": "notificationservice"
     },
     {
@@ -7838,7 +7838,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_profileservice",
-      "community": 62,
+      "community": 29,
       "norm_label": "profileservice.ts"
     },
     {
@@ -7848,7 +7848,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_services_profileservice_profileservice",
-      "community": 62,
+      "community": 29,
       "norm_label": "profileservice"
     },
     {
@@ -8148,7 +8148,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_testresultstepservice",
-      "community": 29,
+      "community": 209,
       "norm_label": "testresultstepservice.ts"
     },
     {
@@ -8158,7 +8158,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_services_testresultstepservice_testresultstepservice",
-      "community": 29,
+      "community": 209,
       "norm_label": "testresultstepservice"
     },
     {
@@ -8455,7 +8455,7 @@
       "label": "AiTestCaseGenerationResult",
       "file_type": "code",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L37",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "frontend_src_types_aitestcase_aitestcasegenerationresult",
       "community": 0,
@@ -8465,7 +8465,7 @@
       "label": "AiDuplicateCandidate",
       "file_type": "code",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L44",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "frontend_src_types_aitestcase_aiduplicatecandidate",
       "community": 0,
@@ -8475,7 +8475,7 @@
       "label": "AiTestCaseSaveInput",
       "file_type": "code",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L50",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "frontend_src_types_aitestcase_aitestcasesaveinput",
       "community": 0,
@@ -8578,7 +8578,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_types_domain_userrole",
-      "community": 62,
+      "community": 29,
       "norm_label": "userrole"
     },
     {
@@ -8588,7 +8588,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_types_domain_profile",
-      "community": 62,
+      "community": 29,
       "norm_label": "profile"
     },
     {
@@ -9308,7 +9308,7 @@
       "source_location": "L448",
       "_origin": "ast",
       "id": "frontend_src_types_domain_testresultstepstatus",
-      "community": 29,
+      "community": 209,
       "norm_label": "testresultstepstatus"
     },
     {
@@ -9438,7 +9438,7 @@
       "source_location": "L553",
       "_origin": "ast",
       "id": "frontend_src_types_domain_notification",
-      "community": 55,
+      "community": 62,
       "norm_label": "notification"
     },
     {
@@ -9498,7 +9498,7 @@
       "source_location": "L581",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirement",
-      "community": 183,
+      "community": 204,
       "norm_label": "requirement"
     },
     {
@@ -9508,7 +9508,7 @@
       "source_location": "L582",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirementlink",
-      "community": 183,
+      "community": 204,
       "norm_label": "requirementlink"
     },
     {
@@ -9518,7 +9518,7 @@
       "source_location": "L583",
       "_origin": "ast",
       "id": "frontend_src_types_domain_requirementwithlinks",
-      "community": 183,
+      "community": 204,
       "norm_label": "requirementwithlinks"
     },
     {
@@ -11468,7 +11468,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "mcp_src_repositories_readrepository_test",
-      "community": 139,
+      "community": 206,
       "norm_label": "readrepository.test.ts"
     },
     {
@@ -11478,7 +11478,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "mcp_src_repositories_readrepository_test_config",
-      "community": 139,
+      "community": 206,
       "norm_label": "config"
     },
     {
@@ -11558,7 +11558,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "mcp_src_repositories_readrepository_readrepositoryerror",
-      "community": 139,
+      "community": 206,
       "norm_label": "readrepositoryerror"
     },
     {
@@ -11568,7 +11568,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "mcp_src_repositories_readrepository_readrepositoryerror_constructor",
-      "community": 139,
+      "community": 206,
       "norm_label": ".constructor()"
     },
     {
@@ -15028,7 +15028,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "runner_src_config_runnercommand",
-      "community": 115,
+      "community": 183,
       "norm_label": "runnercommand"
     },
     {
@@ -15048,7 +15048,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "runner_src_config_interactiverunnerconfig",
-      "community": 115,
+      "community": 183,
       "norm_label": "interactiverunnerconfig"
     },
     {
@@ -15358,7 +15358,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "runner_src_interactive",
-      "community": 115,
+      "community": 183,
       "norm_label": "interactive.ts"
     },
     {
@@ -15368,7 +15368,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "runner_src_interactive_interactiveinvocation",
-      "community": 115,
+      "community": 183,
       "norm_label": "interactiveinvocation"
     },
     {
@@ -15378,7 +15378,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "runner_src_interactive_createinteractiveinvocation",
-      "community": 115,
+      "community": 183,
       "norm_label": "createinteractiveinvocation()"
     },
     {
@@ -15388,7 +15388,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "runner_src_interactive_spawnplaywright",
-      "community": 115,
+      "community": 183,
       "norm_label": "spawnplaywright()"
     },
     {
@@ -15398,7 +15398,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "runner_src_interactive_waitforexit",
-      "community": 115,
+      "community": 183,
       "norm_label": "waitforexit()"
     },
     {
@@ -15408,7 +15408,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "runner_src_interactive_runwatch",
-      "community": 115,
+      "community": 183,
       "norm_label": "runwatch()"
     },
     {
@@ -15418,7 +15418,7 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "runner_src_interactive_runinteractivecommand",
-      "community": 115,
+      "community": 183,
       "norm_label": "runinteractivecommand()"
     },
     {
@@ -16335,7 +16335,7 @@
       "label": "canonicalAction",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L149",
+      "source_location": "L157",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_canonicalaction",
       "community": 35,
@@ -16365,7 +16365,7 @@
       "label": "GenerateOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L91",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_generateoutputschema",
       "community": 24,
@@ -16375,7 +16375,7 @@
       "label": "AnalysisOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L96",
+      "source_location": "L104",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_analysisoutputschema",
       "community": 24,
@@ -16385,7 +16385,7 @@
       "label": "IssueDraftSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L105",
+      "source_location": "L113",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_issuedraftschema",
       "community": 24,
@@ -16395,7 +16395,7 @@
       "label": "DuplicateOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L110",
+      "source_location": "L118",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_duplicateoutputschema",
       "community": 24,
@@ -16405,7 +16405,7 @@
       "label": "AssistantOutputSchema",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L111",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_assistantoutputschema",
       "community": 24,
@@ -16415,7 +16415,7 @@
       "label": "OutputSchemas",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L116",
+      "source_location": "L124",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_outputschemas",
       "community": 24,
@@ -16425,7 +16425,7 @@
       "label": "ActionOutput",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L117",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_actionoutput",
       "community": 33,
@@ -16435,7 +16435,7 @@
       "label": "OUTPUT_SCHEMA_HINT",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L121",
+      "source_location": "L129",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_output_schema_hint",
       "community": 35,
@@ -16445,7 +16445,7 @@
       "label": "GatewayErrorCode",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L145",
+      "source_location": "L153",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_gatewayerrorcode",
       "community": 4,
@@ -16455,7 +16455,7 @@
       "label": "ErrorEnvelope",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L146",
+      "source_location": "L154",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_errorenvelope",
       "community": 35,
@@ -16465,7 +16465,7 @@
       "label": "SuccessEnvelope",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L147",
+      "source_location": "L155",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_successenvelope",
       "community": 35,
@@ -16475,7 +16475,7 @@
       "label": "requestInput()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L158",
+      "source_location": "L166",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_requestinput",
       "community": 35,
@@ -16485,7 +16485,7 @@
       "label": "TEST_CASE_IMPORT_COLUMNS",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L170",
+      "source_location": "L178",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_test_case_import_columns",
       "community": 24,
@@ -16495,7 +16495,7 @@
       "label": "csvCell()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L172",
+      "source_location": "L180",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_csvcell",
       "community": 24,
@@ -16505,7 +16505,7 @@
       "label": "generateTestCasesCsv()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L176",
+      "source_location": "L184",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_generatetestcasescsv",
       "community": 24,
@@ -16515,7 +16515,7 @@
       "label": "parseProviderJson()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L191",
+      "source_location": "L200",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_parseproviderjson",
       "community": 24,
@@ -16525,7 +16525,7 @@
       "label": "validateActionOutput()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L198",
+      "source_location": "L207",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_validateactionoutput",
       "community": 24,
@@ -16535,7 +16535,7 @@
       "label": "computeDuplicateConfidence()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L204",
+      "source_location": "L213",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_contract_computeduplicateconfidence",
       "community": 24,
@@ -16825,7 +16825,7 @@
       "label": "fetchJson()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L94",
+      "source_location": "L100",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_fetchjson",
       "community": 33,
@@ -16835,7 +16835,7 @@
       "label": "OpenAiProvider",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L127",
+      "source_location": "L133",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_openaiprovider",
       "community": 33,
@@ -16845,7 +16845,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L130",
+      "source_location": "L136",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_openaiprovider_constructor",
       "community": 33,
@@ -16855,7 +16855,7 @@
       "label": ".complete()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L134",
+      "source_location": "L140",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_openaiprovider_complete",
       "community": 33,
@@ -16865,7 +16865,7 @@
       "label": "GeminiProvider",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L156",
+      "source_location": "L162",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_geminiprovider",
       "community": 33,
@@ -16875,7 +16875,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L159",
+      "source_location": "L165",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_geminiprovider_constructor",
       "community": 33,
@@ -16885,7 +16885,7 @@
       "label": ".complete()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L163",
+      "source_location": "L169",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_geminiprovider_complete",
       "community": 33,
@@ -16895,7 +16895,7 @@
       "label": "createProvider()",
       "file_type": "code",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L181",
+      "source_location": "L187",
       "_origin": "ast",
       "id": "supabase_functions_ai_gateway_providers_createprovider",
       "community": 33,
@@ -24842,6 +24842,16 @@
       "norm_label": "2026-08-01 \u2014 e2e-01 generate test case csv dari requirement"
     },
     {
+      "label": "2026-08-01 \u2014 E2E-02 negative, edge case, dan requirement traceability",
+      "file_type": "document",
+      "source_file": "WORKLOG.md",
+      "source_location": "L1945",
+      "_origin": "ast",
+      "id": "worklog_2026_08_01_e2e_02_negative_edge_case_dan_requirement_traceability",
+      "community": 162,
+      "norm_label": "2026-08-01 \u2014 e2e-02 negative, edge case, dan requirement traceability"
+    },
+    {
       "label": "AI_INTEGRATION.md",
       "file_type": "document",
       "source_file": "docs/AI_INTEGRATION.md",
@@ -27707,7 +27717,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L130",
+      "source_location": "L137",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_parserequirementfile",
       "target": "frontend_package_dependencies_xlsx"
@@ -34931,7 +34941,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L23",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_aitestcaseresponseschema",
@@ -34951,7 +34961,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationerror",
@@ -34961,7 +34971,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationresult",
@@ -34971,7 +34981,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L48",
+      "source_location": "L50",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_aslist",
@@ -34981,7 +34991,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L53",
+      "source_location": "L55",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_assteps",
@@ -34991,7 +35001,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L44",
+      "source_location": "L46",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_astext",
@@ -35001,7 +35011,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L118",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_detectsourcetype",
@@ -35011,7 +35021,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L66",
+      "source_location": "L68",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
@@ -35021,7 +35031,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L58",
+      "source_location": "L60",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_normalizepriority",
@@ -35031,7 +35041,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L95",
+      "source_location": "L99",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_parseaitestcaseresponse",
@@ -35041,7 +35051,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L125",
+      "source_location": "L132",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_parserequirementfile",
@@ -35061,7 +35071,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L144",
+      "source_location": "L151",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_toaitestcasesource",
@@ -35071,7 +35081,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L82",
+      "source_location": "L86",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_unwrapresponse",
@@ -35081,7 +35091,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L112",
+      "source_location": "L119",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser",
       "target": "frontend_src_helpers_aitestcaseparser_validateaitestcasedraft",
@@ -35192,7 +35202,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L113",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_validateaitestcasedraft",
       "target": "frontend_src_helpers_aitestcaseparser_aitestcaseschema"
@@ -35203,7 +35213,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L98",
+      "source_location": "L102",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_parseaitestcaseresponse",
       "target": "frontend_src_helpers_aitestcaseparser_aitestcaseresponseschema"
@@ -35212,7 +35222,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L37",
+      "source_location": "L39",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationerror",
       "target": "frontend_src_helpers_aitestcaseparser_aitestcasevalidationerror_constructor",
@@ -35223,7 +35233,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L49",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_aslist",
       "target": "frontend_src_helpers_aitestcaseparser_astext",
@@ -35234,7 +35244,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L54",
+      "source_location": "L56",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_assteps",
       "target": "frontend_src_helpers_aitestcaseparser_astext",
@@ -35245,7 +35255,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L69",
+      "source_location": "L71",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
       "target": "frontend_src_helpers_aitestcaseparser_astext",
@@ -35256,7 +35266,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L59",
+      "source_location": "L61",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_normalizepriority",
       "target": "frontend_src_helpers_aitestcaseparser_astext",
@@ -35267,7 +35277,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L103",
+      "source_location": "L110",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_parseaitestcaseresponse",
       "target": "frontend_src_helpers_aitestcaseparser_astext",
@@ -35278,7 +35288,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L75",
+      "source_location": "L79",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
       "target": "frontend_src_helpers_aitestcaseparser_aslist",
@@ -35289,7 +35299,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L72",
+      "source_location": "L76",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
       "target": "frontend_src_helpers_aitestcaseparser_assteps",
@@ -35300,7 +35310,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L74",
+      "source_location": "L78",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
       "target": "frontend_src_helpers_aitestcaseparser_normalizepriority",
@@ -35311,7 +35321,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L100",
+      "source_location": "L104",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_parseaitestcaseresponse",
       "target": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
@@ -35322,7 +35332,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L113",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_validateaitestcasedraft",
       "target": "frontend_src_helpers_aitestcaseparser_normalizecandidate",
@@ -35333,7 +35343,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L96",
+      "source_location": "L100",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_parseaitestcaseresponse",
       "target": "frontend_src_helpers_aitestcaseparser_unwrapresponse",
@@ -35366,7 +35376,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/helpers/aiTestCaseParser.ts",
-      "source_location": "L127",
+      "source_location": "L134",
       "weight": 1.0,
       "source": "frontend_src_helpers_aitestcaseparser_parserequirementfile",
       "target": "frontend_src_helpers_aitestcaseparser_detectsourcetype",
@@ -49745,7 +49755,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/repositories/aiTestCaseRepository.ts",
-      "source_location": "L30",
+      "source_location": "L36",
       "weight": 1.0,
       "source": "frontend_src_repositories_aitestcaserepository",
       "target": "frontend_src_repositories_aitestcaserepository_aitestcaserepository",
@@ -54817,7 +54827,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L44",
+      "source_location": "L46",
       "weight": 1.0,
       "source": "frontend_src_types_aitestcase",
       "target": "frontend_src_types_aitestcase_aiduplicatecandidate",
@@ -54857,7 +54867,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L37",
+      "source_location": "L39",
       "weight": 1.0,
       "source": "frontend_src_types_aitestcase",
       "target": "frontend_src_types_aitestcase_aitestcasegenerationresult",
@@ -54867,7 +54877,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L50",
+      "source_location": "L52",
       "weight": 1.0,
       "source": "frontend_src_types_aitestcase",
       "target": "frontend_src_types_aitestcase_aitestcasesaveinput",
@@ -54931,7 +54941,7 @@
       "context": "field",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "weight": 1.0,
       "source": "frontend_src_types_aitestcase_aitestcasedraft",
       "target": "frontend_src_types_domain_testcasepriority",
@@ -54942,7 +54952,7 @@
       "context": "field",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/types/aiTestCase.ts",
-      "source_location": "L45",
+      "source_location": "L47",
       "weight": 1.0,
       "source": "frontend_src_types_aitestcase_aiduplicatecandidate",
       "target": "frontend_src_types_domain_testcasewithdetails",
@@ -72434,7 +72444,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L117",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_actionoutput",
@@ -72444,7 +72454,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L96",
+      "source_location": "L104",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_analysisoutputschema",
@@ -72464,7 +72474,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L111",
+      "source_location": "L119",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_assistantoutputschema",
@@ -72484,7 +72494,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L149",
+      "source_location": "L157",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_canonicalaction",
@@ -72494,7 +72504,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L204",
+      "source_location": "L213",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_computeduplicateconfidence",
@@ -72504,7 +72514,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L172",
+      "source_location": "L180",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_csvcell",
@@ -72514,7 +72524,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L110",
+      "source_location": "L118",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_duplicateoutputschema",
@@ -72534,7 +72544,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L146",
+      "source_location": "L154",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_errorenvelope",
@@ -72544,7 +72554,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L145",
+      "source_location": "L153",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_gatewayerrorcode",
@@ -72564,7 +72574,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L91",
+      "source_location": "L93",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_generateoutputschema",
@@ -72594,7 +72604,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L176",
+      "source_location": "L184",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_generatetestcasescsv",
@@ -72604,7 +72614,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L105",
+      "source_location": "L113",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_issuedraftschema",
@@ -72634,7 +72644,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L121",
+      "source_location": "L129",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_output_schema_hint",
@@ -72644,7 +72654,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L116",
+      "source_location": "L124",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_outputschemas",
@@ -72654,7 +72664,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L191",
+      "source_location": "L200",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_parseproviderjson",
@@ -72684,7 +72694,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L158",
+      "source_location": "L166",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_requestinput",
@@ -72704,7 +72714,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L147",
+      "source_location": "L155",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_successenvelope",
@@ -72714,7 +72724,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L170",
+      "source_location": "L178",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_test_case_import_columns",
@@ -72754,7 +72764,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L198",
+      "source_location": "L207",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract",
       "target": "supabase_functions_ai_gateway_contract_validateactionoutput",
@@ -73040,7 +73050,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L188",
+      "source_location": "L197",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract_generatetestcasescsv",
       "target": "supabase_functions_ai_gateway_contract_test_case_import_columns"
@@ -73061,7 +73071,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L187",
+      "source_location": "L196",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract_generatetestcasescsv",
       "target": "supabase_functions_ai_gateway_contract_csvcell",
@@ -73094,7 +73104,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/contract.ts",
-      "source_location": "L199",
+      "source_location": "L208",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_contract_validateactionoutput",
       "target": "supabase_functions_ai_gateway_contract_parseproviderjson",
@@ -73639,7 +73649,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L181",
+      "source_location": "L187",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers",
       "target": "supabase_functions_ai_gateway_providers_createprovider",
@@ -73649,7 +73659,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L94",
+      "source_location": "L100",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers",
       "target": "supabase_functions_ai_gateway_providers_fetchjson",
@@ -73659,7 +73669,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L156",
+      "source_location": "L162",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers",
       "target": "supabase_functions_ai_gateway_providers_geminiprovider",
@@ -73689,7 +73699,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L127",
+      "source_location": "L133",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers",
       "target": "supabase_functions_ai_gateway_providers_openaiprovider",
@@ -73750,7 +73760,7 @@
       "context": "type",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L156",
+      "source_location": "L162",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_geminiprovider",
       "target": "supabase_functions_ai_gateway_providers_aiprovider",
@@ -73772,7 +73782,7 @@
       "context": "type",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L127",
+      "source_location": "L133",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_openaiprovider",
       "target": "supabase_functions_ai_gateway_providers_aiprovider",
@@ -73825,7 +73835,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L165",
+      "source_location": "L171",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_geminiprovider_complete",
       "target": "supabase_functions_ai_gateway_providers_fetchjson",
@@ -73836,7 +73846,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L135",
+      "source_location": "L141",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_openaiprovider_complete",
       "target": "supabase_functions_ai_gateway_providers_fetchjson",
@@ -73846,7 +73856,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L134",
+      "source_location": "L140",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_openaiprovider",
       "target": "supabase_functions_ai_gateway_providers_openaiprovider_complete",
@@ -73856,7 +73866,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L130",
+      "source_location": "L136",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_openaiprovider",
       "target": "supabase_functions_ai_gateway_providers_openaiprovider_constructor",
@@ -73866,7 +73876,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L163",
+      "source_location": "L169",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_geminiprovider",
       "target": "supabase_functions_ai_gateway_providers_geminiprovider_complete",
@@ -73876,7 +73886,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "supabase/functions/ai-gateway/providers.ts",
-      "source_location": "L159",
+      "source_location": "L165",
       "weight": 1.0,
       "source": "supabase_functions_ai_gateway_providers_geminiprovider",
       "target": "supabase_functions_ai_gateway_providers_geminiprovider_constructor",
@@ -81746,6 +81756,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "WORKLOG.md",
+      "source_location": "L1945",
+      "weight": 1.0,
+      "source": "worklog_2026_07_31_mcp_08_write_test_case_test_plan_tools",
+      "target": "worklog_2026_08_01_e2e_02_negative_edge_case_dan_requirement_traceability",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "WORKLOG.md",
       "source_location": "L1708",
       "weight": 1.0,
       "source": "worklog_2026_07_31_mcp_08_write_test_case_test_plan_tools",
@@ -83194,5 +83214,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "80ade4162f2636dab0896a8fb16df11a2e025d01"
+  "built_at_commit": "d18ea24aea6a6f578d425729c283dc0932df158a"
 }
