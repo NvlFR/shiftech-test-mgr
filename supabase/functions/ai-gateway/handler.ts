@@ -9,6 +9,8 @@ import {
   type CanonicalAction,
   validateActionOutput,
   OUTPUT_SCHEMA_HINT,
+  generateTestCasesCsv,
+  TEST_CASE_IMPORT_COLUMNS,
 } from "./contract.ts";
 import { createProvider, ProviderError, type AiProvider } from "./providers.ts";
 import {
@@ -113,6 +115,26 @@ function validateInput(request: GatewayRequest): void {
   if (action === "assistant_search" && (typeof input.query !== "string" || !input.query.trim())) throw new GatewayHttpError(422, "INVALID_INPUT", "Query pencarian diperlukan.");
 }
 
+async function generationContext(client: SupabaseClient, projectId: string, input: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const source = input.source as { type?: string; repositoryId?: string } | undefined;
+  if (source?.type !== "repository" || !source.repositoryId) return {};
+  const repository = await query(client.from("project_repositories")
+    .select("id,name,source_type,url_or_path,default_branch,subdirectory")
+    .eq("id", source.repositoryId)
+    .eq("project_id", projectId)
+    .eq("is_active", true)
+    .maybeSingle());
+  if (!repository || !(repository as { id?: string }).id) {
+    throw new GatewayHttpError(403, "PROJECT_ACCESS_DENIED", "Referensi repository tidak berada dalam project yang diizinkan.");
+  }
+  const row = repository as Record<string, unknown>;
+  return {
+    repository: row.source_type === "local_path"
+      ? { ...row, url_or_path: undefined }
+      : row,
+  };
+}
+
 async function completeWithRetry(provider: AiProvider, request: GatewayRequest, prompt: string, timeoutMs: number, retries: number): Promise<ReturnType<typeof validateActionOutput>> {
   const action = canonicalAction(request);
   let lastError: unknown;
@@ -197,9 +219,11 @@ export async function handleAiGateway(request: Request): Promise<Response> {
     const project = await query(client.from("projects").select("id").eq("id", gatewayRequest.projectId).maybeSingle());
     if (!project || !(project as { id?: string }).id) throw new GatewayHttpError(403, "PROJECT_ACCESS_DENIED", "Akses project ditolak.");
     const input = requestInput(gatewayRequest);
-    const context = ["test_run_analysis", "issue_draft", "duplicate_issue_detection", "assistant_search"].includes(action)
-      ? await projectContext(client, gatewayRequest.projectId, input)
-      : { testCases: [], testPlans: [], testRuns: [], testResults: [], issues: [], requirements: [], history: [] } satisfies ScopedContext;
+    const context = action === "generate_test_cases"
+      ? await generationContext(client, gatewayRequest.projectId, input)
+      : ["test_run_analysis", "issue_draft", "duplicate_issue_detection", "assistant_search"].includes(action)
+        ? await projectContext(client, gatewayRequest.projectId, input)
+        : { testCases: [], testPlans: [], testRuns: [], testResults: [], issues: [], requirements: [], history: [] } satisfies ScopedContext;
     const prompt = JSON.stringify({ action, input: JSON.parse(redactPromptInput(input)), scopedContext: JSON.parse(redactPromptInput(context)), promptVersion: PROMPT_VERSION, outputSchema: OUTPUT_SCHEMA_HINT[action], outputInstruction: "Return a single JSON object that EXACTLY matches the keys, nesting, and enum values shown in outputSchema. Use only those keys — no extra keys, no markdown, no prose. Enum fields (priority, severity, risk) must be one of the listed values. Any id you output must be copied verbatim from scopedContext. All results are drafts requiring human review." });
     const provider = createProvider(env);
     const startedAt = Date.now();
@@ -211,9 +235,11 @@ export async function handleAiGateway(request: Request): Promise<Response> {
       request_hash: await requestHash({ action, projectId: gatewayRequest.projectId, input }),
     }).select("id").single();
     if (auditError || !audit?.id) throw new GatewayHttpError(500, "CONFIGURATION_ERROR", "Audit AI belum dapat disimpan.");
-    let output = restrictOutput(action, await completeWithRetry(provider, gatewayRequest, prompt, envNumber(env, "AI_TIMEOUT_MS", 10_000, 500, 30_000), envNumber(env, "AI_MAX_RETRIES", 1, 0, 2)), context);
+    let output = restrictOutput(action, await completeWithRetry(provider, gatewayRequest, prompt, envNumber(env, "AI_TIMEOUT_MS", 10_000, 500, 30_000), envNumber(env, "AI_MAX_RETRIES", 1, 0, 2)), context as ScopedContext);
     if (action === "issue_draft" && "title" in output) output = { ...output, projectId: gatewayRequest.projectId, testResultId: typeof input.testResultId === "string" ? input.testResultId : undefined } as typeof output;
-    const decorated = analysisResponse(gatewayRequest, output, context, provider);
+    const decorated = action === "generate_test_cases" && "testCases" in output
+      ? { ...output, csv: generateTestCasesCsv(output), csvColumns: [...TEST_CASE_IMPORT_COLUMNS] }
+      : analysisResponse(gatewayRequest, output, context as ScopedContext, provider);
     await client.from("ai_audit_events").update({ status: "completed", completed_at: new Date().toISOString(), latency_ms: Date.now() - startedAt }).eq("id", audit.id);
     const body: SuccessEnvelope = { data: decorated as SuccessEnvelope["data"], meta: { action, status: "draft", provider: provider.descriptor.name, model: provider.descriptor.model, promptVersion: PROMPT_VERSION, requestId: id } };
     return response(request, body, 200);

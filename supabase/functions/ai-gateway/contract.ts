@@ -4,14 +4,24 @@ const Uuid = z.string().uuid();
 const Text = z.string().trim();
 const Priority = z.enum(["low", "medium", "high", "critical"]);
 
+const GenerateSource = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("text"), content: Text.min(1).max(30_000) }).strict(),
+  z.object({ type: z.literal("excel"), content: Text.min(1).max(30_000), fileName: Text.min(1).max(255) }).strict(),
+  z.object({ type: z.literal("csv"), content: Text.min(1).max(30_000), fileName: Text.min(1).max(255) }).strict(),
+  z.object({ type: z.literal("document"), content: Text.min(1).max(30_000), fileName: Text.min(1).max(255) }).strict(),
+  z.object({
+    type: z.literal("repository"),
+    repositoryId: Uuid,
+    ref: Text.min(1).max(200).optional(),
+    path: Text.min(1).max(1_000).optional(),
+    context: Text.max(30_000).optional(),
+  }).strict(),
+]);
+
 const GenerateRequest = z.object({
   action: z.literal("generate_test_cases"),
   projectId: Uuid,
-  source: z.object({
-    type: z.enum(["text", "excel", "document"]),
-    content: Text.min(1).max(30_000),
-    fileName: Text.max(255).optional(),
-  }).strict(),
+  source: GenerateSource,
   options: z.object({
     includeScenarios: z.boolean(),
     includeEdgeCases: z.boolean(),
@@ -71,10 +81,12 @@ export type ProviderAction = CanonicalAction;
 // slightly over-generated response is tolerated instead of failing the whole call.
 // Field names/enums the model must produce are conveyed via OUTPUT_SCHEMA_HINT below.
 export const TestCaseDraftSchema = z.object({
+  module: Text.max(200).default(""),
   title: Text.min(1).max(300), objective: Text.max(4_000), preconditions: Text.max(4_000),
   steps: z.string().min(1).max(10_000), expectedResult: Text.min(1).max(4_000), priority: Priority,
   tags: z.array(Text.min(1).max(80)).max(20).default([]), notes: Text.max(4_000).default(""),
   scenarios: z.array(Text.min(1).max(2_000)).max(30).default([]), edgeCases: z.array(Text.min(1).max(2_000)).max(30).default([]),
+  targetRole: Text.max(200).default(""),
 });
 export const GenerateOutputSchema = z.object({
   testCases: z.array(TestCaseDraftSchema).min(1).max(50), scenarios: z.array(Text).max(30).default([]), edgeCases: z.array(Text).max(30).default([]),
@@ -108,7 +120,7 @@ export type ActionOutput = z.infer<(typeof OutputSchemas)[keyof typeof OutputSch
 // real LLM providers (OpenAI/Gemini) emit contract-conforming JSON, not a guess.
 export const OUTPUT_SCHEMA_HINT: Record<CanonicalAction, unknown> = {
   generate_test_cases: {
-    testCases: [{ title: "string", objective: "string", preconditions: "string", steps: "string (numbered)", expectedResult: "string", priority: "low|medium|high|critical", tags: ["string"], notes: "string", scenarios: ["string"], edgeCases: ["string"] }],
+    testCases: [{ module: "string", title: "string", objective: "string", preconditions: "string", steps: "string (numbered)", expectedResult: "string", priority: "low|medium|high|critical", tags: ["string"], targetRole: "string", notes: "string", scenarios: ["string"], edgeCases: ["string"] }],
     scenarios: ["string"], edgeCases: ["string"],
   },
   test_run_analysis: {
@@ -145,11 +157,35 @@ export function canonicalAction(request: GatewayRequest): CanonicalAction {
 
 export function requestInput(request: GatewayRequest): Record<string, unknown> {
   if ("input" in request) return request.input;
-  if (request.action === "generate_test_cases") return { requirement: request.source.content, source: request.source, options: request.options };
+  if (request.action === "generate_test_cases") {
+    const content = "content" in request.source ? request.source.content : request.source.context ?? "";
+    return { requirement: content, source: request.source, options: request.options };
+  }
   if (request.action === "test_run_analysis") return { testRunId: request.testRunId };
   if (request.action === "issue_draft") return { testResultId: request.result.id, result: request.result };
   if (request.action === "duplicate_issue_detection") return { draft: request.draft, candidates: request.candidates };
   return { query: request.query, entityTypes: request.entityTypes, limit: request.limit };
+}
+
+export const TEST_CASE_IMPORT_COLUMNS = ["Module", "Title", "Objective", "Preconditions", "Steps", "Expected Result", "Priority", "Tags", "Target Role"] as const;
+
+function csvCell(value: string): string {
+  return `"${value.replaceAll('"', '""')}"`;
+}
+
+export function generateTestCasesCsv(output: z.infer<typeof GenerateOutputSchema>): string {
+  const rows = output.testCases.map((testCase) => [
+    testCase.module,
+    testCase.title,
+    testCase.objective,
+    testCase.preconditions,
+    testCase.steps,
+    testCase.expectedResult,
+    testCase.priority,
+    testCase.tags.join(","),
+    testCase.targetRole,
+  ].map(csvCell).join(","));
+  return [TEST_CASE_IMPORT_COLUMNS.join(","), ...rows].join("\r\n");
 }
 
 export function parseProviderJson(raw: unknown): unknown {

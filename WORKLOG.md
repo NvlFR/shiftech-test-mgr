@@ -1932,3 +1932,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperbarui dokumentasi kontrak channel runner dan checklist PW-19. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (9/9 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.607 node dan 5.372 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-01 generate Test Case CSV dari requirement
+
+- Menjalankan `graphify query` sebelum menelusuri action `generate_test_cases`, template import CSV aktual, integrasi repository, dan keputusan Section 11.1 `FEATURE_BACKLOG.md`.
+- Memperluas kontrak sumber requirement Edge Function agar menerima teks bebas, hasil ekstraksi file Excel/CSV/dokumen, atau referensi repository aktif milik project beserta ref/path dan potongan konteks opsional. Referensi repository diverifikasi terhadap project dan path lokal tidak diteruskan ke provider AI.
+- Gateway sekarang membentuk CSV secara deterministik dari output provider dengan header persis seperti template import aktual: `Module,Title,Objective,Preconditions,Steps,Expected Result,Priority,Tags,Target Role`. Seluruh cell di-quote dan karakter quote di-escape; respons tetap berstatus draft dan menyertakan `csv` serta `csvColumns` tanpa menghilangkan `testCases` untuk kompatibilitas consumer saat ini.
+- Menambahkan kontrak field `module` dan `targetRole`, schema hint provider, serta test untuk semua tipe input dan kesamaan/escaping format CSV. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada) dan `git diff --check`. Test Deno tidak dijalankan karena runtime Deno maupun image Docker Deno tidak tersedia di workspace.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.613 node dan 5.388 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
