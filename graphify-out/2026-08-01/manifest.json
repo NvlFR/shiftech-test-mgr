@@ -340,8 +340,8 @@
     "semantic_hash": ""
   },
   "frontend/src/repositories/testResultRepository.ts": {
-    "mtime": 1785549016.5986712,
-    "ast_hash": "6523228ecbbc23d6de1c2991cb7a6a08",
+    "mtime": 1785555100.6288452,
+    "ast_hash": "ba606be1f8260d34dbaa371d47f72255",
     "semantic_hash": ""
   },
   "frontend/src/repositories/testRunRepository.ts": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785554854.74459,
-    "ast_hash": "a10f63a5efd39d317f339542ec7686bb",
+    "mtime": 1785555243.9901423,
+    "ast_hash": "5f3afda929e5d76574ffb2e30c485151",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -905,9 +905,9 @@
     "semantic_hash": "8820a581c2b83f33638e707ce56d776f"
   },
   "frontend/src/helpers/aiValidators.ts": {
-    "mtime": 1785028390.852347,
-    "ast_hash": "3d804d11b34f0fd7f1137d671d11fe9b",
-    "semantic_hash": "3d804d11b34f0fd7f1137d671d11fe9b"
+    "mtime": 1785555100.768818,
+    "ast_hash": "0c467dc9dc94a467925e805912ade0aa",
+    "semantic_hash": ""
   },
   "frontend/src/helpers/testRunSummary.ts": {
     "mtime": 1785028158.0246449,
@@ -955,9 +955,9 @@
     "semantic_hash": "03157fb1f7f1312cfb49cdf12f916952"
   },
   "frontend/src/services/aiIssueService.ts": {
-    "mtime": 1785029784.2685788,
-    "ast_hash": "8cde620ac59f54107b1f582281182707",
-    "semantic_hash": "8cde620ac59f54107b1f582281182707"
+    "mtime": 1785555115.0551157,
+    "ast_hash": "5f52ddf846a67b96382b4a1d92617d5f",
+    "semantic_hash": ""
   },
   "frontend/src/services/aiTestCaseService.ts": {
     "mtime": 1785553472.9829266,
@@ -970,9 +970,9 @@
     "semantic_hash": "e41065a4fd6ccc0e7b1e505b08bbdc07"
   },
   "frontend/src/types/ai.ts": {
-    "mtime": 1785028131.9324222,
-    "ast_hash": "2ec5cf5a9b5a12f2b08d71611e76085b",
-    "semantic_hash": "2ec5cf5a9b5a12f2b08d71611e76085b"
+    "mtime": 1785555100.490872,
+    "ast_hash": "5895649be877a7574fef52ffeb3d49fb",
+    "semantic_hash": ""
   },
   "frontend/src/types/aiTestCase.ts": {
     "mtime": 1785553472.0898747,
@@ -990,8 +990,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/ai-gateway/contract.ts": {
-    "mtime": 1785551587.6517177,
-    "ast_hash": "f323905af56bc22a5332182c9147c2e8",
+    "mtime": 1785555101.0597615,
+    "ast_hash": "a8483015e0dee83ba969ea6fd2efcc4c",
     "semantic_hash": ""
   },
   "supabase/functions/ai-gateway/handler.ts": {

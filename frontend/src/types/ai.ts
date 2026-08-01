@@ -47,6 +47,8 @@ export interface AiIssueCandidateInput {
 
 export interface DuplicateIssueCandidate {
   issueId: string;
+  issueCode: string;
+  issueTitle: string;
   confidence: number;
   reason: string;
 }

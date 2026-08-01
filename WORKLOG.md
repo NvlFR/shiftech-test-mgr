@@ -2073,3 +2073,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperluas kontrak request AI Gateway untuk menerima konteks kegagalan lengkap. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run` (5/5 test), `cd frontend && npm run lint` (tujuh warning existing di file di luar scope), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.653 node dan 5.461 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-11 duplicate Issue menjadi komentar
+
+- Menjalankan `graphify query` sebelum menelusuri alur duplicate detection, draft Issue AI, serta layer komentar, lalu mengikuti keputusan Section 11.5 `FEATURE_BACKLOG.md`.
+- Alur simpan mengulang duplicate detection di service untuk menghindari keputusan berdasarkan snapshot UI yang stale. Kandidat dengan confidence tertinggi diverifikasi masih berada pada project aktif, kemudian menerima komentar terstruktur yang membawa Test Result, detail kegagalan, metadata environment, commit, dan artifact; Issue baru hanya dibuat jika pemeriksaan terbaru tidak menemukan kandidat.
+- UI review kini menampilkan kode dan judul kandidat, menandai target komentar, mewajibkan acknowledgement manusia, serta mengubah label aksi sesuai hasil deteksi. Formatter komentar membatasi payload sesuai batas 5.000 karakter pada `commentService`.
+- Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run` (6/6 test), `cd frontend && npm run lint` (tujuh warning existing di file di luar scope), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.655 node dan 5.468 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

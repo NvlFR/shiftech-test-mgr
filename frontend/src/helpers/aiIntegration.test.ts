@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateDuplicateConfidence, parseAiIssueDraft } from './aiValidators';
+import { calculateDuplicateConfidence, formatDuplicateIssueComment, parseAiIssueDraft } from './aiValidators';
 import { parseAiTestCaseResponse } from './aiTestCaseParser';
 import { calculateTestRunSummary } from './testRunSummary';
 import { aiTestCaseService } from '../services/aiTestCaseService';
@@ -50,6 +50,19 @@ describe('AI safety helpers', () => {
       { title: 'Login gagal setelah submit', description: 'Error 500', actualResult: 'Error', expectedResult: 'Dashboard' },
     );
     expect(confidence).toBe(1);
+  });
+
+  it('membentuk komentar duplicate yang tertaut ke Test Result dan memenuhi batas panjang', () => {
+    const comment = formatDuplicateIssueComment({
+      projectId: 'project-1', testResultId: 'result-1', title: 'Login gagal',
+      description: 'x'.repeat(6000), actualResult: 'Error 500', expectedResult: 'Dashboard tampil',
+      priority: 'high', severity: 'high', reproductionSteps: 'Klik login', errorSummary: 'Server error',
+      artifacts: [], commitSha: 'abc123',
+      environment: { name: 'staging', baseUrl: null, browser: 'chromium', browserVersion: null, os: null, viewport: null, buildVersion: null },
+    });
+    expect(comment).toContain('Test Result: result-1');
+    expect(comment).toContain('tidak membuat Issue baru');
+    expect(comment.length).toBeLessThanOrEqual(5000);
   });
 
   it('menghitung summary tanpa mengubah status result', () => {

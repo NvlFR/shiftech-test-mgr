@@ -660,7 +660,7 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
       `test_result_id` → `test_run_id` + `test_case_id`.
 - [ ] Isi otomatis: langkah reproduksi (dari steps), actual vs expected, ringkasan
       error, tautan ke semua artifact, environment + commit SHA.
-- [ ] Duplicate detection dijalankan lebih dulu: kalau kandidat duplikat ditemukan,
+- [x] Duplicate detection dijalankan lebih dulu: kalau kandidat duplikat ditemukan,
       AI menambah **komentar pada Issue lama** alih-alih membuat Issue baru.
 - [ ] Issue hasil AI berstatus draft sampai diverifikasi manusia (konsisten Section 4).
 

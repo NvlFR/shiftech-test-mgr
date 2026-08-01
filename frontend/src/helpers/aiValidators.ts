@@ -121,6 +121,19 @@ export function formatDraftMetadata(draft: AiIssueDraft): string {
   return sections.filter(Boolean).join('\n\n');
 }
 
+export function formatDuplicateIssueComment(draft: AiIssueDraft): string {
+  const body = [
+    'AI mendeteksi kegagalan baru sebagai kandidat duplikat dan tidak membuat Issue baru.',
+    `Test Result: ${draft.testResultId}`,
+    `Judul draft: ${draft.title}`,
+    `Hasil aktual:\n${draft.actualResult.trim() || '-'}`,
+    `Hasil yang diharapkan:\n${draft.expectedResult.trim() || '-'}`,
+    formatDraftMetadata(draft),
+  ].join('\n\n');
+
+  return body.length <= 5000 ? body : `${body.slice(0, 4980).trimEnd()}\n\n[truncated]`;
+}
+
 export function buildDuplicateReason(confidence: number): string {
   if (confidence >= 0.85) return 'Judul dan detail kegagalan sangat mirip dengan Issue pada project aktif.';
   if (confidence >= 0.6) return 'Sebagian detail kegagalan mirip dengan Issue pada project aktif.';

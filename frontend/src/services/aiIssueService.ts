@@ -1,9 +1,11 @@
 import { issueService } from './issueService';
+import { commentService } from './commentService';
 import { aiRepository } from '../repositories/aiRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
 import {
   buildDuplicateReason,
   calculateDuplicateConfidence,
+  formatDuplicateIssueComment,
   formatDraftMetadata,
   parseAiIssueDraft,
   parseDuplicateCandidates,
@@ -132,6 +134,8 @@ export const aiIssueService = {
         const confidence = candidate.confidence ?? calculateDuplicateConfidence(draft, issue);
         return {
           issueId: candidate.issueId,
+          issueCode: issue.code,
+          issueTitle: issue.title,
           confidence,
           reason: candidate.reason ?? buildDuplicateReason(confidence),
         };
@@ -152,6 +156,23 @@ export const aiIssueService = {
     if (!input.duplicateAcknowledged) throw new Error('Hasil duplicate detection harus ditinjau sebelum menyimpan Issue');
 
     const draft = parseAiIssueDraft(input.draft);
+    const duplicates = await this.detectDuplicates({ projectId: input.projectId, draft, actor: input.actor });
+    const duplicate = duplicates[0];
+    if (duplicate) {
+      const existingIssue = await issueService.getById(duplicate.issueId);
+      if (!existingIssue || existingIssue.projectId !== input.projectId) {
+        throw new Error('Issue duplicate tidak ditemukan pada project aktif');
+      }
+      await commentService.create({
+        projectId: input.projectId,
+        targetType: 'issue',
+        targetId: duplicate.issueId,
+        authorId: input.actor.userId,
+        body: formatDuplicateIssueComment(draft),
+      });
+      return existingIssue;
+    }
+
     const issue = await issueService.create({
       testResultId: draft.testResultId,
       title: draft.title,
