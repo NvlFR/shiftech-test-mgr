@@ -15,6 +15,7 @@ import { Message } from 'primereact/message';
 import { Toast } from 'primereact/toast';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useAutomation } from '../../hooks/useAutomation';
+import { useAutomationJobLogs } from '../../hooks/useAutomationJobLogs';
 import { useTestPlans } from '../../hooks/useTestPlans';
 import { useEnvironments } from '../../hooks/useEnvironments';
 import { useProjectRole } from '../../hooks/useProjectRole';
@@ -41,6 +42,8 @@ export function AutomationPage() {
   const { testPlans } = useTestPlans(projectId ?? null);
   const { environments } = useEnvironments(projectId ?? null);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const [logJob, setLogJob] = useState<AutomationJob | null>(null);
+  const { logs: jobLogs, loading: jobLogsLoading, error: jobLogsError } = useAutomationJobLogs(logJob?.id ?? null);
 
   const [runnerDialog, setRunnerDialog] = useState(false);
   const [runnerName, setRunnerName] = useState('');
@@ -178,10 +181,21 @@ export function AutomationPage() {
           <Column field="deviceProfile" header="Device" body={(r: AutomationJob) => r.deviceProfile ?? 'Desktop'} />
           <Column header="Artifact" body={(r: AutomationJob) => r.artifacts.length ? r.artifacts.map((a, i) => <a key={i} role="button" tabIndex={0} onClick={() => openArtifact(a)} onKeyDown={(e) => { if (e.key === 'Enter') openArtifact(a); }} className="mr-2 cursor-pointer text-primary" title={a.name ?? a.type}>{a.type}</a>) : <span className="text-color-secondary">-</span>} />
           <Column field="errorMessage" header="Error" body={(r: AutomationJob) => r.errorMessage ?? '-'} />
-          <Column header="Aksi" body={(r: AutomationJob) => r.status === 'queued' && canEditContent && <Button text size="small" icon="pi pi-times" tooltip="Cancel" onClick={() => cancelJob(r)} />} />
+          <Column header="Aksi" body={(r: AutomationJob) => <div className="flex gap-1">
+            <Button text size="small" icon="pi pi-file" tooltip="Lihat live log" onClick={() => setLogJob(r)} />
+            {r.status === 'queued' && canEditContent && <Button text size="small" icon="pi pi-times" tooltip="Cancel" onClick={() => cancelJob(r)} />}
+          </div>} />
         </DataTable>
       </TabPanel>
     </TabView></Card>
+
+    <Dialog header={`Log Job${logJob ? ` — ${caseLabel(logJob.testCaseId)}` : ''}`} visible={!!logJob} onHide={() => setLogJob(null)} style={{ width: 'min(70rem, 95vw)' }}>
+      {jobLogsError && <Message severity="error" text={jobLogsError} className="mb-2" />}
+      <div className="surface-900 text-100 p-3 border-round overflow-auto" style={{ minHeight: '18rem', maxHeight: '60vh', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }} aria-live="polite">
+        {jobLogsLoading && !jobLogs.length ? 'Memuat log...' : jobLogs.length ? jobLogs.map((entry) => <span key={entry.id} className={entry.stream === 'stderr' ? 'text-red-300' : entry.stream === 'system' ? 'text-blue-300' : undefined}>{entry.content}</span>) : 'Belum ada output dari runner.'}
+      </div>
+      {logJob?.status === 'running' && <small className="text-color-secondary">Log diperbarui otomatis selama job berjalan.</small>}
+    </Dialog>
 
     <Dialog header="Runner Baru" visible={runnerDialog} onHide={() => setRunnerDialog(false)} style={{ width: '32rem' }}>
       <div className="flex flex-column gap-3">

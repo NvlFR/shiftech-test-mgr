@@ -1761,3 +1761,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan tab Diff Screenshot pada halaman detail Test Result dengan informasi run before/after, pencocokan screenshot berdasarkan nama (fallback urutan), dan slider overlay interaktif untuk membandingkan perubahan visual.
 - Memperbarui checklist PW-09 Section 9.4. Tidak menambah dependency atau migrasi, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build`, `cd frontend && npm run lint` (hanya tujuh warning lama di luar file scope), dan `git diff --check`.
+
+## 2026-08-01 — PW-10 live log streaming automation job
+
+- Menjalankan `graphify query` sebelum menelusuri alur automation runner dan mengikuti scope live log pada Section 9.4 `FEATURE_BACKLOG.md`.
+- Menambahkan migrasi `schema_063_pw10_live_job_logs.sql` untuk log job append-only, RLS baca berbasis akses project, RPC append yang memvalidasi token/assignment/status/attempt runner, batas chunk 32 KiB, serta publikasi Supabase Realtime. Migrasi hanya dibuat dan tidak dijalankan ke target Supabase.
+- Runner menangkap stdout/stderr Playwright, membagi output besar, lalu mengirim batch log tiap satu detik dengan sequence idempotent; kegagalan streaming bersifat best-effort dan tidak menggagalkan eksekusi job.
+- Menambahkan alur Repository → Service → Hook untuk initial load dan subscription insert Realtime, serta viewer dialog monospace pada tabel job yang diperbarui otomatis ketika job berjalan.
+- Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (6/6 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm run lint` (hanya tujuh warning lama di luar file scope), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.533 node dan 5.255 edge; terdapat warning tujuh file konfigurasi/hasil test tanpa node, tanpa kegagalan proses.

@@ -1,4 +1,4 @@
-import { AutomationApi, ApiError } from './api.js';
+import { AutomationApi, ApiError, type JobLogStream } from './api.js';
 import type { RunnerConfig } from './config.js';
 import { executeJob } from './executor.js';
 import { collectEnvironmentMetadata } from './environmentMetadata.js';
@@ -9,6 +9,42 @@ import type { LocalRepositoryMetadata } from './localRepository.js';
 import { prepareJobRepository } from './repositoryWorkspace.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+class JobLogStreamer {
+  private sequence = 0;
+  private pending: Array<{ stream: JobLogStream; content: string }> = [];
+  private sending: Promise<void> = Promise.resolve();
+  private timer: ReturnType<typeof setInterval>;
+
+  constructor(private readonly api: AutomationApi, private readonly jobId: string, private readonly attempt: number) {
+    this.timer = setInterval(() => this.flush(), 1_000);
+  }
+
+  push(stream: JobLogStream, content: string): void {
+    for (let offset = 0; offset < content.length; offset += 32_768) {
+      const chunk = content.slice(offset, offset + 32_768);
+      if (chunk) this.pending.push({ stream, content: chunk });
+    }
+  }
+
+  flush(): void {
+    const chunks = this.pending.splice(0);
+    if (!chunks.length) return;
+    this.sending = this.sending.then(async () => {
+      for (const chunk of chunks) {
+        const sequence = this.sequence++;
+        try { await this.api.appendLog(this.jobId, this.attempt, sequence, chunk.stream, chunk.content); }
+        catch (error) { log.warn('Live log chunk failed', { jobId: this.jobId, sequence, error: (error as Error).message }); }
+      }
+    });
+  }
+
+  async close(): Promise<void> {
+    clearInterval(this.timer);
+    this.flush();
+    await this.sending;
+  }
+}
 
 export class Runner {
   private readonly api: AutomationApi;
@@ -59,15 +95,19 @@ export class Runner {
         }
         let workspace: { projectDir: string; metadata: LocalRepositoryMetadata } | null = null;
         let outcome;
+        const logStreamer = new JobLogStreamer(this.api, job.id, job.attempt);
         try {
           workspace = await prepareJobRepository(this.config, job.repository);
-          outcome = await executeJob(this.config, job, workspace.projectDir);
+          logStreamer.push('system', `Menjalankan ${job.script_ref}\n`);
+          outcome = await executeJob(this.config, job, workspace.projectDir, (stream, content) => logStreamer.push(stream, content));
         } catch (error) {
           outcome = {
             result: 'blocked' as const,
             errorMessage: error instanceof Error ? error.message : 'Repository tidak dapat disiapkan',
             artifacts: [],
           };
+        } finally {
+          await logStreamer.close();
         }
         let artifacts;
         try {

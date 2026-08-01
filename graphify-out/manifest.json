@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785547529.9914558,
-    "ast_hash": "8685d6fd926926229e34d910509ae585",
+    "mtime": 1785547909.8451853,
+    "ast_hash": "ec0267b2fcedde05843595391e5870a9",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785547529.8514566,
-    "ast_hash": "1995a2f183e5904bb36faf4cc52647d8",
+    "mtime": 1785547909.7101855,
+    "ast_hash": "7f07f1b8f4171abcc27c0d9205973d1e",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785547637.9259715,
-    "ast_hash": "51555deac8ae4993a03e8cab9c8dd341",
+    "mtime": 1785548059.6777563,
+    "ast_hash": "e8c298639385b1022af7b66efcc1dbbe",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785547649.9719245,
-    "ast_hash": "7866a97bbf1f8b1410f555cb3475dde4",
+    "mtime": 1785548001.593023,
+    "ast_hash": "16493f4c0bffc7a16c826278931ec73e",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1040,13 +1040,13 @@
     "semantic_hash": "19735a4f556735cc5232cfbec4099e1d"
   },
   "frontend/src/repositories/automationRepository.ts": {
-    "mtime": 1785544807.7347236,
-    "ast_hash": "6f675ea796a9983634cb94b4be009339",
+    "mtime": 1785547910.0221848,
+    "ast_hash": "f65b101b0e8e277edbde06416beb7acc",
     "semantic_hash": ""
   },
   "frontend/src/services/automationService.ts": {
-    "mtime": 1785544808.602672,
-    "ast_hash": "bba73523c8e1dafaf8105d01d638c7d1",
+    "mtime": 1785547910.1751845,
+    "ast_hash": "ec1d9801c117c5913a54c968e5a6f55b",
     "semantic_hash": ""
   },
   "supabase/schema_024_p3_automation.sql": {
@@ -1055,8 +1055,8 @@
     "semantic_hash": "b04d53ae5067ad6cb7062ccd4fab40a7"
   },
   "frontend/src/pages/automation/AutomationPage.tsx": {
-    "mtime": 1785544856.33697,
-    "ast_hash": "49ec5671645e072d9c4b9e0315863c23",
+    "mtime": 1785547910.465184,
+    "ast_hash": "bccc2ffebbca54ca109e755badafb415",
     "semantic_hash": ""
   },
   "frontend/src/components/ai/AiAssistantPanel.tsx": {
@@ -1075,8 +1075,8 @@
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785545982.260854,
-    "ast_hash": "19ee3176baa71f49dc5a2696d4de8f6b",
+    "mtime": 1785547909.2871864,
+    "ast_hash": "a556a6ad4db0ac0f2fd858c3bfdc0786",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "runner/src/executor.ts": {
-    "mtime": 1785545640.083736,
-    "ast_hash": "45033f068cf9a36d4a0fc355cc4cc8af",
+    "mtime": 1785547909.430186,
+    "ast_hash": "450df6566480e18458ba89d7c79c950e",
     "semantic_hash": ""
   },
   "runner/src/index.ts": {
@@ -1105,8 +1105,8 @@
     "semantic_hash": "a53e8caa5dddc3c8978ed1a1f56f8a4b"
   },
   "runner/src/runner.ts": {
-    "mtime": 1785546554.5416915,
-    "ast_hash": "b7edce8de90b164e99b5368ffce3e1e8",
+    "mtime": 1785547909.5681858,
+    "ast_hash": "d22280248f47c7d1c0bcfbfb21376ccf",
     "semantic_hash": ""
   },
   "runner/tsconfig.json": {
@@ -3207,6 +3207,16 @@
   "frontend/src/services/testResultService.ts": {
     "mtime": 1785547552.447345,
     "ast_hash": "eaf9f4e4bfcc60244272d668e6dfe08b",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useAutomationJobLogs.ts": {
+    "mtime": 1785548001.2820234,
+    "ast_hash": "a95f18c7402e65aa10079cf5b4c1ec1e",
+    "semantic_hash": ""
+  },
+  "supabase/schema_063_pw10_live_job_logs.sql": {
+    "mtime": 1785547909.1511867,
+    "ast_hash": "0197a9c1cf48f8c8c3108e9fd89ed4bf",
     "semantic_hash": ""
   }
 }

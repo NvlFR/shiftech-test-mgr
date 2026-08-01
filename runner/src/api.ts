@@ -30,6 +30,7 @@ export interface JobRepository {
 }
 
 export type JobResult = 'pass' | 'fail' | 'blocked' | 'skip';
+export type JobLogStream = 'stdout' | 'stderr' | 'system';
 
 export interface EnvironmentMetadata {
   browser: 'chromium' | 'firefox' | 'webkit';
@@ -106,6 +107,17 @@ export class AutomationApi {
       p_token: this.config.runnerToken,
       p_job_id: jobId,
       p_payload: payload,
+    });
+  }
+
+  appendLog(jobId: string, attempt: number, sequence: number, stream: JobLogStream, content: string): Promise<{ job_id: string; sequence: number }> {
+    return this.rpc('append_automation_job_log', {
+      p_token: this.config.runnerToken,
+      p_job_id: jobId,
+      p_attempt: attempt,
+      p_sequence: sequence,
+      p_stream: stream,
+      p_content: content,
     });
   }
 }

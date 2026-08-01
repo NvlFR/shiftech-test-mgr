@@ -390,6 +390,18 @@ export interface AutomationJob {
   updatedAt: string;
 }
 
+export type AutomationJobLogStream = 'stdout' | 'stderr' | 'system';
+export interface AutomationJobLog {
+  id: number;
+  projectId: string;
+  jobId: string;
+  attempt: number;
+  sequence: number;
+  stream: AutomationJobLogStream;
+  content: string;
+  createdAt: string;
+}
+
 export interface AutomationEnqueueResponse { runId: string; runCode: string; jobCount: number; }
 
 export type TestResultStatus = 'pass' | 'fail' | 'skip' | 'blocked' | 'not_run';

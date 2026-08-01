@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import type { RunnerConfig } from './config.js';
-import type { AutomationJob, JobResult } from './api.js';
+import type { AutomationJob, JobLogStream, JobResult } from './api.js';
 import { collectArtifacts, type CollectedArtifact } from './artifacts.js';
 import { log } from './logger.js';
 
@@ -43,7 +43,7 @@ export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): 
 // Run one Playwright spec in an isolated per-job output directory. We invoke the
 // Playwright CLI (no library import) so this runner has zero runtime deps and
 // works against whatever Playwright version the project under test uses.
-export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir): Promise<ExecutionOutcome> {
+export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir = config.projectDir, onLog?: (stream: JobLogStream, content: string) => void): Promise<ExecutionOutcome> {
   if (isAbsolute(job.script_ref)) {
     return Promise.resolve({ result: 'blocked', errorMessage: 'script_ref harus berupa path relatif di repository', artifacts: [] });
   }
@@ -86,8 +86,8 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
     let stdout = '';
     let stderr = '';
     let settled = false;
-    child.stdout.on('data', (chunk: Buffer) => { stdout += chunk.toString(); });
-    child.stderr.on('data', (chunk: Buffer) => { stderr += chunk.toString(); });
+    child.stdout.on('data', (chunk: Buffer) => { const content = chunk.toString(); stdout += content; onLog?.('stdout', content); });
+    child.stderr.on('data', (chunk: Buffer) => { const content = chunk.toString(); stderr += content; onLog?.('stderr', content); });
 
     const timer = setTimeout(() => {
       if (settled) return;

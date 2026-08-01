@@ -1,8 +1,9 @@
 import { supabase } from '../config/supabaseClient';
-import { mapAutomationJobRow, mapAutomationRunnerRow, mapAutomationScriptRow } from '../helpers/mappers';
+import { mapAutomationJobLogRow, mapAutomationJobRow, mapAutomationRunnerRow, mapAutomationScriptRow } from '../helpers/mappers';
 import type {
   AutomationEnqueueResponse,
   AutomationJob,
+  AutomationJobLog,
   AutomationRunner,
   AutomationRunnerSecret,
   AutomationScript,
@@ -64,6 +65,19 @@ export const automationRepository = {
     const { data, error } = await supabase.from('automation_jobs').select(JOB_COLUMNS).eq('project_id', projectId).order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
     return (data ?? []).map(mapAutomationJobRow);
+  },
+
+  async listJobLogs(jobId: string): Promise<AutomationJobLog[]> {
+    const { data, error } = await supabase.from('automation_job_logs').select('id,project_id,job_id,attempt,sequence,stream,content,created_at').eq('job_id', jobId).order('attempt').order('sequence');
+    if (error) throw error;
+    return (data ?? []).map(mapAutomationJobLogRow);
+  },
+
+  subscribeJobLogs(jobId: string, onInsert: (logEntry: AutomationJobLog) => void): () => void {
+    const channel = supabase.channel(`automation-job-logs:${jobId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'automation_job_logs', filter: `job_id=eq.${jobId}` }, (payload) => onInsert(mapAutomationJobLogRow(payload.new)))
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
   },
 
   async enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts: number; browser: string; deviceProfile?: string | null }): Promise<AutomationEnqueueResponse> {

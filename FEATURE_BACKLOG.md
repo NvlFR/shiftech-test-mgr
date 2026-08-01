@@ -504,7 +504,7 @@ tertaut ke `test_result`:
       Network / DOM, bukan sekadar daftar link.
 - [x] Embed **trace viewer** (`trace.playwright.dev` self-hosted atau link ke trace file).
 - [x] Diff screenshot antar run (before/after) untuk regresi visual.
-- [ ] Live log streaming saat job `running` (runner mengirim log chunk berkala).
+- [x] Live log streaming saat job `running` (runner mengirim log chunk berkala).
 
 ### 9.5 Interaktivitas terarah
 
@@ -828,6 +828,30 @@ benar tanpa harus diajari ulang tiap sesi.
 
 ---
 
+### 12.8 Bootstrap runner lewat agent (satu perintah)
+
+Tester tidak boleh disuruh membuka dokumentasi terpisah untuk memasang runner.
+Dari sudut pandang agent, memasang dan menyambungkan runner harus **satu
+perintah**, dan prompt di halaman Connect yang membawanya.
+
+- [ ] Prompt starter menyertakan varian **"Pasang & sambungkan runner"** yang
+      menginstruksikan agent memasang Local Runner lalu menyambungkannya ke
+      project ini.
+- [ ] Perintah yang dihasilkan berbentuk satu baris, contoh bentuknya:
+      `npx @testmanager/runner init --code <BOOTSTRAP_CODE>`
+- [ ] `BOOTSTRAP_CODE` adalah **kode sekali pakai berumur pendek** (default 10
+      menit), bukan runner token. Lihat 14.4 — ini yang membuat perintahnya aman
+      ditempel ke prompt, di-screenshot, atau dikirim lewat chat.
+- [ ] Setelah `init` berhasil, halaman Connect mendeteksi heartbeat pertama dan
+      berpindah sendiri ke status "Runner terhubung" (sinkron dengan wizard 13.1 —
+      satu alur, bukan dua yang mirip).
+- [ ] Agent diberi tahu apa yang harus dilaporkan balik ke user: nama runner,
+      label, dan project yang tersambung. Tidak boleh menampilkan token.
+- [ ] Skill `testmanager-workflow` (12.4) memuat instruksi setup runner ini,
+      supaya agent tahu caranya tanpa harus diberi prompt panjang tiap kali.
+
+---
+
 ## 13. Runner UI/UX yang lebih ramah
 
 **Masalah sekarang.** `pages/automation/AutomationPage.tsx` menyajikan tiga tab
@@ -904,7 +928,142 @@ Section 9 mengurus *kemampuan* runner. Section ini mengurus *pengalaman memakain
 
 ---
 
-## 14. Urutan implementasi yang disarankan
+## 14. Distribusi & arsitektur Local Agent
+
+**Konteks keputusan.** Aplikasi ini akan di-deploy **self-hosted lebih dulu**, dan
+ke depan direncanakan punya **backend custom** (bukan Supabase langsung). Karena
+itu runner dan MCP server dijalankan sebagai **dua proses terpisah untuk sekarang**,
+tapi dirancang supaya bisa disatukan jadi satu **Local Agent** tanpa menulis ulang.
+
+**Kenapa akhirnya harus disatukan.** Runner dan MCP server hidup di mesin yang sama,
+butuh identitas yang sama, dan melayani orang yang sama. Kalau dibiarkan terpisah
+selamanya, kita membangun dua kali: dua auth, dua heartbeat, dua onboarding, dua
+jalur update. Yang lebih penting, agent baru bisa menjalankan test ke `localhost`
+secara langsung kalau ia berada di proses yang sama dengan eksekutor.
+
+```text
+SEKARANG (self-hosted, dua proses)        NANTI (satu Local Agent)
+┌──────────────┐  ┌──────────────┐        ┌────────────────────────┐
+│ MCP server   │  │ Runner       │        │  TestManager Agent     │
+│ (mcp/)       │  │ (runner/)    │   ──▶  │   ├── MCP server       │
+└──────┬───────┘  └──────┬───────┘        │   ├── Job executor     │
+       │  token A        │  token B       │   └── Repo reader      │
+       ▼                 ▼                └───────────┬────────────┘
+   Supabase RPC      Supabase RPC                     │ satu token
+                                                      ▼
+                                          Supabase RPC / Backend API
+```
+
+### 14.1 Adapter pattern (wajib, ini yang bikin penyatuan nanti murah)
+
+Semua akses keluar dari runner dan MCP harus lewat adapter. Ini bukan kerapian —
+ini syarat supaya backend custom nanti bisa masuk tanpa membongkar isi.
+
+- [ ] **`TransportAdapter`** — cara bicara ke server pusat.
+      `SupabaseRpcTransport` (sekarang) → `BackendHttpTransport` (setelah backend ada).
+      Tidak boleh ada pemanggilan Supabase langsung di luar adapter ini.
+- [ ] **`ExecutorAdapter`** — cara menjalankan test.
+      `PlaywrightLocalExecutor` (sekarang) → `CloudExecutor` (kalau cloud runner jadi).
+- [ ] **`ArtifactStorageAdapter`** — tempat menyimpan bukti.
+      `SupabaseStorage` (sekarang) → `S3`/`MinIO`/`BackendUpload`.
+- [ ] **`AuthAdapter`** — cara runner membuktikan identitas.
+      `RunnerTokenAuth` (sekarang) → OAuth device flow / mTLS (kalau jadi SaaS).
+- [ ] **`RepoAdapter`** — cara membaca source (Section 10).
+      `LocalPathRepo` · `GitCloneRepo` — dipakai bersama oleh runner dan MCP.
+- [ ] Kontrak adapter didefinisikan di satu paket bersama (`packages/agent-core`
+      atau sejenis) yang diimpor `runner/` dan `mcp/`, sehingga saat disatukan
+      tinggal menggabungkan entry point.
+- [ ] Aturan review: PR yang menambah `fetch` ke Supabase di luar adapter ditolak.
+
+### 14.2 Jahitan bersama sejak sekarang
+
+Yang harus sudah dipakai bareng oleh `runner/` dan `mcp/` sebelum penyatuan:
+
+- [ ] Konfigurasi: satu skema env dengan prefix `TM_`, satu loader, satu validator.
+- [ ] Identitas: satu format token dan satu mekanisme pencabutan.
+- [ ] Logging: format sama, dengan **redaksi rahasia terpusat** (14.4).
+- [ ] Telemetri/heartbeat: satu bentuk payload, sehingga server melihat satu jenis
+      "agent" walau saat ini datang dari dua proses.
+- [ ] Versioning: `runner/` dan `mcp/` dirilis dengan nomor versi yang sama.
+
+### 14.3 Cara install
+
+Local Agent dipakai developer, dan developer sudah punya Node. Jadi jalur utamanya
+npm. Runner sendiri **tidak memuat Playwright** — ia memanggil Playwright milik
+project yang diuji, jadi paket yang didistribusikan tetap kecil.
+
+| Jalur | Untuk siapa | Bentuk perintah |
+|---|---|---|
+| **`npx`** (utama) | developer, pemakai MCP | `npx @testmanager/runner init --code <CODE>` |
+| **npm global** | mesin tester tetap | `npm i -g @testmanager/runner` |
+| **Tarball self-hosted** | instance tertutup tanpa akses registry | `npm i -g https://<instance>/runner/tm-runner-<ver>.tgz` |
+| **Docker** | mesin bersama / on-prem | `docker run --env-file .env -v <project>:/project ...` |
+| **Binary tertandatangani** | QA non-developer (nanti) | `brew install` / `winget install` |
+
+- [ ] Jalur `npx` didahulukan: tidak ada instalasi permanen, selalu versi terbaru,
+      paling sedikit langkahnya.
+- [ ] Tarball self-hosted disajikan oleh instance itu sendiri beserta **SHA256**
+      yang ditampilkan di halaman Connect, supaya bisa diverifikasi.
+- [ ] **Tidak memakai `curl | bash`** selama belum ada penandatanganan rilis.
+      Kalau nanti dipakai, wajib: domain sendiri, binary tertandatangani,
+      checksum dipublikasikan, dan script bisa diunduh dulu sebelum dijalankan.
+- [ ] **Nol runtime dependency dipertahankan.** Ini bukan estetika — setiap
+      dependency adalah pintu masuk supply chain ke mesin developer pelanggan.
+      Penambahan dependency harus keputusan sadar dan tercatat.
+- [ ] Publikasi paket wajib memakai npm provenance + 2FA.
+- [ ] Catat matriks kompatibilitas versi runner ↔ versi server, dan runner
+      memperingatkan kalau tertinggal terlalu jauh.
+- [ ] Catatan Docker: dari dalam container, `localhost` adalah container itu
+      sendiri. Untuk menguji aplikasi di host perlu `--network host` (Linux) atau
+      `host.docker.internal`. Docker karena itu **bukan** jalur default untuk
+      laptop tester.
+
+### 14.4 Setup yang tidak membocorkan rahasia
+
+Ini syarat utama yang harus dipenuhi supaya "satu perintah" (12.8) tidak berubah
+jadi kebocoran token.
+
+- [ ] **Bootstrap code**, bukan token, yang ditampilkan dan ditempel:
+      sekali pakai, berumur pendek (default 10 menit), hanya berwenang menukar diri
+      menjadi runner token, dan mati begitu dipakai.
+- [ ] Runner token asli **dibuat di sisi mesin lokal** hasil penukaran bootstrap
+      code, lalu ditulis ke file konfigurasi dengan permission `0600`. Token tidak
+      pernah muncul di layar, di prompt, di clipboard, maupun di riwayat shell.
+- [ ] Alasan desain ini ditulis eksplisit: perintah yang ditempel masuk ke
+      `~/.bash_history`, dan halaman Connect akan di-screenshot lalu dibagikan.
+      Dua hal itu membocorkan token permanen, tapi tidak membocorkan bootstrap code
+      yang sudah kedaluwarsa.
+- [ ] Redaksi terpusat: token, bootstrap code, dan kredensial repo di-mask di
+      seluruh log runner, MCP, dan output error — termasuk saat crash.
+- [ ] `.env` runner masuk `.gitignore` bawaan template, dan runner menolak jalan
+      kalau file konfigurasinya world-readable.
+- [ ] Token per runner dapat dicabut dan dirotasi dari UI; pencabutan langsung
+      berlaku pada poll berikutnya.
+- [ ] Peringatan eksplisit saat setup: **runner menjalankan kode dari repo yang
+      kamu tautkan, di mesin ini**. Ini batas kepercayaan yang wajar, tapi harus
+      dinyatakan, bukan diasumsikan.
+- [ ] Trust repo eksplisit sekali di sisi runner (pola "trust this folder"), dan
+      runner menolak `script_ref` di luar repo yang di-trust.
+- [ ] Catatan yang mudah terlewat: `npx playwright test` **memuat
+      `playwright.config.ts` sebelum satu test pun jalan**, dan file itu kode Node
+      biasa. Jadi memvalidasi `script_ref` saja tidak cukup — kepercayaan harus di
+      level repo, bukan level file.
+
+### 14.5 Kriteria penyatuan jadi satu Local Agent
+
+Penyatuan dikerjakan setelah semua ini terpenuhi, bukan sebelumnya:
+
+- [ ] Backend custom sudah ada dan `BackendHttpTransport` sudah terbukti jalan.
+- [ ] Seluruh akses keluar sudah lewat adapter (14.1), nol pemanggilan langsung.
+- [ ] Format token dan konfigurasi sudah sama antara `runner/` dan `mcp/` (14.2).
+- [ ] Ada jalur migrasi untuk pemasangan lama: agent baru membaca konfigurasi
+      runner lama, dan runner lama tetap didukung minimal satu versi mayor.
+- [ ] Setelah disatukan: satu perintah install, satu token, satu status koneksi,
+      dan agent dapat menjalankan test lokal tanpa melewati antrean server.
+
+---
+
+## 15. Urutan implementasi yang disarankan
 
 Sudah selesai (1–9): Requirement Traceability → Environment Management → Test Run
 Enhancement → Dashboard Trend → API dan Webhook → Playwright Local Runner →
@@ -919,22 +1078,32 @@ Berikutnya:
 13. **Playwright interaktif: bukti kegagalan lengkap** (9.3 + 9.4) — ini yang
     membuat Issue hasil AI berguna.
 14. **MCP tools write + automation** (sisa 8.2, 8.3).
-15. **Halaman "Connect your agent"** (Section 12) — begitu tool MCP-nya ada,
-    inilah yang membuatnya bisa dipakai orang lain tanpa dituntun manual.
-16. **Runner UI/UX** (Section 13) — onboarding + status + papan job (13.1–13.3).
-17. **Alur end-to-end tahap 1–5** (11.1–11.5): CSV → review → run → bukti → Issue.
-18. **Regression selektif + verifikasi** (11.6–11.8).
-19. **Playwright interaktif: codegen, UI mode, pause & inspect** (9.1, 9.2, 9.5).
-20. Sisa Runner UI/UX (13.4–13.6) + Scheduled Test Run + Administrasi (Section 5, 6).
+15. **Adapter pattern + jahitan bersama** (14.1, 14.2) — dikerjakan SEBELUM
+    Connect page dan Runner UI, karena keduanya membangun di atas kontrak ini.
+    Menunda langkah ini berarti membayarnya dua kali.
+16. **Bootstrap code + setup anti-bocor** (14.4) — prasyarat teknis untuk 12.8.
+17. **Halaman "Connect your agent"** (Section 12) termasuk bootstrap satu perintah
+    (12.8) — begitu tool MCP-nya ada, inilah yang membuatnya bisa dipakai orang
+    lain tanpa dituntun manual.
+18. **Runner UI/UX** (Section 13) — onboarding + status + papan job (13.1–13.3).
+19. **Distribusi npx + tarball self-hosted** (14.3).
+20. **Alur end-to-end tahap 1–5** (11.1–11.5): CSV → review → run → bukti → Issue.
+21. **Regression selektif + verifikasi** (11.6–11.8).
+22. **Playwright interaktif: codegen, UI mode, pause & inspect** (9.1, 9.2, 9.5).
+23. Sisa Runner UI/UX (13.4–13.6) + Scheduled Test Run + Administrasi (Section 5, 6).
+24. **Penyatuan jadi satu Local Agent** (14.5) — hanya setelah backend custom ada
+    dan kriterianya terpenuhi.
 
 Alasan urutan: repo link dulu karena MCP dan regression selection sama-sama
 bergantung padanya; bukti kegagalan sebelum AI-create-Issue karena Issue tanpa
-screenshot/trace tidak actionable; halaman Connect setelah tool MCP ada karena ia
-generator konfigurasi — tidak ada yang bisa digenerate sebelum tool-nya nyata;
-mode interaktif belakangan karena sifatnya peningkatan pengalaman authoring,
-bukan penghalang alur utama.
+screenshot/trace tidak actionable; **adapter pattern sebelum UI apa pun** karena
+Connect page dan Runner UI keduanya menempel ke kontrak koneksi — kalau kontraknya
+berubah setelah UI jadi, dua-duanya dibongkar ulang; bootstrap code sebelum 12.8
+karena tanpa itu "satu perintah" hanya bisa dicapai dengan menempelkan token
+permanen ke prompt; mode interaktif belakangan karena sifatnya peningkatan
+pengalaman authoring, bukan penghalang alur utama.
 
-## 15. Catatan keputusan teknis
+## 16. Catatan keputusan teknis
 
 - Fokus utama aplikasi adalah manual software testing untuk tim kecil.
 - Fitur Playwright ditambahkan setelah workflow manual dan reporting stabil.
@@ -957,3 +1126,24 @@ Page/Component → Hook → Service → Repository → Supabase
   hanya referensi (URL/path, branch, commit SHA).
 - **AI tidak boleh meng-approve.** Review test case dan approval Test Plan selalu
   aksi manusia; setiap aksi agent tercatat di audit log dan bisa di-override.
+- **Runner dan MCP dua proses sekarang, satu Local Agent nanti.** Pemisahan ini
+  keputusan sadar karena target deploy pertama adalah self-hosted dan backend
+  custom belum ada. Penyatuan dikerjakan setelah kriteria 14.5 terpenuhi, bukan
+  sebelumnya.
+- **Semua akses keluar wajib lewat adapter** (`TransportAdapter`,
+  `ExecutorAdapter`, `ArtifactStorageAdapter`, `AuthAdapter`, `RepoAdapter`).
+  Tidak boleh ada pemanggilan Supabase langsung di dalam `runner/` maupun `mcp/`
+  di luar adapter — inilah yang membuat backend custom bisa masuk tanpa
+  membongkar isi, dan membuat penyatuan agent nanti murah.
+- **Yang ditempel user adalah bootstrap code, bukan token.** Sekali pakai, berumur
+  pendek. Runner token asli dibuat di mesin lokal dan tidak pernah muncul di layar,
+  clipboard, prompt, atau riwayat shell.
+- **Nol runtime dependency pada runner dipertahankan sebagai keputusan keamanan**,
+  bukan estetika. Setiap dependency adalah pintu masuk supply chain ke mesin
+  developer pengguna.
+- **Kepercayaan berada di level repo, bukan level file.** `npx playwright test`
+  memuat `playwright.config.ts` — kode Node biasa — sebelum satu test pun jalan,
+  jadi memvalidasi `script_ref` saja tidak pernah cukup.
+- **Local runner tetap diperlukan bahkan kalau nanti ada cloud runner.** Browser
+  tidak bisa dijalankan dari halaman web, sehingga pengujian aplikasi di
+  `localhost`/jaringan internal selalu menuntut proses di mesin pengguna.

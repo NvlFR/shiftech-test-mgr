@@ -48,6 +48,14 @@ export const automationService = {
     if (!projectId) throw new Error('Project wajib dipilih');
     return automationRepository.listJobs(projectId);
   },
+  listJobLogs(jobId: string) {
+    if (!jobId) throw new Error('Job tidak valid');
+    return automationRepository.listJobLogs(jobId);
+  },
+  subscribeJobLogs(jobId: string, onInsert: Parameters<typeof automationRepository.subscribeJobLogs>[1]) {
+    if (!jobId) throw new Error('Job tidak valid');
+    return automationRepository.subscribeJobLogs(jobId, onInsert);
+  },
   enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts?: number; browser: AutomationBrowser; deviceProfile?: string | null }) {
     if (!input.projectId || !input.testPlanId) throw new Error('Project dan Test Plan wajib dipilih');
     const maxAttempts = input.maxAttempts ?? 1;
