@@ -137,8 +137,9 @@ pun di project yang sama.
 
 Runner mengumpulkan screenshot/video/trace/console log/network HAR/DOM snapshot
 dari output Playwright dan
-melaporkan **metadata**-nya. Jika `TM_ARTIFACT_BASE_URL` diisi, URL artifact
-dibentuk `${TM_ARTIFACT_BASE_URL}/<jobId>/<file>` (asumsi direktori itu di-serve).
+melaporkan **metadata**-nya. Seluruh bundle wajib berhasil di-upload ke bucket
+private `automation-artifacts`; job akan berstatus `blocked` dan di-retry jika
+signing atau salah satu upload gagal agar metadata parsial tidak tersimpan.
 Jika kosong, dilaporkan sebagai path `file://`. Upload binary ke Storage
 (Supabase/S3/MinIO) adalah deliverable terpisah.
 

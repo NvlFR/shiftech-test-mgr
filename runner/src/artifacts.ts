@@ -8,6 +8,15 @@ export interface CollectedArtifact {
   localPath: string;
 }
 
+const REQUIRED_FAILURE_ARTIFACT_TYPES: ReadonlySet<ReportArtifact['type']> = new Set([
+  'screenshot', 'video', 'trace', 'log', 'network', 'dom',
+]);
+
+export function hasCompleteFailureBundle(artifacts: CollectedArtifact[]): boolean {
+  const types = new Set(artifacts.map((artifact) => artifact.type));
+  return [...REQUIRED_FAILURE_ARTIFACT_TYPES].every((type) => types.has(type));
+}
+
 export function classifyArtifact(file: string): ReportArtifact['type'] | null {
   const name = file.toLowerCase();
   const ext = extname(name);

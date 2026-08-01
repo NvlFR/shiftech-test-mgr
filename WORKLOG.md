@@ -1699,3 +1699,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Viewport default Playwright adalah `1280x720` dan dapat dicatat sesuai konfigurasi project melalui `TM_PLAYWRIGHT_VIEWPORT=WIDTHxHEIGHT`; dokumentasi dan contoh environment telah diperbarui.
 - Menambahkan unit test untuk metadata lengkap, nilai nullable, dan fallback viewport. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (5/5 test file, termasuk build TypeScript), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+
+## 2026-08-01 — PW-06 upload dan penautan bundle artifact automation
+
+- Menjalankan `graphify query` sebelum menelusuri alur runner, Edge Function, Storage, dan `test_results`, lalu mengikuti kontrak bukti lengkap Section 9.3/11.4 `FEATURE_BACKLOG.md`.
+- Mengubah upload runner menjadi all-or-nothing: tidak ada fallback path lokal atau metadata parsial; kegagalan signing/upload serta bundle FAIL yang tidak memiliki screenshot, video, trace, console log, HAR, dan DOM dilaporkan sebagai `blocked` dan di-retry sesuai batas job.
+- Memperketat Edge Function `automation-artifacts` agar menolak nama file kosong/duplikat setelah sanitasi dan tetap membatasi object ke prefix project/job milik runner.
+- Menambahkan migration `schema_062_pw06_automation_artifacts.sql` untuk kolom JSONB `test_results.automation_artifacts`, validasi metadata Storage/bundle FAIL lengkap, dan penautan metadata yang sama saat laporan job final. Migration hanya dibuat dan tidak dijalankan ke target Supabase.
+- Menambahkan mapping domain frontend untuk artifact pada Test Result serta unit test kelengkapan bundle dan upload atomik. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (6/6 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.

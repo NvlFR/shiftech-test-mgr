@@ -324,6 +324,7 @@ export function mapTestResultRow(row: any): TestResult {
     status: row.status,
     executedAt: row.executed_at,
     notes: row.notes,
+    automationArtifacts: row.automation_artifacts ?? [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

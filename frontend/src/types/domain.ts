@@ -395,6 +395,7 @@ export interface TestResult {
   status: TestResultStatus;
   executedAt: string | null;
   notes: string | null;
+  automationArtifacts: AutomationArtifact[];
   createdAt: string;
   updatedAt: string;
 }

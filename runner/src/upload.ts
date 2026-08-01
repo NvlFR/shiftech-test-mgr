@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 import { extname } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import type { RunnerConfig } from './config.js';
 import type { ReportArtifact } from './api.js';
 import type { CollectedArtifact } from './artifacts.js';
@@ -15,21 +14,11 @@ const MIME: Record<string, string> = {
 
 interface SignResponse { bucket: string; uploads: { name: string; path: string; uploadUrl: string }[] }
 
-// Local-path fallback used when upload is disabled or fails. The central server
-// stores whatever URL we report; a file:// path is only useful on this machine.
-function localFallback(config: RunnerConfig, jobId: string, collected: CollectedArtifact[]): ReportArtifact[] {
-  return collected.map((a) => ({
-    type: a.type,
-    name: a.name,
-    url: config.artifactBaseUrl ? `${config.artifactBaseUrl}/${jobId}/${a.name}` : pathToFileURL(a.localPath).href,
-  }));
-}
-
 // Ask the automation-artifacts Edge Function for signed upload URLs, PUT each
 // file to Storage, and return artifact metadata pointing at the stored objects.
 export async function uploadArtifacts(config: RunnerConfig, jobId: string, collected: CollectedArtifact[]): Promise<ReportArtifact[]> {
   if (collected.length === 0) return [];
-  if (!config.artifactUpload) return localFallback(config, jobId, collected);
+  if (!config.artifactUpload) throw new Error('Upload artifact ke Supabase Storage dinonaktifkan');
 
   let sign: SignResponse;
   try {
@@ -43,16 +32,18 @@ export async function uploadArtifacts(config: RunnerConfig, jobId: string, colle
       body: JSON.stringify({ token: config.runnerToken, job_id: jobId, files: collected.map((a) => a.name) }),
     });
     if (!res.ok) {
-      log.warn('Artifact signing failed, using local paths', { status: res.status, body: (await res.text()).slice(0, 200) });
-      return localFallback(config, jobId, collected);
+      throw new Error(`Artifact signing failed (${res.status}): ${(await res.text()).slice(0, 200)}`);
     }
     sign = await res.json() as SignResponse;
   } catch (err) {
-    log.warn('Artifact signing request errored, using local paths', { error: (err as Error).message });
-    return localFallback(config, jobId, collected);
+    log.warn('Artifact signing request failed', { error: (err as Error).message });
+    throw err;
   }
 
   const target = new Map(sign.uploads.map((u) => [u.name, u]));
+  if (target.size !== collected.length || collected.some((artifact) => !target.has(artifact.name))) {
+    throw new Error('Edge Function tidak mengembalikan signed URL untuk seluruh bundle artifact');
+  }
   const out: ReportArtifact[] = [];
   for (const a of collected) {
     const t = target.get(a.name);
@@ -64,12 +55,12 @@ export async function uploadArtifacts(config: RunnerConfig, jobId: string, colle
         body: readFileSync(a.localPath),
       });
       if (!put.ok) {
-        log.warn('Artifact upload failed', { name: a.name, status: put.status });
-        continue;
+        throw new Error(`Artifact upload failed untuk ${a.name} (${put.status})`);
       }
       out.push({ type: a.type, name: a.name, url: t.path, path: t.path, bucket: sign.bucket });
     } catch (err) {
       log.warn('Artifact upload errored', { name: a.name, error: (err as Error).message });
+      throw err;
     }
   }
   return out;

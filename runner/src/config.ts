@@ -14,7 +14,6 @@ export interface RunnerConfig {
   heartbeatIntervalMs: number;
   jobTimeoutMs: number;
   artifactDir: string;
-  artifactBaseUrl: string | null;
   artifactUpload: boolean;
 }
 
@@ -145,7 +144,6 @@ export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}):
     heartbeatIntervalMs: intEnv('TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,
     jobTimeoutMs: intEnv('TM_JOB_TIMEOUT_SECONDS', 900) * 1000,
     artifactDir: resolve(process.cwd(), process.env.TM_ARTIFACT_DIR?.trim() || './artifacts'),
-    artifactBaseUrl: process.env.TM_ARTIFACT_BASE_URL?.trim().replace(/\/+$/, '') || null,
     artifactUpload: (process.env.TM_ARTIFACT_UPLOAD?.trim().toLowerCase() ?? 'true') !== 'false',
   };
 }

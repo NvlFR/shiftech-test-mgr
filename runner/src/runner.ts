@@ -3,6 +3,7 @@ import type { RunnerConfig } from './config.js';
 import { executeJob } from './executor.js';
 import { collectEnvironmentMetadata } from './environmentMetadata.js';
 import { uploadArtifacts } from './upload.js';
+import { hasCompleteFailureBundle } from './artifacts.js';
 import { log } from './logger.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
 import { prepareJobRepository } from './repositoryWorkspace.js';
@@ -68,7 +69,29 @@ export class Runner {
             artifacts: [],
           };
         }
-        const artifacts = await uploadArtifacts(this.config, job.id, outcome.artifacts);
+        let artifacts;
+        try {
+          if (outcome.result === 'fail' && !hasCompleteFailureBundle(outcome.artifacts)) {
+            throw new Error('Bundle bukti kegagalan tidak lengkap (screenshot, video, trace, console, HAR, dan DOM wajib tersedia)');
+          }
+          artifacts = await uploadArtifacts(this.config, job.id, outcome.artifacts);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Upload bundle artifact gagal';
+          const report = await this.api.report(job.id, {
+            result: 'blocked',
+            retry: job.attempt < job.max_attempts,
+            error_message: message,
+            artifacts: [],
+            environment: collectEnvironmentMetadata(
+              job,
+              { browser: job.browser ?? 'chromium', deviceProfile: job.device_profile?.trim() || null },
+              workspace?.metadata,
+              workspace?.projectDir ?? this.config.projectDir,
+            ),
+          });
+          log.error('Bundle artifact tidak dapat di-upload seluruhnya', { jobId: job.id, serverStatus: report.status, requeued: report.requeued });
+          continue;
+        }
         const environment = collectEnvironmentMetadata(
           job,
           { browser: job.browser ?? 'chromium', deviceProfile: job.device_profile?.trim() || null },

@@ -85,6 +85,11 @@ Deno.serve(async (req) => {
   if (files.length === 0) return json({ bucket: BUCKET, uploads: [] });
   if (files.length > MAX_FILES) return json({ error: "too_many_files" }, 400);
 
+  const sanitizedFiles = files.map(sanitizeRelPath);
+  if (sanitizedFiles.some((file) => !file) || new Set(sanitizedFiles).size !== files.length) {
+    return json({ error: "invalid_or_duplicate_file" }, 400);
+  }
+
   // Authenticate the runner by its token, then confirm the job belongs to it.
   const { data: runner } = await admin
     .from("automation_runners")
@@ -104,9 +109,7 @@ Deno.serve(async (req) => {
   }
 
   const uploads: { name: string; path: string; uploadUrl: string }[] = [];
-  for (const file of files) {
-    const rel = sanitizeRelPath(file);
-    if (!rel) continue;
+  for (const rel of sanitizedFiles) {
     const path = `${job.project_id}/${job.id}/${rel}`;
     const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(path, { upsert: true });
     if (error || !data) return json({ error: "sign_failed", detail: error?.message }, 500);
