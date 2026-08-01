@@ -51,6 +51,8 @@ npm start -- debug tests/smoke.spec.ts
 npm start -- watch tests
 # Rekam script dan petakan ke Test Case yang dipilih di terminal:
 npm start -- codegen https://app-under-test.example
+# Deteksi script baru di repo dan tawarkan mapping ke Test Case manual:
+npm start -- sync
 ```
 
 Subcommand `ui`, `debug`, dan `watch` berjalan langsung di `TM_PROJECT_DIR` dan
@@ -64,6 +66,12 @@ menyimpan hasil default ke `tests/<kode-test-case>.spec.ts`, dan baru memetakan
 `script_ref` setelah Codegen ditutup dengan sukses serta file hasil tersedia.
 Langkah manual terstruktur milik Test Case ditampilkan sebagai checklist terminal
 sebelum Codegen dibuka, termasuk hasil yang diharapkan bila tersedia.
+
+`sync` memindai `TM_PROJECT_DIR` untuk file `*.spec.*` dan `*.test.*`, lalu
+membandingkannya dengan `script_ref` yang sudah tersimpan. Setiap script baru
+ditawarkan satu per satu untuk dipetakan ke Test Case aktif yang belum memiliki
+automation. Direktori dependency, Git, report, hasil test, dan artifact diabaikan;
+isi source script tidak pernah dikirim ke server.
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
 terhadap repository pada Test Run. Untuk `local_path`, runner menggunakan path

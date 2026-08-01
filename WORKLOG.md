@@ -1893,3 +1893,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan unit test formatter checklist, memperbarui README runner dan checklist backlog. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (8/8 file test) dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
 - `git diff --check` lulus dan `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.575 node dan 5.314 edge; terdapat warning tujuh file konfigurasi/hasil test tanpa node, tanpa kegagalan proses.
+
+## 2026-08-01 — PW-16 sinkronisasi script ke Test Case
+
+- Menjalankan `graphify query` sebelum menelusuri alur runner codegen, mapping `automation_scripts`, dan scope Section 9.2 `FEATURE_BACKLOG.md`.
+- Menambahkan subcommand `runner sync` yang memindai `TM_PROJECT_DIR` untuk file Playwright `*.spec.*`/`*.test.*`, mengabaikan dependency, Git, report, hasil test, artifact, dan symbolic link, lalu membandingkan path relatif portabel dengan `script_ref` server.
+- Setiap script baru ditawarkan melalui prompt terminal untuk dipetakan ke Test Case aktif yang belum memiliki automation. Satu Test Case hanya dapat dipilih sekali per sinkronisasi; pemetaan memakai RPC runner-token yang sudah ada dan isi source script tidak dikirim ke server.
+- Memperbarui README runner dan checklist PW-16. Tidak menambah dependency atau migration, tidak menjalankan migration ke target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (8/8 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.583 node dan 5.336 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

@@ -14,7 +14,7 @@ export interface InteractiveInvocation {
 
 export function createInteractiveInvocation(
   config: InteractiveRunnerConfig,
-  mode: Exclude<RunnerCommand, 'start' | 'codegen'>,
+  mode: Exclude<RunnerCommand, 'start' | 'codegen' | 'sync'>,
   playwrightArgs: string[],
 ): InteractiveInvocation {
   const [command = 'npx', ...baseArgs] = config.playwrightCmd.split(' ').filter(Boolean);
@@ -25,7 +25,7 @@ export function createInteractiveInvocation(
   };
 }
 
-function spawnPlaywright(config: InteractiveRunnerConfig, mode: Exclude<RunnerCommand, 'start' | 'codegen'>, playwrightArgs: string[]): ChildProcess {
+function spawnPlaywright(config: InteractiveRunnerConfig, mode: Exclude<RunnerCommand, 'start' | 'codegen' | 'sync'>, playwrightArgs: string[]): ChildProcess {
   const invocation = createInteractiveInvocation(config, mode, playwrightArgs);
   log.info(`Starting Playwright ${mode} mode`, { projectDir: config.projectDir });
   return spawn(invocation.command, invocation.args, {
@@ -97,7 +97,7 @@ async function runWatch(config: InteractiveRunnerConfig, playwrightArgs: string[
 
 export async function runInteractiveCommand(
   config: InteractiveRunnerConfig,
-  mode: Exclude<RunnerCommand, 'start' | 'codegen'>,
+  mode: Exclude<RunnerCommand, 'start' | 'codegen' | 'sync'>,
   playwrightArgs: string[],
 ): Promise<number> {
   if (mode === 'watch') return runWatch(config, playwrightArgs);

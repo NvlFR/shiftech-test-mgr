@@ -181,8 +181,6 @@
   "179": "schema_053_mcp_test_run_workflow.sql",
   "180": "2026-07-31 — FIX-00b error TypeScript ProjectDetailPage",
   "181": "ReadService",
-  "182": "useStoredState.ts",
-  "183": "activityRoutes.ts",
   "184": "package.json",
   "185": "RepoRepository",
   "186": "schema_051_mcp_write_test_cases_plans.sql",
@@ -205,12 +203,12 @@
   "203": "react-dom",
   "204": "zod",
   "205": "cicdRepository.ts",
+  "206": "ServerConfig",
   "207": "schema_060_fix_test_runs_rls_recursion.sql",
   "208": "codegen.test.mjs",
+  "209": "api.ts",
   "210": "14. Distribusi & arsitektur Local Agent",
-  "211": "NotificationPanel.tsx",
   "213": "useActivity.ts",
   "219": "baseUrlSanityCheck.test.mjs",
-  "220": "RequirementsPage.tsx",
   "225": "schema_065_pw13_manual_test_retry.sql"
 }

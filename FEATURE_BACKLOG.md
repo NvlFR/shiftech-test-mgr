@@ -480,7 +480,7 @@ MCP tool yang menargetkan runner lokal.
       di-attach sebagai `script_ref` ke Test Case yang dipilih.
 - [x] **Record-from-test-case**: ambil `steps` manual sebuah Test Case, tampilkan
       sebagai checklist saat codegen, lalu simpan script hasil rekaman.
-- [ ] Sinkronisasi dua arah: script baru di repo terdeteksi → tawarkan mapping ke
+- [x] Sinkronisasi dua arah: script baru di repo terdeteksi → tawarkan mapping ke
       Test Case yang belum ter-automate.
 - [ ] Scaffold project Playwright baru (`runner init`) kalau tester belum punya.
 

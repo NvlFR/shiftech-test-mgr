@@ -22,7 +22,7 @@ export interface RunnerCliOptions {
   slowMoMs?: number;
 }
 
-export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen';
+export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen' | 'sync';
 
 export interface RunnerCliInput {
   command: RunnerCommand;
@@ -108,6 +108,10 @@ export function parseCliOptions(args: string[]): RunnerCliOptions {
 
 export function parseCliInput(args: string[]): RunnerCliInput {
   const command = args[0];
+  if (command === 'sync') {
+    if (args.length > 1) throw new Error('Usage: runner sync');
+    return { command, options: {}, playwrightArgs: [] };
+  }
   if (command === 'codegen') {
     const url = args[1]?.trim();
     if (!url || args.length > 2) throw new Error('Usage: runner codegen <url>');
