@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabaseClient';
-import { mapProfileRow, mapTestCaseRow, mapTestResultRow, mapTestResultStepRow } from '../helpers/mappers';
+import { mapProfileRow, mapTestCaseRow, mapTestResultRow, mapTestResultScreenshotHistoryRow, mapTestResultStepRow } from '../helpers/mappers';
 import { fetchAllRows } from './paginate';
-import type { AutomationArtifact, TestResult, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
+import type { AutomationArtifact, TestResult, TestResultScreenshotHistory, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
 
 export const testResultRepository = {
   async findById(id: string): Promise<TestResultWithDetails | null> {
@@ -37,6 +37,16 @@ export const testResultRepository = {
       return response.text();
     }
     throw new Error('Artifact hanya tersedia lokal di runner');
+  },
+
+  async findScreenshotHistory(testCaseId: string): Promise<TestResultScreenshotHistory[]> {
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('id, test_run_id, automation_artifacts, test_run:test_runs!inner(code, name, started_at)')
+      .eq('test_case_id', testCaseId)
+      .order('started_at', { referencedTable: 'test_runs', ascending: false });
+    if (error) throw error;
+    return (data ?? []).map(mapTestResultScreenshotHistoryRow).filter((entry) => entry.artifacts.length > 0);
   },
 
   // One row per test case in the plan, seeded as 'not_run' the moment a run starts —

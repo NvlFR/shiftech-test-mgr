@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785546843.3742557,
-    "ast_hash": "3ff2ffc532a383b418892e47d4436d01",
+    "mtime": 1785547252.2043939,
+    "ast_hash": "ce2813b64f0364ec2e23d9f52e4e2564",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785546953.4192393,
-    "ast_hash": "b48adea72e5a902ebb67416534490aab",
+    "mtime": 1785547253.591381,
+    "ast_hash": "1c41b1dda902296945284c4fa8ec3b1a",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785547000.1014717,
-    "ast_hash": "e412905f8c7d3851c7a28c93766c11e0",
+    "mtime": 1785547302.0379555,
+    "ast_hash": "db66e9642a5248593d6e08d099ca98ef",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -3200,13 +3200,13 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestResultDetailPage.tsx": {
-    "mtime": 1785546915.8769119,
-    "ast_hash": "709333edb651c6a62ee14d8322f6f8b5",
+    "mtime": 1785547252.840388,
+    "ast_hash": "6dd7e778624ad445a5148d545f359931",
     "semantic_hash": ""
   },
   "frontend/src/services/testResultService.ts": {
-    "mtime": 1785546915.7379146,
-    "ast_hash": "c415a10a90fa9e80f9eedb154703a284",
+    "mtime": 1785547252.514391,
+    "ast_hash": "23470541013efa8af19ae81d15de95bb",
     "semantic_hash": ""
   }
 }

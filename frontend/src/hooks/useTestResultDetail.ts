@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { testResultService } from '../services/testResultService';
-import type { TestResultWithDetails, ViewableAutomationArtifact } from '../types/domain';
+import type { ScreenshotComparison, TestResultWithDetails, ViewableAutomationArtifact } from '../types/domain';
 
 export function useTestResultDetail(testResultId: string | null) {
   const [result, setResult] = useState<TestResultWithDetails | null>(null);
   const [artifacts, setArtifacts] = useState<ViewableAutomationArtifact[]>([]);
+  const [screenshotComparison, setScreenshotComparison] = useState<ScreenshotComparison | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,10 +22,14 @@ export function useTestResultDetail(testResultId: string | null) {
       try {
         const nextResult = await testResultService.getById(testResultId);
         if (!nextResult) throw new Error('Test Result tidak ditemukan');
-        const nextArtifacts = await testResultService.prepareArtifacts(nextResult.automationArtifacts);
+        const [nextArtifacts, nextComparison] = await Promise.all([
+          testResultService.prepareArtifacts(nextResult.automationArtifacts),
+          testResultService.getScreenshotComparison(nextResult),
+        ]);
         if (active) {
           setResult(nextResult);
           setArtifacts(nextArtifacts);
+          setScreenshotComparison(nextComparison);
         }
       } catch (err) {
         if (active) setError(err instanceof Error ? err.message : 'Gagal memuat Test Result');
@@ -36,5 +41,5 @@ export function useTestResultDetail(testResultId: string | null) {
     return () => { active = false; };
   }, [testResultId]);
 
-  return { result, artifacts, loading, error };
+  return { result, artifacts, screenshotComparison, loading, error };
 }

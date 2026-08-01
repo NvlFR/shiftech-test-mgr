@@ -353,6 +353,20 @@ export interface ViewableAutomationArtifact extends AutomationArtifact {
   traceViewerUrl: string | null;
 }
 
+export interface TestResultScreenshotHistory {
+  testResultId: string;
+  testRunId: string;
+  runCode: string;
+  runName: string;
+  startedAt: string;
+  artifacts: AutomationArtifact[];
+}
+
+export interface ScreenshotComparison {
+  before: Omit<TestResultScreenshotHistory, 'artifacts'> & { artifacts: ViewableAutomationArtifact[] };
+  after: Omit<TestResultScreenshotHistory, 'artifacts'> & { artifacts: ViewableAutomationArtifact[] };
+}
+
 export interface AutomationJob {
   id: string;
   projectId: string;

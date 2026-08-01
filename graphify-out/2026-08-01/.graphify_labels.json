@@ -164,7 +164,6 @@
   "162": "2026-07-31 — SRC-08 sinkronisasi hooks-new",
   "163": "schema_044_repository_connection_test.sql",
   "164": "localRepository.test.mjs",
-  "165": "package.json",
   "166": "2026-07-31 — SRC-04 penyelesaian notification center",
   "167": "2026-07-31 — SRC-04 penyelesaian notification center",
   "168": "react-dom",
@@ -195,15 +194,10 @@
   "193": "registry.ts",
   "194": "executor.ts",
   "195": "schema_060_pw02_browser_device_jobs.sql",
-  "196": "remark-gfm",
   "197": "contract.test.ts",
   "198": "dashboardRepository.ts",
   "199": "primeicons",
   "200": "react-dom",
-  "201": "react-hook-form",
   "202": "environmentMetadata.test.mjs",
-  "203": "@supabase/supabase-js",
-  "204": "@tanstack/react-query",
-  "205": "zod",
   "207": "schema_060_fix_test_runs_rls_recursion.sql"
 }

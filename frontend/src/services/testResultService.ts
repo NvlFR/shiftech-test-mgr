@@ -1,5 +1,5 @@
 import { testResultRepository } from '../repositories/testResultRepository';
-import type { AutomationArtifact, ViewableAutomationArtifact } from '../types/domain';
+import type { AutomationArtifact, ScreenshotComparison, TestResultWithDetails, ViewableAutomationArtifact } from '../types/domain';
 
 const TEXT_ARTIFACT_TYPES = new Set<AutomationArtifact['type']>(['log', 'network', 'dom']);
 const TRACE_VIEWER_URL = import.meta.env.VITE_PLAYWRIGHT_TRACE_VIEWER_URL || 'https://trace.playwright.dev/';
@@ -39,5 +39,26 @@ export const testResultService = {
 
       return { ...artifact, viewUrl, textContent, traceViewerUrl };
     }));
+  },
+
+  async getScreenshotComparison(result: TestResultWithDetails): Promise<ScreenshotComparison | null> {
+    const currentScreenshots = result.automationArtifacts.filter((artifact) => artifact.type === 'screenshot');
+    if (currentScreenshots.length === 0) return null;
+
+    const history = await testResultRepository.findScreenshotHistory(result.testCaseId);
+    const currentIndex = history.findIndex((entry) => entry.testResultId === result.id);
+    const previous = currentIndex >= 0 ? history.slice(currentIndex + 1)[0] : undefined;
+    const current = history.find((entry) => entry.testResultId === result.id);
+    if (!previous || !current) return null;
+
+    const [beforeArtifacts, afterArtifacts] = await Promise.all([
+      this.prepareArtifacts(previous.artifacts),
+      this.prepareArtifacts(currentScreenshots),
+    ]);
+    if (!beforeArtifacts.some((artifact) => artifact.viewUrl) || !afterArtifacts.some((artifact) => artifact.viewUrl)) return null;
+    return {
+      before: { ...previous, artifacts: beforeArtifacts },
+      after: { ...current, artifacts: afterArtifacts },
+    };
   },
 };

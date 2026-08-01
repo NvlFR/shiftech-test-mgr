@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -9,7 +9,7 @@ import { Tag } from 'primereact/tag';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { TEST_RESULT_STATUS_LABEL, TEST_RESULT_STATUS_SEVERITY } from '../../helpers/statusLabels';
 import { useTestResultDetail } from '../../hooks/useTestResultDetail';
-import type { AutomationArtifact, ViewableAutomationArtifact } from '../../types/domain';
+import type { AutomationArtifact, ScreenshotComparison, ViewableAutomationArtifact } from '../../types/domain';
 
 const TAB_TYPES: Array<{ type: AutomationArtifact['type']; label: string; icon: string }> = [
   { type: 'screenshot', label: 'Screenshot', icon: 'pi pi-image' },
@@ -81,10 +81,46 @@ function EvidenceViewer({ type, artifacts }: { type: AutomationArtifact['type'];
   </div>;
 }
 
+function ScreenshotDiffViewer({ comparison }: { comparison: ScreenshotComparison | null }) {
+  const [position, setPosition] = useState(50);
+  if (!comparison) return <Message severity="info" text="Screenshot dari run sebelumnya untuk Test Case ini belum tersedia." className="w-full" />;
+
+  const beforeScreenshots = comparison.before.artifacts.filter((artifact) => artifact.viewUrl);
+  const afterScreenshots = comparison.after.artifacts.filter((artifact) => artifact.viewUrl);
+  const pairs = afterScreenshots.map((after, index) => ({
+    after,
+    before: beforeScreenshots.find((artifact) => artifact.name && artifact.name === after.name) ?? beforeScreenshots[index],
+  })).filter((pair) => pair.before);
+
+  if (pairs.length === 0) return <Message severity="info" text="Tidak ada pasangan screenshot yang dapat dibandingkan." className="w-full" />;
+
+  return <div className="flex flex-column gap-3">
+    <div className="flex justify-content-between flex-wrap gap-2 text-sm text-color-secondary">
+      <span><strong>Before:</strong> {comparison.before.runCode} — {comparison.before.runName}</span>
+      <span><strong>After:</strong> {comparison.after.runCode} — {comparison.after.runName}</span>
+    </div>
+    <label className="flex align-items-center gap-3">
+      <span>Before</span>
+      <input type="range" min="0" max="100" value={position} onChange={(event) => setPosition(Number(event.target.value))} className="flex-1" aria-label="Posisi pembanding screenshot" />
+      <span>After</span>
+    </label>
+    {pairs.map(({ before, after }, index) => <div key={`${after.path ?? after.url}-${index}`} className="border-1 surface-border border-round p-2">
+      <div className="font-medium mb-2">{after.name ?? `Screenshot ${index + 1}`}</div>
+      <div className="relative overflow-hidden border-round" style={{ lineHeight: 0 }}>
+        <img src={after.viewUrl!} alt={`After ${after.name ?? index + 1}`} className="w-full h-auto" />
+        <div className="absolute top-0 left-0 w-full h-full" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
+          <img src={before!.viewUrl!} alt={`Before ${before!.name ?? index + 1}`} className="w-full h-full" style={{ objectFit: 'fill' }} />
+        </div>
+        <div className="absolute top-0 h-full border-left-2 border-white" style={{ left: `${position}%` }} />
+      </div>
+    </div>)}
+  </div>;
+}
+
 export function TestResultDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { result, artifacts, loading, error } = useTestResultDetail(id ?? null);
+  const { result, artifacts, screenshotComparison, loading, error } = useTestResultDetail(id ?? null);
   const artifactsByType = useMemo(() => Object.fromEntries(TAB_TYPES.map(({ type }) => [type, artifacts.filter((artifact) => artifact.type === type)])), [artifacts]);
 
   return <div>
@@ -110,6 +146,9 @@ export function TestResultDetailPage() {
           {TAB_TYPES.map(({ type, label, icon }) => <TabPanel key={type} header={`${label} (${artifactsByType[type]?.length ?? 0})`} leftIcon={`${icon} mr-2`}>
             <EvidenceViewer type={type} artifacts={artifactsByType[type] ?? []} />
           </TabPanel>)}
+          <TabPanel header="Diff Screenshot" leftIcon="pi pi-clone mr-2">
+            <ScreenshotDiffViewer comparison={screenshotComparison} />
+          </TabPanel>
         </TabView>
       </Card>
     </>}

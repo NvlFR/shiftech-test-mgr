@@ -503,7 +503,7 @@ tertaut ke `test_result`:
 - [x] Halaman detail Test Result menampilkan tab bukti: Screenshot / Video / Console /
       Network / DOM, bukan sekadar daftar link.
 - [x] Embed **trace viewer** (`trace.playwright.dev` self-hosted atau link ke trace file).
-- [ ] Diff screenshot antar run (before/after) untuk regresi visual.
+- [x] Diff screenshot antar run (before/after) untuk regresi visual.
 - [ ] Live log streaming saat job `running` (runner mengirim log chunk berkala).
 
 ### 9.5 Interaktivitas terarah

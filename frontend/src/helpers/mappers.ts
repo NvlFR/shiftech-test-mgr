@@ -34,6 +34,7 @@ import type {
   TestResultStep,
   ActivityEvent,
   Notification,
+  TestResultScreenshotHistory,
 } from '../types/domain';
 import type { Attachment, IssueAttachment } from '../types/domain';
 
@@ -42,6 +43,9 @@ export function mapWebhookRow(row: any): Webhook { return { id: row.id, projectI
 export function mapWebhookDeliveryRow(row: any): WebhookDelivery { return { id: row.id, webhookId: row.webhook_id, projectId: row.project_id, event: row.event, resourceId: row.resource_id, status: row.status, attemptCount: row.attempt_count, nextAttemptAt: row.next_attempt_at, responseStatus: row.response_status ?? null, deliveredAt: row.delivered_at ?? null, lastError: row.last_error ?? null, createdAt: row.created_at }; }
 export function mapCicdPipelineRow(row: any): CicdPipeline { return { id: row.id, projectId: row.project_id, testPlanId: row.test_plan_id, name: row.name, provider: row.provider, tokenPrefix: row.token_prefix, active: row.active, lastUsedAt: row.last_used_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapAutomationRunnerRow(row: any): AutomationRunner { return { id: row.id, projectId: row.project_id, name: row.name, labels: row.labels ?? [], tokenPrefix: row.token_prefix, active: row.active, lastSeenAt: row.last_seen_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapTestResultScreenshotHistoryRow(row: any): TestResultScreenshotHistory {
+  return { testResultId: row.id, testRunId: row.test_run_id, runCode: row.test_run.code, runName: row.test_run.name, startedAt: row.test_run.started_at, artifacts: (row.automation_artifacts ?? []).filter((artifact: any) => artifact.type === 'screenshot') };
+}
 export function mapAutomationScriptRow(row: any): AutomationScript { return { id: row.id, projectId: row.project_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, runnerLabels: row.runner_labels ?? [], createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapAutomationJobRow(row: any): AutomationJob { return { id: row.id, projectId: row.project_id, testRunId: row.test_run_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, requiredLabels: row.required_labels ?? [], status: row.status, attempt: row.attempt, maxAttempts: row.max_attempts, browser: row.browser ?? 'chromium', deviceProfile: row.device_profile ?? null, runnerId: row.runner_id ?? null, artifacts: row.artifacts ?? [], errorMessage: row.error_message ?? null, queuedAt: row.queued_at, startedAt: row.started_at ?? null, finishedAt: row.finished_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
 

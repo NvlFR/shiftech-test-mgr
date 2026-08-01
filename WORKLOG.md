@@ -1753,3 +1753,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan tab Trace pada halaman detail Test Result yang meng-embed Playwright Trace Viewer memakai signed URL artefak private, serta menyediakan aksi membuka viewer di tab baru dan mengunduh file trace sebagai fallback.
 - URL dasar viewer dapat diarahkan ke deployment self-hosted melalui `VITE_PLAYWRIGHT_TRACE_VIEWER_URL`; default tetap `https://trace.playwright.dev/`. Tidak menambah dependency, migrasi, atau akses data baru; alur artefak tetap Page → Hook → Service → Repository → Supabase.
 - Verifikasi lulus: `cd frontend && npm run build`, `cd frontend && npm run lint` (hanya tujuh warning lama di luar file scope), dan `git diff --check`.
+
+## 2026-08-01 — PW-09 diff screenshot antar run
+
+- Menjalankan `graphify query` sebelum menelusuri alur Test Result dan mengikuti keputusan viewer regresi visual pada Section 9.4 `FEATURE_BACKLOG.md`.
+- Menambahkan alur Page → Hook → Service → Repository → Supabase untuk mengambil screenshot dari Test Case yang sama pada run sebelumnya, memilih run terdahulu terdekat yang memiliki screenshot, dan menyiapkan signed URL Storage.
+- Menambahkan tab Diff Screenshot pada halaman detail Test Result dengan informasi run before/after, pencocokan screenshot berdasarkan nama (fallback urutan), dan slider overlay interaktif untuk membandingkan perubahan visual.
+- Memperbarui checklist PW-09 Section 9.4. Tidak menambah dependency atau migrasi, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build`, `cd frontend && npm run lint` (hanya tujuh warning lama di luar file scope), dan `git diff --check`.
