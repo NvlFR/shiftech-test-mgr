@@ -490,9 +490,9 @@
     "semantic_hash": "c92894762082bb11510c08794caa977c"
   },
   "supabase/seed.sql": {
-    "mtime": 1784700432.648414,
-    "ast_hash": "e0c69bc53e892c4f974f523864e3dac7",
-    "semantic_hash": "e0c69bc53e892c4f974f523864e3dac7"
+    "mtime": 1785544640.353645,
+    "ast_hash": "e41b58c2b6185e2f92d2cf427b2ff5e8",
+    "semantic_hash": ""
   },
   ".agents/hooks.json": {
     "mtime": 1784737804.6107895,
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785544379.5226147,
-    "ast_hash": "b6d5a319d2298fab671b69559ff9ddee",
+    "mtime": 1785544750.7377038,
+    "ast_hash": "f5d6c773ac57cf8b9fbc738f39e7b875",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {

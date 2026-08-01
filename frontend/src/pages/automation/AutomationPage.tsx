@@ -21,7 +21,7 @@ import { useProjectRole } from '../../hooks/useProjectRole';
 import { useAuthContext } from '../../hooks/useAuth';
 import { automationService } from '../../services/automationService';
 import { testCaseService } from '../../services/testCaseService';
-import type { AutomationJob, AutomationJobStatus, AutomationRunner, AutomationRunnerSecret, AutomationScript, TestCase } from '../../types/domain';
+import type { AutomationBrowser, AutomationJob, AutomationJobStatus, AutomationRunner, AutomationRunnerSecret, AutomationScript, TestCase } from '../../types/domain';
 
 const jobSeverity: Record<AutomationJobStatus, 'info' | 'warning' | 'success' | 'danger' | 'secondary'> = {
   queued: 'info', running: 'warning', passed: 'success', failed: 'danger', canceled: 'secondary',
@@ -56,6 +56,8 @@ export function AutomationPage() {
   const [enqueueName, setEnqueueName] = useState('');
   const [enqueueEnvId, setEnqueueEnvId] = useState<string | null>(null);
   const [enqueueMaxAttempts, setEnqueueMaxAttempts] = useState(1);
+  const [enqueueBrowser, setEnqueueBrowser] = useState<AutomationBrowser>('chromium');
+  const [enqueueDeviceProfile, setEnqueueDeviceProfile] = useState<string | null>(null);
 
   useEffect(() => {
     if (!projectId) { setTestCases([]); return; }
@@ -98,8 +100,8 @@ export function AutomationPage() {
   async function enqueue() {
     if (!projectId || !enqueuePlanId) return;
     try {
-      const res = await automationService.enqueue({ projectId, testPlanId: enqueuePlanId, name: enqueueName, environmentId: enqueueEnvId, maxAttempts: enqueueMaxAttempts });
-      setEnqueueDialog(false); setEnqueuePlanId(null); setEnqueueName(''); setEnqueueEnvId(null); setEnqueueMaxAttempts(1); await reload();
+      const res = await automationService.enqueue({ projectId, testPlanId: enqueuePlanId, name: enqueueName, environmentId: enqueueEnvId, maxAttempts: enqueueMaxAttempts, browser: enqueueBrowser, deviceProfile: enqueueDeviceProfile });
+      setEnqueueDialog(false); setEnqueuePlanId(null); setEnqueueName(''); setEnqueueEnvId(null); setEnqueueMaxAttempts(1); setEnqueueBrowser('chromium'); setEnqueueDeviceProfile(null); await reload();
       toast.current?.show({ severity: 'success', summary: `Test Run ${res.runCode} dibuat`, detail: `${res.jobCount} job automation di-antrekan` });
     } catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal enqueue automation' }); }
   }
@@ -172,6 +174,8 @@ export function AutomationPage() {
           <Column field="scriptRef" header="Script" />
           <Column header="Status" body={(r: AutomationJob) => <Tag value={r.status} severity={jobSeverity[r.status]} />} />
           <Column header="Attempt" body={(r: AutomationJob) => `${r.attempt}/${r.maxAttempts}`} />
+          <Column field="browser" header="Browser" />
+          <Column field="deviceProfile" header="Device" body={(r: AutomationJob) => r.deviceProfile ?? 'Desktop'} />
           <Column header="Artifact" body={(r: AutomationJob) => r.artifacts.length ? r.artifacts.map((a, i) => <a key={i} role="button" tabIndex={0} onClick={() => openArtifact(a)} onKeyDown={(e) => { if (e.key === 'Enter') openArtifact(a); }} className="mr-2 cursor-pointer text-primary" title={a.name ?? a.type}>{a.type}</a>) : <span className="text-color-secondary">-</span>} />
           <Column field="errorMessage" header="Error" body={(r: AutomationJob) => r.errorMessage ?? '-'} />
           <Column header="Aksi" body={(r: AutomationJob) => r.status === 'queued' && canEditContent && <Button text size="small" icon="pi pi-times" tooltip="Cancel" onClick={() => cancelJob(r)} />} />
@@ -201,6 +205,8 @@ export function AutomationPage() {
         <label htmlFor="enq-plan">Test Plan<Dropdown id="enq-plan" className="w-full" value={enqueuePlanId} options={testPlans.map((p) => ({ label: `${p.code} — ${p.name}`, value: p.id }))} onChange={(e) => setEnqueuePlanId(e.value)} placeholder="Pilih test plan" /></label>
         <label htmlFor="enq-name">Nama Run (opsional)<InputText id="enq-name" className="w-full" value={enqueueName} onChange={(e) => setEnqueueName(e.target.value)} /></label>
         <label htmlFor="enq-env">Environment (opsional)<Dropdown id="enq-env" className="w-full" value={enqueueEnvId} options={environments.map((e) => ({ label: e.name, value: e.id }))} onChange={(e) => setEnqueueEnvId(e.value)} showClear placeholder="Pilih environment" /></label>
+        <label htmlFor="enq-browser">Browser<Dropdown id="enq-browser" className="w-full" value={enqueueBrowser} options={['chromium', 'firefox', 'webkit']} onChange={(e) => setEnqueueBrowser(e.value as AutomationBrowser)} /></label>
+        <label htmlFor="enq-device">Device profile<Dropdown id="enq-device" className="w-full" value={enqueueDeviceProfile} options={[{ label: 'Desktop', value: null }, { label: 'Pixel 7', value: 'Pixel 7' }, { label: 'iPhone 13', value: 'iPhone 13' }, { label: 'iPad (gen 7)', value: 'iPad (gen 7)' }]} onChange={(e) => setEnqueueDeviceProfile(e.value)} /></label>
         <label htmlFor="enq-max">Max attempts per job<InputNumber id="enq-max" className="w-full" value={enqueueMaxAttempts} onValueChange={(e) => setEnqueueMaxAttempts(e.value ?? 1)} min={1} max={10} showButtons /></label>
         <small className="text-color-secondary">Hanya Test Case yang punya mapping script yang di-antrekan. Sisanya tetap <code>not_run</code> untuk tes manual.</small>
         <Button label="Enqueue" onClick={enqueue} disabled={!enqueuePlanId} />

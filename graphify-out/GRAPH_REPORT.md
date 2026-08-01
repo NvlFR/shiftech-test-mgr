@@ -1,16 +1,16 @@
 # Graph Report - shiftech-test-mgr  (2026-08-01)
 
 ## Corpus Check
-- 388 files · ~234,953 words
+- 388 files · ~235,167 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2430 nodes · 5063 edges · 194 communities (162 shown, 32 thin omitted)
+- 2430 nodes · 5063 edges · 195 communities (163 shown, 32 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 44 edges (avg confidence: 0.66)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `595f2c08`
+- Built from commit: `5973b5eb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -158,13 +158,14 @@
 - schema_test_run_notes.sql
 - react-markdown
 - repoRepository.ts
+- zod
 - 2026-07-31 — SRC-08 sinkronisasi hooks-new
 - package.json
+- 3. Konsep Test Management
 - ProjectDataManagementPage.tsx
 - schema_045_test_run_repository_traceability.sql
 - schema_042_issue_attachment_storage_cleanup.sql
 - 4. Scope — Modul
-- 3. Konsep Test Management
 - ReadService
 - useStoredState.ts
 - useAuthContext
@@ -207,7 +208,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (194 total, 32 thin omitted)
+## Communities (195 total, 32 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.09
@@ -226,8 +227,8 @@ Cohesion: 0.07
 Nodes (44): ApiError, AutomationApi, AutomationJob, JobRepository, JobResult, ReportArtifact, ReportPayload, classify() (+36 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.19
-Nodes (10): mapAutomationJobRow(), mapAutomationRunnerRow(), mapAutomationScriptRow(), automationRepository, automationService, AutomationEnqueueResponse, AutomationJob, AutomationRunner (+2 more)
+Cohesion: 0.11
+Nodes (22): ImportCasesDialog(), ImportCasesDialogProps, CommentsPanel(), PROJECT_MEMBER_ROLE_LABEL, PROJECT_STATUS_SEVERITY, TEST_CASE_PRIORITY_SEVERITY, ImportedTestCaseRow, useComments() (+14 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.06
@@ -278,8 +279,8 @@ Cohesion: 0.08
 Nodes (37): IssueEditor(), IssueFormData, PRIORITY_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS, describeSystemEvent(), EVENT_TYPE_LABEL, STATUS_LABEL_BY_ENTITY (+29 more)
 
 ### Community 17 - "What You Must Do When Invoked"
-Cohesion: 0.29
-Nodes (5): AnalysisService, annotations, createAnalysisToolRegistrar(), limit, lookbackRuns
+Cohesion: 0.17
+Nodes (8): AnalysisService, ProjectSession, annotations, createAnalysisToolRegistrar(), limit, lookbackRuns, annotations, caseFields
 
 ### Community 18 - "3. Konsep Test Management"
 Cohesion: 0.14
@@ -326,8 +327,8 @@ Cohesion: 0.17
 Nodes (17): mapRequirementLinkRow(), mapRequirementRow(), useRequirements(), Option, PRIORITIES, RequirementsPage(), STATUSES, TYPES (+9 more)
 
 ### Community 29 - "schema_test_management_v2.sql"
-Cohesion: 0.08
-Nodes (32): byteLength(), ErrorDetail, ErrorEnvelope, errorResponse(), McpToolError, paginatedResponse(), PaginationInput, PaginationMeta (+24 more)
+Cohesion: 0.11
+Nodes (26): byteLength(), ErrorDetail, ErrorEnvelope, errorResponse(), McpToolError, paginatedResponse(), PaginationInput, PaginationMeta (+18 more)
 
 ### Community 30 - "TASKS — TestManager (shiftech-test-mgr)"
 Cohesion: 0.10
@@ -346,8 +347,8 @@ Cohesion: 0.15
 Nodes (12): ActionOutput, ProviderAction, AiProvider, fetchJson(), GeminiProvider, jsonObjectFromPrompt(), MockProvider, OpenAiProvider (+4 more)
 
 ### Community 34 - "TestRunDetailPage.tsx"
-Cohesion: 0.21
-Nodes (10): exportTestCasesToExcel(), exportTestCasesToPdf(), TEST_CASE_STATUS_SEVERITY, Option, PRIORITY_OPTIONS, ProjectTestCaseTab(), ProjectTestCaseTabProps, STATUS_OPTIONS (+2 more)
+Cohesion: 0.33
+Nodes (7): body(), readJsonBody(), RemoteTransport, RunningHttpTransport, sendJsonError(), startHttpTransport(), createMcpServer()
 
 ### Community 35 - "graphify reference: extra exports and benchmark"
 Cohesion: 0.20
@@ -362,8 +363,8 @@ Cohesion: 0.12
 Nodes (17): devDependencies, oxlint, @types/node, @types/react, @types/react-dom, typescript, vite, @vitejs/plugin-react (+9 more)
 
 ### Community 39 - "schema_auth.sql"
-Cohesion: 0.11
-Nodes (22): ImportCasesDialog(), ImportCasesDialogProps, CommentsPanel(), PROJECT_MEMBER_ROLE_LABEL, PROJECT_STATUS_SEVERITY, TEST_CASE_PRIORITY_SEVERITY, ImportedTestCaseRow, useComments() (+14 more)
+Cohesion: 0.19
+Nodes (10): mapAutomationJobRow(), mapAutomationRunnerRow(), mapAutomationScriptRow(), automationRepository, automationService, AutomationEnqueueResponse, AutomationJob, AutomationRunner (+2 more)
 
 ### Community 40 - "graphify reference: query, path, explain"
 Cohesion: 0.22
@@ -666,8 +667,12 @@ Cohesion: 0.23
 Nodes (5): normalizePageSize(), decodeCursor(), decodeResultCursor(), ReadService, createReadToolRegistrar()
 
 ### Community 139 - "config.ts"
-Cohesion: 0.10
-Nodes (22): loadConfig(), parseBoundedInteger(), parseReadonly(), parseRerunFailedMaxTests(), requiredEnv(), ServerConfig, baseEnv, body() (+14 more)
+Cohesion: 0.11
+Nodes (17): loadConfig(), parseBoundedInteger(), parseReadonly(), parseRerunFailedMaxTests(), requiredEnv(), ServerConfig, baseEnv, config (+9 more)
+
+### Community 161 - "zod"
+Cohesion: 0.21
+Nodes (10): exportTestCasesToExcel(), exportTestCasesToPdf(), TEST_CASE_STATUS_SEVERITY, Option, PRIORITY_OPTIONS, ProjectTestCaseTab(), ProjectTestCaseTabProps, STATUS_OPTIONS (+2 more)
 
 ### Community 162 - "2026-07-31 — SRC-08 sinkronisasi hooks-new"
 Cohesion: 0.14
@@ -677,6 +682,10 @@ Nodes (14): 2026-07-31 — MCP-01 fondasi MCP server stdio, 2026-07-31 — MCP-0
 Cohesion: 0.18
 Nodes (10): name, private, scripts, build, dev, lint, preview, test (+2 more)
 
+### Community 167 - "3. Konsep Test Management"
+Cohesion: 0.20
+Nodes (10): 3. Konsep Test Management, Issue, Kode Entity (Module, Test Case, Test Plan, Test Run), Module, Project, Tag, Test Case, Test Plan (+2 more)
+
 ### Community 169 - "ProjectDataManagementPage.tsx"
 Cohesion: 0.10
 Nodes (36): AdminRoute(), ProtectedRoute(), formatDate(), useAuthContext(), useAutomation(), useBackupRetention(), useCicdPipelines(), useEnvironments() (+28 more)
@@ -684,10 +693,6 @@ Nodes (36): AdminRoute(), ProtectedRoute(), formatDate(), useAuthContext(), useA
 ### Community 177 - "4. Scope — Modul"
 Cohesion: 0.13
 Nodes (15): 1. Latar Belakang & Tujuan, 2. Target Pengguna, 4.1 Projects, 4.2 Modules & Tags, 4.3 Test Cases, 4.4 Test Plans, 4.5 Test Runs & Test Results, 4.6 Issues (+7 more)
-
-### Community 180 - "3. Konsep Test Management"
-Cohesion: 0.20
-Nodes (10): 3. Konsep Test Management, Issue, Kode Entity (Module, Test Case, Test Plan, Test Run), Module, Project, Tag, Test Case, Test Plan (+2 more)
 
 ### Community 181 - "ReadService"
 Cohesion: 0.23
@@ -703,7 +708,7 @@ Nodes (7): xlsx, downloadTestCaseImportTemplate(), normalizeHeader(), normalizeP
 
 ### Community 185 - "RepoRepository"
 Cohesion: 0.13
-Nodes (12): execFileAsync, ProjectRepositoryConfig, RepoRepository, RepoRepositoryError, RepositoryConfigRow, RepositorySourceType, config, RepoDiff (+4 more)
+Nodes (13): execFileAsync, ProjectRepositoryConfig, RepoRepository, RepositoryConfigRow, RepositorySourceType, RepoDiff, RepoService, fixture() (+5 more)
 
 ### Community 189 - "integrationRepository.ts"
 Cohesion: 0.20
@@ -745,11 +750,11 @@ Nodes (4): DescribableActivityEntry, ACTIVITY_ENTITY_LABEL, ACTIVITY_ENTITY_ROUT
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `query()` connect `ProjectDataManagementPage.tsx` to `Community 8`, `graphify reference: extra exports and benchmark`, `TestRunDetailPage.tsx`, `3. Konsep Test Management`?**
+- **Why does `query()` connect `ProjectDataManagementPage.tsx` to `Community 8`, `zod`, `3. Konsep Test Management`, `graphify reference: extra exports and benchmark`?**
   _High betweenness centrality (0.147) - this node is a cross-community bridge._
 - **Why does `Uuid` connect `AttachmentPanel.tsx` to `testRunService.ts`, `Community 9`, `Community 11`?**
   _High betweenness centrality (0.141) - this node is a cross-community bridge._
-- **Why does `WriteService` connect `Community 11` to `What You Must Do When Invoked`, `schema_test_management_v2.sql`?**
+- **Why does `WriteService` connect `Community 11` to `What You Must Do When Invoked`?**
   _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **What connects `supabase`, `$schema`, `typescript` to the rest of the system?**
   _853 weakly-connected nodes found - possible documentation gaps or missing edges._

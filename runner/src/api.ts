@@ -13,6 +13,8 @@ export interface AutomationJob {
   max_attempts: number;
   headed?: boolean;
   slow_mo_ms?: number | null;
+  browser?: 'chromium' | 'firefox' | 'webkit';
+  device_profile?: string | null;
   repository: JobRepository | null;
 }
 

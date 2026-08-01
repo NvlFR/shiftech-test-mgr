@@ -18,6 +18,17 @@ export interface ExecutionMode {
   slowMoMs: number;
 }
 
+const SUPPORTED_BROWSERS = ['chromium', 'firefox', 'webkit'] as const;
+export interface ExecutionTarget { browser: (typeof SUPPORTED_BROWSERS)[number]; deviceProfile: string | null; }
+
+export function resolveExecutionTarget(job: AutomationJob): ExecutionTarget {
+  const browser = job.browser ?? 'chromium';
+  if (!SUPPORTED_BROWSERS.includes(browser)) throw new Error('browser pada job tidak didukung');
+  const deviceProfile = job.device_profile?.trim() || null;
+  if (deviceProfile && !/^[\w .+()-]{1,80}$/.test(deviceProfile)) throw new Error('device_profile pada job tidak valid');
+  return { browser, deviceProfile };
+}
+
 export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): ExecutionMode {
   const slowMoMs = job.slow_mo_ms == null ? config.slowMoMs : job.slow_mo_ms;
   if (!Number.isInteger(slowMoMs) || slowMoMs < 0) {
@@ -43,8 +54,10 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
   }
 
   let executionMode: ExecutionMode;
+  let executionTarget: ExecutionTarget;
   try {
     executionMode = resolveExecutionMode(config, job);
+    executionTarget = resolveExecutionTarget(job);
   } catch (error) {
     return Promise.resolve({ result: 'blocked', errorMessage: (error as Error).message, artifacts: [] });
   }
@@ -59,14 +72,15 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
     `--output=${jobOutputDir}`,
     '--trace=on',
     '--reporter=list',
+    `--browser=${executionTarget.browser}`,
     ...(executionMode.headed ? ['--headed'] : []),
   ];
 
   return new Promise<ExecutionOutcome>((resolve) => {
-    log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode });
+    log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode, ...executionTarget });
     const child = spawn(cmd ?? 'npx', args, {
       cwd: projectDir,
-      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs) },
+      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '' },
     });
 
     let stdout = '';

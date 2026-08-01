@@ -1,5 +1,5 @@
 import { automationRepository } from '../repositories/automationRepository';
-import type { AutomationRunnerSecret } from '../types/domain';
+import type { AutomationBrowser, AutomationRunnerSecret } from '../types/domain';
 
 function createToken(): string {
   const bytes = new Uint8Array(32);
@@ -48,11 +48,12 @@ export const automationService = {
     if (!projectId) throw new Error('Project wajib dipilih');
     return automationRepository.listJobs(projectId);
   },
-  enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts?: number }) {
+  enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts?: number; browser: AutomationBrowser; deviceProfile?: string | null }) {
     if (!input.projectId || !input.testPlanId) throw new Error('Project dan Test Plan wajib dipilih');
     const maxAttempts = input.maxAttempts ?? 1;
     if (maxAttempts < 1 || maxAttempts > 10) throw new Error('Max attempts harus antara 1 dan 10');
-    return automationRepository.enqueue({ ...input, maxAttempts });
+    if (!['chromium', 'firefox', 'webkit'].includes(input.browser)) throw new Error('Browser tidak didukung');
+    return automationRepository.enqueue({ ...input, deviceProfile: input.deviceProfile?.trim() || null, maxAttempts });
   },
   cancelJob(id: string) {
     if (!id) throw new Error('Job tidak valid');

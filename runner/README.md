@@ -97,6 +97,19 @@ export default defineConfig({
 });
 ```
 
+Job membawa `browser` (`chromium`, `firefox`, atau `webkit`) dan
+`device_profile`. Browser diterapkan langsung melalui CLI Playwright, sedangkan
+profil perangkat diteruskan sebagai `TM_PLAYWRIGHT_DEVICE_PROFILE`. Konfigurasi
+Playwright dapat mengaktifkan emulasi mobile dengan profil tersebut:
+
+```ts
+import { defineConfig, devices } from '@playwright/test';
+const profile = process.env.TM_PLAYWRIGHT_DEVICE_PROFILE;
+export default defineConfig({
+  use: profile && profile in devices ? devices[profile as keyof typeof devices] : {},
+});
+```
+
 ## Label / routing
 
 Label runner = kapabilitas yang diiklankan (mis. `chromium`, `staging`,

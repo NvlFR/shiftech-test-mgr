@@ -318,6 +318,7 @@ export interface CicdIngestResponse { runId: string; runCode: string; status: Te
 // Browsers run on a local runner (separate CLI/agent), never on the central
 // server. The server only stores mappings, enqueues jobs, and records results.
 export type AutomationJobStatus = 'queued' | 'running' | 'passed' | 'failed' | 'canceled';
+export type AutomationBrowser = 'chromium' | 'firefox' | 'webkit';
 
 export interface AutomationRunner {
   id: string;
@@ -356,6 +357,8 @@ export interface AutomationJob {
   status: AutomationJobStatus;
   attempt: number;
   maxAttempts: number;
+  browser: AutomationBrowser;
+  deviceProfile: string | null;
   runnerId: string | null;
   artifacts: AutomationArtifact[];
   errorMessage: string | null;

@@ -1620,7 +1620,18 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 
 - Menjalankan `graphify query` untuk menelusuri `HomePage`, state loading dashboard, dan layout terkait.
 - Memusatkan `ProgressSpinner` loading awal Home secara horizontal dan vertikal di area konten dengan PrimeFlex, serta menambahkan label aksesibilitas `Memuat dashboard`.
-- Verifikasi build frontend, pembaruan Graphify, rekonsiliasi migration history, dan eksekusi `supabase/seed.sql` dicatat setelah proses selesai.
+- `npm run build` frontend lulus dan `graphify update .` dijalankan setelah perubahan UI.
+- MCP `list_migrations` memastikan seluruh 61 migration lokal non-seed sudah terwakili dan tidak ada migration yang dijalankan ulang.
+- Eksekusi seed awal gagal tanpa data parsial karena trigger `handle_new_project()` membutuhkan `auth.uid()`, sementara MCP berjalan tanpa user session.
+- Memperbaiki `supabase/seed.sql` agar idempotent dan dapat dijalankan dari SQL Editor/CLI/MCP: memilih profile approved aktif, memasang claim user hanya untuk transaksi seed, lalu membuat Sample Project beserta membership melalui trigger normal.
+- Seeder yang diperbaiki berhasil dijalankan melalui MCP `execute_sql`. Verifikasi remote menemukan tepat 1 Sample Project, 1 project dengan `owner_id` terisi, dan 1 membership owner berstatus `accepted` dengan role `manager`.
+
+## 2026-08-01 — Perbaikan gagal memuat dashboard
+
+- Menjalankan `graphify query` untuk menelusuri alur `HomePage → useDashboard → dashboardService → dashboardRepository → Supabase`.
+- Log API/PostgreSQL Supabase menunjukkan count `test_runs`, `test_results`, dan `issues` gagal HTTP 500 dengan PostgreSQL `42P17: infinite recursion detected in policy for relation test_runs`; count `projects`, `test_cases`, dan `test_plans` tetap HTTP 200.
+- Akar masalah adalah policy `project access - test_runs select` dari migration structured custom runs yang melakukan subquery kembali ke tabel `test_runs` yang sedang dilindungi.
+- Menambahkan migration `schema_060_fix_test_runs_rls_recursion.sql` untuk mengganti policy select/update/delete `test_runs` agar memakai `custom_project_id` atau project dari `test_plan_id` pada row saat ini tanpa self-query.
 
 ## 2026-08-01 — MCP-17 audit tool destruktif
 
@@ -1653,3 +1664,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Executor meneruskan `--headed` ke Playwright CLI dan nilai slow-mo efektif ke proses Playwright lewat `TM_PLAYWRIGHT_SLOW_MO_MS`. Dokumentasi menjelaskan konfigurasi `use.launchOptions.slowMo` karena Playwright Test tidak menyediakan flag CLI slow-mo.
 - Menambahkan validasi integer non-negatif, dokumentasi `.env`/CLI, dan unit test precedence serta parsing opsi.
 - Verifikasi lulus: `cd runner && npm test` (3/3 test file, termasuk build TypeScript). Tidak menjalankan migration, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+
+## 2026-08-01 — PW-02 browser dan device profile automation runner
+
+- Menambahkan pilihan browser `chromium|firefox|webkit` dan device profile mobile pada dialog enqueue Automation, lengkap melalui service dan repository.
+- Menambahkan migrasi `schema_060_pw02_browser_device_jobs.sql` untuk menyimpan target pada job/Test Run dan memasukkannya ke payload polling runner; migrasi hanya dibuat, tidak dijalankan ke target Supabase.
+- Runner memvalidasi payload, menerapkan browser melalui CLI Playwright, dan meneruskan device profile melalui `TM_PLAYWRIGHT_DEVICE_PROFILE` untuk dipakai konfigurasi emulasi Playwright.
+- Verifikasi lulus: `cd runner && npm test` (3/3 test file) dan `cd frontend && npm run build`.
+- `graphify update .` sudah dijalankan dan memperbarui artifact graph, tetapi proses mengembalikan warning akhir `Operation not permitted` dari watcher sandbox. Tidak ada migrasi yang dijalankan, data dihapus, dependency ditambah, commit, atau push.
