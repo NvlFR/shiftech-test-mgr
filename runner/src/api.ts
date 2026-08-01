@@ -15,6 +15,8 @@ export interface AutomationJob {
   slow_mo_ms?: number | null;
   browser?: 'chromium' | 'firefox' | 'webkit';
   device_profile?: string | null;
+  base_url?: string | null;
+  build_version?: string | null;
   repository: JobRepository | null;
 }
 
@@ -28,6 +30,16 @@ export interface JobRepository {
 }
 
 export type JobResult = 'pass' | 'fail' | 'blocked' | 'skip';
+
+export interface EnvironmentMetadata {
+  browser: 'chromium' | 'firefox' | 'webkit';
+  browserVersion: string;
+  os: string;
+  viewport: { width: number; height: number };
+  baseUrl: string | null;
+  buildVersion: string | null;
+  commitSha: string | null;
+}
 
 export interface ReportArtifact {
   type: 'screenshot' | 'video' | 'trace' | 'log' | 'network' | 'dom';
@@ -46,6 +58,7 @@ export interface ReportPayload {
   error_message?: string;
   artifacts?: ReportArtifact[];
   repository?: LocalRepositoryMetadata;
+  environment?: EnvironmentMetadata;
 }
 
 export class ApiError extends Error {

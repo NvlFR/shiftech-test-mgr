@@ -121,6 +121,11 @@ export default defineConfig({
 });
 ```
 
+Set `TM_PLAYWRIGHT_VIEWPORT=WIDTHxHEIGHT` jika konfigurasi project mengubah
+viewport default Playwright. Setiap laporan hasil menyertakan browser dan versi
+binary browser yang dipakai Playwright, OS, viewport, base URL/build version dari Test
+Run, serta commit SHA repository yang sudah disiapkan runner.
+
 ## Label / routing
 
 Label runner = kapabilitas yang diiklankan (mis. `chromium`, `staging`,

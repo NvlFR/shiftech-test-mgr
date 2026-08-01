@@ -1,6 +1,7 @@
 import { AutomationApi, ApiError } from './api.js';
 import type { RunnerConfig } from './config.js';
 import { executeJob } from './executor.js';
+import { collectEnvironmentMetadata } from './environmentMetadata.js';
 import { uploadArtifacts } from './upload.js';
 import { log } from './logger.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
@@ -68,6 +69,12 @@ export class Runner {
           };
         }
         const artifacts = await uploadArtifacts(this.config, job.id, outcome.artifacts);
+        const environment = collectEnvironmentMetadata(
+          job,
+          { browser: job.browser ?? 'chromium', deviceProfile: job.device_profile?.trim() || null },
+          workspace?.metadata,
+          workspace?.projectDir ?? this.config.projectDir,
+        );
         const report = await this.api.report(job.id, {
           result: outcome.result,
           retry: outcome.result !== 'pass' && job.attempt < job.max_attempts,
@@ -75,6 +82,7 @@ export class Runner {
           error_message: outcome.errorMessage,
           artifacts,
           repository: workspace?.metadata,
+          environment,
         });
         log.info('Reported job', { jobId: job.id, result: outcome.result, serverStatus: report.status, requeued: report.requeued, artifacts: artifacts.length });
       } catch (err) {

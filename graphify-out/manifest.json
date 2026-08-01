@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785545752.444883,
-    "ast_hash": "ee96736a2602fade3d54df60fc64cd0c",
+    "mtime": 1785546026.5437412,
+    "ast_hash": "717456b9b011bc91fe9321f0a527f679",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785545752.584882,
-    "ast_hash": "1206779882a6c54be1ad135695a2cc00",
+    "mtime": 1785546115.185581,
+    "ast_hash": "f62373507248f428e5915fa5ed9cb34e",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1075,8 +1075,8 @@
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785545639.5487406,
-    "ast_hash": "b6775dd955ae4f7cd4c6417261087fb8",
+    "mtime": 1785545982.260854,
+    "ast_hash": "19ee3176baa71f49dc5a2696d4de8f6b",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
@@ -1105,8 +1105,8 @@
     "semantic_hash": "a53e8caa5dddc3c8978ed1a1f56f8a4b"
   },
   "runner/src/runner.ts": {
-    "mtime": 1785537344.68202,
-    "ast_hash": "26b1e77585ccf23a5d146e12ddb7d52d",
+    "mtime": 1785546182.6365101,
+    "ast_hash": "a339adf1039c0c3484d3be38605171b5",
     "semantic_hash": ""
   },
   "runner/tsconfig.json": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785545660.721558,
-    "ast_hash": "ec0569fe2b109101bec3c2e7c0216099",
+    "mtime": 1785546010.0577805,
+    "ast_hash": "1b90b12de1f38fd4916ea81aab74f4ae",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -3167,6 +3167,21 @@
   "runner/test/artifacts.test.mjs": {
     "mtime": 1785545640.75773,
     "ast_hash": "a12d4017a3ba97d19d7aa9e5ecf32c84",
+    "semantic_hash": ""
+  },
+  "runner/src/environmentMetadata.ts": {
+    "mtime": 1785546009.5207818,
+    "ast_hash": "7b82ea58ce5ccd468f9b80aa60161287",
+    "semantic_hash": ""
+  },
+  "runner/test/environmentMetadata.test.mjs": {
+    "mtime": 1785545982.8668523,
+    "ast_hash": "bdea3abfb8e3dd95857628f4ee5f164c",
+    "semantic_hash": ""
+  },
+  "supabase/schema_061_pw05_runner_environment_metadata.sql": {
+    "mtime": 1785545983.0398517,
+    "ast_hash": "e72a09c8e4468a8b5ac31362d580c852",
     "semantic_hash": ""
   }
 }

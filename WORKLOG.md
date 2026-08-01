@@ -1690,3 +1690,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperluas kontrak, klasifikasi, MIME upload, dan tipe frontend artifact dengan tipe `network` dan `dom`; menambahkan unit test klasifikasi bundle bukti.
 - Memperbarui README runner dan checklist Section 9.3 untuk enam artefak dalam scope PW-04. Metadata lingkungan tetap belum dicentang karena bukan bagian task ini.
 - Verifikasi lulus: `runner/npm test` (4 test), type-check fixture example project, dan `frontend/npm run build`. Uji Playwright failure menghasilkan trace tetapi browser lokal belum terpasang, sehingga pengujian browser penuh berhenti pada pesan executable Chromium tidak tersedia; tidak mengunduh browser karena task tidak mengizinkan kebutuhan network eksternal.
+
+## 2026-08-01 — PW-05 metadata lingkungan laporan runner
+
+- Menjalankan `graphify query` sebelum menelusuri runner dan mengikuti scope Section 9.3 serta sumber commit SHA dari Section 10 `FEATURE_BACKLOG.md`.
+- Menambahkan metadata laporan terstruktur berisi browser dan versi binary browser Playwright, OS, viewport, base URL environment, build version Test Run, dan commit SHA repository yang benar-benar disiapkan runner.
+- Menambahkan migrasi `schema_061_pw05_runner_environment_metadata.sql` untuk membawa base URL/build version pada payload poll, memvalidasi serta menyimpan metadata sebagai JSONB di automation job, dan menyalin commit SHA ke Test Run. Migrasi hanya dibuat dan tidak dijalankan ke target Supabase.
+- Viewport default Playwright adalah `1280x720` dan dapat dicatat sesuai konfigurasi project melalui `TM_PLAYWRIGHT_VIEWPORT=WIDTHxHEIGHT`; dokumentasi dan contoh environment telah diperbarui.
+- Menambahkan unit test untuk metadata lengkap, nilai nullable, dan fallback viewport. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (5/5 test file, termasuk build TypeScript), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.

@@ -495,7 +495,7 @@ tertaut ke `test_result`:
 - [x] **Console log** browser (semua level, dengan timestamp).
 - [x] **Network log** (HAR): request/response, status code, timing.
 - [x] **DOM snapshot** pada titik gagal (HTML + computed style penting).
-- [ ] Metadata lingkungan: browser + versi, OS, viewport, base URL, build version,
+- [x] Metadata lingkungan: browser + versi, OS, viewport, base URL, build version,
       commit SHA (dari Section 10).
 
 ### 9.4 Viewer di aplikasi
