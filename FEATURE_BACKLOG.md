@@ -1103,7 +1103,122 @@ karena tanpa itu "satu perintah" hanya bisa dicapai dengan menempelkan token
 permanen ke prompt; mode interaktif belakangan karena sifatnya peningkatan
 pengalaman authoring, bukan penghalang alur utama.
 
-## 16. Catatan keputusan teknis
+## 16. Verifikasi bahwa fitur benar-benar jalan
+
+**Masalahnya.** Sampai 2026-08-01, satu-satunya bukti bahwa sebuah task selesai
+adalah kode itu **ter-compile**. Compile tidak membuktikan fitur jalan. Dengan ~80
+task sudah dikerjakan agent dan hanya **2 berkas test** di seluruh frontend
+(dibanding 9 berkas / 31 test di `runner/`), ada kesenjangan verifikasi yang nyata.
+
+**Ironi yang harus diakui.** Meminta agent menulis test untuk fitur yang dibangun
+agent itu sendiri punya kelemahan mendasar: kalau agent salah paham requirement,
+ia akan menulis test yang mengassert kesalahpahamannya. Test hijau, tidak ada yang
+tertangkap. Test yang ditulis penulis kode yang sama, dalam sesi yang sama, hanya
+membuktikan "kode ini melakukan apa yang kode ini lakukan".
+
+**Yang membuatnya tetap layak.** Repo ini sudah punya **oracle independen**:
+aturan domain di `CLAUDE.md` ditulis manusia, sebelum kodenya ada. Test yang
+mengassert aturan itu bukan tautologi — kalau agent salah paham, test-nya gagal.
+
+### 16.1 Aturan main
+
+- [ ] **Task menulis test WAJIB terpisah dari task implementasi.** Bukan
+      "implementasikan X lalu tulis test-nya", melainkan task tersendiri yang
+      dikerjakan di sesi agent berbeda: "tulis test yang membuktikan invariant Y
+      dari CLAUDE.md". Interpretasi berbeda memberi peluang ketidakcocokan terlihat.
+- [ ] **Agent tidak memutuskan apakah fitur memenuhi requirement.** Itu tetap
+      keputusan manusia. Agent hanya mengunci perilaku (regression) dan
+      membuktikan invariant yang ditulis manusia.
+- [ ] **Test flaky dihapus atau dikarantina, tidak dibiarkan.** Pada loop tanpa
+      pengawasan, satu test yang kadang gagal akan melabeli task benar sebagai
+      `blocked` dan membakar token untuk retry.
+- [ ] Sumber kebenaran test invariant adalah `CLAUDE.md` dan Section 15 berkas ini,
+      bukan pembacaan agent atas kode yang sudah ada.
+
+### 16.2 Infrastruktur test (prasyarat)
+
+Belum ada di repo saat ini — harus dibangun lebih dulu.
+
+- [ ] Konfigurasi Vitest dengan environment DOM (`jsdom` atau `happy-dom`) dan
+      `@testing-library/react` di `frontend/`.
+- [ ] Utilitas test bersama: factory data domain (Project, TestCase, TestPlan,
+      TestRun, TestResult, Issue) dan mock Supabase client yang dipakai seluruh test.
+- [ ] Skrip `npm run test` mencakup seluruh berkas test, dan `npm run test:coverage`
+      untuk melihat area yang belum tersentuh.
+- [ ] Konvensi penamaan dan lokasi berkas test dicatat di `AGENTS.md`.
+
+### 16.3 Tingkat 1 — Test invariant domain (nilai tertinggi)
+
+Setiap aturan di `CLAUDE.md` menjadi test eksekutabel di level service, dengan
+repository di-mock. Inilah yang paling layak masuk gate.
+
+- [ ] `test_cases` dan `test_plan_cases` tidak pernah menyimpan kolom hasil.
+- [ ] Re-run selalu membuat Test Run baru, tidak pernah menimpa run sebelumnya.
+- [ ] Summary/progress Test Run selalu dihitung on-the-fly, tidak pernah disimpan
+      sebagai kolom.
+- [ ] Status Test Run `completed` hanya berubah lewat aksi eksplisit, tidak otomatis.
+- [ ] Issue hanya dapat dibuat dari Test Result berstatus FAIL, dan relasinya 1:many.
+- [ ] Tester pada Test Result harus user terdaftar (`profiles`), bukan teks bebas.
+- [ ] User `pending` tidak dapat mengakses modul apa pun.
+- [ ] AI/agent tidak dapat meng-approve test case maupun Test Plan.
+- [ ] Test case hasil AI berstatus draft sampai disetujui manusia.
+- [ ] Mapping row Supabase (`snake_case`) ↔ domain (`camelCase`) bolak-balik utuh.
+
+### 16.4 Tingkat 2 — Unit test logika murni (murah, nilai nyata)
+
+- [ ] `helpers/mappers.ts` — seluruh mapper row↔domain.
+- [ ] `helpers/dateFormatter.ts`, `helpers/statusLabels.ts`.
+- [ ] Validasi di service: input kosong, panjang berlebih, enum tidak dikenal.
+- [ ] Logika filter dan sorting yang dipakai halaman list.
+- [ ] Pembentukan kode entity otomatis (MOD/TC/TP/TR-####).
+
+### 16.5 Tingkat 3 — Component test (terbatas, hanya alur kritis)
+
+Hanya alur yang bila rusak menghasilkan **data salah**, bukan sekadar tampilan
+kurang rapi. Mocking Supabase mahal dan rapuh; jangan diperluas tanpa alasan.
+
+- [ ] Halaman review batch test case AI: approve/reject/edit.
+- [ ] Alur approval Test Plan.
+- [ ] Pembuatan Issue dari Test Result FAIL.
+- [ ] Pencatatan Test Result pada Test Run.
+
+### 16.6 Tingkat 4 — Smoke & E2E (di luar gate per-task)
+
+- [ ] **Smoke test** (`scripts/codex-loop/smoke.sh`): build, jalankan preview,
+      muat aplikasi, pastikan tidak ada error runtime pada boot. Ini satu-satunya
+      lapis yang membuktikan aplikasi benar-benar JALAN, bukan sekadar ter-compile.
+- [ ] E2E Playwright untuk alur utama, dijalankan **per batch, bukan per task** —
+      tiap task akan butuh boot aplikasi dan reset database, terlalu lambat dan
+      terlalu rapuh untuk gate.
+- [ ] Seed data deterministik untuk E2E, terpisah dari data pengembangan.
+
+### 16.7 Audit fitur yang sudah terlanjur dibangun
+
+Sekitar 80 task sudah selesai tanpa verifikasi selain compile. Ini utang, dan
+harus dibayar sebagai pekerjaan tersendiri.
+
+- [ ] Inventarisasi fitur yang sudah diklaim selesai, urut berdasarkan risiko
+      (yang menyentuh data dan RBAC lebih dulu).
+- [ ] Untuk tiap fitur berisiko tinggi: tulis test invariant, lalu perbaiki bila
+      test-nya gagal.
+- [ ] Bersihkan artefak yang tidak terpakai. Per 2026-08-01 ditemukan 4 hook
+      yatim yang tidak pernah diimpor siapa pun: `useModules`,
+      `useProjectBreadcrumbItems`, `useStoredState`, `useTabQueryParam`.
+      Pakai, atau hapus.
+- [ ] Daftar smoke test manual yang **tetap harus dijalankan manusia** sebelum
+      rilis: login Google, approval user pending, alur project → test case →
+      plan → run → result → issue, import/export Excel, upload attachment.
+
+### 16.8 Endgame — dogfooding
+
+- [ ] Setelah produk matang, E2E TestManager dijalankan memakai TestManager
+      sendiri: test case tersimpan di aplikasi, dieksekusi Local Runner sendiri.
+- [ ] Jangan dikerjakan sekarang: bila aplikasi dan alat ujinya rusak bersamaan,
+      tidak ada cara membedakan mana yang salah.
+
+---
+
+## 17. Catatan keputusan teknis
 
 - Fokus utama aplikasi adalah manual software testing untuk tim kecil.
 - Fitur Playwright ditambahkan setelah workflow manual dan reporting stabil.

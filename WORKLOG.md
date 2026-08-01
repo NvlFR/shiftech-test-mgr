@@ -1,5 +1,86 @@
 # Worklog
 
+## 2026-08-01 — Gate berlapis + Section 16 verifikasi fitur
+
+**Audit kondisi testing:**
+
+- Frontend hanya punya 2 berkas test / 7 test untuk ~80 task fitur, dibanding
+  `runner/` yang punya 9 berkas / 31 test dan `supabase/functions` 2 contract test.
+- Tidak ditemukan penanda TODO/FIXME/not-implemented sama sekali di frontend,
+  dan 7 test yang ada lolos. Namun ini bukti lemah: halusinasi agent justru
+  berbentuk kode yang tampak lengkap.
+- Ditemukan 4 hook yatim yang tidak pernah diimpor siapa pun: `useModules`,
+  `useProjectBreadcrumbItems`, `useStoredState`, `useTabQueryParam`.
+- Belum ada `jsdom`/`happy-dom`, `@testing-library/react`, maupun Playwright di
+  frontend, sehingga component test dan E2E belum mungkin dijalankan.
+- Kesimpulan jujur: tidak ada bukti kuat fitur rusak, tapi juga tidak ada bukti
+  fitur jalan — karena tidak ada satu pun alat yang benar-benar menjalankannya.
+
+**`run.sh` — gate diperluas dari 2 menjadi 6 lapis:**
+
+1. Ada perubahan nyata — `completed` tanpa perubahan berkas ditolak.
+2. Klaim jujur — berkas pada `files_changed` diverifikasi ke `git diff`.
+3. Tanpa lubang baru — TODO/FIXME/not-implemented pada berkas yang diubah ditolak.
+4. Tipe — jumlah error `tsc` tidak boleh naik (sudah ada sebelumnya).
+5. Test — jumlah test gagal tidak boleh naik, DAN jumlah test tidak boleh
+   berkurang (mencegah test dihapus/di-skip agar hijau).
+6. Build + smoke — `smoke.sh` opsional dijalankan setelah build hijau untuk
+   membuktikan aplikasi benar-benar boot; dilewati bila skrip belum ada.
+
+- Env baru: `CODEX_LOOP_GATE_TEST`, `CODEX_LOOP_GATE_SMOKE`.
+- Parser jumlah test diverifikasi terhadap output vitest nyata (gagal=0 total=7).
+
+**FEATURE_BACKLOG.md Section 16 baru — "Verifikasi bahwa fitur benar-benar jalan":**
+
+- 16.1 aturan main, 16.2 infrastruktur, 16.3 test invariant domain,
+  16.4 unit test logika murni, 16.5 component test terbatas, 16.6 smoke & E2E,
+  16.7 audit utang test, 16.8 endgame dogfooding. Catatan keputusan teknis
+  bergeser 16 → 17.
+- Keputusan yang ditulis eksplisit: **task menulis test wajib terpisah dari task
+  implementasi** dan dikerjakan di sesi agent berbeda. Alasannya, test yang
+  ditulis penulis kode yang sama dalam sesi yang sama hanya membuktikan
+  tautologi — kalau agent salah paham requirement, test-nya ikut salah.
+- Oracle independen yang dipakai adalah aturan domain di `CLAUDE.md`, karena
+  ditulis manusia sebelum kodenya ada.
+- E2E Playwright sengaja TIDAK masuk gate per-task: butuh boot aplikasi dan reset
+  database tiap task, terlalu lambat dan rapuh. Dijalankan per batch.
+
+**queue.md — Blok M (15 task) disisipkan di posisi paling depan:**
+
+- TEST-01/02 infrastruktur, TEST-03..06 invariant domain, TEST-07..09 unit test,
+  TEST-10 `smoke.sh`, TEST-11/12 component test terbatas, TEST-13 audit hook
+  yatim, TEST-14 inventaris utang test, TEST-15 daftar smoke manual.
+- Ditaruh paling depan karena lapis 5 dan 6 gate baru tidak punya arti sebelum
+  infrastruktur test ada. Antrean 52 → 67 task.
+
+
+## 2026-08-01 — Pemulihan setelah mati listrik + commit/push otomatis
+
+**Pemeriksaan pasca mati listrik (PC mati ~03:48):**
+
+- Loop sempat menyelesaikan 6 task (E2E-07 s/d E2E-12), semuanya ter-commit.
+- Task ke-7 (E2E-13) mati ~40 detik setelah mulai; `session.log`-nya 0 byte,
+  Codex belum sempat menulis apa pun.
+- Tidak ada kerusakan: working tree bersih, E2E-13 tetap berada di posisi teratas
+  Antrean (tidak hilang, tidak terduplikasi), `tsc` 0 error, `npm run build` hijau,
+  test runner 31/31 lolos. Antrean/Selesai/Diblokir = 52/81/1.
+- Penyebab selamatnya: `move_task` baru dipanggil SETELAH Codex selesai, sehingga
+  task yang terpotong tidak pernah dipindahkan; ditambah auto-commit per task.
+
+**Perubahan `run.sh`:**
+
+- Pesan commit `codex-loop:` diganti menjadi `agent-task <N>:`.
+- `<N>` dihitung dari riwayat git (`git log -E --grep='^(codex-loop|agent-task)'`),
+  bukan dari counter sesi, supaya penomoran berlanjut setelah restart/mati mendadak
+  dan tidak pernah terulang. Commit berikutnya = `agent-task 81`.
+- Push otomatis tiap 10 task selesai (`--push-every N`, `--no-push`), plus push
+  terakhir saat loop berakhir agar tidak ada commit tertinggal di lokal.
+- Kegagalan push tidak menghentikan loop — commit tetap aman di lokal, dan
+  notifikasi ⚠️ dikirim ke Telegram.
+- Diedit langsung pada `run.sh` karena driver sedang tidak berjalan (diverifikasi
+  dengan `ps` setelah `pgrep` sempat memberi false positive dari command sendiri).
+
+
 ## 2026-08-01 — Notifikasi Telegram codex-loop + konvensi DataTable
 
 **Notifikasi Telegram (agar loop bisa ditinggal pergi):**

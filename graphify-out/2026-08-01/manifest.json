@@ -120,8 +120,8 @@
     "semantic_hash": "54f0d45db2ed5ff5b4baad86a54e1719"
   },
   "frontend/src/helpers/statusLabels.ts": {
-    "mtime": 1785552448.80629,
-    "ast_hash": "a6ce98c178fbbaab415a876415849680",
+    "mtime": 1785555857.5750153,
+    "ast_hash": "887592335f16f071bb6f79268bf12039",
     "semantic_hash": ""
   },
   "frontend/src/helpers/testCaseExcel.ts": {
@@ -225,8 +225,8 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/issues/IssueDetailPage.tsx": {
-    "mtime": 1785534568.886606,
-    "ast_hash": "4eec785d9cad76f3506e0f9899d0cd7d",
+    "mtime": 1785555857.7200096,
+    "ast_hash": "bb4cdbc400024b24a4a0294d4d1aa325",
     "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectDetailPage.tsx": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "frontend/src/services/issueService.ts": {
-    "mtime": 1785531509.598415,
-    "ast_hash": "e54649c607cc329bc70b57e990481cb4",
+    "mtime": 1785555857.8730035,
+    "ast_hash": "90df1e3f0687f98b90d9ea2f1592f145",
     "semantic_hash": ""
   },
   "frontend/src/services/moduleService.ts": {
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785554300.7677727,
-    "ast_hash": "53ca1fbc39f59ac32fb9e253444435ab",
+    "mtime": 1785555857.4250212,
+    "ast_hash": "0d112241f8688c7c4945af8d8e30d58c",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785555589.6508508,
-    "ast_hash": "f9cebc62370614e1cd4c8fb0bcf00fc7",
+    "mtime": 1785555858.311986,
+    "ast_hash": "e591522e3f3ba27b00c5dafedbaf6b90",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785555620.3936934,
-    "ast_hash": "58178231635504c64e03742d41ee12b6",
+    "mtime": 1785555915.7781172,
+    "ast_hash": "f8d8cc3783e06699dc06cea9e73fdfad",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -955,8 +955,8 @@
     "semantic_hash": "03157fb1f7f1312cfb49cdf12f916952"
   },
   "frontend/src/services/aiIssueService.ts": {
-    "mtime": 1785555525.3193152,
-    "ast_hash": "d3e4956e5e070065973dcd7483b48c5e",
+    "mtime": 1785555858.0179975,
+    "ast_hash": "1edaa2539c57752a845495cd0c7a0afb",
     "semantic_hash": ""
   },
   "frontend/src/services/aiTestCaseService.ts": {
@@ -1065,8 +1065,8 @@
     "semantic_hash": "f51c4acf355a7e45ee67783fa3d67506"
   },
   "frontend/src/components/ai/AiIssueDraftDialog.tsx": {
-    "mtime": 1785555476.8391163,
-    "ast_hash": "dc4feb186497d0534f27f9e95c4691d4",
+    "mtime": 1785555858.1639917,
+    "ast_hash": "a6244bdcb32256e1651655464b7d9233",
     "semantic_hash": ""
   },
   "runner/package.json": {
@@ -3312,6 +3312,16 @@
   "supabase/schema_073_e2e08_reviewed_test_plan.sql": {
     "mtime": 1785554431.417917,
     "ast_hash": "0873426f90f5b5842e1178ca014ce200",
+    "semantic_hash": ""
+  },
+  "frontend/src/services/issueService.test.ts": {
+    "mtime": 1785555858.4659798,
+    "ast_hash": "0254806b17335ab7a1de6940fce20deb",
+    "semantic_hash": ""
+  },
+  "supabase/schema_074_e2e12_ai_issue_draft.sql": {
+    "mtime": 1785555858.610974,
+    "ast_hash": "dd9a216bc95fcc4b7832784e31e55357",
     "semantic_hash": ""
   }
 }
