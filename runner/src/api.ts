@@ -62,6 +62,13 @@ export interface ReportPayload {
   environment?: EnvironmentMetadata;
 }
 
+export interface CodegenTestCase {
+  id: string;
+  code: string;
+  title: string;
+  script_ref: string | null;
+}
+
 export class ApiError extends Error {
   constructor(message: string, readonly status: number) {
     super(message);
@@ -118,6 +125,18 @@ export class AutomationApi {
       p_sequence: sequence,
       p_stream: stream,
       p_content: content,
+    });
+  }
+
+  listCodegenTestCases(): Promise<CodegenTestCase[]> {
+    return this.rpc('list_runner_codegen_test_cases', { p_token: this.config.runnerToken });
+  }
+
+  attachCodegenScript(testCaseId: string, scriptRef: string): Promise<{ test_case_id: string; script_ref: string }> {
+    return this.rpc('attach_runner_codegen_script', {
+      p_token: this.config.runnerToken,
+      p_test_case_id: testCaseId,
+      p_script_ref: scriptRef,
     });
   }
 }

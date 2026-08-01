@@ -22,12 +22,13 @@ export interface RunnerCliOptions {
   slowMoMs?: number;
 }
 
-export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch';
+export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen';
 
 export interface RunnerCliInput {
   command: RunnerCommand;
   options: RunnerCliOptions;
   playwrightArgs: string[];
+  codegenUrl?: string;
 }
 
 export interface InteractiveRunnerConfig {
@@ -107,6 +108,17 @@ export function parseCliOptions(args: string[]): RunnerCliOptions {
 
 export function parseCliInput(args: string[]): RunnerCliInput {
   const command = args[0];
+  if (command === 'codegen') {
+    const url = args[1]?.trim();
+    if (!url || args.length > 2) throw new Error('Usage: runner codegen <url>');
+    try {
+      const parsed = new URL(url);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error();
+    } catch {
+      throw new Error('URL codegen harus berupa URL HTTP(S) yang valid');
+    }
+    return { command, options: {}, playwrightArgs: [], codegenUrl: url };
+  }
   if (command === 'ui' || command === 'debug' || command === 'watch') {
     return { command, options: {}, playwrightArgs: args.slice(1) };
   }

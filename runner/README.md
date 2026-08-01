@@ -49,12 +49,19 @@ npm start -- ui tests/smoke.spec.ts
 npm start -- debug tests/smoke.spec.ts
 # Jalankan ulang otomatis ketika file *.spec.* / *.test.* berubah:
 npm start -- watch tests
+# Rekam script dan petakan ke Test Case yang dipilih di terminal:
+npm start -- codegen https://app-under-test.example
 ```
 
 Subcommand `ui`, `debug`, dan `watch` berjalan langsung di `TM_PROJECT_DIR` dan
 tidak melakukan polling maupun membutuhkan kredensial TestManager. `watch`
 mengabaikan perubahan pada `node_modules`, `.git`, artifact, dan output report;
 tekan Ctrl+C untuk berhenti.
+
+`codegen` membutuhkan konfigurasi TestManager yang sama dengan mode `start`.
+CLI menampilkan Test Case aktif dari proyek runner, membuka Playwright Codegen,
+menyimpan hasil default ke `tests/<kode-test-case>.spec.ts`, dan baru memetakan
+`script_ref` setelah Codegen ditutup dengan sukses serta file hasil tersedia.
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
 terhadap repository pada Test Run. Untuk `local_path`, runner menggunakan path

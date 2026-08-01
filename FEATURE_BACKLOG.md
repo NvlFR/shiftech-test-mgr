@@ -476,7 +476,7 @@ MCP tool yang menargetkan runner lokal.
 
 ### 9.2 Authoring & codegen
 
-- [ ] `runner codegen <url>` — buka Playwright codegen, hasil script langsung
+- [x] `runner codegen <url>` — buka Playwright codegen, hasil script langsung
       di-attach sebagai `script_ref` ke Test Case yang dipilih.
 - [ ] **Record-from-test-case**: ambil `steps` manual sebuah Test Case, tampilkan
       sebagai checklist saat codegen, lalu simpan script hasil rekaman.

@@ -3,9 +3,14 @@ import { loadConfig, loadInteractiveConfig, parseCliInput } from './config.js';
 import { Runner } from './runner.js';
 import { log } from './logger.js';
 import { runInteractiveCommand } from './interactive.js';
+import { runCodegen } from './codegen.js';
 
 async function main(): Promise<void> {
   const cli = parseCliInput(process.argv.slice(2));
+  if (cli.command === 'codegen') {
+    process.exitCode = await runCodegen(loadConfig(), cli.codegenUrl!);
+    return;
+  }
   if (cli.command !== 'start') {
     const exitCode = await runInteractiveCommand(loadInteractiveConfig(), cli.command, cli.playwrightArgs);
     process.exitCode = exitCode;
