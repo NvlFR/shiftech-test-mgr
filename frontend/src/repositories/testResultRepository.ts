@@ -1,9 +1,44 @@
 import { supabase } from '../config/supabaseClient';
 import { mapProfileRow, mapTestCaseRow, mapTestResultRow, mapTestResultStepRow } from '../helpers/mappers';
 import { fetchAllRows } from './paginate';
-import type { TestResult, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
+import type { AutomationArtifact, TestResult, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
 
 export const testResultRepository = {
+  async findById(id: string): Promise<TestResultWithDetails | null> {
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('*, test_case:test_cases(*), tester:profiles(*)')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return {
+      ...mapTestResultRow(data),
+      testCase: mapTestCaseRow(data.test_case),
+      tester: data.tester ? mapProfileRow(data.tester) : null,
+    };
+  },
+
+  async getArtifactSignedUrl(bucket: string, path: string): Promise<string> {
+    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 300);
+    if (error) throw error;
+    return data.signedUrl;
+  },
+
+  async getArtifactText(artifact: AutomationArtifact): Promise<string> {
+    if (artifact.bucket && artifact.path) {
+      const { data, error } = await supabase.storage.from(artifact.bucket).download(artifact.path);
+      if (error) throw error;
+      return data.text();
+    }
+    if (/^https?:\/\//.test(artifact.url)) {
+      const response = await fetch(artifact.url);
+      if (!response.ok) throw new Error(`Artifact tidak dapat dibaca (${response.status})`);
+      return response.text();
+    }
+    throw new Error('Artifact hanya tersedia lokal di runner');
+  },
+
   // One row per test case in the plan, seeded as 'not_run' the moment a run starts —
   // this is what lets the run screen show every case up front, not just the ones touched so far.
   async seedForRun(testRunId: string, testCaseIds: string[]): Promise<void> {

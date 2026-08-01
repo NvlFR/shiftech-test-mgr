@@ -347,6 +347,11 @@ export interface AutomationScript {
 
 export interface AutomationArtifact { type: 'screenshot' | 'video' | 'trace' | 'log' | 'network' | 'dom'; url: string; name?: string; path?: string; bucket?: string; }
 
+export interface ViewableAutomationArtifact extends AutomationArtifact {
+  viewUrl: string | null;
+  textContent: string | null;
+}
+
 export interface AutomationJob {
   id: string;
   projectId: string;

@@ -15,6 +15,7 @@ import { TestSuitesPage } from './pages/test-suites/TestSuitesPage';
 import { TestSuiteDetailPage } from './pages/test-suites/TestSuiteDetailPage';
 import { TestCaseDetailPage } from './pages/test-cases/TestCaseDetailPage';
 import { TestRunDetailPage } from './pages/test-runs/TestRunDetailPage';
+import { TestResultDetailPage } from './pages/test-runs/TestResultDetailPage';
 import { TestRunIssuesPage } from './pages/test-runs/TestRunIssuesPage';
 import { CustomTestRunPage } from './pages/test-runs/CustomTestRunPage';
 import { IssueDetailPage } from './pages/issues/IssueDetailPage';
@@ -53,6 +54,7 @@ function App() {
           <Route path="/test-suites/:id" element={<TestSuiteDetailPage />} />
           <Route path="/test-cases/:id" element={<TestCaseDetailPage />} />
           <Route path="/test-runs/:id" element={<TestRunDetailPage />} />
+          <Route path="/test-results/:id" element={<TestResultDetailPage />} />
           <Route path="/test-runs/:id/issues" element={<TestRunIssuesPage />} />
           <Route path="/issues/:id" element={<IssueDetailPage />} />
 

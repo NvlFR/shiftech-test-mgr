@@ -346,6 +346,11 @@ export function TestRunDetailPage() {
             );
           }}
         />
+        <Column
+          header=""
+          style={{ width: '3rem' }}
+          body={(row: TestResultWithDetails) => <Button icon="pi pi-eye" size="small" text aria-label="Lihat detail dan bukti" onClick={() => navigate(`/test-results/${row.id}`)} />}
+        />
         {(canRunTests || canManageIssues) && (
           <Column
             header=""

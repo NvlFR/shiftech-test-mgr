@@ -1708,3 +1708,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_062_pw06_automation_artifacts.sql` untuk kolom JSONB `test_results.automation_artifacts`, validasi metadata Storage/bundle FAIL lengkap, dan penautan metadata yang sama saat laporan job final. Migration hanya dibuat dan tidak dijalankan ke target Supabase.
 - Menambahkan mapping domain frontend untuk artifact pada Test Result serta unit test kelengkapan bundle dan upload atomik. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (6/6 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+
+## 2026-08-01 — PW-07 viewer bukti Test Result
+
+- Menjalankan `graphify query` sebelum menelusuri alur Test Result dan mengikuti keputusan viewer Section 9.4 serta bukti langsung Section 11.4 `FEATURE_BACKLOG.md`.
+- Menambahkan halaman detail Test Result terlindungi di `/test-results/:id`, beserta aksi lihat detail dari tabel hasil pada halaman Test Run.
+- Menambahkan tab bukti Screenshot, Video, Console, Network, dan DOM: gambar serta video diputar lewat signed URL Storage, console/network ditampilkan inline sebagai teks, dan DOM snapshot dirender dalam iframe sandbox tanpa unduh manual.
+- Menambahkan alur lengkap Page → Hook → Service → Repository → Supabase untuk mengambil detail hasil, membuat signed URL artifact private, dan membaca artifact teks; kegagalan satu artifact tidak menutup bukti lain yang masih tersedia.
+- Memperbarui checklist scope PW-07 pada Section 9.4 dan 11.4. Tidak menambah dependency atau migrasi, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm run lint` (hanya warning lama di file di luar scope), dan `git diff --check`. `graphify update .` berhasil memperbarui graph menjadi 2.494 node dan 5.185 edge.

@@ -500,7 +500,7 @@ tertaut ke `test_result`:
 
 ### 9.4 Viewer di aplikasi
 
-- [ ] Halaman detail Test Result menampilkan tab bukti: Screenshot / Video / Console /
+- [x] Halaman detail Test Result menampilkan tab bukti: Screenshot / Video / Console /
       Network / DOM, bukan sekadar daftar link.
 - [ ] Embed **trace viewer** (`trace.playwright.dev` self-hosted atau link ke trace file).
 - [ ] Diff screenshot antar run (before/after) untuk regresi visual.
@@ -652,7 +652,7 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 - [ ] Setiap `test_result` FAIL membawa bundle bukti §9.3 secara utuh (screenshot,
       video, console, network/HAR, DOM snapshot, trace).
 - [ ] Artifact tersimpan di Storage dengan retention sesuai kebijakan Section 3.
-- [ ] Bukti dapat dibuka langsung dari halaman Test Result, tanpa unduh manual.
+- [x] Bukti dapat dibuka langsung dari halaman Test Result, tanpa unduh manual.
 
 ### 11.5 Tahap 5 — AI membuat Issue
 
