@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-08-01 — TEST-15 daftar smoke test manual sebelum rilis
+
+- Menjalankan `graphify query` sebelum menelusuri autentikasi/RBAC, workflow
+  Test Management, import/export Excel, dan attachment, lalu mengikuti scope
+  Section 16.7 `FEATURE_BACKLOG.md`.
+- Menambahkan `docs/MANUAL_SMOKE.md` berisi prasyarat, langkah, hasil yang
+  diharapkan, dan tabel rekap untuk login Google, approval user pending, workflow
+  Project → Test Case → Test Plan → Test Run → Test Result → Issue, import Test
+  Case Excel, export Test Case dan laporan Test Run ke Excel, serta upload dan
+  akses attachment private.
+- Checklist menegaskan invariant manual completion Test Run, relasi Issue dari
+  hasil FAIL, pembatasan akses user pending, validasi isi workbook, dan privasi
+  attachment. Tidak mengubah kode, dependency, database, atau migration; tidak
+  menjalankan migration ke Supabase target, tidak menghapus data, tidak commit,
+  dan tidak push.
+- Verifikasi lulus: seluruh cakupan wajib ditemukan pada dokumen dan
+  `cd frontend && npm run build` berhasil (hanya warning ukuran chunk Vite yang
+  sudah ada). `graphify update .` berhasil menyinkronkan knowledge graph menjadi
+  2.783 node dan 5.655 edge; warning tujuh source tanpa node tidak menggagalkan
+  proses.
+
 ## 2026-08-01 — Gate berlapis + Section 16 verifikasi fitur
 
 **Audit kondisi testing:**
@@ -2290,3 +2311,153 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak menghapus keempat hook karena masing-masing mempunyai consumer yang jelas dan sesuai tanggung jawabnya; tidak mengubah database, dependency, atau migration, serta tidak menjalankan migration ke Supabase target.
 - Verifikasi lulus: `cd frontend && npm run build` (hanya warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run src/pages/test-plans/TestPlanDetailPage.test.tsx` (1/1 test), serta seluruh empat hook terkonfirmasi memiliki import consumer melalui `rg`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.763 node dan 5.637 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — TEST-14 inventaris utang test berbasis risiko
+
+- Menjalankan `graphify query` sebelum menelusuri klaim fitur, layer aplikasi, dan test yang tersedia, lalu memakai Section 16.7 `FEATURE_BACKLOG.md` sebagai scope audit.
+- Menambahkan `docs/TEST_DEBT.md` berisi inventaris fitur berstatus selesai yang belum memiliki test langsung, diurutkan ke P0 akses/RBAC dan mutasi data kritis, P1 integritas workflow, serta P2 reporting/UI.
+- Membedakan cakupan yang benar-benar belum diuji dari invariant, helper, component flow, MCP, runner, dan Edge Function yang sudah mempunyai bukti test agar prioritas berikutnya tidak menduplikasi test yang ada.
+- Mencatat konflik klaim authentication email/password di backlog dengan keputusan Google OAuth-only di `CLAUDE.md`, serta keterbatasan restore binary Storage yang sudah dinyatakan backlog; task ini hanya analisis dan tidak mengubah kode, test, dependency, database, atau migration.
+- Verifikasi dokumentasi dilakukan dengan mencocokkan seluruh item `[x]` pada `FEATURE_BACKLOG.md`, inventaris berkas test repo, dan pemeriksaan diff; `cd frontend && npm run build` lulus dengan warning ukuran chunk Vite yang sudah ada.
+- `graphify update .` dijalankan setelah perubahan dokumentasi untuk menyinkronkan knowledge graph.
+
+## 2026-08-01 — E2E-13 konteks kode pada detail Issue
+
+- Menjalankan `graphify query` sebelum menelusuri alur Issue dan mengikuti scope Section 11.6 serta keputusan traceability repository Section 10.5 di `FEATURE_BACKLOG.md`.
+- Menambahkan konteks kode melalui alur `IssueDetailPage` → `useIssueCodeContext` → `issueService` → `issueRepository` → Supabase, tanpa melewati layer arsitektur.
+- Konteks diturunkan dari Issue → Test Result → Test Run yang menyimpan repository, branch, dan commit SHA; file terkait diambil dari automation job terbaru untuk pasangan Test Run dan Test Case yang sama.
+- Halaman detail Issue kini menampilkan kartu repository, branch, commit, dan file terkait hanya bila Test Run mempunyai repository tertaut. Repository GitHub mendapat tautan langsung ke repo, commit, dan file pada revisi yang diuji; local path tetap ditampilkan tanpa membuat URL browser palsu.
+- Tidak menambah migration atau dependency, tidak mengakses maupun menjalankan migration ke Supabase target, dan tidak menyimpan token/kredensial repository di konteks UI.
+- Verifikasi lulus: `cd frontend && npm run build`, unit test terarah `issueService.test.ts` (12/12), dan `cd frontend && npm run lint` (delapan warning existing di luar scope).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.790 node dan 5.673 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-14 event resolved dan referensi perbaikan Issue
+
+- Menjalankan `graphify query` sebelum menelusuri alur Issue, integrasi webhook, dan schema, lalu mengikuti scope Section 11.6 `FEATURE_BACKLOG.md`.
+- Menambahkan migration idempotent `schema_075_e2e14_issue_resolution_event.sql`: field HTTPS opsional `issues.fix_reference_url`, event webhook khusus `issue.resolved` hanya pada transisi masuk ke resolved, dan dukungan Test Run custom project saat menentukan project event.
+- Menambahkan event `issue.resolved` pada tipe domain, allowlist service integrasi, serta pilihan konfigurasi webhook. Dispatcher, signing secret, dan retry yang sudah ada tetap dipakai tanpa secret baru di source/log.
+- Menyalurkan perubahan status melalui `IssueDetailPage` → `useIssueStatus` → `issueService` → `issueRepository` → Supabase. Dialog resolved menerima link commit/PR opsional, service memvalidasi URL HTTPS, dan detail Issue menampilkan referensi perbaikannya.
+- Menambahkan unit test service untuk normalisasi link HTTPS, penolakan non-HTTPS, dan preservasi referensi saat berpindah ke status selain resolved.
+- Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run test -- --run src/services/issueService.test.ts` (15/15), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), serta `cd frontend && npm run lint` (delapan warning existing di luar scope).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.797 node dan 5.686 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-15 seleksi regression empat sinyal
+
+- Menjalankan `graphify query` sebelum menelusuri alur regression dan mengikuti keputusan Section 11.7 serta traceability commit Section 10.5 `FEATURE_BACKLOG.md`.
+- Memperluas `testmanager.automation.rerun_failed` melalui layering Tool → `AutomationService` → `AutomationRepository`/`RepoService` → Supabase/repository Git agar seleksi menjadi union Test Case tertaut langsung ke Issue, satu module/tag, satu requirement, dan automation script yang path-nya terdampak commit perbaikan.
+- Menambahkan migration `schema_076_e2e15_regression_selection.sql` tanpa menjalankannya ke target. Konteks diff memakai commit terakhir yang PASS untuk Test Case dan repository yang sama, fallback ke commit run gagal, lalu commit perbaikan dari URL `/commit/<sha>` pada Issue.
+- Hasil regression selalu Test Run baru, membawa repository serta commit perbaikan, mempertahankan ambang konfirmasi manusia, dan mencatat jumlah kandidat dari diff beserta base/head pada audit tanpa patch, kredensial, atau token.
+- Menambahkan test service/repository untuk pemetaan rename path, fallback ketika referensi hanya PR, payload RPC, dan redaksi boundary existing. Dokumentasi MCP dan checklist scope diperbarui.
+- Verifikasi lulus: `cd mcp && npm test` (20/20 test file, termasuk build TypeScript) dan `cd frontend && npm run build` (warning ukuran chunk Vite existing). Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-08-01 — E2E-16 enqueue Test Run regression dan safety gate
+
+- Menjalankan `graphify query` sebelum menelusuri alur Issue resolved menuju regression dan mengikuti keputusan Section 11.7 `FEATURE_BACKLOG.md`.
+- Memastikan `testmanager.automation.rerun_failed` hanya menerima Issue resolved dengan sumber Test Result FAIL, menjalankan safety gate sebelum mutasi, dan selalu melakukan `insert` Test Run baru tanpa memperbarui run lama.
+- Memperbaiki cakupan enqueue agar seluruh Test Case aktif yang relevan dari empat sinyal E2E-15 disnapshot menjadi Test Result pada run baru, termasuk case tanpa automation script yang harus tetap tersedia untuk eksekusi manual; automation job hanya dibuat bagi case yang mempunyai mapping script.
+- Ambang aman tetap dapat dikonfigurasi melalui `TM_MCP_RERUN_FAILED_MAX_TESTS` (default 25). Jika jumlah test melampaui ambang, tidak ada run/job yang dibuat sampai anggota project approved memberikan `confirmed_by` bersama `explicit_confirmation: true`; identitas dan keputusan dicatat pada audit log.
+- Memperbarui dokumentasi MCP dan menandai dua butir E2E-16 Section 11.7 selesai. Migration tidak dijalankan ke Supabase target; tidak menghapus data, commit, push, atau mencatat secret/token.
+- Verifikasi lulus: `cd mcp && npm test` (20/20 test file, termasuk build TypeScript), `cd frontend && npm run build` (warning ukuran chunk Vite existing), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.805 node dan 5.703 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-17 verifikasi hasil regression
+
+- Menjalankan `graphify query`/`graphify path` sebelum menelusuri alur regression dan mengikuti keputusan Section 11.8 `FEATURE_BACKLOG.md`.
+- Menambahkan tool `testmanager.automation.verify_regression` melalui layering Tool → `AutomationService` → `AutomationRepository` → RPC Supabase, dengan validasi UUID pada service dan token tetap hanya berada di request body repository.
+- Menambahkan migration `schema_077_e2e17_regression_verification.sql` tanpa menjalankannya ke target. RPC hanya menerima Test Run completed yang tercatat dibuat oleh `automation.rerun_failed` untuk Issue yang sama dan hasil direct Test Case PASS/FAIL.
+- PASS mengubah Issue resolved menjadi `verified`, menyimpan FK `verified_test_run_id` ke Test Run pembuktian, dan mencatat aksi agent beserta run/result pada audit log. Detail Issue menampilkan tautan internal ke run tersebut melalui mapper dan repository yang ada.
+- FAIL membuka kembali Issue menjadi `open` dan menambah komentar atomik berisi Test Result, actual/notes, bundle artifact lama dan baru, serta hasil perbandingan. Aksi dan comment ID juga masuk audit log.
+- Menambahkan test repository, service, katalog tool, dan kontrak migration. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit/push, dan tidak mencatat secret/token.
+- Verifikasi lulus: `cd mcp && npm test` (20/20 test file), `cd frontend && npm run build` (warning ukuran chunk Vite existing), dan `git diff --check` untuk file scope.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.811 node dan 5.712 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — E2E-18 audit agent dan override manusia untuk verified
+
+- Menjalankan `graphify query` sebelum menelusuri alur verifikasi regression, audit log, dan detail Issue, lalu mengikuti keputusan Section 11.8 `FEATURE_BACKLOG.md`.
+- Menambahkan migration idempotent `schema_078_e2e18_agent_verification_audit.sql` tanpa menjalankannya ke target: `audit_logs.actor_type` membedakan aksi `human`, `agent`, dan `system`; audit MCP dengan penanda `agent_action` diklasifikasikan sebagai agent, termasuk backfill event yang sudah ada.
+- Menampilkan actor `AI Agent` beserta badge `AGENT` pada Activity Panel, melalui mapping Repository → Service → Hook → Component yang sudah ada.
+- Mempertahankan override status pada detail Issue untuk anggota yang berwenang, menambahkan keterangan eksplisit ketika Issue berstatus verified, dan membersihkan `verified_test_run_id` melalui Page → Hook → Service → Repository ketika manusia memilih status selain verified agar tautan pembuktian lama tidak tersisa.
+- Menambahkan unit test service yang membuktikan override manusia ke `open` meneruskan pembersihan tautan run pembuktian. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit/push, dan tidak mencatat secret/token.
+- Verifikasi lulus: `cd frontend && npm run test -- --run src/services/issueService.test.ts` (16/16) dan `cd frontend && npm run build` (warning ukuran chunk Vite existing).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.817 node dan 5.718 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+- Percobaan ulang gate driver: memperbarui test mapper audit agar memverifikasi `actorType` eksplisit untuk agent serta fallback human/system, lalu mengulang seluruh verifikasi E2E-18.
+
+## 2026-08-01 — E2E-19 panel siklus QA loop dashboard
+
+- Menjalankan `graphify query` dan `graphify explain/path` sebelum menelusuri dashboard, audit regression, dan keputusan Section 11.8 `FEATURE_BACKLOG.md`.
+- Menambahkan panel "Siklus QA loop" pada dashboard reporting yang menampilkan jumlah Issue unik masuk selective regression, jumlah terverifikasi, jumlah reopen, dan reopen rate (Issue unik reopened dibagi Issue unik masuk loop).
+- Data mengalir lengkap melalui Page → Hook existing → `dashboardReportService` → `dashboardReportRepository` → Supabase. Repository membaca audit `mcp.automation.rerun_failed` dan `mcp.automation.verify_regression`, lalu mapper mengubah row ke domain camelCase.
+- Memperluas query dashboard agar custom selective regression Test Run (tanpa Test Plan) ikut tercakup, serta menerapkan filter dashboard yang sama pada metrik QA loop.
+- Menambahkan unit test untuk mapping audit/custom run, deduplikasi Issue, pembatasan berdasarkan run terfilter, denominator reopen rate, dan kondisi kosong. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak commit/push, dan tidak mencatat secret/token.
+- Verifikasi lulus: `cd frontend && npm run test -- --run src/services/dashboardReportService.test.ts src/helpers/mappers.test.ts` (45/45), `cd frontend && npm run build` (warning ukuran chunk Vite existing), dan `git diff --check`.
+- `graphify update .` dicoba tetapi watcher ditolak sandbox (`Operation not permitted`); fallback resmi `graphify extract . --code-only` berhasil menyinkronkan AST graph menjadi 2.822 node dan 5.241 edge tanpa API atau secret.
+- Pada percobaan ulang verifikasi driver, `graphify update .` berhasil penuh dan menyinkronkan knowledge graph menjadi 2.825 node dan 5.733 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+## 2026-08-01 — ADM-01 Scheduled Test Run
+
+- Menambahkan migration `schema_079_adm01_scheduled_test_runs.sql`: tabel jadwal per Test Plan, RLS project-scoped, rekonsiliasi due schedule berbasis `pg_cron` tiap menit, pembuatan snapshot Test Run/results, dan enqueue automation job tanpa menjalankan browser di server.
+- Jadwal yang terlewat saat sistem/runner offline hanya menghasilkan satu catch-up run; job tetap queued dan diambil Local Runner saat online.
+- Menambahkan domain mapper, repository, service, hook, serta tab Schedule pada detail Test Plan untuk waktu mulai, interval hari, environment, browser/device, retry, pause-on-failure, status aktif, dan penghapusan jadwal.
+- Menandai Scheduled Test Run selesai pada Section 5 `FEATURE_BACKLOG.md`.
+- Verifikasi: `cd frontend && npm run build` lulus. Migration tidak dijalankan ke Supabase target sesuai instruksi.
+- `graphify update .` sudah dicoba tetapi gagal pada watcher dengan `Operation not permitted`; tidak ada source code yang gagal dibangun akibat warning ini.
+- Percobaan ulang gate driver: daftar laporan dibatasi ke berkas ADM-01 yang benar-benar berubah menurut Git. Audit tambahan memperbaiki perhitungan catch-up agar tidak melewati interval berikutnya, menjaga `created_by` jadwal selalu valid untuk FK job, memvalidasi kesamaan project pada Test Plan/environment, dan membuat policy migration aman dijalankan ulang.
+- Verifikasi ulang lulus: `cd frontend && npm test -- --run src/helpers/mappers.test.ts` (44/44), `cd frontend && npm run build`, dan `cd frontend && npm run lint` (delapan warning existing di luar scope).
+- `graphify update .` kemudian berhasil menyinkronkan knowledge graph menjadi 2.838 node dan 5.765 edge; warning tujuh source tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — ADM-02 pembatasan eksekusi dan secret management runner
+
+- Menjalankan `graphify query` sebelum menelusuri runner dan mengikuti keputusan keamanan Section 5, 14.4, 16, dan 17 `FEATURE_BACKLOG.md`.
+- Menambahkan trust repository fail-closed melalui `TM_TRUSTED_REPOSITORIES`; root Git harus dipercaya eksplisit, sedangkan `script_ref` absolut, traversal, file hilang, dan symlink keluar workspace ditolak sebelum Playwright dijalankan.
+- Membatasi executable runner pada invocation Playwright resmi yang diizinkan dan menolak command/wrapper arbitrer, termasuk mode polling dan interaktif.
+- Memisahkan credential runner/repository dari environment child Playwright, mewajibkan permission `0600` untuk `.env` pada POSIX, serta meredaksi nilai environment sensitif dan bentuk Base64-nya pada logger, live output lintas chunk, artifact log, error, dan crash fatal.
+- Memperbarui `.env.example`, README runner, fixture test repository, dan checklist ADM-02. Tidak menjalankan migration, menghapus data, commit, push, atau mencatat nilai secret/token.
+- Verifikasi: `cd runner && npm test` lulus (9/9 berkas test, termasuk build TypeScript).
+
+## 2026-08-01 — ADM-02 percobaan ulang gate verifikasi
+
+- Menutup jalur environment secret pada mode Playwright `ui`, `debug`, `watch`, dan `codegen`; seluruh child process kini memakai environment tersaring dan parser allowlist yang sama dengan job polling.
+- Menerapkan trust root repository yang sama sebelum mode interaktif maupun codegen memuat konfigurasi Playwright.
+- Menambahkan test keamanan khusus untuk exact repository trust, penolakan symlink `script_ref` keluar repo, penolakan shell injection pada command, redaksi secret lintas chunk, serta pemisahan secret dari child environment.
+- Verifikasi ulang lulus: `cd runner && npm test` (10/10 berkas test, termasuk build TypeScript).
+- Sanity check `cd frontend && npm run build` lulus dengan warning ukuran chunk existing; `graphify update .` berhasil menyinkronkan graph menjadi 2.857 node dan 5.840 edge.
+## 2026-08-01 — ADM-03 permission granular per project
+
+- Menambahkan migration manual `schema_080_adm03_granular_permissions.sql` (tidak dijalankan ke Supabase target): kolom JSONB permission per anggota, preset berdasarkan role, helper RLS `has_project_permission`, serta kompatibilitas helper policy project yang sudah ada.
+- Menambahkan domain, mapper, repository, service, dan hook untuk membaca serta mengubah permission `view`, `create`, `update`, `delete`, `import`, `export`, dan `run_automation` tanpa melompati layering.
+- Menambahkan editor permission pada tab Anggota Project. Perubahan role mereset permission ke preset role; kombinasi permission tanpa `view` ditolak service.
+- Mengaktifkan gate UI terpisah untuk import/export Test Case, export laporan dashboard, dan halaman/aksi automation. Admin tetap memiliki seluruh permission.
+- Verifikasi lulus: `cd frontend && npm run build`; `cd frontend && npm run test -- --run` (15 file, 139 test). Build hanya memberi warning ukuran chunk yang sudah ada.
+- Migration belum dan tidak dijalankan ke Supabase target sesuai instruksi task.
+
+## 2026-08-01 — ADM-03 percobaan ulang gate verifikasi
+
+- Memisahkan gate UI `create` dan `update` pada daftar Test Plan dan Test Case; permission membuat tidak lagi membuka aksi edit, dan permission mengubah tidak lagi membuka tombol membuat.
+- Memperketat kontrak JSONB permission pada migration agar tepat tujuh key boolean yang didukung, memisahkan policy RLS create/update untuk entity utama, dan menambahkan enforcement `run_automation` pada insert/update job untuk caller frontend terautentikasi tanpa mengganggu runner non-user.
+- Migration tetap hanya berupa file SQL dan tidak dijalankan ke Supabase target.
+- Verifikasi ulang lulus: `cd frontend && npm run build` dan `cd frontend && npm run test -- --run` (15 file, 139 test). Build hanya memberi warning ukuran chunk existing.
+
+## 2026-08-01 — ADM-04 Team management
+
+- Menambahkan migration manual `schema_081_adm04_team_management.sql` (tidak dijalankan ke Supabase target): tabel `teams`, `team_members`, dan `project_teams`, RLS admin/project-manager, serta perluasan `has_project_permission` agar permission direct dan team digabung secara OR.
+- Menambahkan layer lengkap Team dan akses Team per Project: domain, mapper, repository, service, hook, halaman admin Team Management, halaman pengaturan akses team Project, route, dan menu.
+- Role akses team memakai preset permission project ADM-03; penghapusan team melepaskan seluruh akses Project melalui foreign key cascade.
+- Verifikasi lulus: `cd frontend && npm test -- --run` (15 file, 141 test), `cd frontend && npm run build` (warning ukuran chunk Vite existing), dan `git diff --check` untuk seluruh file ADM-04. Migration tidak dijalankan, data tidak dihapus, serta tidak ada commit/push atau secret/token yang dicatat.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.900 node dan 5.958 edge; warning tujuh source tanpa node tidak menggagalkan update.
+
+## 2026-08-01 — ADM-04 Team management (perbaikan gate verifikasi)
+
+- Mengaudit ulang scope ADM-04 melalui Graphify dan Section 6 `FEATURE_BACKLOG.md`, tanpa menjalankan migration ke Supabase target.
+- Menutup celah akses user yang hanya menjadi anggota Project melalui Team: migration kini menyediakan `get_my_project_access` yang menggabungkan role dan permission direct + seluruh Team, dan repository frontend mengonsumsi effective access tersebut.
+- Menyamakan otorisasi pengelolaan Project untuk Team ber-role manager, membuat penggantian anggota Team atomik melalui RPC `set_team_members`, serta menambahkan perubahan role/preset permission akses Team yang sudah terpasang pada Project.
+- Menambahkan penanganan error UI dan unit test service untuk normalisasi input, deduplikasi anggota, preset role saat menambah Team, dan perubahan role akses Team.
+- Verifikasi lulus: `cd frontend && npm run test -- --run src/services/teamService.test.ts src/helpers/mappers.test.ts` (2 file, 51 test), `cd frontend && npm run build`, dan pemeriksaan diff scope ADM-04. Build hanya memberi warning ukuran chunk Vite yang sudah ada; tidak ada migration target, penghapusan data, commit, push, atau secret/token.
+
+## 2026-08-01 — ADM-05 Activity feed per Project
+
+- Menelusuri alur audit log dan Project melalui Graphify serta mengikuti scope Section 6 `FEATURE_BACKLOG.md`.
+- Menuntaskan timeline Activity pada detail Project memakai `audit_logs` yang sudah ada melalui layer repository → service → hook → component; tidak menambah atau menjalankan migration.
+- Menambahkan kontrak URL tab `activity`, state loading/error/retry, identitas actor human/agent/system, dan ringkasan perubahan status dari snapshot `old_data`/`new_data` audit.
+- Service memvalidasi Project dan membatasi ukuran feed 1–100 entri; mapper dan unit test diperbarui untuk payload audit.
+- Verifikasi lulus: `cd frontend && npm run build`; `cd frontend && npm test -- --run src/helpers/mappers.test.ts` (46/46); `cd frontend && npm run lint` (delapan warning existing di luar scope).
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.906 node dan 5.968 edge; warning tujuh source tanpa node tidak menggagalkan update.

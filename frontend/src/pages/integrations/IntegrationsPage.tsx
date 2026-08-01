@@ -16,7 +16,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import type { ApiTokenScope, WebhookEvent } from '../../types/domain';
 
 const scopeOptions: { label: string; value: ApiTokenScope }[] = [{ label: 'Baca project', value: 'read:project' }, { label: 'Tulis Test Run', value: 'write:test-runs' }, { label: 'Tulis Test Result', value: 'write:test-results' }, { label: 'Tulis Issue', value: 'write:issues' }];
-const eventOptions: { label: string; value: WebhookEvent }[] = ['test_run.created', 'test_run.updated', 'test_result.updated', 'issue.created', 'issue.updated'].map((value) => ({ label: value, value: value as WebhookEvent }));
+const eventOptions: { label: string; value: WebhookEvent }[] = ['test_run.created', 'test_run.updated', 'test_result.updated', 'issue.created', 'issue.updated', 'issue.resolved'].map((value) => ({ label: value, value: value as WebhookEvent }));
 
 export function IntegrationsPage() {
   const { id } = useParams<{ id: string }>(); const { canManageSettings, loading: roleLoading } = useProjectRole(id); const { tokens, webhooks, deliveries, loading, reload } = useIntegrations(id);

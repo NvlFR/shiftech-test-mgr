@@ -15,6 +15,7 @@ import { Toast } from 'primereact/toast';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputSwitch } from 'primereact/inputswitch';
+import { Checkbox } from 'primereact/checkbox';
 import { RowActionsMenu } from '../../components/ui/RowActionsMenu';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
@@ -28,7 +29,7 @@ import { testRoleService } from '../../services/testRoleService';
 import { useEnvironments } from '../../hooks/useEnvironments';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { useProjectRepositories } from '../../hooks/useProjectRepositories';
-import type { Project, Module, Tag as TagEntity, TestRole, Profile, ProjectMemberWithProfile, ProjectMemberRole, ProjectVisibility, Environment, ProjectRepository, ProjectRepositorySourceType } from '../../types/domain';
+import type { Project, Module, Tag as TagEntity, TestRole, Profile, ProjectMemberWithProfile, ProjectMemberRole, ProjectPermission, ProjectPermissions, ProjectVisibility, Environment, ProjectRepository, ProjectRepositorySourceType } from '../../types/domain';
 import { PROJECT_MEMBER_ROLE_LABEL } from '../../helpers/statusLabels';
 import { Tag } from 'primereact/tag';
 import { PROJECT_STATUS_LABEL, PROJECT_STATUS_SEVERITY } from '../../helpers/statusLabels';
@@ -39,6 +40,13 @@ const MEMBER_ROLE_OPTIONS: { label: string; value: ProjectMemberRole }[] = [
   { label: PROJECT_MEMBER_ROLE_LABEL.supervisor, value: 'supervisor' },
   { label: PROJECT_MEMBER_ROLE_LABEL.tester, value: 'tester' },
   { label: PROJECT_MEMBER_ROLE_LABEL.manager, value: 'manager' },
+];
+
+const PERMISSION_OPTIONS: { key: ProjectPermission; label: string }[] = [
+  { key: 'view', label: 'Lihat' }, { key: 'create', label: 'Buat' },
+  { key: 'update', label: 'Ubah' }, { key: 'delete', label: 'Hapus' },
+  { key: 'import', label: 'Import' }, { key: 'export', label: 'Export' },
+  { key: 'run_automation', label: 'Jalankan automation' },
 ];
 
 const VISIBILITY_OPTIONS: { label: string; value: ProjectVisibility }[] = [
@@ -527,6 +535,9 @@ export function ProjectSettingsPage() {
   const [memberRole, setMemberRole] = useState<ProjectMemberRole>('member');
   const [memberError, setMemberError] = useState<string | null>(null);
   const [selectedMembers, setSelectedMembers] = useState<ProjectMemberWithProfile[]>([]);
+  const [permissionDialogOpen, setPermissionDialogOpen] = useState(false);
+  const [permissionMember, setPermissionMember] = useState<ProjectMemberWithProfile | null>(null);
+  const [permissionDraft, setPermissionDraft] = useState<ProjectPermissions | null>(null);
 
   const availableUserOptions = useMemo(() => {
     const memberIds = new Set(members.map((m) => m.userId));
@@ -576,7 +587,25 @@ export function ProjectSettingsPage() {
 
   async function handleChangeMemberRole(row: ProjectMemberWithProfile, role: ProjectMemberRole) {
     await projectMemberService.changeRole(row.id, role);
-    setMembers((prev) => prev.map((m) => (m.id === row.id ? { ...m, role } : m)));
+    await loadAll(false);
+  }
+
+  function openPermissionDialog(row: ProjectMemberWithProfile) {
+    setPermissionMember(row);
+    setPermissionDraft({ ...row.permissions });
+    setPermissionDialogOpen(true);
+  }
+
+  async function handleSavePermissions() {
+    if (!permissionMember || !permissionDraft) return;
+    try {
+      await projectMemberService.changePermissions(permissionMember.id, permissionDraft);
+      setPermissionDialogOpen(false);
+      await loadAll(false);
+      toast.current?.show({ severity: 'success', summary: 'Permission diperbarui' });
+    } catch (error) {
+      toast.current?.show({ severity: 'error', summary: 'Gagal memperbarui permission', detail: error instanceof Error ? error.message : undefined });
+    }
   }
 
   function handleRemoveMember(row: ProjectMemberWithProfile) {
@@ -932,6 +961,12 @@ export function ProjectSettingsPage() {
                 )}
               />
               <Column
+                header="Permission"
+                body={(row: ProjectMemberWithProfile) => (
+                  <Button label="Atur" icon="pi pi-lock" size="small" outlined onClick={() => openPermissionDialog(row)} />
+                )}
+              />
+              <Column
                 header=""
                 style={{ width: '3.5rem' }}
                 body={(row: ProjectMemberWithProfile) => (
@@ -942,6 +977,13 @@ export function ProjectSettingsPage() {
               />
             </DataTable>
           </TabPanel>
+
+          <Dialog header={`Permission · ${permissionMember?.profile.fullName ?? permissionMember?.profile.email ?? ''}`} visible={permissionDialogOpen} onHide={() => setPermissionDialogOpen(false)} style={{ width: '32rem', maxWidth: '95vw' }} footer={<div className="flex justify-content-end gap-2"><Button label="Batal" outlined onClick={() => setPermissionDialogOpen(false)} /><Button label="Simpan" icon="pi pi-save" onClick={handleSavePermissions} /></div>}>
+            <p className="text-color-secondary mt-0">Permission khusus anggota ini. Mengubah peran akan mengembalikannya ke default peran.</p>
+            <div className="grid">
+              {PERMISSION_OPTIONS.map((option) => <div key={option.key} className="col-12 md:col-6 flex align-items-center gap-2"><Checkbox inputId={`permission-${option.key}`} checked={permissionDraft?.[option.key] ?? false} onChange={(event) => setPermissionDraft((current) => current ? { ...current, [option.key]: event.checked === true } : current)} /><label htmlFor={`permission-${option.key}`}>{option.label}</label></div>)}
+            </div>
+          </Dialog>
 
           {(canArchiveProject || canDeleteProject) && (
             <TabPanel header="Danger Zone">

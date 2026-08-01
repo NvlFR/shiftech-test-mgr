@@ -1,6 +1,6 @@
 import { issueRepository } from '../repositories/issueRepository';
 import { testResultRepository } from '../repositories/testResultRepository';
-import type { ExternalLink, Issue, IssuePriority, IssueType } from '../types/domain';
+import type { ExternalLink, Issue, IssueCodeContext, IssuePriority, IssueType } from '../types/domain';
 
 const MAX_TITLE_LENGTH = 255;
 const VALID_PRIORITIES: readonly IssuePriority[] = ['low', 'medium', 'high', 'critical'];
@@ -13,7 +13,40 @@ function validateIssueInput(input: { title: string; priority?: IssuePriority; ty
   if (input.type && !VALID_TYPES.includes(input.type)) throw new Error('Tipe issue tidak dikenal');
 }
 
+function trimGitSuffix(value: string): string {
+  return value.replace(/\/+$/, '').replace(/\.git$/, '');
+}
+
+function encodeRepositoryPath(value: string): string {
+  return value.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+}
+
 export const issueService = {
+  async getCodeContext(id: string): Promise<IssueCodeContext | null> {
+    const context = await issueRepository.findCodeContext(id);
+    if (!context) return null;
+
+    const { repository, branch, commitSha } = context;
+    const filePath = context.scriptRef
+      ? [repository.subdirectory, context.scriptRef].filter(Boolean).join('/').replace(/^\/+/, '')
+      : null;
+    const isGitHub = repository.sourceType === 'github_public' || repository.sourceType === 'github_private';
+    const repositoryUrl = isGitHub ? trimGitSuffix(repository.urlOrPath) : null;
+    const revision = commitSha ?? branch ?? repository.defaultBranch;
+
+    return {
+      repository,
+      branch,
+      commitSha,
+      filePath,
+      repositoryUrl,
+      commitUrl: repositoryUrl && commitSha ? `${repositoryUrl}/commit/${encodeURIComponent(commitSha)}` : null,
+      fileUrl: repositoryUrl && revision && filePath
+        ? `${repositoryUrl}/blob/${encodeURIComponent(revision)}/${encodeRepositoryPath(filePath)}`
+        : null,
+    };
+  },
+
   getById(id: string) {
     return issueRepository.findById(id);
   },
@@ -97,7 +130,24 @@ export const issueService = {
     } satisfies Partial<Issue>);
   },
 
-  changeStatus: issueRepository.updateStatus,
+  async changeStatus(id: string, status: Issue['status'], fixReferenceUrl?: string | null) {
+    const normalizedUrl = fixReferenceUrl?.trim() || null;
+    if (normalizedUrl) {
+      let url: URL;
+      try {
+        url = new URL(normalizedUrl);
+      } catch {
+        throw new Error('Link commit/PR harus berupa URL yang valid');
+      }
+      if (url.protocol !== 'https:') throw new Error('Link commit/PR harus menggunakan HTTPS');
+    }
+    return issueRepository.updateStatus(
+      id,
+      status,
+      status === 'resolved' ? normalizedUrl : undefined,
+      status === 'verified' ? undefined : null,
+    );
+  },
   assign: issueRepository.assign,
   remove: issueRepository.remove,
 };

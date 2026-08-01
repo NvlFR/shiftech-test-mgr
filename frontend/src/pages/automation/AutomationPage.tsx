@@ -38,7 +38,7 @@ export function AutomationPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const toast = useRef<Toast>(null);
   const { session } = useAuthContext();
-  const { canEditContent, canManageSettings, loading: roleLoading } = useProjectRole(projectId);
+  const { canRunAutomation, canManageSettings, loading: roleLoading } = useProjectRole(projectId);
   const { runners, scripts, jobs, loading, error, reload, runLocally, sendStepCommand } = useAutomation(projectId ?? null);
   const { testPlans } = useTestPlans(projectId ?? null);
   const { environments } = useEnvironments(projectId ?? null);
@@ -77,7 +77,7 @@ export function AutomationPage() {
   }, [projectId]);
 
   if (roleLoading) return <p>Memuat...</p>;
-  if (!canEditContent) return <Navigate to={`/projects/${projectId}`} replace />;
+  if (!canRunAutomation) return <Navigate to={`/projects/${projectId}`} replace />;
 
   const caseLabel = (id: string) => { const tc = testCases.find((c) => c.id === id); return tc ? `${tc.code} — ${tc.title}` : id; };
 
@@ -211,11 +211,11 @@ export function AutomationPage() {
           <Column field="errorMessage" header="Error" body={(r: AutomationJob) => r.errorMessage ?? '-'} />
           <Column header="Aksi" body={(r: AutomationJob) => <div className="flex gap-1">
             <Button text size="small" icon="pi pi-file" tooltip="Lihat live log" onClick={() => setLogJob(r)} />
-            {r.status === 'running' && canEditContent && <>
+            {r.status === 'running' && canRunAutomation && <>
               <Button text size="small" icon="pi pi-step-forward" label="Next" tooltip="Jalankan satu langkah berikutnya" onClick={() => controlJob(r, 'next')} />
               <Button text size="small" icon="pi pi-forward" label="Continue" tooltip="Lanjutkan tanpa berhenti di setiap langkah" onClick={() => controlJob(r, 'continue')} />
             </>}
-            {r.status === 'queued' && canEditContent && <Button text size="small" icon="pi pi-times" tooltip="Cancel" onClick={() => cancelJob(r)} />}
+            {r.status === 'queued' && canRunAutomation && <Button text size="small" icon="pi pi-times" tooltip="Cancel" onClick={() => cancelJob(r)} />}
           </div>} />
         </DataTable>
       </TabPanel>

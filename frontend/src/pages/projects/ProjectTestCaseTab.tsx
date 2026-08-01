@@ -20,8 +20,11 @@ type ProjectTestCaseTabProps = {
   project: Project;
   cases: TestCaseWithDetails[];
   loading?: boolean;
-  canEditContent: boolean;
+  canCreateContent: boolean;
+  canUpdateContent: boolean;
   canDeleteContent: boolean;
+  canImport: boolean;
+  canExport: boolean;
   moduleOptions: Option[];
   tagOptions: Option[];
   onCreate: () => void;
@@ -40,7 +43,7 @@ const STATUS_OPTIONS: { label: string; value: TestCaseStatus }[] = (['draft', 'a
   .map((value) => ({ value, label: TEST_CASE_STATUS_LABEL[value] }));
 
 export function ProjectTestCaseTab({
-  project, cases, loading, canEditContent, canDeleteContent, moduleOptions, tagOptions,
+  project, cases, loading, canCreateContent, canUpdateContent, canDeleteContent, canImport, canExport, moduleOptions, tagOptions,
   onCreate, onEdit, onArchive, onDelete, onBulkDelete, onImportExcel, onImportLibrary, onRowClick,
 }: ProjectTestCaseTabProps) {
   const [search, setSearch] = useState('');
@@ -78,11 +81,13 @@ export function ProjectTestCaseTab({
           <Button icon="pi pi-refresh" outlined severity="secondary" size="small" disabled={!hasFilters} onClick={clearFilters} tooltip="Reset filter" />
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button label="Export Excel" icon="pi pi-download" size="small" outlined onClick={() => exportTestCasesToExcel(project, filtered)} disabled={!filtered.length} />
-          <Button label="Export PDF" icon="pi pi-file-pdf" size="small" outlined onClick={() => exportTestCasesToPdf(project, filtered)} disabled={!filtered.length} />
-          {canEditContent && <>
+          {canExport && <><Button label="Export Excel" icon="pi pi-download" size="small" outlined onClick={() => exportTestCasesToExcel(project, filtered)} disabled={!filtered.length} />
+          <Button label="Export PDF" icon="pi pi-file-pdf" size="small" outlined onClick={() => exportTestCasesToPdf(project, filtered)} disabled={!filtered.length} /></>}
+          {canImport && <>
             <Button label="Import Library" icon="pi pi-folder-open" size="small" outlined onClick={onImportLibrary} />
             <Button label="Import Excel" icon="pi pi-file-excel" size="small" outlined onClick={onImportExcel} />
+          </>}
+          {canCreateContent && <>
             <Button label="Test Case Baru" icon="pi pi-plus" size="small" onClick={onCreate} />
           </>}
         </div>
@@ -104,7 +109,7 @@ export function ProjectTestCaseTab({
         <Column field="status" header="Status" sortable body={(row: TestCaseWithDetails) => <Tag value={TEST_CASE_STATUS_LABEL[row.status]} severity={TEST_CASE_STATUS_SEVERITY[row.status]} />} />
         <Column field="tags" header="Tag" body={(row: TestCaseWithDetails) => <div className="flex flex-wrap gap-1">{row.tags.map((tag) => <Tag key={tag.id} value={tag.name} severity="info" />)}</div>} />
         <Column header="" style={{ width: '3.5rem' }} body={(row: TestCaseWithDetails) => <RowActionsMenu items={[
-          ...(canEditContent ? [{ label: 'Edit', icon: 'pi pi-pencil', command: () => onEdit(row) }, { label: row.status === 'active' ? 'Arsipkan' : 'Aktifkan', icon: 'pi pi-refresh', command: () => onArchive(row) }] : []),
+          ...(canUpdateContent ? [{ label: 'Edit', icon: 'pi pi-pencil', command: () => onEdit(row) }, { label: row.status === 'active' ? 'Arsipkan' : 'Aktifkan', icon: 'pi pi-refresh', command: () => onArchive(row) }] : []),
           ...(canDeleteContent ? [{ label: 'Hapus', icon: 'pi pi-trash', className: 'p-error', command: () => onDelete(row) }] : []),
         ]} />} />
       </DataTable>

@@ -5,8 +5,8 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { prepareJobRepository } from '../dist/repositoryWorkspace.js';
 
-function config(cacheDir, projectDir = cacheDir) {
-  return { repositoryCacheDir: cacheDir, projectDir };
+function config(cacheDir, projectDir = cacheDir, trustedRepositories = []) {
+  return { repositoryCacheDir: cacheDir, projectDir, trustedRepositories };
 }
 
 const metadata = (path) => ({ path, branch: 'main', commitSha: 'abc123', dirty: false });
@@ -21,7 +21,7 @@ test('clone private repository memakai token hanya melalui environment Git', asy
     subdirectory: null, token,
   };
 
-  const result = await prepareJobRepository(config(cacheDir), repository, async (args, env) => {
+  const result = await prepareJobRepository(config(cacheDir, cacheDir, [join(cacheDir, repository.id)]), repository, async (args, env) => {
     calls.push({ args, env });
     mkdirSync(join(cacheDir, repository.id, '.git'), { recursive: true });
   }, metadata);
@@ -42,7 +42,7 @@ test('repository cache yang sudah ada di-pull sebelum eksekusi', async () => {
   mkdirSync(join(repositoryRoot, 'e2e'), { recursive: true });
   const calls = [];
 
-  const result = await prepareJobRepository(config(cacheDir), {
+  const result = await prepareJobRepository(config(cacheDir, cacheDir, [repositoryRoot]), {
     id: 'repository-2', source_type: 'github_public',
     url_or_path: 'https://github.example/team/app.git', default_branch: 'develop',
     subdirectory: 'e2e', token: null,
@@ -62,7 +62,7 @@ test('menolak URL non-HTTP dan subdirectory yang keluar dari root', async () => 
   }, async () => {}, metadata), /HTTP\(S\)/);
 
   const localRoot = mkdtempSync(join(tmpdir(), 'tm-local-repo-'));
-  await assert.rejects(() => prepareJobRepository(config(cacheDir), {
+  await assert.rejects(() => prepareJobRepository(config(cacheDir, cacheDir, [localRoot]), {
     id: 'repository-4', source_type: 'local_path', url_or_path: localRoot,
     default_branch: null, subdirectory: '../outside', token: null,
   }, async () => {}, metadata), /di luar root/);

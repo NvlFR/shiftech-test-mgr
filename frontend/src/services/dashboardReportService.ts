@@ -1,5 +1,5 @@
 import { dashboardReportRepository } from '../repositories/dashboardReportRepository';
-import type { DashboardIssueAging, DashboardReport, DashboardReportFilters, DashboardReportRun, TestResultStatus } from '../types/domain';
+import type { DashboardIssueAging, DashboardQaLoop, DashboardQaLoopAudit, DashboardReport, DashboardReportFilters, DashboardReportRun, TestResultStatus } from '../types/domain';
 
 const RESULT_STATUSES: TestResultStatus[] = ['pass', 'fail', 'skip', 'blocked', 'not_run'];
 const ACTIVE_ISSUE_STATUSES = new Set(['open', 'in_progress']);
@@ -42,12 +42,24 @@ function calculateIssueAging(issues: Awaited<ReturnType<typeof dashboardReportRe
   };
 }
 
+function calculateQaLoop(audits: DashboardQaLoopAudit[], runIds: Set<string>): DashboardQaLoop {
+  const issueIds = (action: DashboardQaLoopAudit['action']) => new Set(
+    audits.filter((audit) => audit.action === action && runIds.has(audit.testRunId)).map((audit) => audit.issueId),
+  );
+  const entered = issueIds('entered').size;
+  const verified = issueIds('verified').size;
+  const reopened = issueIds('reopened').size;
+  return { entered, verified, reopened, reopenRate: percent(reopened, entered) };
+}
+
 export const dashboardReportService = {
   async getReport(filters: DashboardReportFilters = {}): Promise<DashboardReport> {
-    const runs = await dashboardReportRepository.findRuns(filters);
+    const allRuns = await dashboardReportRepository.findRuns(filters);
+    const runs = filters.projectId ? allRuns.filter((run) => run.projectId === filters.projectId) : allRuns;
     const runIds = runs.map((run) => run.id);
     const results = await dashboardReportRepository.findResults(runIds, filters.testerId);
     const issues = await dashboardReportRepository.findIssues(results.map((result) => result.id));
+    const qaLoopAudits = await dashboardReportRepository.findQaLoopAudits(filters);
     const summarizedRuns = runs
       .map((run) => withSummary(run, results.filter((result) => result.testRunId === run.id).map((result) => result.status)))
       .filter((run) => !filters.testerId || run.total > 0);
@@ -67,6 +79,13 @@ export const dashboardReportService = {
     totals.passRate = percent(totals.pass, totals.executed);
     totals.failRate = percent(totals.fail, totals.executed);
     totals.progressPercent = percent(totals.executed, totals.totalResults);
-    return { generatedAt: new Date().toISOString(), filters, runs: summarizedRuns, totals, issueAging: calculateIssueAging(issues) };
+    return {
+      generatedAt: new Date().toISOString(),
+      filters,
+      runs: summarizedRuns,
+      totals,
+      issueAging: calculateIssueAging(issues),
+      qaLoop: calculateQaLoop(qaLoopAudits, new Set(summarizedRuns.map((run) => run.id))),
+    };
   },
 };

@@ -85,7 +85,7 @@ const ISSUE_STATUS_OPTIONS: { label: string; value: IssueStatus }[] = (
 const ISSUE_PRIORITY_OPTIONS: { label: string; value: IssuePriority }[] = (
   ['low', 'medium', 'high', 'critical'] as const
 ).map((v) => ({ label: ISSUE_PRIORITY_LABEL[v], value: v }));
-const PROJECT_TAB_NAMES = ['test-plans', 'test-cases', 'test-runs', 'issues'] as const;
+const PROJECT_TAB_NAMES = ['test-plans', 'test-cases', 'test-runs', 'issues', 'activity'] as const;
 
 type TestRunWithSummary = TestRun & {
   testPlanId: string;
@@ -126,6 +126,7 @@ const TAB_DEPENDENCIES: (keyof ProjectTabData)[][] = [
   ['testCases', 'modules', 'tags'],
   ['testRuns'],
   ['issues', 'approvedUsers'],
+  [],
 ];
 
 export function ProjectDetailPage() {
@@ -135,7 +136,7 @@ export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
-  const { canEditContent, canDeleteContent, canManageIssues, canRunTests } = useProjectRole(id);
+  const { canCreateContent, canUpdateContent, canDeleteContent, canManageIssues, canRunTests, canImport, canExport } = useProjectRole(id);
 
   const [project, setProject] = useState<Project | null>(id ? projectCache.get(id) ?? null : null);
   const [projectLoading, setProjectLoading] = useState(!project);
@@ -201,6 +202,7 @@ export function ProjectDetailPage() {
   // already present in cache are skipped, so re-visiting a tab is instant.
   async function loadTab(projectId: string, tabIndex: number, force = false) {
     const keys = TAB_DEPENDENCIES[tabIndex];
+    if (!keys || keys.length === 0) return;
     const cache = getTabCache(projectId);
     const missing = force ? keys : keys.filter((k) => cache[k] === undefined);
 
@@ -827,7 +829,8 @@ export function ProjectDetailPage() {
               onSort={sortHandler(setPlanSortField, setPlanSortOrder)}
               selected={selectedPlans}
               onSelectedChange={setSelectedPlans}
-              canEditContent={canEditContent}
+              canCreateContent={canCreateContent}
+              canUpdateContent={canUpdateContent}
               canDeleteContent={canDeleteContent}
               onCreate={openCreatePlanDialog}
               onEdit={openEditPlanDialog}
@@ -843,8 +846,11 @@ export function ProjectDetailPage() {
               project={project}
               cases={testCases}
               loading={tabLoading[1]}
-              canEditContent={canEditContent}
+              canCreateContent={canCreateContent}
+              canUpdateContent={canUpdateContent}
               canDeleteContent={canDeleteContent}
+              canImport={canImport}
+              canExport={canExport}
               moduleOptions={moduleOptions}
               tagOptions={tagOptions}
               onCreate={openCreateCaseDialog}

@@ -194,7 +194,7 @@ Mesin lokal (tester / on-prem)          Server pusat (self-hosted)
       (Binary tersimpan di Supabase Storage; metadata `path`/`bucket` di job.)
 - [x] Routing job ke runner yang sesuai berdasarkan label/kapabilitas &
       environment.
-- [ ] Scheduled Test Run (server men-enqueue job sesuai jadwal; runner lokal yang
+- [x] Scheduled Test Run (server men-enqueue job sesuai jadwal; runner lokal yang
       mengeksekusi saat online).
 - [x] Storage adapter untuk Supabase Storage (bucket `automation-artifacts` +
       Edge Function signed upload URL). S3/MinIO belum.
@@ -203,7 +203,7 @@ Mesin lokal (tester / on-prem)          Server pusat (self-hosted)
 
 - [x] Mendukung banyak runner lokal sekaligus (multi-runner) — server membagi
       antrean berdasarkan runner yang tersedia.
-- [ ] Validasi script, pembatasan command, dan secret management di sisi runner.
+- [x] Validasi script, pembatasan command, dan secret management di sisi runner.
 - [x] API token per runner dapat dicabut/di-rotate dari server pusat.
 - [x] Heartbeat/health status runner terlihat di server (online/offline, job
       terakhir).
@@ -240,9 +240,9 @@ RLS aktif, `get_advisors` 0 ERROR. Detail server-side:
 
 - [ ] Role dan permission yang lebih detail.
   - Permission terpisah untuk melihat, membuat, mengubah, menghapus, import, export, dan menjalankan automation.
-- [ ] Team management.
+- [x] Team management.
   - Mengelompokkan user dan mengatur akses team per Project.
-- [ ] Activity feed per Project.
+- [x] Activity feed per Project.
   - Timeline aktivitas penting dalam satu Project.
 - [ ] Notification center.
   - Pusat notifikasi untuk assignment, mention, perubahan status, dan hasil automation.
@@ -666,29 +666,29 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 
 ### 11.6 Tahap 6 — Developer memperbaiki
 
-- [ ] Issue menampilkan konteks kode dari repo (file/commit terkait) bila tersedia.
-- [ ] Perubahan status Issue ke `resolved` memicu event (webhook/notifikasi).
-- [ ] Opsional: link commit/PR yang mengklaim memperbaiki Issue.
+- [x] Issue menampilkan konteks kode dari repo (file/commit terkait) bila tersedia.
+- [x] Perubahan status Issue ke `resolved` memicu event (webhook/notifikasi).
+- [x] Opsional: link commit/PR yang mengklaim memperbaiki Issue.
 
 ### 11.7 Tahap 7 — Regression selektif
 
 - [ ] AI memantau Issue berstatus `resolved` yang belum diverifikasi.
-- [ ] **Pemilihan test yang relevan** (bukan seluruh suite), dari gabungan sinyal:
+- [x] **Pemilihan test yang relevan** (bukan seluruh suite), dari gabungan sinyal:
       1. Test Case yang tertaut langsung ke Issue tersebut.
       2. Test Case satu module/tag dengan yang gagal.
       3. Test Case yang tertaut ke requirement yang sama.
       4. Test Case yang terdampak `repo.diff` commit perbaikan (§10.5).
-- [ ] Enqueue **Test Run regression baru** (tidak pernah menimpa run lama).
-- [ ] Batas aman: kalau jumlah test terpilih melebihi ambang, minta konfirmasi manusia.
+- [x] Enqueue **Test Run regression baru** (tidak pernah menimpa run lama).
+- [x] Batas aman: kalau jumlah test terpilih melebihi ambang, minta konfirmasi manusia.
 
 ### 11.8 Tahap 8 — Verifikasi
 
-- [ ] PASS → Issue ditandai `verified`, dengan tautan ke Test Run pembuktinya.
-- [ ] FAIL → Issue **tetap terbuka**, AI menambah komentar berisi bukti baru dan
+- [x] PASS → Issue ditandai `verified`, dengan tautan ke Test Run pembuktinya.
+- [x] FAIL → Issue **tetap terbuka**, AI menambah komentar berisi bukti baru dan
       perbandingan dengan kegagalan sebelumnya (regresi lama vs baru).
-- [ ] Status `verified` boleh di-set AI, tapi tercatat sebagai aksi agent di audit log
+- [x] Status `verified` boleh di-set AI, tapi tercatat sebagai aksi agent di audit log
       dan bisa di-override manusia.
-- [ ] Dashboard menampilkan siklus: berapa Issue masuk loop, berapa yang verified,
+- [x] Dashboard menampilkan siklus: berapa Issue masuk loop, berapa yang verified,
       berapa yang bolak-balik (reopen rate).
 
 ### 11.9 Kriteria selesai (definition of done alur ini)

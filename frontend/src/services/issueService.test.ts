@@ -1,14 +1,87 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { create, findExecutionContext } = vi.hoisted(() => ({
+const { create, findCodeContext, findExecutionContext, updateStatus } = vi.hoisted(() => ({
   create: vi.fn(),
+  findCodeContext: vi.fn(),
   findExecutionContext: vi.fn(),
+  updateStatus: vi.fn(),
 }));
 
-vi.mock('../repositories/issueRepository', () => ({ issueRepository: { create } }));
+vi.mock('../repositories/issueRepository', () => ({ issueRepository: { create, findCodeContext, updateStatus } }));
 vi.mock('../repositories/testResultRepository', () => ({ testResultRepository: { findExecutionContext } }));
 
 import { issueService } from './issueService';
+
+describe('issueService.changeStatus', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('meneruskan link commit atau PR HTTPS saat Issue menjadi resolved', async () => {
+    updateStatus.mockResolvedValue({ id: 'issue-1' });
+    await issueService.changeStatus('issue-1', 'resolved', '  https://github.com/acme/app/pull/42  ');
+    expect(updateStatus).toHaveBeenCalledWith('issue-1', 'resolved', 'https://github.com/acme/app/pull/42', null);
+  });
+
+  it('menolak link perbaikan non-HTTPS', async () => {
+    await expect(issueService.changeStatus('issue-1', 'resolved', 'http://example.com/commit/1'))
+      .rejects.toThrow('Link commit/PR harus menggunakan HTTPS');
+    expect(updateStatus).not.toHaveBeenCalled();
+  });
+
+  it('tidak mengubah link perbaikan untuk status selain resolved', async () => {
+    updateStatus.mockResolvedValue({ id: 'issue-1' });
+    await issueService.changeStatus('issue-1', 'verified');
+    expect(updateStatus).toHaveBeenCalledWith('issue-1', 'verified', undefined, undefined);
+  });
+
+  it('membersihkan tautan run pembuktian saat manusia meng-override status verified', async () => {
+    updateStatus.mockResolvedValue({ id: 'issue-1', status: 'open' });
+    await issueService.changeStatus('issue-1', 'open');
+    expect(updateStatus).toHaveBeenCalledWith('issue-1', 'open', undefined, null);
+  });
+});
+
+describe('issueService.getCodeContext', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('membentuk link commit dan file GitHub dari traceability Test Run', async () => {
+    findCodeContext.mockResolvedValue({
+      repository: {
+        id: 'repo-1', projectId: 'project-1', name: 'Web App', sourceType: 'github_private',
+        urlOrPath: 'https://github.com/acme/web-app.git', defaultBranch: 'main', subdirectory: 'frontend',
+        credentialId: null, credentialMask: null, credentialCreatedAt: null, credentialExpiresAt: null,
+        isActive: true, createdAt: '', updatedAt: '',
+      },
+      branch: 'fix/login flow',
+      commitSha: 'abc123def456',
+      scriptRef: 'tests/login.spec.ts',
+    });
+
+    await expect(issueService.getCodeContext('issue-1')).resolves.toMatchObject({
+      filePath: 'frontend/tests/login.spec.ts',
+      repositoryUrl: 'https://github.com/acme/web-app',
+      commitUrl: 'https://github.com/acme/web-app/commit/abc123def456',
+      fileUrl: 'https://github.com/acme/web-app/blob/abc123def456/frontend/tests/login.spec.ts',
+    });
+  });
+
+  it('tidak membuat URL browser untuk repository local path', async () => {
+    findCodeContext.mockResolvedValue({
+      repository: {
+        id: 'repo-1', projectId: 'project-1', name: 'Local App', sourceType: 'local_path',
+        urlOrPath: '/srv/app', defaultBranch: 'main', subdirectory: null,
+        credentialId: null, credentialMask: null, credentialCreatedAt: null, credentialExpiresAt: null,
+        isActive: true, createdAt: '', updatedAt: '',
+      },
+      branch: 'main', commitSha: 'abc123', scriptRef: 'tests/app.spec.ts',
+    });
+
+    await expect(issueService.getCodeContext('issue-1')).resolves.toMatchObject({
+      filePath: 'tests/app.spec.ts', repositoryUrl: null, commitUrl: null, fileUrl: null,
+    });
+  });
+});
 
 describe('issueService.createAiDraft', () => {
   beforeEach(() => {

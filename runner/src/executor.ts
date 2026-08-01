@@ -1,11 +1,12 @@
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import type { RunnerConfig } from './config.js';
 import type { AutomationJob, JobLogStream, JobResult, StepCommand } from './api.js';
 import { collectArtifacts, type CollectedArtifact } from './artifacts.js';
 import { log } from './logger.js';
 import { checkBaseUrlReachable } from './baseUrlSanityCheck.js';
+import { assertPathInsideRepository, childProcessEnvironment, parseAllowedPlaywrightCommand, redactSecrets, SecretRedactorStream } from './security.js';
 
 export interface ExecutionOutcome {
   result: JobResult;
@@ -55,6 +56,14 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
   if (!relativeScript || relativeScript.startsWith('..') || isAbsolute(relativeScript)) {
     return { result: 'blocked', errorMessage: 'script_ref berada di luar root repository', artifacts: [] };
   }
+  try {
+    assertPathInsideRepository(projectDir, resolvedScript);
+    if (!statSync(resolvedScript).isFile() || !/\.(?:spec|test)\.(?:[cm]?[jt]sx?)$/i.test(relativeScript)) {
+      throw new Error('script_ref harus menunjuk file test Playwright yang didukung');
+    }
+  } catch (error) {
+    return { result: 'blocked', errorMessage: (error as Error).message, artifacts: [] };
+  }
 
   let executionMode: ExecutionMode;
   let executionTarget: ExecutionTarget;
@@ -74,7 +83,11 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
   const jobOutputDir = join(config.artifactDir, job.id);
   mkdirSync(jobOutputDir, { recursive: true });
 
-  const [cmd, ...baseArgs] = config.playwrightCmd.split(' ').filter(Boolean);
+  let invocation;
+  try { invocation = parseAllowedPlaywrightCommand(config.playwrightCmd); }
+  catch (error) { return { result: 'blocked', errorMessage: (error as Error).message, artifacts: [] }; }
+  const cmd = invocation.command;
+  const baseArgs = invocation.args;
   const args = [
     ...baseArgs,
     relativeScript,
@@ -89,7 +102,7 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
     log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode, ...executionTarget });
     const child = spawn(cmd ?? 'npx', args, {
       cwd: projectDir,
-      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '', TM_PAUSE_ON_FAILURE: executionMode.pauseOnFailure ? '1' : '0', TM_STEP_CONTROL_CHANNEL: 'stdin-jsonl' },
+      env: childProcessEnvironment({ TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '', TM_PAUSE_ON_FAILURE: executionMode.pauseOnFailure ? '1' : '0', TM_STEP_CONTROL_CHANNEL: 'stdin-jsonl' }),
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     const unsubscribeCommands = subscribeCommands?.((command) => {
@@ -101,17 +114,19 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
 
     let stdout = '';
     let stderr = '';
+    const stdoutRedactor = new SecretRedactorStream();
+    const stderrRedactor = new SecretRedactorStream();
     let settled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
     child.stdout.on('data', (chunk: Buffer) => {
-      const content = chunk.toString(); stdout += content; onLog?.('stdout', content);
+      const content = stdoutRedactor.write(chunk.toString()); stdout += content; if (content) onLog?.('stdout', content);
       if (executionMode.pauseOnFailure && content.includes('[TM_PAUSE_ON_FAILURE]') && timer) {
         clearTimeout(timer);
         timer = null;
         onLog?.('system', 'Job gagal dan dijeda untuk inspeksi lokal; tekan Resume di Playwright Inspector.\n');
       }
     });
-    child.stderr.on('data', (chunk: Buffer) => { const content = chunk.toString(); stderr += content; onLog?.('stderr', content); });
+    child.stderr.on('data', (chunk: Buffer) => { const content = stderrRedactor.write(chunk.toString()); stderr += content; if (content) onLog?.('stderr', content); });
 
     timer = setTimeout(() => {
       if (settled) return;
@@ -122,8 +137,14 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
 
     function finalize(result: JobResult, errorMessage?: string): void {
       unsubscribeCommands?.();
+      const finalStdout = stdoutRedactor.flush();
+      const finalStderr = stderrRedactor.flush();
+      stdout += finalStdout;
+      stderr += finalStderr;
+      if (finalStdout) onLog?.('stdout', finalStdout);
+      if (finalStderr) onLog?.('stderr', finalStderr);
       const logPath = join(jobOutputDir, 'runner-output.log');
-      try { writeFileSync(logPath, `$ ${cmd} ${args.join(' ')}\n\n[stdout]\n${stdout}\n[stderr]\n${stderr}\n`); } catch { /* best effort */ }
+      try { writeFileSync(logPath, redactSecrets(`$ ${cmd} ${args.join(' ')}\n\n[stdout]\n${stdout}\n[stderr]\n${stderr}\n`), { mode: 0o600 }); } catch { /* best effort */ }
       const artifacts = collectArtifacts(jobOutputDir);
       resolve({ result, errorMessage, notes: errorMessage ? undefined : 'Automation run selesai', artifacts });
     }

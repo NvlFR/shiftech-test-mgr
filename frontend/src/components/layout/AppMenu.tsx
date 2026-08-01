@@ -65,7 +65,7 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
     { label: 'Trend & Reporting', icon: 'pi pi-chart-line', url: '/dashboard' },
     { label: 'Test Suite Library', icon: 'pi pi-book', url: '/test-suites' },
     { label: 'Projects', icon: 'pi pi-folder', url: '/', end: true },
-    ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }, { label: 'Retensi Global', icon: 'pi pi-database', url: '/admin/data-retention' }] : []),
+    ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }, { label: 'Teams', icon: 'pi pi-sitemap', url: '/teams' }, { label: 'Retensi Global', icon: 'pi pi-database', url: '/admin/data-retention' }] : []),
   ];
 
   return (
@@ -134,6 +134,9 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
             </button>
             <button type="button" className="layout-submenu-pin" title="Automation (Playwright)" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/automation`); }}>
               <i className="pi pi-play" />
+            </button>
+            <button type="button" className="layout-submenu-pin" title="Akses Team" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/teams`); }}>
+              <i className="pi pi-users" />
             </button>
           </li>
         ))}

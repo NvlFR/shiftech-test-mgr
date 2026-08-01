@@ -30,7 +30,8 @@ type ProjectTestPlanTabProps = {
   onSort: (event: DataTableStateEvent) => void;
   selected: TestPlan[];
   onSelectedChange: (value: TestPlan[]) => void;
-  canEditContent: boolean;
+  canCreateContent: boolean;
+  canUpdateContent: boolean;
   canDeleteContent: boolean;
   onCreate: () => void;
   onEdit: (plan: TestPlan) => void;
@@ -45,7 +46,7 @@ const STATUS_OPTIONS = (['draft', 'active', 'completed', 'archived'] as const)
 export function ProjectTestPlanTab({
   plans, loading, isMobile, search, onSearchChange, statusFilter,
   onStatusFilterChange, sortField, sortOrder, onSort, selected, onSelectedChange,
-  canEditContent, canDeleteContent, onCreate, onEdit, onDelete, onBulkDelete, onRefresh,
+  canCreateContent, canUpdateContent, canDeleteContent, onCreate, onEdit, onDelete, onBulkDelete, onRefresh,
 }: ProjectTestPlanTabProps) {
   const navigate = useNavigate();
   const [editing, setEditing] = useState<{ id: string; field: 'name' | 'status' } | null>(null);
@@ -89,9 +90,9 @@ export function ProjectTestPlanTab({
             className="w-12rem"
           />
         </div>
-        {canEditContent && <Button label="Test Plan Baru" icon="pi pi-plus" size="small" onClick={onCreate} />}
+        {canCreateContent && <Button label="Test Plan Baru" icon="pi pi-plus" size="small" onClick={onCreate} />}
       </div>
-      {(canEditContent || canDeleteContent) && (
+      {(canUpdateContent || canDeleteContent) && (
         <BulkActionsBar
           selectedCount={selected.length}
           onClear={() => onSelectedChange([])}
@@ -125,15 +126,15 @@ export function ProjectTestPlanTab({
           if (editing?.id === plan.id && editing.field === 'name') {
             return <InputText autoFocus value={editValue} onChange={(event) => setEditValue(event.target.value)} onBlur={() => void commit(plan, 'name', editValue)} onKeyDown={(event) => { if (event.key === 'Enter') void commit(plan, 'name', editValue); if (event.key === 'Escape') setEditing(null); }} className="w-full" />;
           }
-          return <span onClick={(event) => { event.stopPropagation(); if (canEditContent) { setEditing({ id: plan.id, field: 'name' }); setEditValue(plan.name); } }} style={{ cursor: canEditContent ? 'pointer' : undefined }}>{plan.name}</span>;
+          return <span onClick={(event) => { event.stopPropagation(); if (canUpdateContent) { setEditing({ id: plan.id, field: 'name' }); setEditValue(plan.name); } }} style={{ cursor: canUpdateContent ? 'pointer' : undefined }}>{plan.name}</span>;
         }} />
         <Column field="status" header="Status" sortable hidden={isMobile} body={(plan: TestPlan) => editing?.id === plan.id && editing.field === 'status'
           ? <Dropdown autoFocus value={editValue} options={STATUS_OPTIONS} onChange={(event) => void commit(plan, 'status', event.value)} onHide={() => setEditing(null)} className="w-10rem" />
-          : <span onClick={(event) => { event.stopPropagation(); if (canEditContent) { setEditing({ id: plan.id, field: 'status' }); setEditValue(plan.status); } }} style={{ cursor: canEditContent ? 'pointer' : undefined }}><Tag value={TEST_PLAN_STATUS_LABEL[plan.status]} severity={TEST_PLAN_STATUS_SEVERITY[plan.status]} /></span>} />
+          : <span onClick={(event) => { event.stopPropagation(); if (canUpdateContent) { setEditing({ id: plan.id, field: 'status' }); setEditValue(plan.status); } }} style={{ cursor: canUpdateContent ? 'pointer' : undefined }}><Tag value={TEST_PLAN_STATUS_LABEL[plan.status]} severity={TEST_PLAN_STATUS_SEVERITY[plan.status]} /></span>} />
         <Column field="updatedAt" header="Update Terakhir" sortable hidden={isMobile} body={(plan: TestPlan) => formatDateTime(plan.updatedAt)} />
         <Column header="" style={{ width: '3.5rem' }} body={(plan: TestPlan) => (
           <div className="flex gap-1">
-            {canEditContent && <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit test plan" onClick={() => onEdit(plan)} />}
+            {canUpdateContent && <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit test plan" onClick={() => onEdit(plan)} />}
             {canDeleteContent && <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Hapus test plan" onClick={() => onDelete(plan)} />}
           </div>
         )} />

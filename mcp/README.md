@@ -109,10 +109,15 @@ token `write:automation` untuk `automation.map_script` serta
 `automation.job_status` dan `automation.runner_list` bersifat read-only, dengan
 runner dianggap online bila heartbeat terakhir berada dalam 90 detik.
 
-`automation.rerun_failed` memerlukan migration `schema_056_mcp_rerun_failed.sql`.
-Tool menerima Issue `resolved`, lalu membuat Test Run baru hanya untuk Test Case
-yang gagal serta Test Case aktif yang berbagi module, tag, atau requirement.
-Hanya Test Case yang memiliki mapping automation yang dibuatkan job. Jika jumlah
+`automation.rerun_failed` memerlukan migration `schema_056_mcp_rerun_failed.sql`
+dan `schema_076_e2e15_regression_selection.sql`. Tool menerima Issue `resolved`,
+lalu membuat Test Run baru hanya untuk Test Case yang gagal, Test Case aktif yang
+berbagi module/tag/requirement, serta Test Case dengan `script_ref` yang berubah
+pada diff antara commit terakhir yang lulus (fallback: commit gagal) dan commit
+perbaikan pada referensi Issue.
+Semua Test Case relevan disnapshot sebagai Test Result pada run baru agar case
+tanpa script tetap dapat dieksekusi manual; hanya Test Case yang memiliki mapping
+automation yang dibuatkan job. Jika jumlah
 test terpilih melampaui `TM_MCP_RERUN_FAILED_MAX_TESTS`, pemanggilan gagal tanpa
 membuat run/job. Setelah anggota project mengonfirmasi, ulangi dengan
 `confirmed_by` dan `explicit_confirmation: true`.

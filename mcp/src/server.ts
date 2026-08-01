@@ -24,8 +24,8 @@ import { createWriteToolRegistrar } from "./tools/writeTools.js";
 export const createMcpServer = (config: ServerConfig, session: ProjectSession): McpServer => {
   const readService = new ReadService(session, new ReadRepository(config));
   const writeService = new WriteService(new WriteRepository(config));
-  const automationService = new AutomationService(new AutomationRepository(config));
   const repoService = new RepoService(new RepoRepository(config));
+  const automationService = new AutomationService(new AutomationRepository(config), repoService);
   const analysisService = new AnalysisService(new AnalysisRepository(config));
   const server = new McpServer({ name: "testmanager", version: "0.1.0" });
 

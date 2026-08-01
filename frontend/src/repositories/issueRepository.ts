@@ -1,6 +1,13 @@
 import { supabase } from '../config/supabaseClient';
-import { mapIssueRow, mapModuleRow, mapProfileRow, mapTagRow } from '../helpers/mappers';
-import type { Issue, IssueStatus, IssueWithDetails } from '../types/domain';
+import { mapIssueRow, mapModuleRow, mapProfileRow, mapProjectRepositoryRow, mapTagRow } from '../helpers/mappers';
+import type { Issue, IssueStatus, IssueWithDetails, ProjectRepository } from '../types/domain';
+
+export interface IssueCodeContextRecord {
+  repository: ProjectRepository;
+  branch: string | null;
+  commitSha: string | null;
+  scriptRef: string | null;
+}
 
 function mapTestCaseSummary(testCase: any) {
   if (!testCase) return null;
@@ -23,6 +30,7 @@ function mapIssueDetails(row: any): IssueWithDetails {
     assignee: row.assignee ? mapProfileRow(row.assignee) : null,
     testCase: mapTestCaseSummary(result?.test_case),
     testRun,
+    verifiedTestRun: row.verified_test_run ?? null,
     targetRole: row.target_role ?? null,
     tags: [],
     linkedTestResults: result ? [{ id: result.id, testRunId: result.test_run_id, testCaseCode: result.test_case?.code ?? null, testCaseTitle: result.test_case?.title ?? '', testRun }] : [],
@@ -30,6 +38,36 @@ function mapIssueDetails(row: any): IssueWithDetails {
 }
 
 export const issueRepository = {
+  async findCodeContext(id: string): Promise<IssueCodeContextRecord | null> {
+    const { data, error } = await supabase
+      .from('issues')
+      .select('test_result:test_results!inner(test_run_id, test_case_id, test_run:test_runs!inner(branch, commit_sha, repository:project_repositories(*)))')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw error;
+
+    const result = data?.test_result as any;
+    const run = result?.test_run;
+    if (!run?.repository) return null;
+
+    const { data: job, error: jobError } = await supabase
+      .from('automation_jobs')
+      .select('script_ref')
+      .eq('test_run_id', result.test_run_id)
+      .eq('test_case_id', result.test_case_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (jobError) throw jobError;
+
+    return {
+      repository: mapProjectRepositoryRow(run.repository),
+      branch: run.branch ?? null,
+      commitSha: run.commit_sha ?? null,
+      scriptRef: job?.script_ref ?? null,
+    };
+  },
+
   async searchByProject(projectId: string, query: string, limit = 5): Promise<Pick<Issue, 'id' | 'code' | 'title'>[]> {
     const search = query.trim().replace(/^!/, '').replace(/[,()%*]/g, '');
     if (!search) return [];
@@ -48,7 +86,7 @@ export const issueRepository = {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), target_role:test_roles(*), test_result:test_results!inner(id, test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, custom_project_id, test_plan:test_plans(project_id)))',
+        '*, assignee:profiles(*), target_role:test_roles(*), verified_test_run:test_runs!verified_test_run_id(id, code, name), test_result:test_results!inner(id, test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, custom_project_id, test_plan:test_plans(project_id)))',
       )
       .eq('id', id)
       .maybeSingle();
@@ -162,8 +200,11 @@ export const issueRepository = {
     return mapIssueRow(data);
   },
 
-  async updateStatus(id: string, status: IssueStatus): Promise<Issue> {
-    const { data, error } = await supabase.from('issues').update({ status }).eq('id', id).select('*').single();
+  async updateStatus(id: string, status: IssueStatus, fixReferenceUrl?: string | null, verifiedTestRunId?: string | null): Promise<Issue> {
+    const payload: { status: IssueStatus; fix_reference_url?: string | null; verified_test_run_id?: string | null } = { status };
+    if (fixReferenceUrl !== undefined) payload.fix_reference_url = fixReferenceUrl;
+    if (verifiedTestRunId !== undefined) payload.verified_test_run_id = verifiedTestRunId;
+    const { data, error } = await supabase.from('issues').update(payload).eq('id', id).select('*').single();
     if (error) throw error;
     return mapIssueRow(data);
   },

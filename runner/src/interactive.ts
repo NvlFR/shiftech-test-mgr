@@ -2,6 +2,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { watch } from 'node:fs';
 import type { InteractiveRunnerConfig, RunnerCommand } from './config.js';
 import { log } from './logger.js';
+import { assertTrustedRepository, childProcessEnvironment, parseAllowedPlaywrightCommand } from './security.js';
 
 const TEST_FILE_PATTERN = /(?:^|[/\\])[^/\\]+\.(?:spec|test)\.(?:[cm]?[jt]sx?)$/i;
 const IGNORED_DIRECTORY_PATTERN = /(?:^|[/\\])(?:node_modules|\.git|test-results|playwright-report|artifacts)(?:[/\\]|$)/;
@@ -17,11 +18,11 @@ export function createInteractiveInvocation(
   mode: Exclude<RunnerCommand, 'start' | 'codegen' | 'sync'>,
   playwrightArgs: string[],
 ): InteractiveInvocation {
-  const [command = 'npx', ...baseArgs] = config.playwrightCmd.split(' ').filter(Boolean);
+  const invocation = parseAllowedPlaywrightCommand(config.playwrightCmd);
   return {
-    command,
-    args: [...baseArgs, ...playwrightArgs, ...(mode === 'ui' ? ['--ui'] : mode === 'debug' ? ['--debug'] : [])],
-    env: { ...process.env, ...(mode === 'debug' ? { PWDEBUG: '1' } : {}) },
+    command: invocation.command,
+    args: [...invocation.args, ...playwrightArgs, ...(mode === 'ui' ? ['--ui'] : mode === 'debug' ? ['--debug'] : [])],
+    env: childProcessEnvironment(mode === 'debug' ? { PWDEBUG: '1' } : {}),
   };
 }
 
@@ -100,6 +101,7 @@ export async function runInteractiveCommand(
   mode: Exclude<RunnerCommand, 'start' | 'codegen' | 'sync'>,
   playwrightArgs: string[],
 ): Promise<number> {
+  assertTrustedRepository(config.projectDir, config.trustedRepositories);
   if (mode === 'watch') return runWatch(config, playwrightArgs);
   return waitForExit(spawnPlaywright(config, mode, playwrightArgs));
 }

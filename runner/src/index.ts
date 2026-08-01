@@ -6,8 +6,10 @@ import { runInteractiveCommand } from './interactive.js';
 import { runCodegen } from './codegen.js';
 import { runScriptSync } from './sync.js';
 import { runInit } from './init.js';
+import { registerEnvironmentSecrets } from './security.js';
 
 async function main(): Promise<void> {
+  registerEnvironmentSecrets();
   const cli = parseCliInput(process.argv.slice(2));
   if (cli.command === 'init') {
     process.exitCode = await runInit(cli.initDirectory);

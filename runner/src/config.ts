@@ -1,5 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
+import { assertPrivateConfigFile, parseAllowedPlaywrightCommand, parseTrustedRepositories, registerEnvironmentSecrets, registerSecret } from './security.js';
 
 export interface RunnerConfig {
   supabaseUrl: string;
@@ -8,6 +9,7 @@ export interface RunnerConfig {
   projectDir: string;
   repositoryCacheDir: string;
   playwrightCmd: string;
+  trustedRepositories: string[];
   headed: boolean;
   slowMoMs: number;
   pollIntervalMs: number;
@@ -35,12 +37,14 @@ export interface RunnerCliInput {
 export interface InteractiveRunnerConfig {
   projectDir: string;
   playwrightCmd: string;
+  trustedRepositories: string[];
 }
 
 // Minimal zero-dependency .env loader. Existing process.env always wins so that
 // container/CI env vars override the file.
 function loadDotEnv(path: string): void {
   if (!existsSync(path)) return;
+  assertPrivateConfigFile(path);
   for (const raw of readFileSync(path, 'utf8').split('\n')) {
     const line = raw.trim();
     if (!line || line.startsWith('#')) continue;
@@ -136,29 +140,35 @@ export function parseCliInput(args: string[]): RunnerCliInput {
 
 export function loadInteractiveConfig(envPath = '.env'): InteractiveRunnerConfig {
   loadDotEnv(resolve(process.cwd(), envPath));
+  registerEnvironmentSecrets();
   const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
   if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
     throw new Error('TM_PROJECT_DIR must be an absolute path');
   }
-  return {
+  const config = {
     projectDir: resolve(projectDir),
     playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
+    trustedRepositories: parseTrustedRepositories(process.env.TM_TRUSTED_REPOSITORIES),
   };
+  parseAllowedPlaywrightCommand(config.playwrightCmd);
+  return config;
 }
 
 export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}): RunnerConfig {
   loadDotEnv(resolve(process.cwd(), envPath));
+  registerEnvironmentSecrets();
   const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
   if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
     throw new Error('TM_PROJECT_DIR must be an absolute path');
   }
-  return {
+  const config = {
     supabaseUrl: required('TM_SUPABASE_URL').replace(/\/+$/, ''),
     supabaseAnonKey: required('TM_SUPABASE_ANON_KEY'),
     runnerToken: required('TM_RUNNER_TOKEN'),
     projectDir: resolve(projectDir),
     repositoryCacheDir: resolve(process.cwd(), process.env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
     playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
+    trustedRepositories: parseTrustedRepositories(process.env.TM_TRUSTED_REPOSITORIES),
     headed: cliOptions.headed ?? boolEnv('TM_PLAYWRIGHT_HEADED', false),
     slowMoMs: cliOptions.slowMoMs ?? nonNegativeIntEnv('TM_PLAYWRIGHT_SLOW_MO_MS', 0),
     pollIntervalMs: intEnv('TM_POLL_INTERVAL_SECONDS', 5) * 1000,
@@ -167,4 +177,8 @@ export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}):
     artifactDir: resolve(process.cwd(), process.env.TM_ARTIFACT_DIR?.trim() || './artifacts'),
     artifactUpload: (process.env.TM_ARTIFACT_UPLOAD?.trim().toLowerCase() ?? 'true') !== 'false',
   };
+  parseAllowedPlaywrightCommand(config.playwrightCmd);
+  registerSecret(config.supabaseAnonKey);
+  registerSecret(config.runnerToken);
+  return config;
 }

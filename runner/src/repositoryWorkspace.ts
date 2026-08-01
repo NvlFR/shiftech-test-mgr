@@ -1,10 +1,11 @@
 import { execFile } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, realpathSync } from 'node:fs';
 import { isAbsolute, join, normalize, relative, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import type { JobRepository } from './api.js';
 import type { RunnerConfig } from './config.js';
 import { inspectLocalRepository, type LocalRepositoryMetadata } from './localRepository.js';
+import { assertTrustedRepository, registerSecret } from './security.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -31,12 +32,18 @@ function resolveSubdirectory(repositoryRoot: string, subdirectory: string | null
   if (!subdirectory) return repositoryRoot;
   if (isAbsolute(subdirectory)) throw new Error('Repository subdirectory harus berupa path relatif');
   const resolved = resolve(repositoryRoot, normalize(subdirectory));
-  const childPath = relative(repositoryRoot, resolved);
-  if (!childPath || childPath.startsWith('..') || isAbsolute(childPath)) {
+  const lexicalChildPath = relative(repositoryRoot, resolved);
+  if (!lexicalChildPath || lexicalChildPath.startsWith('..') || isAbsolute(lexicalChildPath)) {
     throw new Error('Repository subdirectory berada di luar root repository');
   }
   if (!existsSync(resolved)) throw new Error(`Repository subdirectory tidak ditemukan: ${subdirectory}`);
-  return resolved;
+  const realRoot = realpathSync(repositoryRoot);
+  const realResolved = realpathSync(resolved);
+  const childPath = relative(realRoot, realResolved);
+  if (!childPath || childPath.startsWith('..') || isAbsolute(childPath)) {
+    throw new Error('Repository subdirectory berada di luar root repository');
+  }
+  return realResolved;
 }
 
 export async function prepareJobRepository(
@@ -46,11 +53,14 @@ export async function prepareJobRepository(
   inspectRepository: InspectRepository = inspectLocalRepository,
 ): Promise<{ projectDir: string; metadata: LocalRepositoryMetadata }> {
   if (!repository) {
-    return { projectDir: config.projectDir, metadata: inspectRepository(config.projectDir) };
+    const metadata = inspectRepository(config.projectDir);
+    assertTrustedRepository(metadata.path, config.trustedRepositories);
+    return { projectDir: config.projectDir, metadata };
   }
 
   if (repository.source_type === 'local_path') {
     const metadata = inspectRepository(repository.url_or_path);
+    assertTrustedRepository(metadata.path, config.trustedRepositories);
     return {
       projectDir: resolveSubdirectory(repository.url_or_path, repository.subdirectory),
       metadata,
@@ -77,6 +87,7 @@ export async function prepareJobRepository(
   const repositoryRoot = join(config.repositoryCacheDir, repository.id);
   const branch = repository.default_branch || 'main';
   const env = gitEnvironment(repository.token);
+  registerSecret(repository.token);
 
   if (!existsSync(join(repositoryRoot, '.git'))) {
     await gitCommand(['clone', '--branch', branch, '--single-branch', '--', repository.url_or_path, repositoryRoot], env);
@@ -86,8 +97,10 @@ export async function prepareJobRepository(
     await gitCommand(['-C', repositoryRoot, 'pull', '--ff-only', 'origin', branch], env);
   }
 
+  const metadata = inspectRepository(repositoryRoot);
+  assertTrustedRepository(metadata.path, config.trustedRepositories);
   return {
     projectDir: resolveSubdirectory(repositoryRoot, repository.subdirectory),
-    metadata: inspectRepository(repositoryRoot),
+    metadata,
   };
 }

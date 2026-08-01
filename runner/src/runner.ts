@@ -7,6 +7,7 @@ import { hasCompleteFailureBundle } from './artifacts.js';
 import { log } from './logger.js';
 import type { LocalRepositoryMetadata } from './localRepository.js';
 import { prepareJobRepository } from './repositoryWorkspace.js';
+import { registerSecret, redactSecrets } from './security.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -21,6 +22,7 @@ class JobLogStreamer {
   }
 
   push(stream: JobLogStream, content: string): void {
+    content = redactSecrets(content);
     for (let offset = 0; offset < content.length; offset += 32_768) {
       const chunk = content.slice(offset, offset + 32_768);
       if (chunk) this.pending.push({ stream, content: chunk });
@@ -116,6 +118,7 @@ export class Runner {
         let outcome;
         const logStreamer = new JobLogStreamer(this.api, job.id, job.attempt);
         try {
+          registerSecret(job.repository?.token);
           workspace = await prepareJobRepository(this.config, job.repository);
           logStreamer.push('system', `Menjalankan ${job.script_ref}\n`);
           outcome = await executeJob(

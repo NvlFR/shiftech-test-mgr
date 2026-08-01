@@ -24,7 +24,7 @@ test('subcommand interaktif dan argumen Playwright diparse tanpa opsi server', (
 });
 
 test('invocation UI, debug, dan watch dibentuk sesuai Playwright', () => {
-  const interactiveConfig = { projectDir: '/tmp/project', playwrightCmd: 'npx playwright test' };
+  const interactiveConfig = { projectDir: '/tmp/project', playwrightCmd: 'npx playwright test', trustedRepositories: ['/tmp/project'] };
   assert.deepEqual(createInteractiveInvocation(interactiveConfig, 'ui', ['smoke.spec.ts']).args, ['playwright', 'test', 'smoke.spec.ts', '--ui']);
   const debug = createInteractiveInvocation(interactiveConfig, 'debug', []);
   assert.deepEqual(debug.args, ['playwright', 'test', '--debug']);

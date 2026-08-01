@@ -6,6 +6,7 @@ import type { CodegenTestCase } from './api.js';
 import { AutomationApi } from './api.js';
 import type { RunnerConfig } from './config.js';
 import { log } from './logger.js';
+import { assertTrustedRepository, childProcessEnvironment, parseAllowedPlaywrightCommand } from './security.js';
 
 export function codegenScriptRef(testCase: Pick<CodegenTestCase, 'code'>): string {
   const slug = testCase.code.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -13,10 +14,9 @@ export function codegenScriptRef(testCase: Pick<CodegenTestCase, 'code'>): strin
 }
 
 export function createCodegenInvocation(config: Pick<RunnerConfig, 'playwrightCmd'>, url: string, output: string) {
-  const parts = config.playwrightCmd.split(' ').filter(Boolean);
-  const command = parts.shift() ?? 'npx';
-  if (parts.at(-1) === 'test') parts.pop();
-  return { command, args: [...parts, 'codegen', url, '--output', output] };
+  const invocation = parseAllowedPlaywrightCommand(config.playwrightCmd);
+  const baseArgs = invocation.args.at(-1) === 'test' ? invocation.args.slice(0, -1) : invocation.args;
+  return { command: invocation.command, args: [...baseArgs, 'codegen', url, '--output', output] };
 }
 
 export function formatCodegenChecklist(testCase: Pick<CodegenTestCase, 'code' | 'title' | 'steps'>): string {
@@ -57,6 +57,7 @@ async function selectTestCase(testCases: CodegenTestCase[]): Promise<CodegenTest
 }
 
 export async function runCodegen(config: RunnerConfig, url: string): Promise<number> {
+  assertTrustedRepository(config.projectDir, config.trustedRepositories);
   const api = new AutomationApi(config);
   const selected = await selectTestCase(await api.listCodegenTestCases());
   if (!selected) return 0;
@@ -71,7 +72,7 @@ export async function runCodegen(config: RunnerConfig, url: string): Promise<num
   process.stdout.write(formatCodegenChecklist(selected));
   const invocation = createCodegenInvocation(config, url, output);
   log.info('Starting Playwright codegen', { testCase: selected.code, scriptRef });
-  const exitCode = await waitForExit(spawn(invocation.command, invocation.args, { cwd: config.projectDir, env: process.env, stdio: 'inherit' }));
+  const exitCode = await waitForExit(spawn(invocation.command, invocation.args, { cwd: config.projectDir, env: childProcessEnvironment(), stdio: 'inherit' }));
   if (exitCode !== 0) return exitCode;
   if (!existsSync(output)) throw new Error(`Playwright selesai tetapi script tidak ditemukan: ${scriptRef}`);
   await api.attachCodegenScript(selected.id, scriptRef);

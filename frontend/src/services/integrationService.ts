@@ -1,6 +1,6 @@
 import { integrationRepository } from '../repositories/integrationRepository';
 import type { ApiTokenScope, WebhookEvent } from '../types/domain';
-const allowedEvents: WebhookEvent[] = ['test_run.created', 'test_run.updated', 'test_result.updated', 'issue.created', 'issue.updated'];
+const allowedEvents: WebhookEvent[] = ['test_run.created', 'test_run.updated', 'test_result.updated', 'issue.created', 'issue.updated', 'issue.resolved'];
 export const integrationService = {
   listTokens: integrationRepository.listTokens, listWebhooks: integrationRepository.listWebhooks, listDeliveries: integrationRepository.listDeliveries, revokeToken: integrationRepository.revokeToken, updateWebhook: integrationRepository.updateWebhook, rotateWebhookSecret: integrationRepository.rotateWebhookSecret,
   async createToken(input: { projectId: string; name: string; scopes: ApiTokenScope[] }) { if (!input.name.trim()) throw new Error('Nama token wajib diisi'); if (!input.scopes.length) throw new Error('Pilih minimal satu scope'); return integrationRepository.createToken(input.projectId, input.name.trim(), input.scopes); },

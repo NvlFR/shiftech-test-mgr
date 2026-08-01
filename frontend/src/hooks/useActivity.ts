@@ -12,6 +12,7 @@ export function useActivity(projectId: string | null) {
   return {
     events: query.data ?? [],
     loading: query.isLoading,
+    error: query.error instanceof Error ? query.error.message : null,
     reload: query.refetch,
   };
 }

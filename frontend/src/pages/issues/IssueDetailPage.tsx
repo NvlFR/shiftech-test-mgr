@@ -4,6 +4,8 @@ import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { issueService } from '../../services/issueService';
@@ -13,6 +15,8 @@ import { projectService } from '../../services/projectService';
 import { useProjectRole } from '../../hooks/useProjectRole';
 import { useAuthContext } from '../../hooks/useAuth';
 import { useIssueAttachments } from '../../hooks/useIssueAttachments';
+import { useIssueCodeContext } from '../../hooks/useIssueCodeContext';
+import { useIssueStatus } from '../../hooks/useIssueStatus';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
 import { CommentsPanel } from '../../components/ui/CommentsPanel';
 import { IssueEditor, type IssueFormData } from '../../components/issues/IssueEditor';
@@ -51,6 +55,8 @@ export function IssueDetailPage() {
   const [projectName, setProjectName] = useState<string | null>(null);
   const [attachmentUploading, setAttachmentUploading] = useState(false);
   const { attachments, loading: attachmentsLoading, upload: uploadAttachment, remove: removeAttachment } = useIssueAttachments(id ?? null);
+  const { codeContext, loading: codeContextLoading } = useIssueCodeContext(id ?? null);
+  const { changeStatus, updating: statusUpdating } = useIssueStatus();
   const { canManageIssues, canDeleteContent } = useProjectRole(issue?.projectId ?? undefined);
   const { testRoles, projectMembers } = useIssueEditorOptions(issue?.projectId ?? null);
 
@@ -86,6 +92,9 @@ export function IssueDetailPage() {
 
   // --- Edit dialog ---
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
+  const [fixReferenceUrl, setFixReferenceUrl] = useState('');
+  const [resolveError, setResolveError] = useState<string | null>(null);
 
   function openEditDialog() {
     if (!issue) return;
@@ -95,7 +104,7 @@ export function IssueDetailPage() {
   async function handleSaveEdit(data: IssueFormData) {
     if (!issue) return;
     await issueService.update(issue.id, data);
-    if (data.status !== issue.status) await issueService.changeStatus(issue.id, data.status);
+    if (data.status !== issue.status) await changeStatus(issue.id, data.status, data.status === 'resolved' ? issue.fixReferenceUrl : undefined);
     if (data.assignedTo !== issue.assignedTo) await issueService.assign(issue.id, data.assignedTo);
     setEditDialogOpen(false);
     await reload();
@@ -104,8 +113,27 @@ export function IssueDetailPage() {
 
   async function handleChangeStatus(status: IssueStatus) {
     if (!issue) return;
-    await issueService.changeStatus(issue.id, status);
+    if (status === 'resolved' && issue.status !== 'resolved') {
+      setFixReferenceUrl(issue.fixReferenceUrl ?? '');
+      setResolveError(null);
+      setResolveDialogOpen(true);
+      return;
+    }
+    await changeStatus(issue.id, status);
     await reload();
+  }
+
+  async function handleResolve() {
+    if (!issue) return;
+    setResolveError(null);
+    try {
+      await changeStatus(issue.id, 'resolved', fixReferenceUrl);
+      setResolveDialogOpen(false);
+      await reload();
+      toast.current?.show({ severity: 'success', summary: 'Issue ditandai resolved' });
+    } catch (error) {
+      setResolveError(error instanceof Error ? error.message : 'Gagal menyelesaikan issue');
+    }
   }
 
   async function handleAssign(assignedTo: string | null | undefined) {
@@ -140,7 +168,7 @@ export function IssueDetailPage() {
       acceptLabel: 'Arsipkan',
       rejectLabel: 'Batal',
       accept: async () => {
-        await issueService.changeStatus(issue.id, 'closed');
+        await changeStatus(issue.id, 'closed');
         await reload();
         toast.current?.show({ severity: 'success', summary: 'Issue diarsipkan' });
       },
@@ -301,7 +329,8 @@ export function IssueDetailPage() {
         <div className="grid mt-3">
           <div className="col-12 md:col-6 flex flex-column gap-1">
             <label className="text-color-secondary text-sm">Status</label>
-            <Dropdown value={issue.status} options={STATUS_OPTIONS} onChange={(e) => handleChangeStatus(e.value)} disabled={!canManageIssues} className="w-full" />
+            <Dropdown value={issue.status} options={STATUS_OPTIONS} onChange={(e) => handleChangeStatus(e.value)} disabled={!canManageIssues || statusUpdating} className="w-full" />
+            {issue.status === 'verified' && canManageIssues && <small className="text-color-secondary">Status dari AI dapat Anda override; perubahan manusia dicatat di audit log.</small>}
           </div>
           <div className="col-12 md:col-6 flex flex-column gap-1">
             <label className="text-color-secondary text-sm">Ditugaskan Ke</label>
@@ -336,6 +365,49 @@ export function IssueDetailPage() {
         </Card>
       )}
 
+      {(codeContextLoading || codeContext) && (
+        <Card title="Konteks Kode" className="mb-3">
+          {codeContextLoading ? (
+            <span className="text-color-secondary">Memuat konteks repository...</span>
+          ) : codeContext && (
+            <div className="flex flex-column gap-3">
+              <div className="flex flex-wrap gap-4 text-sm">
+                <span className="text-color-secondary">
+                  Repository:{' '}
+                  {codeContext.repositoryUrl ? (
+                    <a href={codeContext.repositoryUrl} target="_blank" rel="noreferrer" className="entity-link">
+                      {codeContext.repository.name}
+                    </a>
+                  ) : <span className="text-color">{codeContext.repository.name}</span>}
+                </span>
+                <span className="text-color-secondary">
+                  Branch: <span className="text-color">{codeContext.branch ?? codeContext.repository.defaultBranch ?? '-'}</span>
+                </span>
+                <span className="text-color-secondary">
+                  Commit:{' '}
+                  {codeContext.commitUrl ? (
+                    <a href={codeContext.commitUrl} target="_blank" rel="noreferrer" className="entity-link">
+                      <code>{codeContext.commitSha?.slice(0, 12)}</code>
+                    </a>
+                  ) : <code className="text-color">{codeContext.commitSha?.slice(0, 12) ?? '-'}</code>}
+                </span>
+              </div>
+              {codeContext.filePath && (
+                <div className="text-sm">
+                  <span className="text-color-secondary">File terkait: </span>
+                  {codeContext.fileUrl ? (
+                    <a href={codeContext.fileUrl} target="_blank" rel="noreferrer" className="entity-link">
+                      <i className="pi pi-file-code mr-2" />
+                      <code>{codeContext.filePath}</code>
+                    </a>
+                  ) : <code>{codeContext.filePath}</code>}
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+      )}
+
       {issue.externalLinks && issue.externalLinks.length > 0 && (
         <Card title="External Links" className="mb-3">
           <div className="flex flex-column gap-2">
@@ -346,6 +418,26 @@ export function IssueDetailPage() {
               </a>
             ))}
           </div>
+        </Card>
+      )}
+
+      {issue.fixReferenceUrl && (
+        <Card title="Perbaikan yang Diklaim" className="mb-3">
+          <a href={issue.fixReferenceUrl} target="_blank" rel="noreferrer" className="entity-link">
+            <i className="pi pi-code mr-2" />
+            {issue.fixReferenceUrl}
+          </a>
+        </Card>
+      )}
+      {issue.verifiedTestRun && (
+        <Card title="Regression pembuktian" className="mb-3">
+          <Button
+            link
+            className="p-0"
+            icon="pi pi-check-circle"
+            label={`${issue.verifiedTestRun.code} - ${issue.verifiedTestRun.name}`}
+            onClick={() => navigate(`/test-runs/${issue.verifiedTestRun!.id}`)}
+          />
         </Card>
       )}
 
@@ -406,6 +498,21 @@ export function IssueDetailPage() {
           externalLinks: issue.externalLinks ?? [],
         }}
       />
+
+      <Dialog header="Tandai Issue Resolved" visible={resolveDialogOpen} onHide={() => setResolveDialogOpen(false)} closable={!statusUpdating} style={{ width: '32rem' }} className="dialog-fullscreen-mobile">
+        <div className="flex flex-column gap-3">
+          <span className="text-color-secondary">Link commit atau pull request bersifat opsional dan menunjukkan perubahan yang mengklaim memperbaiki Issue ini.</span>
+          <div className="flex flex-column gap-1">
+            <label htmlFor="fix-reference-url">Link commit/PR (opsional)</label>
+            <InputText id="fix-reference-url" value={fixReferenceUrl} onChange={(event) => setFixReferenceUrl(event.target.value)} placeholder="https://github.com/org/repo/pull/123" disabled={statusUpdating} autoFocus />
+          </div>
+          {resolveError && <small className="p-error">{resolveError}</small>}
+          <div className="flex justify-content-end gap-2">
+            <Button label="Batal" outlined onClick={() => setResolveDialogOpen(false)} disabled={statusUpdating} />
+            <Button label="Tandai Resolved" icon="pi pi-check" onClick={handleResolve} loading={statusUpdating} />
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

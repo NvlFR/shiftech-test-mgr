@@ -36,6 +36,7 @@ Runner **tidak membuka port** apa pun — aman di balik NAT/firewall.
 ```bash
 cd runner
 cp .env.example .env      # isi TM_SUPABASE_URL, TM_SUPABASE_ANON_KEY, TM_RUNNER_TOKEN, TM_PROJECT_DIR
+chmod 600 .env            # wajib pada Linux/macOS; runner menolak file yang terbaca user lain
 npm install               # hanya devDependency (TypeScript); runner tanpa runtime deps
 npm run build
 npm start
@@ -88,6 +89,20 @@ lokal tersebut. Untuk repository remote, runner melakukan clone atau pull ke
 ke repository, `TM_PROJECT_DIR` menjadi fallback dan wajib berupa path absolut,
 terbaca, serta menunjuk root git repository. Runner yang hanya menangani repository
 remote tidak perlu menyiapkan source code lebih dulu.
+
+Sebelum eksekusi, root Git harus tercantum eksplisit di
+`TM_TRUSTED_REPOSITORIES` (delimiter `:` di Linux/macOS, `;` di Windows). Runner
+fail-closed untuk repo lain, termasuk clone remote baru: periksa repo beserta
+`playwright.config.*`, lalu tambahkan path cache root repo tersebut dan restart.
+Trust sengaja berada di level repository karena Playwright memuat konfigurasi
+Node sebelum file test. `script_ref` absolut, traversal, dan symlink keluar root
+tetap ditolak sebagai lapisan tambahan.
+
+Runner hanya mengizinkan invocation Playwright resmi yang tercantum di
+`.env.example`; shell/wrapper arbitrer ditolak. Kredensial runner dan repository
+tidak diteruskan ke proses Playwright. Nilai environment yang bernama sensitif
+dimask sebagai `[REDACTED]` pada logger, live log, artifact log, dan fatal error.
+File `.env` wajib berpermission `0600` pada sistem POSIX atau runner menolak start.
 
 Credential private repository diambil bersama job saat runtime. Runner memasangnya
 hanya pada environment proses Git, tidak pada URL/argumen command, konfigurasi Git,

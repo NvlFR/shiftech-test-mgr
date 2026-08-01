@@ -15,6 +15,20 @@ export interface AutomationRerunFailedInput {
   maxAttempts: number;
   confirmedBy?: string;
   explicitConfirmation: boolean;
+  diffPaths?: string[];
+  diffBase?: string;
+  diffHead?: string;
+}
+
+export interface RegressionDiffContext {
+  repositoryId: string | null;
+  baseCommit: string | null;
+  fixReferenceUrl: string | null;
+}
+
+export interface AutomationVerifyRegressionInput {
+  issueId: string;
+  testRunId: string;
 }
 
 export class AutomationRepositoryError extends Error {
@@ -52,7 +66,25 @@ export class AutomationRepository {
       p_selection_limit: this.config.rerunFailedMaxTests,
       p_confirmed_by: input.confirmedBy ?? null,
       p_explicit_confirmation: input.explicitConfirmation,
+      p_diff_paths: input.diffPaths ?? [],
+      p_diff_base: input.diffBase ?? null,
+      p_diff_head: input.diffHead ?? null,
     });
+  }
+  verifyRegression(input: AutomationVerifyRegressionInput) {
+    return this.rpc("mcp_verify_regression", {
+      p_issue_id: input.issueId,
+      p_test_run_id: input.testRunId,
+    });
+  }
+  async regressionDiffContext(issueId: string): Promise<RegressionDiffContext | null> {
+    const value = await this.rpc("mcp_regression_diff_context", { p_issue_id: issueId });
+    const row = Array.isArray(value) ? value[0] as Record<string, unknown> | undefined : undefined;
+    return row ? {
+      repositoryId: typeof row.repository_id === "string" ? row.repository_id : null,
+      baseCommit: typeof row.base_commit === "string" ? row.base_commit : null,
+      fixReferenceUrl: typeof row.fix_reference_url === "string" ? row.fix_reference_url : null,
+    } : null;
   }
   jobStatus(jobId: string) { return this.rpc("mcp_automation_job_status", { p_job_id: jobId }); }
   runnerList() { return this.rpc("mcp_automation_runner_list", {}); }

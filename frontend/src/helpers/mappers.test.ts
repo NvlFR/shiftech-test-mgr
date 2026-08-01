@@ -25,13 +25,14 @@ describe('mappers', () => {
     expect(Object.keys(mappers).sort()).toEqual([
       'mapActivityEventRow', 'mapApiTokenRow', 'mapAttachmentRow', 'mapAutomationJobLogRow',
       'mapAutomationJobRow', 'mapAutomationRunnerRow', 'mapAutomationScriptRow', 'mapCicdPipelineRow',
-      'mapCommentMentionRow', 'mapCommentRow', 'mapDashboardReportRunRow', 'mapEnvironmentRow',
+      'mapCommentMentionRow', 'mapCommentRow', 'mapDashboardQaLoopAuditRow', 'mapDashboardReportRunRow', 'mapEnvironmentRow',
       'mapIssueAttachmentRow', 'mapIssueRow', 'mapModuleRow', 'mapNotificationRow', 'mapProfileRow',
       'mapProjectMemberRow', 'mapProjectMemberWithProfileRow', 'mapProjectRepositoryRow', 'mapProjectRow',
-      'mapRequirementLinkRow', 'mapRequirementRow', 'mapRestorePreviewRow', 'mapRestoreResultRow',
+      'mapProjectTeamRow', 'mapRequirementLinkRow', 'mapRequirementRow', 'mapRestorePreviewRow', 'mapRestoreResultRow',
       'mapRetentionCleanupPreviewRow', 'mapRetentionCleanupResultRow', 'mapRetentionPolicyRow', 'mapTagRow',
+      'mapTeamRow', 'mapTeamWithMembersRow',
       'mapTestCaseRow', 'mapTestCaseStepRow', 'mapTestCaseVersionRow', 'mapTestPlanCaseRow',
-      'mapTestPlanRow', 'mapTestResultRow', 'mapTestResultScreenshotHistoryRow', 'mapTestResultStepRow',
+      'mapTestPlanRow', 'mapTestPlanScheduleRow', 'mapTestResultRow', 'mapTestResultScreenshotHistoryRow', 'mapTestResultStepRow',
       'mapTestRoleRow', 'mapTestRunAssignmentRow', 'mapTestRunRow', 'mapTestSuiteItemRow',
       'mapTestSuiteItemStepRow', 'mapTestSuiteRow', 'mapWebhookDeliveryRow', 'mapWebhookRow',
     ]);
@@ -56,6 +57,7 @@ describe('mappers', () => {
       ['tag', mappers.mapTagRow, { id: 'tag-1', project_id: 'project-1', name: 'smoke', created_at: timestamps.created_at }],
       ['test role', mappers.mapTestRoleRow, { id: 'role-1', project_id: 'project-1', name: 'Administrator', ...timestamps }],
       ['test plan', mappers.mapTestPlanRow, { id: 'plan-1', project_id: 'project-1', code: 'TP-0001', name: 'Release', description: null, status: 'draft', created_by: null, approved_by: null, approved_at: null, ...timestamps }],
+      ['test plan schedule', mappers.mapTestPlanScheduleRow, { id: 'schedule-1', project_id: 'project-1', test_plan_id: 'plan-1', name: 'Nightly', next_run_at: timestamps.created_at, interval_days: 1, environment_id: null, browser: 'chromium', device_profile: null, max_attempts: 2, pause_on_failure: true, active: true, last_enqueued_at: null, ...timestamps }],
       ['environment', mappers.mapEnvironmentRow, { id: 'environment-1', project_id: 'project-1', name: 'Staging', base_url: null, ...timestamps }],
       ['test case', mappers.mapTestCaseRow, { id: 'case-1', project_id: 'project-1', module_id: null, code: 'TC-0001', title: 'Login', objective: null, preconditions: null, steps: 'Submit form', expected_result: 'Dashboard', step_type: 'simple', priority: 'critical', status: 'draft', source: 'ai', ai_batch_id: null, review_decision: null, reviewed_by: null, reviewed_at: null, notes: null, assigned_to: null, target_role_id: null, created_by: null, external_links: [], ...timestamps }],
       ['test case version', mappers.mapTestCaseVersionRow, { id: 'version-1', test_case_id: 'case-1', version: 2, steps: 'Updated step', expected_result: 'Updated result', changed_by: null, created_at: timestamps.created_at }],
@@ -64,8 +66,9 @@ describe('mappers', () => {
       ['test case step', mappers.mapTestCaseStepRow, { id: 'step-1', test_case_id: 'case-1', step_number: 1, action: 'Open page', expected_result: null, ...timestamps }],
       ['test result step', mappers.mapTestResultStepRow, { id: 'result-step-1', test_result_id: 'result-1', test_case_step_id: 'step-1', step_number: 1, action: 'Open page', expected_result: null, status: 'not_run', notes: null, updated_at: timestamps.updated_at }],
       ['test run assignment', mappers.mapTestRunAssignmentRow, { id: 'assignment-1', test_run_id: 'run-1', test_case_id: 'case-1', tester_id: 'user-1', ...timestamps }],
-      ['issue', mappers.mapIssueRow, { id: 'issue-1', code: 'ISS-0001', test_result_id: 'result-1', title: 'Login fails', description: null, actual_result: null, expected_result: null, priority: 'high', status: 'open', assigned_to: null, type: 'bug', created_by: null, target_role_id: null, external_links: [], ...timestamps }],
+      ['issue', mappers.mapIssueRow, { id: 'issue-1', code: 'ISS-0001', test_result_id: 'result-1', title: 'Login fails', description: null, actual_result: null, expected_result: null, priority: 'high', status: 'open', assigned_to: null, type: 'bug', created_by: null, target_role_id: null, external_links: [], fix_reference_url: null, verified_test_run_id: null, ...timestamps }],
       ['profile', mappers.mapProfileRow, { id: 'user-1', email: 'user@example.test', full_name: null, avatar_url: null, role: 'user', created_at: timestamps.created_at, updated_at: timestamps.updated_at, deleted_at: null }],
+      ['team', mappers.mapTeamRow, { id: 'team-1', name: 'QA', description: null, created_by: null, ...timestamps }],
       ['requirement', mappers.mapRequirementRow, { id: 'requirement-1', project_id: 'project-1', key: 'REQ-1', title: 'Login', description: null, status: 'approved', priority: 'high', created_by: null, ...timestamps }],
       ['requirement link', mappers.mapRequirementLinkRow, { id: 'link-1', requirement_id: 'requirement-1', type: 'test_case', target_id: 'case-1', target_label: 'TC-0001', created_by: null, created_at: timestamps.created_at }],
     ];
@@ -84,15 +87,23 @@ describe('mappers', () => {
       expect(mappers.mapProjectMemberWithProfileRow(row)).toEqual({ ...camelizeRow(row), profile });
     });
 
+    it('memetakan anggota team dan akses team project beserta relasi nested', () => {
+      const teamRow = { id: 'team-1', name: 'QA', description: null, created_by: 'user-1', ...timestamps };
+      expect(mappers.mapTeamWithMembersRow({ ...teamRow, team_members: [{ profile: profileRow }] })).toEqual({ ...camelizeRow(teamRow), members: [profile] });
+      expect(mappers.mapProjectTeamRow({ id: 'access-1', project_id: 'project-1', team_id: 'team-1', role: 'tester', permissions: { view: true }, created_at: timestamps.created_at, team: teamRow })).toEqual({ id: 'access-1', projectId: 'project-1', teamId: 'team-1', role: 'tester', permissions: { view: true }, createdAt: timestamps.created_at, team: camelizeRow(teamRow) });
+    });
+
     it('memetakan notification dan target comment nested yang nullable', () => {
       const row = { id: 'notification-1', recipient_id: 'user-1', issue_id: null, comment_id: 'comment-1', comment: { target_type: 'issue', target_id: 'issue-1' }, kind: 'comment_mentioned', message: 'Mentioned', read_at: null, created_at: timestamps.created_at };
       expect(mappers.mapNotificationRow(row)).toEqual({ id: 'notification-1', recipientId: 'user-1', issueId: null, commentId: 'comment-1', commentTargetType: 'issue', commentTargetId: 'issue-1', kind: 'comment_mentioned', message: 'Mentioned', readAt: null, createdAt: timestamps.created_at });
     });
 
     it('memetakan activity actor nested dan nullable', () => {
-      const row = { id: 'activity-1', project_id: 'project-1', table_name: 'issues', record_id: null, action: 'updated', changed_by: null, actor: profileRow, created_at: timestamps.created_at };
-      expect(mappers.mapActivityEventRow(row)).toEqual({ id: 'activity-1', projectId: 'project-1', tableName: 'issues', recordId: null, action: 'updated', changedBy: null, actor: profile, createdAt: timestamps.created_at });
+      const row = { id: 'activity-1', project_id: 'project-1', table_name: 'issues', record_id: null, action: 'updated', changed_by: null, actor: profileRow, old_data: { status: 'open' }, new_data: { status: 'resolved' }, created_at: timestamps.created_at };
+      expect(mappers.mapActivityEventRow(row)).toEqual({ id: 'activity-1', projectId: 'project-1', tableName: 'issues', recordId: null, action: 'updated', changedBy: null, actorType: 'system', actor: profile, oldData: { status: 'open' }, newData: { status: 'resolved' }, createdAt: timestamps.created_at });
       expect(mappers.mapActivityEventRow({ ...row, actor: null }).actor).toBeNull();
+      expect(mappers.mapActivityEventRow({ ...row, actor_type: 'agent' }).actorType).toBe('agent');
+      expect(mappers.mapActivityEventRow({ ...row, changed_by: 'user-1' }).actorType).toBe('human');
     });
 
     it('memetakan comment, author, mentions, dan profile nested', () => {
@@ -128,6 +139,12 @@ describe('mappers', () => {
     it('memetakan dashboard report dari relasi nested dan menginisialisasi summary', () => {
       const row = { id: 'run-1', code: 'TR-0001', name: 'Regression', test_plan: { project_id: 'project-1', name: 'Release', project: { name: 'TestManager' } }, environment: null, release: null, status: 'completed', started_at: timestamps.created_at, completed_at: null };
       expect(mappers.mapDashboardReportRunRow(row)).toEqual({ id: 'run-1', code: 'TR-0001', name: 'Regression', projectId: 'project-1', projectName: 'TestManager', testPlanName: 'Release', environmentName: null, release: null, status: 'completed', startedAt: timestamps.created_at, completedAt: null, total: 0, executed: 0, pass: 0, fail: 0, skip: 0, blocked: 0, notRun: 0, passRate: 0, failRate: 0, progressPercent: 0 });
+    });
+
+    it('memetakan audit siklus QA dan custom regression run', () => {
+      expect(mappers.mapDashboardQaLoopAuditRow({ table_name: 'mcp.automation.rerun_failed', record_id: 'run-1', new_data: { issue_id: 'issue-1' }, created_at: timestamps.created_at })).toEqual({ issueId: 'issue-1', testRunId: 'run-1', action: 'entered', createdAt: timestamps.created_at });
+      expect(mappers.mapDashboardQaLoopAuditRow({ table_name: 'mcp.automation.verify_regression', record_id: 'issue-1', new_data: { issue_id: 'issue-1', test_run_id: 'run-1', agent_action: 'issue_verified' }, created_at: timestamps.created_at })).toEqual({ issueId: 'issue-1', testRunId: 'run-1', action: 'verified', createdAt: timestamps.created_at });
+      expect(mappers.mapDashboardReportRunRow({ id: 'run-1', code: 'TR-0001', name: 'Regression', custom_project_id: 'project-1', custom_project: { name: 'TestManager' }, environment: null, release: null, status: 'completed', started_at: timestamps.created_at, completed_at: timestamps.updated_at })).toMatchObject({ projectId: 'project-1', projectName: 'TestManager', testPlanName: 'Custom regression' });
     });
 
     it('memetakan retention dan restore serta menjaga null dan konversi number', () => {

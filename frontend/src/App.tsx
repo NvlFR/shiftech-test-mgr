@@ -28,6 +28,8 @@ import { IntegrationsPage } from './pages/integrations/IntegrationsPage';
 import { AutomationPage } from './pages/automation/AutomationPage';
 import { ProjectDataManagementPage } from './pages/projects/ProjectDataManagementPage';
 import { DashboardReportPage } from './pages/dashboard/DashboardReportPage';
+import { TeamsPage } from './pages/teams/TeamsPage';
+import { ProjectTeamsPage } from './pages/teams/ProjectTeamsPage';
 
 function App() {
   return (
@@ -42,6 +44,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardReportPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/projects/:id/settings" element={<ProjectSettingsPage />} />
+          <Route path="/projects/:id/teams" element={<ProjectTeamsPage />} />
           <Route path="/projects/:id/integrations" element={<IntegrationsPage />} />
           <Route path="/projects/:id/requirements" element={<RequirementsPage />} />
           <Route path="/projects/:id/integrations/cicd" element={<CicdIntegrationPage />} />
@@ -64,6 +67,7 @@ function App() {
             <Route path="/admin/data-retention" element={<ProjectDataManagementPage />} />
             <Route path="/users" element={<UserManagementPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
+            <Route path="/teams" element={<TeamsPage />} />
           </Route>
         </Route>
       </Route>

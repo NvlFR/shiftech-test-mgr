@@ -14,6 +14,14 @@ export interface Profile {
 export type ProjectStatus = 'active' | 'inactive' | 'archived';
 export type ProjectVisibility = 'private' | 'unlisted' | 'public';
 export type ProjectSortField = 'name' | 'createdAt' | 'updatedAt';
+
+export interface TestPlanSchedule {
+  id: string; projectId: string; testPlanId: string; name: string;
+  nextRunAt: string; intervalDays: number; environmentId: string | null;
+  browser: AutomationBrowser; deviceProfile: string | null; maxAttempts: number;
+  pauseOnFailure: boolean; active: boolean; lastEnqueuedAt: string | null;
+  createdAt: string; updatedAt: string;
+}
 export type SortDirection = 'asc' | 'desc';
 
 export interface Project {
@@ -91,12 +99,14 @@ export interface TestSuiteItemWithSteps extends TestSuiteItem {
 }
 
 export type ProjectMemberRole = 'manager' | 'supervisor' | 'tester' | 'member';
+export type ProjectPermission = 'view' | 'create' | 'update' | 'delete' | 'import' | 'export' | 'run_automation';
+export type ProjectPermissions = Record<ProjectPermission, boolean>;
 export type ProjectMemberStatus = 'invited' | 'accepted' | 'declined';
 
 export type ApiTokenScope = 'read:project' | 'write:test-runs' | 'write:test-results' | 'write:issues';
 export interface ApiToken { id: string; projectId: string; name: string; tokenPrefix: string; scopes: ApiTokenScope[]; revokedAt: string | null; createdAt: string; updatedAt: string; }
 export interface CreatedApiToken extends ApiToken { token: string; }
-export type WebhookEvent = 'test_run.created' | 'test_run.updated' | 'test_result.updated' | 'issue.created' | 'issue.updated';
+export type WebhookEvent = 'test_run.created' | 'test_run.updated' | 'test_result.updated' | 'issue.created' | 'issue.updated' | 'issue.resolved';
 export interface Webhook { id: string; projectId: string; name: string; url: string; events: WebhookEvent[]; isActive: boolean; maxRetries: number; createdAt: string; updatedAt: string; }
 export interface CreatedWebhook extends Webhook { secret: string; }
 export type WebhookDeliveryStatus = 'pending' | 'delivered' | 'retrying' | 'failed';
@@ -107,6 +117,7 @@ export interface ProjectMember {
   projectId: string;
   userId: string;
   role: ProjectMemberRole;
+  permissions: ProjectPermissions;
   status: ProjectMemberStatus;
   invitedBy: string | null;
   invitedAt: string | null;
@@ -116,6 +127,26 @@ export interface ProjectMember {
 
 export interface ProjectMemberWithProfile extends ProjectMember {
   profile: Profile;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  description: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TeamWithMembers extends Team { members: Profile[]; }
+export interface ProjectTeam {
+  id: string;
+  projectId: string;
+  teamId: string;
+  role: ProjectMemberRole;
+  permissions: ProjectPermissions;
+  createdAt: string;
+  team: Team;
 }
 
 export interface Module {
@@ -500,6 +531,8 @@ export interface Issue {
   createdBy?: string | null;
   targetRoleId?: string | null;
   externalLinks?: ExternalLink[];
+  fixReferenceUrl?: string | null;
+  verifiedTestRunId?: string | null;
   assignedTo: string | null;
   createdAt: string;
   updatedAt: string;
@@ -529,6 +562,17 @@ export interface IssueWithDetails extends Issue {
       }
     | null;
   testRun: { id: string; code: string; name: string } | null;
+  verifiedTestRun?: { id: string; code: string; name: string } | null;
+}
+
+export interface IssueCodeContext {
+  repository: ProjectRepository;
+  branch: string | null;
+  commitSha: string | null;
+  filePath: string | null;
+  repositoryUrl: string | null;
+  commitUrl: string | null;
+  fileUrl: string | null;
 }
 
 export interface IssueAttachment {
@@ -573,6 +617,7 @@ export interface Notification {
 }
 
 export type ActivityAction = 'created' | 'updated' | 'deleted';
+export type ActivityActorType = 'human' | 'agent' | 'system';
 export interface ActivityEvent {
   id: string;
   projectId: string;
@@ -580,7 +625,10 @@ export interface ActivityEvent {
   recordId: string | null;
   action: ActivityAction;
   changedBy: string | null;
+  actorType: ActivityActorType;
   actor: Profile | null;
+  oldData: Record<string, unknown> | null;
+  newData: Record<string, unknown> | null;
   createdAt: string;
 }
 
@@ -649,6 +697,20 @@ export interface DashboardIssueAging {
   oldestDays: number;
 }
 
+export interface DashboardQaLoopAudit {
+  issueId: string;
+  testRunId: string;
+  action: 'entered' | 'verified' | 'reopened';
+  createdAt: string;
+}
+
+export interface DashboardQaLoop {
+  entered: number;
+  verified: number;
+  reopened: number;
+  reopenRate: number;
+}
+
 export interface DashboardReport {
   generatedAt: string;
   filters: DashboardReportFilters;
@@ -667,6 +729,7 @@ export interface DashboardReport {
     progressPercent: number;
   };
   issueAging: DashboardIssueAging;
+  qaLoop: DashboardQaLoop;
 }
 
 export interface RetentionPolicy { id: string; projectId: string | null; retentionDays: number; attachmentRetentionDays: number | null; enabled: boolean; createdBy: string | null; createdAt: string; updatedAt: string; }

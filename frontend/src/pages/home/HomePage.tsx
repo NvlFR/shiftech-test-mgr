@@ -10,6 +10,7 @@ import { testRunService } from '../../services/testRunService';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import { exportTestRunsToExcel, exportTestRunsToPdf, type TestRunExportRow } from '../../helpers/testRunExporter';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { useProjectRole } from '../../hooks/useProjectRole';
 
 function StatCard({ icon, label, value, detail }: { icon: string; label: string; value: number; detail: string }) {
   return (
@@ -61,6 +62,7 @@ function downloadCsv(stats: NonNullable<ReturnType<typeof useDashboard>['stats']
 export function HomePage() {
   const { stats, loading, error, reload } = useDashboard();
   const { activeProject } = useProjectContext();
+  const { canExport } = useProjectRole(activeProject?.id);
   const [exportingRuns, setExportingRuns] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
@@ -150,7 +152,7 @@ export function HomePage() {
         </div>
       </div>
 
-      <Card title="Export Laporan Test Run">
+      {canExport && <Card title="Export Laporan Test Run">
         <div className="flex align-items-center justify-content-between gap-3 flex-wrap">
           <span className="text-color-secondary">
             {activeProject ? `Project aktif: ${activeProject.name}` : 'Pilih project aktif dari topbar terlebih dahulu.'}
@@ -160,7 +162,7 @@ export function HomePage() {
             <Button label="Export PDF" icon="pi pi-file-pdf" outlined onClick={() => void exportRuns('pdf')} disabled={!activeProject} loading={exportingRuns} />
           </div>
         </div>
-      </Card>
+      </Card>}
     </div>
   );
 }

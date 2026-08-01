@@ -1,5 +1,6 @@
 import type {
   TestPlan,
+  TestPlanSchedule,
   TestCase,
   TestPlanCase,
   Project,
@@ -13,12 +14,16 @@ import type {
   Issue,
   ProjectMember,
   ProjectMemberWithProfile,
+  Team,
+  TeamWithMembers,
+  ProjectTeam,
   Environment,
   Requirement,
   RequirementLink,
   Comment,
   CommentMention,
   DashboardReportRun,
+  DashboardQaLoopAudit,
   ApiToken,
   Webhook,
   UserRole,
@@ -134,6 +139,7 @@ export function mapProjectMemberRow(row: any): ProjectMember {
     projectId: row.project_id,
     userId: row.user_id,
     role: row.role,
+    permissions: row.permissions,
     status: row.status ?? 'accepted',
     invitedBy: row.invited_by ?? null,
     invitedAt: row.invited_at ?? null,
@@ -255,7 +261,7 @@ export function mapNotificationRow(row: any): Notification {
 }
 
 export function mapActivityEventRow(row: any): ActivityEvent {
-  return { id: row.id, projectId: row.project_id, tableName: row.table_name, recordId: row.record_id ?? null, action: row.action, changedBy: row.changed_by ?? null, actor: row.actor ? mapProfileRow(row.actor) : null, createdAt: row.created_at };
+  return { id: row.id, projectId: row.project_id, tableName: row.table_name, recordId: row.record_id ?? null, action: row.action, changedBy: row.changed_by ?? null, actorType: row.actor_type ?? (row.changed_by ? 'human' : 'system'), actor: row.actor ? mapProfileRow(row.actor) : null, oldData: row.old_data ?? null, newData: row.new_data ?? null, createdAt: row.created_at };
 }
 
 export function mapTestPlanCaseRow(row: any): TestPlanCase {
@@ -359,6 +365,8 @@ export function mapIssueRow(row: any): Issue {
     createdBy: row.created_by ?? null,
     targetRoleId: row.target_role_id ?? null,
     externalLinks: row.external_links ?? [],
+    fixReferenceUrl: row.fix_reference_url ?? null,
+    verifiedTestRunId: row.verified_test_run_id ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -375,6 +383,18 @@ export function mapProfileRow(row: any): Profile {
     updatedAt: row.updated_at,
     deletedAt: row.deleted_at,
   };
+}
+
+export function mapTeamRow(row: any): Team {
+  return { id: row.id, name: row.name, description: row.description, createdBy: row.created_by ?? null, createdAt: row.created_at, updatedAt: row.updated_at };
+}
+
+export function mapTeamWithMembersRow(row: any): TeamWithMembers {
+  return { ...mapTeamRow(row), members: (row.team_members ?? []).map((item: any) => mapProfileRow(item.profile)) };
+}
+
+export function mapProjectTeamRow(row: any): ProjectTeam {
+  return { id: row.id, projectId: row.project_id, teamId: row.team_id, role: row.role, permissions: row.permissions, createdAt: row.created_at, team: mapTeamRow(row.team) };
 }
 
 export function mapRequirementRow(row: any): Requirement {
@@ -436,15 +456,15 @@ export function mapIssueAttachmentRow(row: any, url: string | null = null): Issu
 
 export function mapDashboardReportRunRow(row: any): DashboardReportRun {
   const plan = row.test_plan ?? {};
-  const project = plan.project ?? {};
+  const project = plan.project ?? row.custom_project ?? {};
   const environment = row.environment ?? null;
   return {
     id: row.id,
     code: row.code,
     name: row.name,
-    projectId: plan.project_id,
+    projectId: plan.project_id ?? row.custom_project_id,
     projectName: project.name ?? '',
-    testPlanName: plan.name ?? '',
+    testPlanName: plan.name ?? 'Custom regression',
     environmentName: environment?.name ?? null,
     release: row.release ?? null,
     status: row.status,
@@ -463,7 +483,37 @@ export function mapDashboardReportRunRow(row: any): DashboardReportRun {
   };
 }
 
+export function mapDashboardQaLoopAuditRow(row: any): DashboardQaLoopAudit {
+  const data = row.new_data ?? {};
+  const entered = row.table_name === 'mcp.automation.rerun_failed';
+  return {
+    issueId: data.issue_id,
+    testRunId: entered ? row.record_id : data.test_run_id,
+    action: entered ? 'entered' : data.agent_action === 'issue_verified' ? 'verified' : 'reopened',
+    createdAt: row.created_at,
+  };
+}
+
 export function mapRetentionPolicyRow(row: any) { return { id: row.id, projectId: row.project_id ?? null, retentionDays: Number(row.retention_days), attachmentRetentionDays: row.attachment_retention_days == null ? null : Number(row.attachment_retention_days), enabled: Boolean(row.enabled), createdBy: row.created_by ?? null, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapTestPlanScheduleRow(row: any): TestPlanSchedule {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    testPlanId: row.test_plan_id,
+    name: row.name,
+    nextRunAt: row.next_run_at,
+    intervalDays: Number(row.interval_days),
+    environmentId: row.environment_id ?? null,
+    browser: row.browser,
+    deviceProfile: row.device_profile ?? null,
+    maxAttempts: Number(row.max_attempts),
+    pauseOnFailure: Boolean(row.pause_on_failure),
+    active: Boolean(row.active),
+    lastEnqueuedAt: row.last_enqueued_at ?? null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
 export function mapRetentionCleanupPreviewRow(row: any) { return { projectId: row.project_id ?? null, attachmentCutoff: row.attachment_cutoff, testAttachmentCount: Number(row.test_attachment_count ?? 0), issueAttachmentCount: Number(row.issue_attachment_count ?? 0) }; }
 export function mapRetentionCleanupResultRow(row: any) { return { cutoff: row.cutoff, testAttachments: Number(row.test_attachments ?? 0), issueAttachments: Number(row.issue_attachments ?? 0) }; }
 export function mapRestorePreviewRow(row: any) { return { valid: Boolean(row.valid), projectName: row.project_name ?? '', modules: Number(row.modules ?? 0), tags: Number(row.tags ?? 0), testCases: Number(row.test_cases ?? 0), testPlans: Number(row.test_plans ?? 0), testRuns: Number(row.test_runs ?? 0), testResults: Number(row.test_results ?? 0), issues: Number(row.issues ?? 0), attachments: Number(row.attachments ?? 0) }; }

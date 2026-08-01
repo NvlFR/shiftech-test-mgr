@@ -14,6 +14,8 @@ import { MultiSelect } from 'primereact/multiselect';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Message } from 'primereact/message';
+import { InputNumber } from 'primereact/inputnumber';
+import { InputSwitch } from 'primereact/inputswitch';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { TestPlanDialog } from '../../components/dialogs/TestPlanDialog';
@@ -41,6 +43,9 @@ import {
   TEST_CASE_PRIORITY_SEVERITY,
 } from '../../helpers/statusLabels';
 import type { TestRunWithSummary } from '../../hooks/useTestRuns';
+import { useTestPlanSchedule } from '../../hooks/useTestPlanSchedule';
+import { testPlanScheduleService } from '../../services/testPlanScheduleService';
+import type { AutomationBrowser } from '../../types/domain';
 
 const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = [
   { label: TEST_CASE_PRIORITY_LABEL.low, value: 'low' },
@@ -69,6 +74,41 @@ export function TestPlanDetailPage() {
   const { canEditContent, canDeleteContent, canRunTests } = useProjectRole(testPlan?.projectId);
   const { environments } = useEnvironments(testPlan?.projectId ?? null);
   const { modules } = useModules(testPlan?.projectId ?? null);
+  const { schedule, loading: scheduleLoading, error: scheduleLoadError, reload: reloadSchedule } = useTestPlanSchedule(id ?? null);
+  const [scheduleName, setScheduleName] = useState('Scheduled automation run');
+  const [scheduleNextRun, setScheduleNextRun] = useState('');
+  const [scheduleIntervalDays, setScheduleIntervalDays] = useState(1);
+  const [scheduleEnvironmentId, setScheduleEnvironmentId] = useState<string | null>(null);
+  const [scheduleBrowser, setScheduleBrowser] = useState<AutomationBrowser>('chromium');
+  const [scheduleDevice, setScheduleDevice] = useState('');
+  const [scheduleMaxAttempts, setScheduleMaxAttempts] = useState(1);
+  const [schedulePauseOnFailure, setSchedulePauseOnFailure] = useState(false);
+  const [scheduleActive, setScheduleActive] = useState(true);
+  const [scheduleSaving, setScheduleSaving] = useState(false);
+
+  useEffect(() => {
+    if (!schedule) return;
+    setScheduleName(schedule.name); setScheduleNextRun(new Date(schedule.nextRunAt).toISOString().slice(0, 16));
+    setScheduleIntervalDays(schedule.intervalDays); setScheduleEnvironmentId(schedule.environmentId);
+    setScheduleBrowser(schedule.browser); setScheduleDevice(schedule.deviceProfile ?? '');
+    setScheduleMaxAttempts(schedule.maxAttempts); setSchedulePauseOnFailure(schedule.pauseOnFailure); setScheduleActive(schedule.active);
+  }, [schedule]);
+
+  async function handleSaveSchedule() {
+    if (!id || !testPlan) return;
+    setScheduleSaving(true);
+    try {
+      await testPlanScheduleService.save({ projectId: testPlan.projectId, testPlanId: id, name: scheduleName, nextRunAt: new Date(scheduleNextRun).toISOString(), intervalDays: scheduleIntervalDays, environmentId: scheduleEnvironmentId, browser: scheduleBrowser, deviceProfile: scheduleDevice || null, maxAttempts: scheduleMaxAttempts, pauseOnFailure: schedulePauseOnFailure, active: scheduleActive });
+      await reloadSchedule(); toast.current?.show({ severity: 'success', summary: 'Jadwal automation disimpan' });
+    } catch (err) { toast.current?.show({ severity: 'error', summary: 'Gagal menyimpan jadwal', detail: err instanceof Error ? err.message : undefined }); }
+    finally { setScheduleSaving(false); }
+  }
+
+  async function handleDeleteSchedule() {
+    if (!id) return;
+    await testPlanScheduleService.remove(id); await reloadSchedule();
+    setScheduleNextRun(''); toast.current?.show({ severity: 'success', summary: 'Jadwal dihapus' });
+  }
 
   // Source-new exposes plan metadata editing from the detail header. Keep the
   // existing local status action and add the same additive edit flow here.
@@ -517,6 +557,29 @@ export function TestPlanDetailPage() {
               />
             )}
           </DataTable>
+        </TabPanel>
+
+        <TabPanel header="Schedule">
+          {scheduleLoadError && <Message severity="error" text={scheduleLoadError.message} className="mb-3" />}
+          <div className="flex flex-column gap-3" style={{ maxWidth: '38rem' }} aria-busy={scheduleLoading}>
+            <Message severity="info" text="Server membuat job saat jadwal jatuh tempo. Local Runner akan mengambilnya ketika kembali online." />
+            <div className="flex flex-column gap-1"><label htmlFor="schedule-name">Nama Test Run</label><InputText id="schedule-name" value={scheduleName} onChange={(e) => setScheduleName(e.target.value)} disabled={!canEditContent} /></div>
+            <div className="flex gap-3 flex-wrap">
+              <div className="flex flex-column gap-1 flex-1"><label htmlFor="schedule-next">Run berikutnya</label><InputText id="schedule-next" type="datetime-local" value={scheduleNextRun} onChange={(e) => setScheduleNextRun(e.target.value)} disabled={!canEditContent} /></div>
+              <div className="flex flex-column gap-1"><label htmlFor="schedule-interval">Ulangi setiap (hari)</label><InputNumber inputId="schedule-interval" value={scheduleIntervalDays} onValueChange={(e) => setScheduleIntervalDays(e.value ?? 1)} min={1} max={365} disabled={!canEditContent} /></div>
+            </div>
+            <div className="flex gap-3 flex-wrap">
+              <div className="flex flex-column gap-1 flex-1"><label htmlFor="schedule-environment">Environment</label><Dropdown inputId="schedule-environment" value={scheduleEnvironmentId} options={environments.map((e) => ({ label: e.name, value: e.id }))} onChange={(e) => setScheduleEnvironmentId(e.value)} showClear disabled={!canEditContent} /></div>
+              <div className="flex flex-column gap-1 flex-1"><label htmlFor="schedule-browser">Browser</label><Dropdown inputId="schedule-browser" value={scheduleBrowser} options={['chromium','firefox','webkit'].map((value) => ({ label: value, value }))} onChange={(e) => setScheduleBrowser(e.value)} disabled={!canEditContent} /></div>
+            </div>
+            <div className="flex gap-3 flex-wrap">
+              <div className="flex flex-column gap-1 flex-1"><label htmlFor="schedule-device">Device profile</label><InputText id="schedule-device" value={scheduleDevice} onChange={(e) => setScheduleDevice(e.target.value)} disabled={!canEditContent} /></div>
+              <div className="flex flex-column gap-1"><label htmlFor="schedule-attempts">Max attempts</label><InputNumber inputId="schedule-attempts" value={scheduleMaxAttempts} onValueChange={(e) => setScheduleMaxAttempts(e.value ?? 1)} min={1} max={10} disabled={!canEditContent} /></div>
+            </div>
+            <div className="flex gap-4 align-items-center"><label className="flex align-items-center gap-2"><InputSwitch checked={scheduleActive} onChange={(e) => setScheduleActive(e.value)} disabled={!canEditContent} /> Aktif</label><label className="flex align-items-center gap-2"><InputSwitch checked={schedulePauseOnFailure} onChange={(e) => setSchedulePauseOnFailure(e.value)} disabled={!canEditContent} /> Pause saat gagal</label></div>
+            {schedule?.lastEnqueuedAt && <small className="text-color-secondary">Terakhir di-enqueue: {formatDateTime(schedule.lastEnqueuedAt)}</small>}
+            {canEditContent && <div className="flex gap-2"><Button label="Simpan Jadwal" icon="pi pi-save" onClick={handleSaveSchedule} loading={scheduleSaving} disabled={!scheduleNextRun} /><Button label="Hapus" icon="pi pi-trash" severity="danger" outlined onClick={handleDeleteSchedule} disabled={!schedule} /></div>}
+          </div>
         </TabPanel>
 
         <TabPanel header="Activity">
