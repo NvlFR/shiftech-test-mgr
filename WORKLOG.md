@@ -2595,3 +2595,17 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperluas `.gitignore` bawaan runner agar `.env` dan seluruh varian `.env.*` diabaikan, dengan pengecualian eksplisit untuk template aman `.env.example`.
 - Memperbarui checklist Section 14.4 untuk butir penyimpanan token lokal dan perlindungan `.env` yang kini lengkap.
 - Verifikasi lulus: `cd runner && npm test` (13/13 suite), pemeriksaan aturan gitignore, dan `git diff --check`. Tidak ada migration, perubahan data target, secret/token, commit, atau push.
+## 2026-08-01 — BOOT-04 trust repository lokal eksplisit
+
+- Menjalankan `graphify query` sebelum menelusuri runner dan mengikuti keputusan Section 14.4 `FEATURE_BACKLOG.md`.
+- Mengganti konfigurasi trust berbasis `TM_TRUSTED_REPOSITORIES` dengan subcommand eksplisit `tm-runner trust [repository-path]`; canonical root repository disimpan sekali di trust store lokal JSON berpermission `0600`.
+- Runner tetap fail-closed: repository yang belum ada di trust store ditolak sebelum Playwright memuat konfigurasi, sedangkan `script_ref` absolut, traversal, file hilang, dan symlink keluar workspace tetap ditolak.
+- Menambahkan override `TM_TRUST_STORE_PATH` untuk container/CI, dokumentasi alur clone remote, serta test persistensi, deduplikasi, permission, dan kondisi trust store kosong. Tidak menjalankan migration, menghapus data, commit, push, atau mencatat secret/token.
+- Verifikasi lulus: `cd runner && npm test` (14/14 berkas test, termasuk build TypeScript) dan `git diff --check`; `graphify update .` berhasil menyinkronkan graph menjadi 3.157 node dan 6.373 edge dengan warning tujuh source tanpa node.
+
+## 2026-08-01 — BOOT-05 peringatan eksplisit setup runner
+
+- Menambahkan peringatan eksplisit pada output CLI bootstrap bahwa runner menjalankan kode dari repo yang ditautkan di mesin lokal dan Playwright mengeksekusi `playwright.config.ts` sebagai kode Node sebelum test berjalan.
+- Menampilkan batas kepercayaan yang sama pada dialog pembuatan runner dan dialog penyimpanan token di UI Automation agar pengguna melihatnya selama setup.
+- Menambahkan regresi CLI untuk memastikan kedua pesan keamanan selalu ditampilkan tanpa mengekspos bootstrap code atau runner token.
+- Verifikasi lulus: `cd runner && npm test` (14/14 berkas test) dan `cd frontend && npm run build`. Build frontend tetap memunculkan warning ukuran chunk yang sudah ada; tidak ada migration, perubahan data target, secret/token, commit, atau push.

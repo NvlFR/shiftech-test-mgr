@@ -39,6 +39,8 @@ cp .env.example .env      # isi TM_SUPABASE_URL, TM_SUPABASE_ANON_KEY, TM_RUNNER
 chmod 600 .env            # wajib pada Linux/macOS; runner menolak file yang terbaca user lain
 npm install               # hanya devDependency (TypeScript); runner tanpa runtime deps
 npm run build
+# Setelah memeriksa source dan playwright.config.*, trust folder satu kali:
+node dist/index.js trust /absolute/path/to/playwright-project
 npm start
 # Browser terlihat untuk semua job pada sesi runner ini:
 npm start -- --headed
@@ -90,10 +92,13 @@ ke repository, `TM_PROJECT_DIR` menjadi fallback dan wajib berupa path absolut,
 terbaca, serta menunjuk root git repository. Runner yang hanya menangani repository
 remote tidak perlu menyiapkan source code lebih dulu.
 
-Sebelum eksekusi, root Git harus tercantum eksplisit di
-`TM_TRUSTED_REPOSITORIES` (delimiter `:` di Linux/macOS, `;` di Windows). Runner
-fail-closed untuk repo lain, termasuk clone remote baru: periksa repo beserta
-`playwright.config.*`, lalu tambahkan path cache root repo tersebut dan restart.
+Sebelum eksekusi, root Git harus dipercaya eksplisit satu kali melalui
+`tm-runner trust <path>` (atau `node dist/index.js trust <path>` saat development).
+Daftarnya disimpan lokal di `~/.config/testmanager/trusted-repositories.json`
+(dapat dipindah lewat `TM_TRUST_STORE_PATH`) dengan permission `0600`. Runner
+fail-closed untuk repo lain, termasuk clone remote baru: biarkan runner menyiapkan
+clone, periksa repo beserta `playwright.config.*`, lalu trust path cache yang
+ditampilkan oleh pesan penolakan dan jalankan runner kembali.
 Trust sengaja berada di level repository karena Playwright memuat konfigurasi
 Node sebelum file test. `script_ref` absolut, traversal, dan symlink keluar root
 tetap ditolak sebagai lapisan tambahan.

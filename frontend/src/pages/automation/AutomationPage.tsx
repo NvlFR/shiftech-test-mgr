@@ -231,6 +231,7 @@ export function AutomationPage() {
 
     <Dialog header="Runner Baru" visible={runnerDialog} onHide={() => setRunnerDialog(false)} style={{ width: '32rem' }}>
       <div className="flex flex-column gap-3">
+        <Message severity="warn" text="Runner menjalankan kode dari repo yang kamu tautkan, di mesin ini. Playwright juga mengeksekusi playwright.config.ts sebagai kode Node sebelum satu test pun berjalan. Pastikan kamu memercayai seluruh repo sebelum menghubungkannya." />
         <label htmlFor="runner-name">Nama<InputText id="runner-name" className="w-full" value={runnerName} onChange={(e) => setRunnerName(e.target.value)} /></label>
         <label htmlFor="runner-labels">Labels (kapabilitas, mis. chromium, staging)<Chips id="runner-labels" className="w-full" value={runnerLabels} onChange={(e) => setRunnerLabels(e.value ?? [])} /></label>
         <Button label="Buat runner" onClick={createRunner} disabled={!runnerName.trim()} />
@@ -240,6 +241,7 @@ export function AutomationPage() {
     <Dialog header="Simpan token runner sekarang" visible={!!secret} onHide={() => setSecret(null)} style={{ width: '36rem' }}>
       {secret && <div className="flex flex-column gap-3">
         <Message severity="warn" text="Token hanya ditampilkan sekali. Simpan di konfigurasi runner lokal; jangan commit atau kirim ke log." />
+        <Message severity="warn" text="Runner menjalankan kode dari repo yang kamu tautkan, di mesin ini. Termasuk playwright.config.ts, yang dieksekusi sebagai kode Node sebelum test berjalan." />
         <InputText readOnly value={secret.token} onFocus={(e) => e.currentTarget.select()} />
         <small>Set sebagai <code>TM_RUNNER_TOKEN</code> di mesin lokal. Regenerate akan langsung mencabut token lama.</small>
         <Button label="Salin token" icon="pi pi-copy" onClick={() => { void navigator.clipboard.writeText(secret.token); toast.current?.show({ severity: 'info', summary: 'Token disalin' }); }} />

@@ -1,5 +1,5 @@
 import { realpathSync, statSync } from 'node:fs';
-import { delimiter, isAbsolute, relative, resolve } from 'node:path';
+import { isAbsolute, relative } from 'node:path';
 export { SecretRedactorStream, redactSecrets, redactValue, registerEnvironmentSecrets, registerSecret } from '@testmanager/agent-core';
 const SENSITIVE_ENV_NAME = /(?:TOKEN|SECRET|PASSWORD|PASSWD|API_KEY|PRIVATE_KEY|CREDENTIAL|AUTHORIZATION|COOKIE)/i;
 
@@ -11,18 +11,10 @@ export function assertPrivateConfigFile(path: string): void {
   }
 }
 
-export function parseTrustedRepositories(raw: string | undefined): string[] {
-  if (!raw?.trim()) throw new Error('TM_TRUSTED_REPOSITORIES wajib berisi root repository yang dipercaya');
-  return raw.split(delimiter).map((item) => item.trim()).filter(Boolean).map((item) => {
-    if (!isAbsolute(item)) throw new Error('TM_TRUSTED_REPOSITORIES hanya menerima path absolut');
-    return realpathSync(resolve(item));
-  });
-}
-
 export function assertTrustedRepository(repositoryRoot: string, trustedRepositories: readonly string[]): string {
   const root = realpathSync(repositoryRoot);
   if (!trustedRepositories.includes(root)) {
-    throw new Error(`Repository belum dipercaya oleh runner: ${root}. Tambahkan root ini ke TM_TRUSTED_REPOSITORIES setelah memeriksa seluruh repository, termasuk playwright.config.*`);
+    throw new Error(`Repository belum dipercaya oleh runner: ${root}. Periksa seluruh repository, termasuk playwright.config.*, lalu jalankan: tm-runner trust ${root}`);
   }
   return root;
 }

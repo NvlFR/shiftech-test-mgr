@@ -1045,9 +1045,9 @@ jadi kebocoran token.
 - [ ] Peringatan eksplisit saat setup: **runner menjalankan kode dari repo yang
       kamu tautkan, di mesin ini**. Ini batas kepercayaan yang wajar, tapi harus
       dinyatakan, bukan diasumsikan.
-- [ ] Trust repo eksplisit sekali di sisi runner (pola "trust this folder"), dan
+- [x] Trust repo eksplisit sekali di sisi runner (pola "trust this folder"), dan
       runner menolak `script_ref` di luar repo yang di-trust.
-- [ ] Catatan yang mudah terlewat: `npx playwright test` **memuat
+- [x] Catatan yang mudah terlewat: `npx playwright test` **memuat
       `playwright.config.ts` sebelum satu test pun jalan**, dan file itu kode Node
       biasa. Jadi memvalidasi `script_ref` saja tidak cukup — kepercayaan harus di
       level repo, bukan level file.

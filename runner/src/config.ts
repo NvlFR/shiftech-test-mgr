@@ -1,6 +1,7 @@
 import { isAbsolute, resolve } from 'node:path';
 import { loadAgentEnv } from '@testmanager/agent-core';
-import { parseAllowedPlaywrightCommand, parseTrustedRepositories, registerEnvironmentSecrets, registerSecret } from './security.js';
+import { parseAllowedPlaywrightCommand, registerEnvironmentSecrets, registerSecret } from './security.js';
+import { loadTrustedRepositories } from './trustStore.js';
 
 export interface RunnerConfig {
   supabaseUrl: string;
@@ -24,7 +25,7 @@ export interface RunnerCliOptions {
   slowMoMs?: number;
 }
 
-export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen' | 'sync' | 'init';
+export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch' | 'codegen' | 'sync' | 'init' | 'trust';
 
 export interface RunnerCliInput {
   command: RunnerCommand;
@@ -32,6 +33,7 @@ export interface RunnerCliInput {
   playwrightArgs: string[];
   codegenUrl?: string;
   initCode?: string;
+  trustPath?: string;
 }
 
 export interface InteractiveRunnerConfig {
@@ -87,6 +89,10 @@ export function parseCliOptions(args: string[]): RunnerCliOptions {
 
 export function parseCliInput(args: string[]): RunnerCliInput {
   const command = args[0];
+  if (command === 'trust') {
+    if (args.length > 2) throw new Error('Usage: runner trust [repository-path]');
+    return { command, options: {}, playwrightArgs: [], trustPath: args[1]?.trim() || process.cwd() };
+  }
   if (command === 'init') {
     const code = args[1] === '--code' ? args[2]?.trim() : undefined;
     if (!code || args.length !== 3) throw new Error('Usage: runner init --code <CODE>');
@@ -123,7 +129,7 @@ export function loadInteractiveConfig(envPath = '.env'): InteractiveRunnerConfig
   const config = {
     projectDir: resolve(projectDir),
     playwrightCmd: env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
-    trustedRepositories: parseTrustedRepositories(env.TM_TRUSTED_REPOSITORIES),
+    trustedRepositories: loadTrustedRepositories(),
   };
   parseAllowedPlaywrightCommand(config.playwrightCmd);
   return config;
@@ -143,7 +149,7 @@ export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}):
     projectDir: resolve(projectDir),
     repositoryCacheDir: resolve(process.cwd(), env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
     playwrightCmd: env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
-    trustedRepositories: parseTrustedRepositories(env.TM_TRUSTED_REPOSITORIES),
+    trustedRepositories: loadTrustedRepositories(),
     headed: cliOptions.headed ?? boolEnv(env, 'TM_PLAYWRIGHT_HEADED', false),
     slowMoMs: cliOptions.slowMoMs ?? nonNegativeIntEnv(env, 'TM_PLAYWRIGHT_SLOW_MO_MS', 0),
     pollIntervalMs: intEnv(env, 'TM_POLL_INTERVAL_SECONDS', 5) * 1000,

@@ -43,6 +43,8 @@ test('init menukar code, menulis config 0600, lalu mengirim heartbeat tanpa meng
   assert.doesNotMatch(output, new RegExp(token));
   assert.doesNotMatch(output, new RegExp(code));
   assert.match(output, /Runner Aman.*project-1/);
+  assert.match(output, /runner menjalankan kode dari repo yang kamu tautkan, di mesin ini/);
+  assert.match(output, /mengeksekusi playwright\.config\.ts sebagai kode Node sebelum satu test pun berjalan/);
 });
 
 test('runner menolak file config yang dapat dibaca group atau user lain', async (t) => {

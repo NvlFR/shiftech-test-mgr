@@ -26,7 +26,6 @@ function serializeConfig(supabaseUrl: string, supabaseAnonKey: string, runnerTok
     `TM_SUPABASE_ANON_KEY=${supabaseAnonKey}`,
     `TM_RUNNER_TOKEN=${runnerToken}`,
     `TM_PROJECT_DIR=${projectDir}`,
-    `TM_TRUSTED_REPOSITORIES=${projectDir}`,
     '',
   ].join('\n');
 }
@@ -65,7 +64,8 @@ export async function bootstrapRunner(code: string, options: BootstrapInitOption
 
   (options.stdout ?? process.stdout).write(
     `Runner ${runner.name} tersambung ke project ${runner.project_id}.\n` +
-    'Peringatan: runner menjalankan kode dari repository yang dipercaya di mesin ini.\n',
+    'Peringatan: runner menjalankan kode dari repo yang kamu tautkan, di mesin ini.\n' +
+    'Playwright juga mengeksekusi playwright.config.ts sebagai kode Node sebelum satu test pun berjalan.\n',
   );
 }
 

@@ -8,12 +8,18 @@ import { runScriptSync } from './sync.js';
 import { runInit } from './init.js';
 import { registerEnvironmentSecrets } from './security.js';
 import { formatCrash, installCrashHandlers } from '@testmanager/agent-core';
+import { trustRepository } from './trustStore.js';
 
 installCrashHandlers(log);
 
 async function main(): Promise<void> {
   registerEnvironmentSecrets();
   const cli = parseCliInput(process.argv.slice(2));
+  if (cli.command === 'trust') {
+    const trustedPath = trustRepository(cli.trustPath!);
+    process.stdout.write(`Repository dipercaya: ${trustedPath}\nTrust disimpan lokal dan berlaku untuk eksekusi berikutnya.\n`);
+    return;
+  }
   if (cli.command === 'init') {
     process.exitCode = await runInit(cli.initCode!);
     return;
