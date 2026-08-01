@@ -1683,3 +1683,10 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan unit test parsing subcommand dan pembentukan invocation Playwright, serta dokumentasi penggunaan dan penghentian watch dengan Ctrl+C.
 - Verifikasi lulus: `cd runner && npm test` (3/3 test file, termasuk build TypeScript) dan `cd frontend && npm run build` (dengan warning ukuran chunk Vite yang sudah ada). Tidak menjalankan migration, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
 - `graphify update .` memperbarui graph menjadi 2.454 node dan 5.108 edge; pemanggilan ulang setelah koreksi kecil mendeteksi tidak ada source tersisa untuk diperbarui lalu watcher sandbox melaporkan `Operation not permitted`.
+## 2026-08-01 — PW-04 bukti kegagalan lengkap di runner
+
+- Mengubah eksekusi runner agar trace memakai `retain-on-failure` dan contoh konfigurasi Playwright memakai screenshot `only-on-failure`, video `retain-on-failure`, serta trace `retain-on-failure`.
+- Menambahkan fixture observability otomatis pada example project untuk merekam semua level console browser dengan timestamp ISO, network HAR (request/response/status/timing), dan snapshot DOM pada titik gagal beserta computed style penting.
+- Memperluas kontrak, klasifikasi, MIME upload, dan tipe frontend artifact dengan tipe `network` dan `dom`; menambahkan unit test klasifikasi bundle bukti.
+- Memperbarui README runner dan checklist Section 9.3 untuk enam artefak dalam scope PW-04. Metadata lingkungan tetap belum dicentang karena bukan bagian task ini.
+- Verifikasi lulus: `runner/npm test` (4 test), type-check fixture example project, dan `frontend/npm run build`. Uji Playwright failure menghasilkan trace tetapi browser lokal belum terpasang, sehingga pengujian browser penuh berhenti pada pesan executable Chromium tidak tersedia; tidak mengunduh browser karena task tidak mengizinkan kebutuhan network eksternal.

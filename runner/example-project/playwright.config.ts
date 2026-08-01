@@ -1,13 +1,13 @@
 import { defineConfig } from '@playwright/test';
 
-// Minimal config for the runner smoke test. Artifacts (screenshot/video/trace)
-// are turned on so the runner has something to collect and report back.
+// Failure evidence is retained in the per-job output directory supplied by the
+// runner. Console, HAR, and DOM evidence is installed by tests/observability.ts.
 export default defineConfig({
   testDir: '.',
   reporter: 'list',
   use: {
-    screenshot: 'on',
-    video: 'on',
-    trace: 'on',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
 });

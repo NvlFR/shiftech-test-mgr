@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785544806.0298254,
-    "ast_hash": "7c8e4b01911241d17f6e92ba3a5971d7",
+    "mtime": 1785545639.9477372,
+    "ast_hash": "396085bbd9ce8155784d348c02dcff4c",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785543487.7637722,
-    "ast_hash": "3daa337c2893563d736f750477f2e129",
+    "mtime": 1785545752.444883,
+    "ast_hash": "ee96736a2602fade3d54df60fc64cd0c",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785545397.388727,
-    "ast_hash": "16e83357955f3196b5d138ea44480002",
+    "mtime": 1785545752.584882,
+    "ast_hash": "1206779882a6c54be1ad135695a2cc00",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1075,14 +1075,14 @@
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785544803.7259634,
-    "ast_hash": "aa046e3c470878bc692ee2a167b33bf7",
+    "mtime": 1785545639.5487406,
+    "ast_hash": "b6775dd955ae4f7cd4c6417261087fb8",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
-    "mtime": 1785073593.940485,
-    "ast_hash": "139ed5da4a90c9a2a569fa0b8bd453c4",
-    "semantic_hash": "139ed5da4a90c9a2a569fa0b8bd453c4"
+    "mtime": 1785545639.6817396,
+    "ast_hash": "faf40d2fc9ebb4e1751b52cb4b714c25",
+    "semantic_hash": ""
   },
   "runner/src/config.ts": {
     "mtime": 1785545356.6744273,
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "runner/src/executor.ts": {
-    "mtime": 1785544804.44892,
-    "ast_hash": "a587c7ebd5e29d4e06e561b02db49bd9",
+    "mtime": 1785545640.083736,
+    "ast_hash": "45033f068cf9a36d4a0fc355cc4cc8af",
     "semantic_hash": ""
   },
   "runner/src/index.ts": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785545357.2104175,
-    "ast_hash": "79ec317a0c67a6e45c51c6be66b236aa",
+    "mtime": 1785545660.721558,
+    "ast_hash": "ec0569fe2b109101bec3c2e7c0216099",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -1160,24 +1160,24 @@
     "semantic_hash": "98afe08d85c5cbbe8c9e007dd514e8d9"
   },
   "runner/example-project/playwright.config.ts": {
-    "mtime": 1785071139.3154407,
-    "ast_hash": "7c92a626016d887691426d84b1f13004",
-    "semantic_hash": "7c92a626016d887691426d84b1f13004"
+    "mtime": 1785545640.2177348,
+    "ast_hash": "c1d3561203b92d2056205379f390fc3d",
+    "semantic_hash": ""
   },
   "runner/example-project/tests/broken.spec.ts": {
-    "mtime": 1785071151.5835505,
-    "ast_hash": "202149c4bc60ddd40a9c9d9db775552d",
-    "semantic_hash": "202149c4bc60ddd40a9c9d9db775552d"
+    "mtime": 1785545640.4897323,
+    "ast_hash": "348450989f017eea334af532a30c4dde",
+    "semantic_hash": ""
   },
   "runner/example-project/tests/smoke.spec.ts": {
-    "mtime": 1785071145.5824194,
-    "ast_hash": "cb7060496df6f10620a1599bdcd60148",
-    "semantic_hash": "cb7060496df6f10620a1599bdcd60148"
+    "mtime": 1785545640.3557334,
+    "ast_hash": "33134fae3c1bd6a93ab182335611cd56",
+    "semantic_hash": ""
   },
   "runner/src/upload.ts": {
-    "mtime": 1785073635.2182243,
-    "ast_hash": "7d8748859fdd0231fb7a0a4efc88500b",
-    "semantic_hash": "7d8748859fdd0231fb7a0a4efc88500b"
+    "mtime": 1785545639.8157382,
+    "ast_hash": "c1c8869a9af878e67fde82f6197daf19",
+    "semantic_hash": ""
   },
   "supabase/functions/automation-artifacts/index.ts": {
     "mtime": 1785539479.2040298,
@@ -3155,8 +3155,18 @@
     "semantic_hash": ""
   },
   "runner/src/interactive.ts": {
-    "mtime": 1785545356.8094249,
-    "ast_hash": "11a45eb0defd33532e39a891b3f8c450",
+    "mtime": 1785545418.5053897,
+    "ast_hash": "075e943cbcd0d29aa5da03cd88391522",
+    "semantic_hash": ""
+  },
+  "runner/example-project/tests/observability.ts": {
+    "mtime": 1785545660.5895593,
+    "ast_hash": "72173a04a1942fdd83513fcf982ec8a1",
+    "semantic_hash": ""
+  },
+  "runner/test/artifacts.test.mjs": {
+    "mtime": 1785545640.75773,
+    "ast_hash": "a12d4017a3ba97d19d7aa9e5ecf32c84",
     "semantic_hash": ""
   }
 }

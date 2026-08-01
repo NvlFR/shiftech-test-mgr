@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './observability';
 
 // A deliberately failing spec — use it to verify the FAIL + artifact + retry
 // path. Map it to a second Test Case with script_ref: tests/broken.spec.ts

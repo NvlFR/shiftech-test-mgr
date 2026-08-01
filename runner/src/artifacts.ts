@@ -8,10 +8,12 @@ export interface CollectedArtifact {
   localPath: string;
 }
 
-function classify(file: string): ReportArtifact['type'] | null {
+export function classifyArtifact(file: string): ReportArtifact['type'] | null {
   const name = file.toLowerCase();
   const ext = extname(name);
   if (name.includes('trace') && ext === '.zip') return 'trace';
+  if (ext === '.har') return 'network';
+  if (name.includes('dom-snapshot') && ['.html', '.htm'].includes(ext)) return 'dom';
   if (['.png', '.jpg', '.jpeg'].includes(ext)) return 'screenshot';
   if (['.webm', '.mp4'].includes(ext)) return 'video';
   if (['.txt', '.log'].includes(ext)) return 'log';
@@ -34,7 +36,7 @@ export function collectArtifacts(jobOutputDir: string): CollectedArtifact[] {
   if (!existsSync(jobOutputDir)) return [];
   const artifacts: CollectedArtifact[] = [];
   for (const file of walk(jobOutputDir)) {
-    const type = classify(file);
+    const type = classifyArtifact(file);
     if (!type) continue;
     const name = relative(jobOutputDir, file).split(/[\\/]/).join('/');
     artifacts.push({ type, name, localPath: file });

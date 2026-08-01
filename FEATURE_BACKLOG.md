@@ -489,12 +489,12 @@ MCP tool yang menargetkan runner lokal.
 Setiap kegagalan **wajib** menghasilkan bundle berikut, di-upload ke Storage dan
 tertaut ke `test_result`:
 
-- [ ] **Screenshot** pada titik gagal (+ screenshot per step opsional).
-- [ ] **Video** eksekusi (`video: retain-on-failure`).
-- [ ] **Trace** Playwright (`trace: retain-on-failure`) — timeline + network + DOM.
-- [ ] **Console log** browser (semua level, dengan timestamp).
-- [ ] **Network log** (HAR): request/response, status code, timing.
-- [ ] **DOM snapshot** pada titik gagal (HTML + computed style penting).
+- [x] **Screenshot** pada titik gagal (+ screenshot per step opsional).
+- [x] **Video** eksekusi (`video: retain-on-failure`).
+- [x] **Trace** Playwright (`trace: retain-on-failure`) — timeline + network + DOM.
+- [x] **Console log** browser (semua level, dengan timestamp).
+- [x] **Network log** (HAR): request/response, status code, timing.
+- [x] **DOM snapshot** pada titik gagal (HTML + computed style penting).
 - [ ] Metadata lingkungan: browser + versi, OS, viewport, base URL, build version,
       commit SHA (dari Section 10).
 

@@ -30,7 +30,7 @@ export interface JobRepository {
 export type JobResult = 'pass' | 'fail' | 'blocked' | 'skip';
 
 export interface ReportArtifact {
-  type: 'screenshot' | 'video' | 'trace' | 'log';
+  type: 'screenshot' | 'video' | 'trace' | 'log' | 'network' | 'dom';
   url: string;
   name?: string;
   // Set when the artifact was uploaded to Supabase Storage; the UI builds a

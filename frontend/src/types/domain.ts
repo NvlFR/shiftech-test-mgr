@@ -345,7 +345,7 @@ export interface AutomationScript {
   updatedAt: string;
 }
 
-export interface AutomationArtifact { type: 'screenshot' | 'video' | 'trace' | 'log'; url: string; name?: string; path?: string; bucket?: string; }
+export interface AutomationArtifact { type: 'screenshot' | 'video' | 'trace' | 'log' | 'network' | 'dom'; url: string; name?: string; path?: string; bucket?: string; }
 
 export interface AutomationJob {
   id: string;

@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785545187.6731036,
-    "ast_hash": "fd04a36fad65cbec93bbae5a47f82686",
+    "mtime": 1785545436.8091106,
+    "ast_hash": "1115737b06acbb2bbaac83cfbce96a3a",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1085,8 +1085,8 @@
     "semantic_hash": "139ed5da4a90c9a2a569fa0b8bd453c4"
   },
   "runner/src/config.ts": {
-    "mtime": 1785544266.1775212,
-    "ast_hash": "efdd21d4daa319e5adea300fa87a8ded",
+    "mtime": 1785545356.6744273,
+    "ast_hash": "289fcd3a2a81a5a71f3c6277de730e70",
     "semantic_hash": ""
   },
   "runner/src/executor.ts": {
@@ -1095,8 +1095,8 @@
     "semantic_hash": ""
   },
   "runner/src/index.ts": {
-    "mtime": 1785544266.5075235,
-    "ast_hash": "3d7d5969f32a7b5bee4e711a81f91436",
+    "mtime": 1785545356.9434223,
+    "ast_hash": "6c93b2a597e2fdf4ccb083e9afac13d8",
     "semantic_hash": ""
   },
   "runner/src/logger.ts": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785544883.997523,
-    "ast_hash": "5050168bda38f01aa3828d941bd0f1e9",
+    "mtime": 1785545357.2104175,
+    "ast_hash": "79ec317a0c67a6e45c51c6be66b236aa",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -3140,8 +3140,8 @@
     "semantic_hash": ""
   },
   "runner/test/executionMode.test.mjs": {
-    "mtime": 1785544805.1758764,
-    "ast_hash": "2d1da8a3185775bf0766ad9fabd30dc7",
+    "mtime": 1785545357.07642,
+    "ast_hash": "bdc6b8632db7d40307c5d753bb45595d",
     "semantic_hash": ""
   },
   "supabase/schema_060_fix_test_runs_rls_recursion.sql": {
@@ -3152,6 +3152,11 @@
   "supabase/schema_060_pw02_browser_device_jobs.sql": {
     "mtime": 1785544855.5440128,
     "ast_hash": "b3489732d5dc033ce4ee8763e9a85792",
+    "semantic_hash": ""
+  },
+  "runner/src/interactive.ts": {
+    "mtime": 1785545418.5053897,
+    "ast_hash": "075e943cbcd0d29aa5da03cd88391522",
     "semantic_hash": ""
   }
 }

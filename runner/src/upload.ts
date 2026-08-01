@@ -9,7 +9,8 @@ import { log } from './logger.js';
 const MIME: Record<string, string> = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.webm': 'video/webm', '.mp4': 'video/mp4', '.zip': 'application/zip',
-  '.txt': 'text/plain', '.log': 'text/plain',
+  '.txt': 'text/plain', '.log': 'text/plain', '.har': 'application/json',
+  '.html': 'text/html', '.htm': 'text/html',
 };
 
 interface SignResponse { bucket: string; uploads: { name: string; path: string; uploadUrl: string }[] }

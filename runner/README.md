@@ -130,11 +130,20 @@ pun di project yang sama.
 
 ## Artifact
 
-Runner mengumpulkan screenshot/video/trace/log dari output Playwright dan
+Runner mengumpulkan screenshot/video/trace/console log/network HAR/DOM snapshot
+dari output Playwright dan
 melaporkan **metadata**-nya. Jika `TM_ARTIFACT_BASE_URL` diisi, URL artifact
 dibentuk `${TM_ARTIFACT_BASE_URL}/<jobId>/<file>` (asumsi direktori itu di-serve).
 Jika kosong, dilaporkan sebagai path `file://`. Upload binary ke Storage
 (Supabase/S3/MinIO) adalah deliverable terpisah.
+
+Project Playwright wajib menerapkan kebijakan `screenshot: 'only-on-failure'`,
+`video: 'retain-on-failure'`, dan `trace: 'retain-on-failure'`. Contoh siap pakai
+ada di `example-project/playwright.config.ts`; fixture otomatis
+`example-project/tests/observability.ts` wajib diimpor oleh spec agar console
+browser bertimestamp, HAR, serta HTML DOM dan computed style penting dibuat pada
+titik gagal. Semua bukti ditempatkan di output test per job sehingga ikut dalam
+upload artifact runner.
 
 ## Docker
 

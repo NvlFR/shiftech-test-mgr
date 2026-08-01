@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './observability';
 
 // A passing spec — maps to a Test Case whose automation should end up PASS.
 // script_ref to use in the app: tests/smoke.spec.ts

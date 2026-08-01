@@ -70,7 +70,7 @@ export function executeJob(config: RunnerConfig, job: AutomationJob, projectDir 
     ...baseArgs,
     relativeScript,
     `--output=${jobOutputDir}`,
-    '--trace=on',
+    '--trace=retain-on-failure',
     '--reporter=list',
     `--browser=${executionTarget.browser}`,
     ...(executionMode.headed ? ['--headed'] : []),
