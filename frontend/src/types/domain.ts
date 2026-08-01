@@ -350,6 +350,7 @@ export interface AutomationArtifact { type: 'screenshot' | 'video' | 'trace' | '
 export interface ViewableAutomationArtifact extends AutomationArtifact {
   viewUrl: string | null;
   textContent: string | null;
+  traceViewerUrl: string | null;
 }
 
 export interface AutomationJob {

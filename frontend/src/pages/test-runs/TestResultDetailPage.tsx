@@ -14,6 +14,7 @@ import type { AutomationArtifact, ViewableAutomationArtifact } from '../../types
 const TAB_TYPES: Array<{ type: AutomationArtifact['type']; label: string; icon: string }> = [
   { type: 'screenshot', label: 'Screenshot', icon: 'pi pi-image' },
   { type: 'video', label: 'Video', icon: 'pi pi-video' },
+  { type: 'trace', label: 'Trace', icon: 'pi pi-chart-line' },
   { type: 'log', label: 'Console', icon: 'pi pi-align-left' },
   { type: 'network', label: 'Network', icon: 'pi pi-globe' },
   { type: 'dom', label: 'DOM', icon: 'pi pi-code' },
@@ -49,6 +50,18 @@ function EvidenceViewer({ type, artifacts }: { type: AutomationArtifact['type'];
         return <div key={key} className="border-1 surface-border border-round p-2">
           <div className="font-medium mb-2">{artifact.name ?? `Video ${index + 1}`}</div>
           <video src={artifact.viewUrl} controls preload="metadata" className="w-full border-round">Browser tidak mendukung pemutar video.</video>
+        </div>;
+      }
+      if (type === 'trace' && artifact.traceViewerUrl) {
+        return <div key={key} className="border-1 surface-border border-round p-2">
+          <div className="flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <div className="font-medium">{artifact.name ?? `Playwright trace ${index + 1}`}</div>
+            <div className="flex gap-2">
+              <Button label="Buka Viewer" icon="pi pi-external-link" size="small" outlined onClick={() => window.open(artifact.traceViewerUrl!, '_blank', 'noopener,noreferrer')} />
+              <Button label="Unduh Trace" icon="pi pi-download" size="small" text onClick={() => window.open(artifact.viewUrl!, '_blank', 'noopener,noreferrer')} />
+            </div>
+          </div>
+          <iframe title={artifact.name ?? `Playwright trace ${index + 1}`} src={artifact.traceViewerUrl} className="w-full border-1 surface-border border-round" style={{ minHeight: '42rem' }} allow="clipboard-read; clipboard-write" />
         </div>;
       }
       if (type === 'dom' && artifact.textContent) {

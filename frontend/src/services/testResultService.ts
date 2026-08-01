@@ -2,6 +2,13 @@ import { testResultRepository } from '../repositories/testResultRepository';
 import type { AutomationArtifact, ViewableAutomationArtifact } from '../types/domain';
 
 const TEXT_ARTIFACT_TYPES = new Set<AutomationArtifact['type']>(['log', 'network', 'dom']);
+const TRACE_VIEWER_URL = import.meta.env.VITE_PLAYWRIGHT_TRACE_VIEWER_URL || 'https://trace.playwright.dev/';
+
+function buildTraceViewerUrl(traceUrl: string): string {
+  const viewerUrl = new URL(TRACE_VIEWER_URL, window.location.origin);
+  viewerUrl.searchParams.set('trace', traceUrl);
+  return viewerUrl.toString();
+}
 
 export const testResultService = {
   getById(id: string) {
@@ -13,6 +20,7 @@ export const testResultService = {
     return Promise.all(artifacts.map(async (artifact) => {
       let viewUrl: string | null = null;
       let textContent: string | null = null;
+      let traceViewerUrl: string | null = null;
 
       try {
         if (TEXT_ARTIFACT_TYPES.has(artifact.type)) {
@@ -22,11 +30,14 @@ export const testResultService = {
         } else if (/^https?:\/\//.test(artifact.url)) {
           viewUrl = artifact.url;
         }
+        if (artifact.type === 'trace' && viewUrl) {
+          traceViewerUrl = buildTraceViewerUrl(viewUrl);
+        }
       } catch {
         // Keep the remaining evidence viewable when one artifact is missing or expired.
       }
 
-      return { ...artifact, viewUrl, textContent };
+      return { ...artifact, viewUrl, textContent, traceViewerUrl };
     }));
   },
 };

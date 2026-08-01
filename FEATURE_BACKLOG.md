@@ -502,7 +502,7 @@ tertaut ke `test_result`:
 
 - [x] Halaman detail Test Result menampilkan tab bukti: Screenshot / Video / Console /
       Network / DOM, bukan sekadar daftar link.
-- [ ] Embed **trace viewer** (`trace.playwright.dev` self-hosted atau link ke trace file).
+- [x] Embed **trace viewer** (`trace.playwright.dev` self-hosted atau link ke trace file).
 - [ ] Diff screenshot antar run (before/after) untuk regresi visual.
 - [ ] Live log streaming saat job `running` (runner mengirim log chunk berkala).
 
@@ -700,7 +700,211 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 
 ---
 
-## 12. Urutan implementasi yang disarankan
+## 12. Halaman "Connect your agent" (MCP + Skills + Prompt)
+
+**Tujuan.** Menyatukan semua cara menyambungkan AI agent ke sebuah Project
+TestManager dalam satu halaman generator, meniru pola modal "Connect to your
+project" milik Supabase. User memilih opsi, halaman **menghasilkan** perintah dan
+konfigurasi siap tempel — bukan dokumentasi statis yang harus diedit manual.
+
+**Kenapa perlu.** Section 8 membangun MCP server, tapi tanpa ini setiap tester
+harus mengarang sendiri `claude mcp add ...`, menebak nama tool, dan menyalin
+token dengan cara yang rawan. Halaman ini yang mengubah MCP dari fitur developer
+jadi fitur produk.
+
+**Tahap 1 hanya Claude Code.** Client lain (Cursor, Claude Desktop, VS Code,
+Windsurf) disiapkan di struktur data tapi ditandai "coming soon" di UI. Alasannya
+tiap client punya format konfigurasi berbeda dan menambah permukaan uji sebelum
+alur intinya terbukti.
+
+### 12.1 Kerangka halaman
+
+- [ ] Route `/projects/:id/connect` + tombol **Connect Agent** di Project Detail
+      dan Project Settings.
+- [ ] Tab bar mode koneksi, meniru struktur Supabase — tahap 1 hanya **MCP** yang
+      aktif; sisanya placeholder disabled dengan label alasan:
+      `MCP (aktif)` · `API Token` · `Webhook` · `CI/CD` · `Runner`.
+- [ ] Semua nilai yang ditampilkan **project-scoped**: project id, nama, dan URL
+      diambil dari project yang sedang dibuka, bukan diketik user.
+- [ ] Halaman ini read-only terhadap data project — ia hanya membaca konfigurasi
+      dan membuat token; tidak mengubah test case/plan/run apa pun.
+
+### 12.2 Panel konfigurasi MCP
+
+- [ ] **Client selector** — dropdown. Tahap 1: `Claude Code` (satu-satunya
+      enabled). Entri `Cursor`, `Claude Desktop`, `VS Code`, `Windsurf` tampil
+      disabled + badge "segera".
+- [ ] **Read-only toggle** — memetakan langsung ke `TM_MCP_READONLY=1` (Section
+      8.1). Saat aktif, tool tulis tidak diregistrasikan sama sekali, dan UI
+      menampilkan berapa tool yang akan tersedia.
+- [ ] **Feature groups** — multiselect chip yang memilih grup tool mana yang
+      diaktifkan, memakai pengelompokan Section 8.2:
+      `DISCOVERY` · `TEST-CASE` · `TEST-PLAN` · `TEST-RUN` · `ISSUE` ·
+      `AUTOMATION` · `REPO` · `ANALYSIS` · `DOCS`.
+- [ ] Grup yang berat/berisiko (`AUTOMATION`, `REPO`) **off secara default** —
+      alasan sama dengan Supabase mematikan Storage: menjaga jumlah tool tetap
+      terkelola dan mengurangi permukaan risiko.
+- [ ] Penghitung live: "N tool akan aktif" + peringatan kalau N melewati ambang
+      yang bikin context agent membengkak.
+- [ ] Preview daftar nama tool yang akan teregistrasi, bisa dilipat.
+
+### 12.3 Langkah bernomor + perintah siap salin
+
+- [ ] **Langkah 1 — Add MCP server.** Menghasilkan perintah lengkap, contoh
+      bentuknya:
+      `claude mcp add --scope project --transport http testmanager <url>`
+      dengan URL dan header yang sudah terisi sesuai project + opsi terpilih.
+- [ ] **Langkah 2 — Authenticate.** Instruksi `claude /mcp` lalu pilih server dan
+      jalankan flow auth. Sertakan catatan bahwa ini harus dijalankan di terminal
+      biasa, bukan di dalam ekstensi IDE.
+- [ ] **Langkah 3 — Install Agent Skills (opsional).** Perintah pemasangan skill
+      pack TestManager (lihat 12.4).
+- [ ] Tombol **Copy** per langkah + tombol **Copy semua** di header panel.
+- [ ] Setiap perintah yang disalin ikut menyesuaikan pilihan read-only dan feature
+      group — bukan template statis.
+- [ ] Blok perintah bisa di-scroll horizontal dan tidak pernah memotong isi
+      diam-diam (perintah terpotong = user menempel perintah rusak).
+
+### 12.4 Agent Skills pack
+
+Skill = instruksi + resource siap pakai supaya agent memakai TestManager dengan
+benar tanpa harus diajari ulang tiap sesi.
+
+- [ ] Folder `skills/` berisi skill pack TestManager, dapat dipasang ke project
+      user (pola `npx skills add ...` atau salin ke `.claude/skills/`).
+- [ ] Skill **`testmanager-workflow`** — aturan main domain: re-run selalu Test Run
+      baru, Test Case tidak pernah menyimpan hasil, Issue hanya dari Test Result
+      FAIL, approval selalu manusia.
+- [ ] Skill **`testmanager-authoring`** — cara menulis Test Case yang baik:
+      struktur steps, expected result, skenario negatif, edge case.
+- [ ] Skill **`testmanager-triage`** — cara membaca Test Run gagal, membaca bundle
+      bukti, dan menyusun Issue yang actionable.
+- [ ] Skill **`testmanager-regression`** — cara memilih test regression yang
+      relevan (sinyal Section 11.7) dan kapan harus minta konfirmasi manusia.
+- [ ] Halaman menampilkan daftar skill + deskripsi singkat, dengan checkbox mana
+      yang ikut dipasang.
+- [ ] Skill pack diversipkan dan dicatat versinya, supaya bisa diperbarui tanpa
+      menebak-nebak.
+
+### 12.5 Prompt starter
+
+- [ ] Panel **Prompt** berisi prompt siap pakai yang sudah terisi konteks project
+      (nama, id, module, environment aktif).
+- [ ] Kategori prompt minimal: *generate test case dari requirement*, *analisis
+      Test Run terakhir*, *triage Issue terbuka*, *pilih regression untuk Issue
+      resolved*, *audit coverage requirement*.
+- [ ] Tombol **Copy prompt** per item (sejajar dengan tombol "Copy prompt" di pola
+      Supabase).
+- [ ] Prompt disimpan sebagai data, bukan hardcode di komponen, supaya bisa
+      ditambah tanpa menyentuh UI.
+- [ ] Opsional: user bisa menyimpan prompt sendiri per project (butuh tabel baru —
+      putuskan dulu apakah masuk scope tahap 1).
+
+### 12.6 Keamanan (jangan dilewat)
+
+- [ ] Token **tidak pernah ditanam di dalam string perintah yang ditampilkan**.
+      Perintah yang disalin merujuk ke variabel environment atau flow auth
+      interaktif; kalau token harus muncul, tampilkan sekali dengan peringatan
+      eksplisit.
+- [ ] Alasannya: perintah yang ditempel ke shell masuk ke `~/.bash_history`, dan
+      screenshot halaman ini akan beredar di grup chat. Dua-duanya membocorkan
+      token permanen.
+- [ ] Token yang dibuat dari halaman ini **project-scoped**, punya masa berlaku,
+      dan bisa dicabut dari halaman yang sama.
+- [ ] Tampilkan daftar token aktif yang pernah dibuat lewat halaman ini beserta
+      pemakaian terakhir, supaya token menganggur bisa dicabut.
+- [ ] Pembuatan/pencabutan token tercatat di audit log.
+- [ ] Peringatan eksplisit saat read-only dimatikan: agent akan bisa menulis data
+      project.
+
+### 12.7 Kualitas UI
+
+- [ ] Status koneksi: deteksi apakah project ini sudah pernah dipakai lewat MCP
+      (dari `ai_audit_events`) dan tampilkan "terakhir dipakai <waktu>".
+- [ ] Empty state yang mengajari, bukan sekadar "belum ada data".
+- [ ] Seluruh perintah punya fallback teks yang bisa diseleksi manual kalau
+      clipboard API diblokir browser.
+- [ ] Konsisten dengan `PageHeader` dan tema light/dark yang sudah ada.
+
+---
+
+## 13. Runner UI/UX yang lebih ramah
+
+**Masalah sekarang.** `pages/automation/AutomationPage.tsx` menyajikan tiga tab
+tabel mentah (Runner, Mapping Script, Job). Ini cukup untuk yang sudah paham
+arsitekturnya, tapi tester baru tidak tahu harus mulai dari mana, kenapa runner-nya
+`offline`, atau kenapa job-nya menggantung di `queued`. Section ini membuat modul
+automation bisa dipakai tanpa harus membaca `runner/README.md` lebih dulu.
+
+Section 9 mengurus *kemampuan* runner. Section ini mengurus *pengalaman memakainya*.
+
+### 13.1 Onboarding runner
+
+- [ ] Wizard **"Hubungkan Runner"** berlangkah: beri nama runner → pilih label
+      kapabilitas → dapatkan token sekali tampil → salin perintah instalasi →
+      halaman menunggu heartbeat pertama dan mengonfirmasi "Runner terhubung".
+- [ ] Deteksi otomatis heartbeat pertama tanpa perlu refresh manual.
+- [ ] Perintah instalasi siap salin untuk dua jalur: **npm** (`npm install` +
+      `npm start`) dan **Docker** (`docker run` dengan `--env-file`).
+- [ ] Empty state di tab Runner yang mengarah langsung ke wizard, bukan tabel kosong.
+- [ ] Penjelasan singkat satu paragraf di halaman: kenapa runner harus di mesin
+      lokal dan kenapa tidak perlu buka port.
+
+### 13.2 Status runner yang terbaca
+
+- [ ] Indikator status jelas: `Online` · `Idle` · `Sibuk` · `Offline`, dengan
+      warna dan waktu heartbeat terakhir dalam bahasa manusia ("2 menit lalu").
+- [ ] Kartu runner (bukan hanya baris tabel) di layar lebar: nama, label, versi
+      runner, OS, browser tersedia, job terakhir, dan uptime.
+- [ ] Peringatan kalau runner offline > ambang tertentu padahal masih ada job antre.
+- [ ] Tombol rotate/revoke token per runner dengan konfirmasi eksplisit.
+- [ ] Tampilkan **kenapa** sebuah job tidak diambil runner mana pun (label tidak
+      cocok, semua runner offline, atau environment tidak terjangkau) — ini
+      penyebab kebingungan paling umum pada pola pull-based.
+
+### 13.3 Papan job
+
+- [ ] Tampilan papan berkolom status: `Queued` → `Running` → `Passed`/`Failed`,
+      sebagai alternatif tabel.
+- [ ] Progres per job: langkah yang sedang jalan, durasi berjalan, dan perkiraan
+      selesai berdasarkan run sebelumnya.
+- [ ] Live log streaming saat job `running` (bergantung pada Section 9.4).
+- [ ] Filter cepat: per runner, per environment, per test plan, per status.
+- [ ] Aksi baris: batalkan job antre, ulangi job gagal, buka Test Result terkait.
+- [ ] Badge jumlah job antre di menu sidebar supaya terlihat tanpa membuka halaman.
+
+### 13.4 Mapping script yang tidak membingungkan
+
+- [ ] Tampilkan Test Case yang **belum** punya script secara menonjol — inilah
+      pekerjaan yang tersisa, bukan daftar yang sudah selesai.
+- [ ] Validasi `script_ref` saat disimpan: beri tahu kalau file tidak ditemukan di
+      runner mana pun yang online.
+- [ ] Bulk mapping: pilih banyak Test Case sekaligus lalu petakan berdasarkan pola
+      penamaan file.
+- [ ] Tampilkan label runner yang dibutuhkan beserta runner mana yang memenuhi,
+      dievaluasi saat itu juga.
+
+### 13.5 Diagnostik & troubleshooting
+
+- [ ] Panel **Diagnostik** per runner: hasil sanity check terakhir (base URL
+      reachable, browser terpasang, versi Playwright, ruang disk).
+- [ ] Daftar penyebab kegagalan umum beserta cara memperbaikinya, ditampilkan
+      kontekstual saat kondisinya terdeteksi — bukan halaman FAQ terpisah.
+- [ ] Tombol "Uji koneksi" yang mengirim job no-op ke runner untuk membuktikan
+      jalur end-to-end hidup.
+- [ ] Tampilkan versi runner dan peringatkan kalau tertinggal dari versi server.
+
+### 13.6 Responsif & konsisten
+
+- [ ] Layout mobile: kartu, bukan tabel yang harus digeser horizontal.
+- [ ] Ikuti konvensi `PageHeader` untuk halaman list (lihat CLAUDE.md) dan tema
+      light/dark.
+- [ ] Semua state (loading, kosong, error, offline) punya tampilan yang dirancang,
+      tidak ada spinner tanpa konteks.
+
+---
+
+## 14. Urutan implementasi yang disarankan
 
 Sudah selesai (1–9): Requirement Traceability → Environment Management → Test Run
 Enhancement → Dashboard Trend → API dan Webhook → Playwright Local Runner →
@@ -715,17 +919,22 @@ Berikutnya:
 13. **Playwright interaktif: bukti kegagalan lengkap** (9.3 + 9.4) — ini yang
     membuat Issue hasil AI berguna.
 14. **MCP tools write + automation** (sisa 8.2, 8.3).
-15. **Alur end-to-end tahap 1–5** (11.1–11.5): CSV → review → run → bukti → Issue.
-16. **Regression selektif + verifikasi** (11.6–11.8).
-17. **Playwright interaktif: codegen, UI mode, pause & inspect** (9.1, 9.2, 9.5).
-18. Scheduled Test Run + sisa Administrasi/monitoring (Section 5, 6).
+15. **Halaman "Connect your agent"** (Section 12) — begitu tool MCP-nya ada,
+    inilah yang membuatnya bisa dipakai orang lain tanpa dituntun manual.
+16. **Runner UI/UX** (Section 13) — onboarding + status + papan job (13.1–13.3).
+17. **Alur end-to-end tahap 1–5** (11.1–11.5): CSV → review → run → bukti → Issue.
+18. **Regression selektif + verifikasi** (11.6–11.8).
+19. **Playwright interaktif: codegen, UI mode, pause & inspect** (9.1, 9.2, 9.5).
+20. Sisa Runner UI/UX (13.4–13.6) + Scheduled Test Run + Administrasi (Section 5, 6).
 
 Alasan urutan: repo link dulu karena MCP dan regression selection sama-sama
 bergantung padanya; bukti kegagalan sebelum AI-create-Issue karena Issue tanpa
-screenshot/trace tidak actionable; mode interaktif belakangan karena sifatnya
-peningkatan pengalaman authoring, bukan penghalang alur utama.
+screenshot/trace tidak actionable; halaman Connect setelah tool MCP ada karena ia
+generator konfigurasi — tidak ada yang bisa digenerate sebelum tool-nya nyata;
+mode interaktif belakangan karena sifatnya peningkatan pengalaman authoring,
+bukan penghalang alur utama.
 
-## 13. Catatan keputusan teknis
+## 15. Catatan keputusan teknis
 
 - Fokus utama aplikasi adalah manual software testing untuk tim kecil.
 - Fitur Playwright ditambahkan setelah workflow manual dan reporting stabil.

@@ -1,5 +1,34 @@
 # Worklog
 
+## 2026-08-01 — Backlog: halaman "Connect your agent" + Runner UI/UX
+
+- `FEATURE_BACKLOG.md` Section 12 baru — **Halaman "Connect your agent"**, meniru
+  pola modal "Connect to your project" Supabase: panel konfigurasi MCP (client
+  selector, read-only toggle, feature groups), langkah bernomor dengan perintah
+  siap salin, Agent Skills pack, dan prompt starter. Tahap 1 **hanya Claude Code**;
+  client lain disiapkan di struktur data tapi disabled di UI.
+- Sub-section: 12.1 kerangka halaman, 12.2 panel MCP, 12.3 langkah + perintah,
+  12.4 skills pack (4 skill: workflow, authoring, triage, regression),
+  12.5 prompt starter, 12.6 keamanan, 12.7 kualitas UI.
+- Keputusan keamanan yang ditulis eksplisit: token **tidak boleh ditanam di string
+  perintah** yang ditampilkan/disalin, karena perintah tempel masuk `bash_history`
+  dan screenshot halaman ini akan beredar di grup chat. Token project-scoped,
+  ada masa berlaku, bisa dicabut dari halaman yang sama.
+- Grup tool berat/berisiko (`AUTOMATION`, `REPO`) default off — alasan sama dengan
+  Supabase mematikan Storage secara default: menjaga jumlah tool terkelola.
+- `FEATURE_BACKLOG.md` Section 13 baru — **Runner UI/UX yang lebih ramah**.
+  Baseline sekarang `AutomationPage.tsx` hanya 3 tab tabel mentah (Runner, Mapping
+  Script, Job). Ditambahkan: 13.1 wizard onboarding runner, 13.2 status runner
+  terbaca, 13.3 papan job, 13.4 mapping script, 13.5 diagnostik, 13.6 responsif.
+- Pembagian tanggung jawab dicatat: Section 9 mengurus *kemampuan* runner,
+  Section 13 mengurus *pengalaman memakainya*.
+- Renumber: Urutan implementasi 12→14, Catatan keputusan teknis 13→15. Daftar
+  urutan diperbarui — Connect page (15) setelah MCP tools write, Runner UI/UX (16)
+  menyusul, dengan alasan halaman Connect itu generator konfigurasi sehingga tidak
+  ada yang bisa digenerate sebelum tool MCP-nya nyata.
+- Belum ada perubahan kode pada sesi ini — dokumentasi/perencanaan saja.
+
+
 ## 2026-07-31 — MCP-14 tool konteks repository
 
 - Menambahkan tool read-only MCP `testmanager.repo.list_files`, `repo.read_file`,
@@ -1717,3 +1746,10 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan alur lengkap Page → Hook → Service → Repository → Supabase untuk mengambil detail hasil, membuat signed URL artifact private, dan membaca artifact teks; kegagalan satu artifact tidak menutup bukti lain yang masih tersedia.
 - Memperbarui checklist scope PW-07 pada Section 9.4 dan 11.4. Tidak menambah dependency atau migrasi, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm run lint` (hanya warning lama di file di luar scope), dan `git diff --check`. `graphify update .` berhasil memperbarui graph menjadi 2.494 node dan 5.185 edge.
+
+## 2026-08-01 — PW-08 Playwright trace viewer
+
+- Menjalankan `graphify query` sebelum menelusuri alur artefak Test Result dan mengikuti keputusan viewer Section 9.4 `FEATURE_BACKLOG.md`.
+- Menambahkan tab Trace pada halaman detail Test Result yang meng-embed Playwright Trace Viewer memakai signed URL artefak private, serta menyediakan aksi membuka viewer di tab baru dan mengunduh file trace sebagai fallback.
+- URL dasar viewer dapat diarahkan ke deployment self-hosted melalui `VITE_PLAYWRIGHT_TRACE_VIEWER_URL`; default tetap `https://trace.playwright.dev/`. Tidak menambah dependency, migrasi, atau akses data baru; alur artefak tetap Page → Hook → Service → Repository → Supabase.
+- Verifikasi lulus: `cd frontend && npm run build`, `cd frontend && npm run lint` (hanya tujuh warning lama di luar file scope), dan `git diff --check`.
