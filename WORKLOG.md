@@ -1959,3 +1959,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Mempertahankan field `module` dan `targetRole` dari respons AI pada parser frontend agar preview dan unduhan sesuai kontrak CSV gateway. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run` (5/5 test), dan `cd frontend && npm run lint` (hanya warning existing di file di luar scope).
 - `graphify update .` sudah dijalankan; incremental rebuild melaporkan `Operation not permitted`, sementara cache statistik Graphify tetap diperbarui. Source aplikasi dan graph lama tetap tersedia.
+
+## 2026-08-01 — E2E-04 draft Test Case hasil import AI
+
+- Menjalankan `graphify query` sebelum menelusuri alur AI generator ke penyimpanan Test Case dan mengikuti gate review manusia pada Section 11.2 `FEATURE_BACKLOG.md`.
+- Menambahkan migration `schema_070_ai_test_case_drafts.sql` untuk kolom `test_cases.source` dengan nilai terbatas `manual`/`ai`, default `manual`, serta memperluas constraint status Test Case agar menerima `draft`. Migration hanya dibuat dan tidak dijalankan ke target Supabase.
+- Menambahkan `TestCaseSource` dan status `draft` pada domain, mapping `source` snake_case ke camelCase, serta meneruskan field tersebut melalui repository dan service dengan default `manual` + `active` untuk alur non-AI.
+- Hasil simpan dari generator AI sekarang selalu `source = 'ai'` dan `status = 'draft'`; pencatatan approval saat import dihapus agar tidak melewati gate review manusia. Status Draft ditampilkan pada daftar dan tersedia di filter/status bulk untuk alur review berikutnya.
+- Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test` (5/5 test), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.623 node dan 5.400 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

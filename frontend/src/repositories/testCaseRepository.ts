@@ -114,6 +114,7 @@ export const testCaseRepository = {
         step_type: input.stepType,
         priority: input.priority,
         status: input.status,
+        source: input.source,
         notes: input.notes,
         assigned_to: input.assignedTo ?? null,
         target_role_id: input.targetRoleId ?? null,
@@ -138,6 +139,7 @@ export const testCaseRepository = {
     if (changes.stepType !== undefined) payload.step_type = changes.stepType;
     if (changes.priority !== undefined) payload.priority = changes.priority;
     if (changes.status !== undefined) payload.status = changes.status;
+    if (changes.source !== undefined) payload.source = changes.source;
     if (changes.notes !== undefined) payload.notes = changes.notes;
     if (changes.assignedTo !== undefined) payload.assigned_to = changes.assignedTo;
     if (changes.targetRoleId !== undefined) payload.target_role_id = changes.targetRoleId;
@@ -178,6 +180,7 @@ export const testCaseRepository = {
       title: input.title, objective: input.objective, preconditions: input.preconditions,
       steps: input.steps, expected_result: input.expectedResult, step_type: input.stepType,
       priority: input.priority, status: input.status, notes: input.notes,
+      source: input.source,
       assigned_to: input.assignedTo ?? null, target_role_id: input.targetRoleId ?? null,
       external_links: input.externalLinks ?? [], created_by: input.createdBy ?? null,
     }))).select('*');

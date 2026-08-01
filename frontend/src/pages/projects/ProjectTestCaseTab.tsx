@@ -36,7 +36,7 @@ type ProjectTestCaseTabProps = {
 
 const PRIORITY_OPTIONS: { label: string; value: TestCasePriority }[] = (['low', 'medium', 'high', 'critical'] as const)
   .map((value) => ({ value, label: TEST_CASE_PRIORITY_LABEL[value] }));
-const STATUS_OPTIONS: { label: string; value: TestCaseStatus }[] = (['active', 'archived'] as const)
+const STATUS_OPTIONS: { label: string; value: TestCaseStatus }[] = (['draft', 'active', 'archived'] as const)
   .map((value) => ({ value, label: TEST_CASE_STATUS_LABEL[value] }));
 
 export function ProjectTestCaseTab({

@@ -1,7 +1,6 @@
 import { aiTestCaseRepository } from '../repositories/aiTestCaseRepository';
 import { AiTestCaseSchema, validateAiTestCaseDraft } from '../helpers/aiTestCaseParser';
 import { testCaseService } from './testCaseService';
-import { aiRepository } from '../repositories/aiRepository';
 import type { AiDuplicateCandidate, AiTestCaseCsvPreview, AiTestCaseDraft, AiTestCaseGenerationRequest, AiTestCaseGenerationResult, AiTestCaseSaveInput } from '../types/aiTestCase';
 import type { TestCaseWithDetails } from '../types/domain';
 
@@ -91,10 +90,11 @@ export const aiTestCaseService = {
       steps: draft.steps,
       expectedResult: draft.expectedResult,
       priority: draft.priority,
+      status: 'draft',
+      source: 'ai',
       notes: draft.notes,
       tagNames: draft.tags,
     });
-    await aiRepository.recordApproval({ projectId: input.projectId, targetType: 'test_case', targetId: testCase.id });
     return testCase;
   },
 };

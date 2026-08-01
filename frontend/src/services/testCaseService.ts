@@ -73,6 +73,8 @@ export const testCaseService = {
     stepType?: TestCase['stepType'];
     preconditions?: string;
     priority?: TestCase['priority'];
+    status?: TestCase['status'];
+    source?: TestCase['source'];
     notes?: string;
     tagNames?: string[];
     detailedSteps?: { action: string; expectedResult?: string }[];
@@ -97,7 +99,8 @@ export const testCaseService = {
       expectedResult: input.expectedResult.trim(),
       stepType,
       priority: input.priority ?? 'medium',
-      status: 'active',
+      status: input.status ?? 'active',
+      source: input.source ?? 'manual',
       notes: input.notes?.trim() || null,
       assignedTo: null,
       targetRoleId: null,

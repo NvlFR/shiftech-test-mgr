@@ -22,7 +22,7 @@ import { useScreenSize } from '../../hooks/useScreenSize';
 import { dataTablePaginatorProps } from '../../components/ui/dataTablePaginator';
 
 const priorities: { label: string; value: TestCasePriority }[] = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ label: TEST_CASE_PRIORITY_LABEL[value], value }));
-const statuses: { label: string; value: TestCaseStatus }[] = (['active', 'archived'] as const).map((value) => ({ label: TEST_CASE_STATUS_LABEL[value], value }));
+const statuses: { label: string; value: TestCaseStatus }[] = (['draft', 'active', 'archived'] as const).map((value) => ({ label: TEST_CASE_STATUS_LABEL[value], value }));
 
 export function TestCasesPage() {
   const { lt } = useScreenSize();

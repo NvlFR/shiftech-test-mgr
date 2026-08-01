@@ -68,11 +68,13 @@ export const TEST_PLAN_STATUS_SEVERITY: Record<TestPlanStatus, TagSeverity> = {
 };
 
 export const TEST_CASE_STATUS_LABEL: Record<TestCaseStatus, string> = {
+  draft: 'Draft',
   active: 'Aktif',
   archived: 'Diarsipkan',
 };
 
 export const TEST_CASE_STATUS_SEVERITY: Record<TestCaseStatus, TagSeverity> = {
+  draft: 'warning',
   active: 'success',
   archived: 'secondary',
 };

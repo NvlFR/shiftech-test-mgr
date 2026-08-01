@@ -218,6 +218,7 @@ export function mapTestCaseRow(row: any): TestCase {
     stepType: row.step_type ?? 'simple',
     priority: row.priority,
     status: row.status,
+    source: row.source ?? 'manual',
     notes: row.notes,
     assignedTo: row.assigned_to ?? null,
     targetRoleId: row.target_role_id ?? null,

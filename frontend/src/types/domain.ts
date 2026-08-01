@@ -170,7 +170,8 @@ export interface Environment {
 // Test Case is a reusable template — it never stores a pass/fail result itself.
 // Results live on TestResult, one row per (TestRun x TestCase).
 export type TestCasePriority = 'low' | 'medium' | 'high' | 'critical';
-export type TestCaseStatus = 'active' | 'archived';
+export type TestCaseStatus = 'draft' | 'active' | 'archived';
+export type TestCaseSource = 'manual' | 'ai';
 
 export interface TestCase {
   id: string;
@@ -185,6 +186,7 @@ export interface TestCase {
   stepType: TestCaseStepType;
   priority: TestCasePriority;
   status: TestCaseStatus;
+  source: TestCaseSource;
   notes: string | null;
   assignedTo: string | null;
   targetRoleId?: string | null;
