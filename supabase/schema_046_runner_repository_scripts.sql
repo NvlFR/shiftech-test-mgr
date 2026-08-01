@@ -30,15 +30,17 @@ begin
   where id = v_job.id returning * into v_job;
   select * into v_case from test_cases where id = v_job.test_case_id;
 
-  select r, s.decrypted_secret into v_repository, v_repository_token
+  select r.* into v_repository
   from test_runs tr
   join project_repositories r on r.id = tr.repository_id and r.project_id = v_job.project_id and r.is_active
-  left join vault.decrypted_secrets s
-    on s.id = r.credential_id
-   and (r.credential_expires_at is null or r.credential_expires_at > now())
   where tr.id = v_job.test_run_id;
 
   if found then
+    select s.decrypted_secret into v_repository_token
+    from vault.decrypted_secrets s
+    where s.id = v_repository.credential_id
+      and (v_repository.credential_expires_at is null or v_repository.credential_expires_at > now());
+
     v_repository_payload := jsonb_build_object(
       'id', v_repository.id,
       'source_type', v_repository.source_type,

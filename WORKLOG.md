@@ -1598,3 +1598,18 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_059_mcp_rate_limit_audit.sql` tanpa menjalankannya ke target. Setiap panggilan membuat `ai_audit_events` berisi nama tool, status, dan latency; argumen, hasil, payload mentah, serta token tidak disimpan di audit.
 - Menambahkan test repository/service/wrapper untuk metadata minimal, status sukses/gagal/rate-limited, latency, dan redaksi kegagalan upstream; fixture konfigurasi existing disesuaikan untuk opsi baru.
 - Verifikasi lulus: `cd mcp && npm test` (19/19 test file, termasuk build TypeScript) dan `git diff --check`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+
+## 2026-08-01 — Eksekusi seluruh migration melalui MCP Supabase
+
+- Mengautentikasi MCP Supabase untuk project `fohuxwzczepdqyrfkovc`, membandingkan 61 file migration lokal (tanpa `seed.sql`) dengan migration history remote, dan menemukan 29 file sudah terwakili.
+- Berhasil menerapkan 18 migration berurutan dari `schema_029_project_ownership_visibility.sql` sampai `schema_045_test_run_repository_traceability.sql`.
+- Eksekusi awal `schema_046_runner_repository_scripts.sql` gagal dengan PostgreSQL `42601` karena variabel `%ROWTYPE` dan scalar dipakai bersama dalam satu daftar `SELECT INTO`.
+- Memperbaiki migration `schema_046_runner_repository_scripts.sql` dengan mengambil row repository dan secret Vault melalui dua query terpisah; perilaku expiry credential dan payload runner tetap dipertahankan.
+- Migration `schema_046` hingga `schema_059` akan dilanjutkan melalui MCP Supabase dan history remote diverifikasi setelah rangkaian selesai.
+
+## 2026-08-01 — MCP-17 audit tool destruktif
+
+- Menjalankan `graphify query` sebelum menelusuri registrasi tool MCP dan mengaudit katalog terhadap guardrail Section 8.3 `FEATURE_BACKLOG.md`.
+- Hasil audit: tidak ada tool hapus project, hapus Test Case, atau hapus Test Run yang teregistrasi. Katalog hanya menyediakan baca project/Test Case/Test Run, mutation non-destruktif, `testcase.archive` (soft archive), dan `testplan.remove_cases` yang hanya melepas relasi scope plan tanpa menghapus Test Case.
+- Registrasi aktual ditelusuri dari `mcp/src/index.ts` melalui seluruh registrar di `mcp/src/tools/`; `toolRegistry` bawaan kosong dan mode read-only tetap mengecualikan seluruh registrar write.
+- Verifikasi lulus: pencarian statis seluruh pemanggilan `registerTool` dan pola delete/remove/destroy pada `mcp/`, serta `cd mcp && npm test` (19/19 test file, termasuk build TypeScript). Tidak mengubah kode, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
