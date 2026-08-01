@@ -43,7 +43,18 @@ npm start
 npm start -- --headed
 # Browser terlihat dengan delay 250 ms per operasi:
 npm start -- --slow-mo=250
+# Playwright UI Mode (argumen setelah subcommand diteruskan ke Playwright):
+npm start -- ui tests/smoke.spec.ts
+# Playwright Inspector + PWDEBUG=1:
+npm start -- debug tests/smoke.spec.ts
+# Jalankan ulang otomatis ketika file *.spec.* / *.test.* berubah:
+npm start -- watch tests
 ```
+
+Subcommand `ui`, `debug`, dan `watch` berjalan langsung di `TM_PROJECT_DIR` dan
+tidak melakukan polling maupun membutuhkan kredensial TestManager. `watch`
+mengabaikan perubahan pada `node_modules`, `.git`, artifact, dan output report;
+tekan Ctrl+C untuk berhenti.
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
 terhadap repository pada Test Run. Untuk `local_path`, runner menggunakan path

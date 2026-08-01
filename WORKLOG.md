@@ -1632,6 +1632,8 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Log API/PostgreSQL Supabase menunjukkan count `test_runs`, `test_results`, dan `issues` gagal HTTP 500 dengan PostgreSQL `42P17: infinite recursion detected in policy for relation test_runs`; count `projects`, `test_cases`, dan `test_plans` tetap HTTP 200.
 - Akar masalah adalah policy `project access - test_runs select` dari migration structured custom runs yang melakukan subquery kembali ke tabel `test_runs` yang sedang dilindungi.
 - Menambahkan migration `schema_060_fix_test_runs_rls_recursion.sql` untuk mengganti policy select/update/delete `test_runs` agar memakai `custom_project_id` atau project dari `test_plan_id` pada row saat ini tanpa self-query.
+- Migration `schema_060_fix_test_runs_rls_recursion` berhasil diterapkan melalui MCP Supabase dan tercatat sebagai version `20260801004504`.
+- Verifikasi RLS dijalankan dalam transaksi read-only sebagai role efektif `authenticated` dengan `auth.uid()` owner Sample Project, lalu di-rollback. Count berhasil untuk projects (3), test_cases (2), test_plans (2), test_runs (4), test_results (8), dan issues (1), termasuk seluruh filter status dashboard; tidak ada lagi `42P17` atau HTTP 500.
 
 ## 2026-08-01 — MCP-17 audit tool destruktif
 
@@ -1672,3 +1674,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Runner memvalidasi payload, menerapkan browser melalui CLI Playwright, dan meneruskan device profile melalui `TM_PLAYWRIGHT_DEVICE_PROFILE` untuk dipakai konfigurasi emulasi Playwright.
 - Verifikasi lulus: `cd runner && npm test` (3/3 test file) dan `cd frontend && npm run build`.
 - `graphify update .` sudah dijalankan dan memperbarui artifact graph, tetapi proses mengembalikan warning akhir `Operation not permitted` dari watcher sandbox. Tidak ada migrasi yang dijalankan, data dihapus, dependency ditambah, commit, atau push.
+
+## 2026-08-01 — PW-03 mode UI, debug, dan watch runner
+
+- Menjalankan `graphify query` sebelum menelusuri CLI runner dan mengikuti keputusan mode eksekusi interaktif pada Section 9.1 `FEATURE_BACKLOG.md`.
+- Menambahkan subcommand lokal `runner ui`, `runner debug`, dan `runner watch`; argumen setelah subcommand diteruskan ke Playwright dan mode lokal tidak memerlukan kredensial/polling server TestManager.
+- Mode UI menjalankan Playwright dengan `--ui`, mode debug dengan `--debug` dan `PWDEBUG=1`, sedangkan mode watch menjalankan test pada awal sesi lalu menjadwalkan ulang ketika file `*.spec.*` atau `*.test.*` berubah, dengan debounce dan pengecualian direktori dependency/artifact/report.
+- Menambahkan unit test parsing subcommand dan pembentukan invocation Playwright, serta dokumentasi penggunaan dan penghentian watch dengan Ctrl+C.
+- Verifikasi lulus: `cd runner && npm test` (3/3 test file, termasuk build TypeScript) dan `cd frontend && npm run build` (dengan warning ukuran chunk Vite yang sudah ada). Tidak menjalankan migration, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.
+- `graphify update .` memperbarui graph menjadi 2.454 node dan 5.108 edge; pemanggilan ulang setelah koreksi kecil mendeteksi tidak ada source tersisa untuk diperbarui lalu watcher sandbox melaporkan `Operation not permitted`.

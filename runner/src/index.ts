@@ -1,10 +1,17 @@
 #!/usr/bin/env node
-import { loadConfig, parseCliOptions } from './config.js';
+import { loadConfig, loadInteractiveConfig, parseCliInput } from './config.js';
 import { Runner } from './runner.js';
 import { log } from './logger.js';
+import { runInteractiveCommand } from './interactive.js';
 
 async function main(): Promise<void> {
-  const config = loadConfig('.env', parseCliOptions(process.argv.slice(2)));
+  const cli = parseCliInput(process.argv.slice(2));
+  if (cli.command !== 'start') {
+    const exitCode = await runInteractiveCommand(loadInteractiveConfig(), cli.command, cli.playwrightArgs);
+    process.exitCode = exitCode;
+    return;
+  }
+  const config = loadConfig('.env', cli.options);
   const runner = new Runner(config);
 
   const shutdown = (signal: string) => {

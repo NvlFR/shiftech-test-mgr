@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseCliOptions } from '../dist/config.js';
+import { parseCliInput, parseCliOptions } from '../dist/config.js';
 import { resolveExecutionMode, resolveExecutionTarget } from '../dist/executor.js';
+import { createInteractiveInvocation } from '../dist/interactive.js';
 
 const config = { headed: false, slowMoMs: 0 };
 const job = { headed: undefined, slow_mo_ms: null };
@@ -11,6 +12,24 @@ test('CLI headed dan slow-mo diparse, slow-mo otomatis headed', () => {
   assert.deepEqual(parseCliOptions(['--slow-mo', '250']), { slowMoMs: 250, headed: true });
   assert.deepEqual(parseCliOptions(['--slow-mo=100']), { slowMoMs: 100, headed: true });
   assert.throws(() => parseCliOptions(['--slow-mo=-1']), /integer milidetik/);
+});
+
+test('subcommand interaktif dan argumen Playwright diparse tanpa opsi server', () => {
+  assert.deepEqual(parseCliInput(['ui', 'tests/login.spec.ts', '--project=chromium']), {
+    command: 'ui', options: {}, playwrightArgs: ['tests/login.spec.ts', '--project=chromium'],
+  });
+  assert.deepEqual(parseCliInput(['debug']), { command: 'debug', options: {}, playwrightArgs: [] });
+  assert.deepEqual(parseCliInput(['watch', 'tests']), { command: 'watch', options: {}, playwrightArgs: ['tests'] });
+  assert.deepEqual(parseCliInput(['start', '--headed']), { command: 'start', options: { headed: true }, playwrightArgs: [] });
+});
+
+test('invocation UI, debug, dan watch dibentuk sesuai Playwright', () => {
+  const interactiveConfig = { projectDir: '/tmp/project', playwrightCmd: 'npx playwright test' };
+  assert.deepEqual(createInteractiveInvocation(interactiveConfig, 'ui', ['smoke.spec.ts']).args, ['playwright', 'test', 'smoke.spec.ts', '--ui']);
+  const debug = createInteractiveInvocation(interactiveConfig, 'debug', []);
+  assert.deepEqual(debug.args, ['playwright', 'test', '--debug']);
+  assert.equal(debug.env.PWDEBUG, '1');
+  assert.deepEqual(createInteractiveInvocation(interactiveConfig, 'watch', ['tests']).args, ['playwright', 'test', 'tests']);
 });
 
 test('target browser dan device profile divalidasi dari payload job', () => {

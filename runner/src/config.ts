@@ -23,6 +23,19 @@ export interface RunnerCliOptions {
   slowMoMs?: number;
 }
 
+export type RunnerCommand = 'start' | 'ui' | 'debug' | 'watch';
+
+export interface RunnerCliInput {
+  command: RunnerCommand;
+  options: RunnerCliOptions;
+  playwrightArgs: string[];
+}
+
+export interface InteractiveRunnerConfig {
+  projectDir: string;
+  playwrightCmd: string;
+}
+
 // Minimal zero-dependency .env loader. Existing process.env always wins so that
 // container/CI env vars override the file.
 function loadDotEnv(path: string): void {
@@ -91,6 +104,26 @@ export function parseCliOptions(args: string[]): RunnerCliOptions {
     throw new Error(`Unknown runner option: ${argument}`);
   }
   return options;
+}
+
+export function parseCliInput(args: string[]): RunnerCliInput {
+  const command = args[0];
+  if (command === 'ui' || command === 'debug' || command === 'watch') {
+    return { command, options: {}, playwrightArgs: args.slice(1) };
+  }
+  return { command: 'start', options: parseCliOptions(command === 'start' ? args.slice(1) : args), playwrightArgs: [] };
+}
+
+export function loadInteractiveConfig(envPath = '.env'): InteractiveRunnerConfig {
+  loadDotEnv(resolve(process.cwd(), envPath));
+  const projectDir = process.env.TM_PROJECT_DIR?.trim() || process.cwd();
+  if (process.env.TM_PROJECT_DIR && !isAbsolute(projectDir)) {
+    throw new Error('TM_PROJECT_DIR must be an absolute path');
+  }
+  return {
+    projectDir: resolve(projectDir),
+    playwrightCmd: process.env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
+  };
 }
 
 export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}): RunnerConfig {
