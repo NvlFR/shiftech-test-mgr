@@ -1,5 +1,6 @@
 import { issueService } from './issueService';
 import { aiRepository } from '../repositories/aiRepository';
+import { testResultRepository } from '../repositories/testResultRepository';
 import {
   buildDuplicateReason,
   calculateDuplicateConfidence,
@@ -30,21 +31,30 @@ export function assertAiProjectScope(projectId: string, actor: AiActorContext, s
   }
 }
 
-function failedResultPayload(result: TestResultWithDetails) {
+function failedResultPayload(result: TestResultWithDetails, context: Awaited<ReturnType<typeof testResultRepository.findAiIssueContext>>) {
+  const snapshot = result.testCaseSnapshot;
+  const snapshotPriority = snapshot?.priority;
+  const priority = snapshotPriority && ['low', 'medium', 'high', 'critical'].includes(snapshotPriority)
+    ? snapshotPriority as TestResultWithDetails['testCase']['priority']
+    : result.testCase.priority;
   return {
     id: result.id,
     status: result.status,
     notes: result.notes,
+    errorSummary: context.errorSummary,
+    artifacts: result.automationArtifacts,
+    environment: context.environment,
+    commitSha: context.commitSha,
     testCase: {
       id: result.testCase.id,
       projectId: result.testCase.projectId,
-      code: result.testCase.code,
-      title: result.testCase.title,
-      objective: result.testCase.objective,
-      preconditions: result.testCase.preconditions,
-      steps: result.testCase.steps,
-      expectedResult: result.testCase.expectedResult,
-      priority: result.testCase.priority,
+      code: snapshot?.code ?? result.testCase.code,
+      title: snapshot?.title ?? result.testCase.title,
+      objective: snapshot?.objective ?? result.testCase.objective,
+      preconditions: snapshot?.preconditions ?? result.testCase.preconditions,
+      steps: snapshot?.steps ?? result.testCase.steps,
+      expectedResult: snapshot?.expectedResult ?? result.testCase.expectedResult,
+      priority,
     },
   } satisfies AiGatewayIssueDraftRequest['result'];
 }
@@ -68,15 +78,37 @@ export const aiIssueService = {
     assertAiProjectScope(input.projectId, input.actor, input.result.testCase.projectId);
     if (input.result.status !== 'fail') throw new Error('Draft Issue AI hanya dapat dibuat dari Test Result FAIL');
 
+    const context = await testResultRepository.findAiIssueContext(input.result.id);
+    const payload = failedResultPayload(input.result, context);
     const response = await aiRepository.invoke({
       action: 'issue_draft',
       projectId: input.projectId,
-      result: failedResultPayload(input.result),
+      result: payload,
     });
-    const draft = parseAiIssueDraft(response && typeof response === 'object' && 'draft' in response ? response.draft : response);
+    const generated = response && typeof response === 'object' && 'draft' in response ? response.draft : response;
+    const draft = parseAiIssueDraft({
+      ...(generated as Record<string, unknown>),
+      projectId: input.projectId,
+      testResultId: input.result.id,
+      reproductionSteps: payload.testCase.steps,
+      expectedResult: payload.testCase.expectedResult,
+      errorSummary: payload.errorSummary,
+      artifacts: payload.artifacts,
+      environment: payload.environment,
+      commitSha: payload.commitSha,
+    });
     if (draft.projectId !== input.projectId) throw new Error('Draft AI merujuk ke project yang berbeda');
     if (draft.testResultId !== input.result.id) throw new Error('Draft AI merujuk ke Test Result yang berbeda');
-    return draft;
+    return {
+      ...draft,
+      testResultId: input.result.id,
+      reproductionSteps: payload.testCase.steps,
+      expectedResult: payload.testCase.expectedResult,
+      errorSummary: payload.errorSummary,
+      artifacts: payload.artifacts,
+      environment: payload.environment,
+      commitSha: payload.commitSha,
+    };
   },
 
   async detectDuplicates(input: { projectId: string; draft: AiIssueDraft; actor: AiActorContext }): Promise<DuplicateIssueCandidate[]> {

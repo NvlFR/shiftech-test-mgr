@@ -1,4 +1,14 @@
-import type { IssuePriority, IssueStatus, TestResultWithDetails } from './domain';
+import type { AutomationArtifact, IssuePriority, IssueStatus, TestResultWithDetails } from './domain';
+
+export interface AiIssueEnvironment {
+  name: string | null;
+  baseUrl: string | null;
+  browser: string | null;
+  browserVersion: string | null;
+  os: string | null;
+  viewport: { width: number; height: number } | null;
+  buildVersion: string | null;
+}
 
 export type AiIssueSeverity = 'low' | 'medium' | 'high' | 'critical';
 
@@ -12,6 +22,10 @@ export interface AiIssueDraft {
   priority: IssuePriority;
   severity: AiIssueSeverity;
   reproductionSteps: string;
+  errorSummary: string;
+  artifacts: AutomationArtifact[];
+  environment: AiIssueEnvironment;
+  commitSha: string | null;
 }
 
 export interface AiActorContext {
@@ -68,6 +82,10 @@ export interface AiGatewayIssueDraftRequest {
     id: string;
     status: TestResultWithDetails['status'];
     notes: string | null;
+    errorSummary: string;
+    artifacts: AutomationArtifact[];
+    environment: AiIssueEnvironment;
+    commitSha: string | null;
     testCase: Pick<TestResultWithDetails['testCase'], 'id' | 'projectId' | 'code' | 'title' | 'objective' | 'preconditions' | 'steps' | 'expectedResult' | 'priority'>;
   };
 }

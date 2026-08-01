@@ -1,9 +1,46 @@
 import { supabase } from '../config/supabaseClient';
 import { mapProfileRow, mapTestCaseRow, mapTestResultRow, mapTestResultScreenshotHistoryRow, mapTestResultStepRow } from '../helpers/mappers';
 import { fetchAllRows } from './paginate';
+import type { AiIssueEnvironment } from '../types/ai';
 import type { AutomationArtifact, TestResult, TestResultScreenshotHistory, TestResultStatus, TestResultWithDetails, TestRunStatus } from '../types/domain';
 
 export const testResultRepository = {
+  async findAiIssueContext(resultId: string): Promise<{ errorSummary: string; environment: AiIssueEnvironment; commitSha: string | null }> {
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('test_run_id, test_case_id, test_run:test_runs(commit_sha, build_version, browser, environment:environments(name, base_url))')
+      .eq('id', resultId)
+      .single();
+    if (error) throw error;
+
+    const { data: job, error: jobError } = await supabase
+      .from('automation_jobs')
+      .select('error_message, environment_metadata')
+      .eq('test_run_id', data.test_run_id)
+      .eq('test_case_id', data.test_case_id)
+      .order('attempt', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (jobError) throw jobError;
+
+    const run = data.test_run as any;
+    const metadata = (job?.environment_metadata ?? {}) as Record<string, any>;
+    return {
+      errorSummary: job?.error_message?.trim() || 'Tidak ada ringkasan error dari runner.',
+      environment: {
+        name: run?.environment?.name ?? null,
+        baseUrl: metadata.baseUrl ?? run?.environment?.base_url ?? null,
+        browser: metadata.browser ?? run?.browser ?? null,
+        browserVersion: metadata.browserVersion ?? null,
+        os: metadata.os ?? null,
+        viewport: metadata.viewport && typeof metadata.viewport.width === 'number' && typeof metadata.viewport.height === 'number'
+          ? { width: metadata.viewport.width, height: metadata.viewport.height }
+          : null,
+        buildVersion: metadata.buildVersion ?? run?.build_version ?? null,
+      },
+      commitSha: metadata.commitSha ?? run?.commit_sha ?? null,
+    };
+  },
   async retryAutomation(id: string): Promise<{ jobId: string; testResultId: string; testRunId: string }> {
     const { data, error } = await supabase.rpc('retry_automation_test_result', { p_test_result_id: id });
     if (error) throw error;

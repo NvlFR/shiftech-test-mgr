@@ -2064,3 +2064,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan regression contract test di `mcp/src/services/automationService.test.ts` yang membuktikan kasus tanpa script tetap tersedia untuk eksekusi manual, tidak masuk antrean automation, dan hasil otomatis hanya dapat berasal dari job runner yang valid.
 - Tidak menjalankan migration atau mengubah data Supabase.
 - Verifikasi lulus: `cd mcp && npm test` (20/20 suite), `cd frontend && npm run build`, dan `git diff --check`. `graphify update .` sudah meregenerasi output graph; proses watch lanjutannya berhenti karena sandbox melaporkan `Operation not permitted`.
+
+## 2026-08-01 — E2E-10 draft Issue otomatis dari Test Result FAIL
+
+- Menjalankan `graphify query` sebelum menelusuri alur Test Result FAIL ke draft Issue AI dan mengikuti kontrak Section 11.5 `FEATURE_BACKLOG.md`.
+- Memperluas konteks repository untuk mengambil error runner, metadata environment, dan commit SHA dari Test Run/automation job yang tepat; payload juga membawa seluruh artifact yang tertaut ke Test Result.
+- Draft mempertahankan secara deterministik relasi `test_result_id`, langkah reproduksi dan expected result dari snapshot Test Case saat run dibuat, ringkasan error, seluruh referensi artifact, environment, dan commit SHA. Data faktual tersebut tidak diserahkan kepada AI untuk diubah dan disimpan dalam deskripsi Issue setelah review manusia.
+- Memperluas kontrak request AI Gateway untuk menerima konteks kegagalan lengkap. Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), `cd frontend && npm test -- --run` (5/5 test), `cd frontend && npm run lint` (tujuh warning existing di file di luar scope), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.653 node dan 5.461 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

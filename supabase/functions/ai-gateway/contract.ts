@@ -3,6 +3,8 @@ import { z } from "https://esm.sh/zod@3.23.8";
 const Uuid = z.string().uuid();
 const Text = z.string().trim();
 const Priority = z.enum(["low", "medium", "high", "critical"]);
+const Artifact = z.object({ type: z.enum(["screenshot", "video", "trace", "log", "network", "dom"]), url: Text.min(1), name: Text.optional(), path: Text.optional(), bucket: Text.optional() }).strict();
+const IssueEnvironment = z.object({ name: Text.nullable(), baseUrl: Text.nullable(), browser: Text.nullable(), browserVersion: Text.nullable(), os: Text.nullable(), viewport: z.object({ width: z.number(), height: z.number() }).strict().nullable(), buildVersion: Text.nullable() }).strict();
 
 const GenerateSource = z.discriminatedUnion("type", [
   z.object({ type: z.literal("text"), content: Text.min(1).max(30_000) }).strict(),
@@ -43,6 +45,10 @@ const IssueRequest = z.object({
     id: Uuid,
     status: z.enum(["pass", "fail", "skip", "blocked", "not_run"]),
     notes: Text.max(10_000).nullable(),
+    errorSummary: Text.max(10_000),
+    artifacts: z.array(Artifact).max(100),
+    environment: IssueEnvironment,
+    commitSha: Text.max(200).nullable(),
     testCase: z.object({ id: Uuid, projectId: Uuid, code: Text.max(100), title: Text.max(500), objective: Text.max(4_000).nullable(), preconditions: Text.max(4_000).nullable(), steps: Text.max(10_000), expectedResult: Text.max(4_000), priority: Priority }).strict(),
   }).strict(),
 }).strict();

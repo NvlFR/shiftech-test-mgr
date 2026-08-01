@@ -4,6 +4,18 @@ import type { IssuePriority } from '../types/domain';
 
 const prioritySchema = z.enum(['low', 'medium', 'high', 'critical']);
 const severitySchema = prioritySchema;
+const artifactSchema = z.object({
+  type: z.enum(['screenshot', 'video', 'trace', 'log', 'network', 'dom']),
+  url: z.string().trim().min(1),
+  name: z.string().optional(),
+  path: z.string().optional(),
+  bucket: z.string().optional(),
+});
+const environmentSchema = z.object({
+  name: z.string().nullable(), baseUrl: z.string().nullable(), browser: z.string().nullable(),
+  browserVersion: z.string().nullable(), os: z.string().nullable(),
+  viewport: z.object({ width: z.number(), height: z.number() }).nullable(), buildVersion: z.string().nullable(),
+});
 
 export const aiIssueDraftSchema = z.object({
   projectId: z.string().trim().min(1),
@@ -15,6 +27,10 @@ export const aiIssueDraftSchema = z.object({
   priority: prioritySchema,
   severity: severitySchema,
   reproductionSteps: z.string().trim().max(10000),
+  errorSummary: z.string().trim().max(10000),
+  artifacts: z.array(artifactSchema).max(100),
+  environment: environmentSchema,
+  commitSha: z.string().trim().nullable(),
 });
 
 const duplicateCandidateSchema = z.object({
@@ -88,6 +104,19 @@ export function toIssuePriority(value: AiIssueSeverity): IssuePriority {
 export function formatDraftMetadata(draft: AiIssueDraft): string {
   const sections = [draft.description.trim()];
   if (draft.reproductionSteps.trim()) sections.push(`Reproduction steps (AI draft):\n${draft.reproductionSteps.trim()}`);
+  sections.push(`Error summary:\n${draft.errorSummary.trim() || '-'}`);
+  const environment = [
+    draft.environment.name && `Name: ${draft.environment.name}`,
+    draft.environment.baseUrl && `Base URL: ${draft.environment.baseUrl}`,
+    draft.environment.browser && `Browser: ${draft.environment.browser}${draft.environment.browserVersion ? ` ${draft.environment.browserVersion}` : ''}`,
+    draft.environment.os && `OS: ${draft.environment.os}`,
+    draft.environment.viewport && `Viewport: ${draft.environment.viewport.width}x${draft.environment.viewport.height}`,
+    draft.environment.buildVersion && `Build: ${draft.environment.buildVersion}`,
+  ].filter(Boolean);
+  sections.push(`Environment:\n${environment.join('\n') || '-'}`);
+  sections.push(`Commit SHA: ${draft.commitSha || '-'}`);
+  const artifacts = draft.artifacts.map((artifact) => `- [${artifact.type}] ${artifact.name ?? artifact.path ?? artifact.url}: ${artifact.url}`);
+  sections.push(`Artifacts (${artifacts.length}):\n${artifacts.join('\n') || '-'}`);
   sections.push(`Severity (AI draft): ${draft.severity}`);
   return sections.filter(Boolean).join('\n\n');
 }
