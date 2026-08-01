@@ -19,6 +19,20 @@ export function createCodegenInvocation(config: Pick<RunnerConfig, 'playwrightCm
   return { command, args: [...parts, 'codegen', url, '--output', output] };
 }
 
+export function formatCodegenChecklist(testCase: Pick<CodegenTestCase, 'code' | 'title' | 'steps'>): string {
+  const lines = [`\nChecklist langkah manual ${testCase.code} — ${testCase.title}:`];
+  if (testCase.steps.length === 0) {
+    lines.push('(Test Case ini belum memiliki langkah manual terstruktur.)');
+  } else {
+    for (const step of testCase.steps) {
+      lines.push(`[ ] ${step.step_number}. ${step.action}`);
+      if (step.expected_result) lines.push(`    Hasil yang diharapkan: ${step.expected_result}`);
+    }
+  }
+  lines.push('Gunakan checklist ini sebagai panduan selama Playwright Codegen terbuka.\n');
+  return lines.join('\n');
+}
+
 function waitForExit(child: ChildProcess): Promise<number> {
   return new Promise((resolve, reject) => {
     child.once('error', reject);
@@ -54,6 +68,7 @@ export async function runCodegen(config: RunnerConfig, url: string): Promise<num
   if (!rel || rel === '..' || rel.startsWith(`..${sep}`)) throw new Error('script_ref berada di luar TM_PROJECT_DIR');
   mkdirSync(resolve(output, '..'), { recursive: true });
 
+  process.stdout.write(formatCodegenChecklist(selected));
   const invocation = createCodegenInvocation(config, url, output);
   log.info('Starting Playwright codegen', { testCase: selected.code, scriptRef });
   const exitCode = await waitForExit(spawn(invocation.command, invocation.args, { cwd: config.projectDir, env: process.env, stdio: 'inherit' }));

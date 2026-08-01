@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785549019.931015,
-    "ast_hash": "82e45b2ff810e5bf3b6424a3715b04d1",
+    "mtime": 1785549618.654588,
+    "ast_hash": "ba439c8c3a840ec5e9b62de92b1255ba",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785549102.187859,
-    "ast_hash": "dd5a963e0fef63b4defcfaef96343bc7",
+    "mtime": 1785549662.7458634,
+    "ast_hash": "94e37bbaefd05a42e87a5394c6f4bd60",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1075,8 +1075,8 @@
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785547909.2871864,
-    "ast_hash": "a556a6ad4db0ac0f2fd858c3bfdc0786",
+    "mtime": 1785549618.1166346,
+    "ast_hash": "0b831d28ce613d6382f6605577c64d45",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
@@ -1085,8 +1085,8 @@
     "semantic_hash": ""
   },
   "runner/src/config.ts": {
-    "mtime": 1785546586.0097396,
-    "ast_hash": "4453a493f3d166baa4dc30aa5308aa62",
+    "mtime": 1785549319.2858076,
+    "ast_hash": "db79ca61d879c05b0bdabf62961bfc28",
     "semantic_hash": ""
   },
   "runner/src/executor.ts": {
@@ -1095,8 +1095,8 @@
     "semantic_hash": ""
   },
   "runner/src/index.ts": {
-    "mtime": 1785545356.9434223,
-    "ast_hash": "6c93b2a597e2fdf4ccb083e9afac13d8",
+    "mtime": 1785549319.6947563,
+    "ast_hash": "542c1cc8f77481ce13a1e2e53084ed34",
     "semantic_hash": ""
   },
   "runner/src/logger.ts": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785546571.362717,
-    "ast_hash": "1a5501b8d88de2bc7de606060efd9fc8",
+    "mtime": 1785549618.5205996,
+    "ast_hash": "8c056374e9b1f6b83f994d184ecb4306",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -3155,8 +3155,8 @@
     "semantic_hash": ""
   },
   "runner/src/interactive.ts": {
-    "mtime": 1785545418.5053897,
-    "ast_hash": "075e943cbcd0d29aa5da03cd88391522",
+    "mtime": 1785549319.8277395,
+    "ast_hash": "b05d32101e5bb609e06f818d9f8d7a77",
     "semantic_hash": ""
   },
   "runner/example-project/tests/observability.ts": {
@@ -3237,6 +3237,26 @@
   "supabase/schema_065_pw13_manual_test_retry.sql": {
     "mtime": 1785549036.129874,
     "ast_hash": "2761f48c8a46fb6a95eb1d8aaf4465a8",
+    "semantic_hash": ""
+  },
+  "runner/src/codegen.ts": {
+    "mtime": 1785549618.250623,
+    "ast_hash": "a531fe9bb1b54d4d0e55802a79a2e1ba",
+    "semantic_hash": ""
+  },
+  "runner/test/codegen.test.mjs": {
+    "mtime": 1785549618.3826115,
+    "ast_hash": "ee0b716fbbefef11c79494b13b1bca3d",
+    "semantic_hash": ""
+  },
+  "supabase/schema_066_pw14_runner_codegen.sql": {
+    "mtime": 1785549376.8948355,
+    "ast_hash": "0b54eaf6255d399d2a37c8bc4fa1dbb9",
+    "semantic_hash": ""
+  },
+  "supabase/schema_067_pw15_record_from_test_case.sql": {
+    "mtime": 1785549618.7905762,
+    "ast_hash": "796fd8b6eb1a9a8dfba372a2530203a3",
     "semantic_hash": ""
   }
 }

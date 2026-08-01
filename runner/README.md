@@ -62,6 +62,8 @@ tekan Ctrl+C untuk berhenti.
 CLI menampilkan Test Case aktif dari proyek runner, membuka Playwright Codegen,
 menyimpan hasil default ke `tests/<kode-test-case>.spec.ts`, dan baru memetakan
 `script_ref` setelah Codegen ditutup dengan sukses serta file hasil tersedia.
+Langkah manual terstruktur milik Test Case ditampilkan sebagai checklist terminal
+sebelum Codegen dibuka, termasuk hasil yang diharapkan bila tersedia.
 
 `script_ref` yang dikirim server (mis. `tests/login.spec.ts`) di-resolve relatif
 terhadap repository pada Test Run. Untuk `local_path`, runner menggunakan path

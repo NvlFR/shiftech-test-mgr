@@ -1884,3 +1884,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_066_pw14_runner_codegen.sql`; migration hanya dibuat dan tidak dijalankan ke target Supabase. Memperbarui README runner, checklist PW-14, parser CLI, API runner, dan unit test codegen. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (8/8 file test) dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
 - `graphify update .` sudah dijalankan tetapi incremental rebuild melaporkan `Operation not permitted`; tidak ada source aplikasi yang gagal dibangun dan file graph lama tetap tersedia.
+
+## 2026-08-01 — PW-15 record-from-test-case
+
+- Menjalankan `graphify query` sebelum menelusuri alur codegen runner, structured manual steps, dan keputusan Section 9.2 `FEATURE_BACKLOG.md`.
+- Menambahkan migration `schema_067_pw15_record_from_test_case.sql` yang memperluas payload Test Case codegen dengan `test_case_steps` terurut beserta expected result; migration hanya dibuat dan tidak dijalankan ke target Supabase.
+- Runner menampilkan langkah manual sebagai checklist terminal sebelum Playwright Codegen dibuka. Script hasil rekaman tetap disimpan ke repository lokal dan `script_ref` hanya di-attach setelah Codegen sukses serta file hasil tersedia.
+- Menambahkan unit test formatter checklist, memperbarui README runner dan checklist backlog. Tidak menambah dependency, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (8/8 file test) dan `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada).
+- `git diff --check` lulus dan `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.575 node dan 5.314 edge; terdapat warning tujuh file konfigurasi/hasil test tanpa node, tanpa kegagalan proses.

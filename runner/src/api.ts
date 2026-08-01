@@ -67,6 +67,13 @@ export interface CodegenTestCase {
   code: string;
   title: string;
   script_ref: string | null;
+  steps: CodegenTestCaseStep[];
+}
+
+export interface CodegenTestCaseStep {
+  step_number: number;
+  action: string;
+  expected_result: string | null;
 }
 
 export class ApiError extends Error {
