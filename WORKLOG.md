@@ -1630,3 +1630,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Mengekstrak factory MCP server agar setiap koneksi remote memperoleh instance server dan transport sendiri, tetapi seluruh mode tetap memakai `AuthService` yang sama sebelum listener dibuka, API token/JWT dari env, project scope sesi yang sama, governance, dan read-only registration yang sama.
 - Menambahkan konfigurasi host/port dengan default loopback, batas request body 1 MiB, lifecycle session in-memory, penutupan bersih, dokumentasi endpoint dan kewajiban TLS/reverse proxy, serta test parsing konfigurasi transport. Tidak menambah dependency atau mengekspos token pada URL/header/argumen tool.
 - Verifikasi lulus: `cd mcp && npm test`, `cd mcp && npm run build`, dan `git diff --check`. Listener HTTP tidak di-smoke-test melalui socket karena sandbox menolak operasi listen (`EPERM`); routing dibangun langsung dengan transport resmi MCP SDK. Tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-08-01 — MCP-19 dokumentasi MCP server
+
+- Menjalankan `graphify query` sebelum menelusuri fondasi MCP dan mengikuti keputusan setup, autentikasi, project scoping, read-only, transport, serta keamanan pada Section 8.1 `FEATURE_BACKLOG.md`.
+- Menambahkan `docs/MCP_SERVER.md` berisi persyaratan dan setup Node.js 20+, konfigurasi environment, katalog 42 tool aktual per domain/mode, contoh `claude_desktop_config.json` dan `.mcp.json`, serta panduan validasi awal client.
+- Seluruh nilai konfigurasi menggunakan placeholder; dokumentasi menegaskan token hanya berasal dari environment/secret manager, scope minimum, RLS dan project isolation, read-only, human gate, audit/rate limit, signed URL, serta TLS/firewall untuk HTTP/SSE.
+- Verifikasi lulus: dua contoh JSON berhasil di-parse, katalog dokumentasi cocok dengan 42 registrasi tool aktual, `cd mcp && npm run build`, dan `git diff --check`. `graphify update .` juga dijalankan; tidak ada source code untuk diekstrak ulang karena perubahan hanya dokumentasi, sedangkan watcher melaporkan batasan sandbox `EPERM`.
+- Tidak mengubah kode, dependency, atau database; tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
