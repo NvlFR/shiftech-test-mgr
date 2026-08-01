@@ -32,6 +32,8 @@ Git. Jangan menaruh token pada argumen tool atau menyimpannya di source code.
 | `TM_API_TOKEN` | Ya | API token TestManager untuk autentikasi. |
 | `TM_PROJECT_ID` | Ya | Project yang mengikat satu sesi MCP. |
 | `TM_MCP_READONLY` | Tidak | `1` mengaktifkan read-only dan membuat tool tulis tidak diregistrasikan; `0` atau kosong menonaktifkannya. |
+| `TM_MCP_RATE_LIMIT` | Tidak | Maksimum pemanggilan per tool dan API token dalam satu window; default `120`, maksimum `10000`. |
+| `TM_MCP_RATE_LIMIT_WINDOW_SECONDS` | Tidak | Durasi window rate limit dalam detik; default `60`, maksimum `86400`. |
 | `TM_MCP_RERUN_FAILED_MAX_TESTS` | Tidak | Ambang aman regression selektif; default `25`, rentang `1`–`500`. Di atas ambang, tool meminta konfirmasi manusia. |
 | `TM_MCP_REPOSITORY_CACHE_DIR` | Tidak | Cache clone repository remote; default `/tmp/testmanager-mcp-repositories`. |
 | `TM_SUPABASE_ACCESS_TOKEN` | Khusus AI | JWT user Supabase yang approved untuk memanggil `ai-gateway`; diperlukan oleh `issue.detect_duplicate`, tidak pernah menjadi argumen tool. |
@@ -58,6 +60,10 @@ repository yang dibatasi `ProjectSession.projectId`; RLS tetap menjadi batas
 keamanan terakhir. Jalankan `supabase/schema_047_mcp_auth.sql` setelah
 `supabase/schema_025_fix_pgcrypto_and_audit.sql` melalui proses
 migration proyek sebelum mengoperasikan server (jangan memasukkan token ke SQL).
+Jalankan juga `supabase/schema_059_mcp_rate_limit_audit.sql` setelah migration
+MCP sebelumnya. Seluruh tool dibatasi secara atomik per API token dan nama tool; setiap
+pemanggilan dicatat di `ai_audit_events` hanya sebagai nama tool, status, dan
+latency; argumen, hasil, serta token mentah tidak disimpan dalam audit.
 Migration read tools `supabase/schema_048_mcp_read_batch_1.sql` juga harus
 dijalankan sesudahnya, lalu `supabase/schema_049_mcp_read_batch_2.sql` untuk
 tool Test Plan, Test Run, dan Test Result, serta

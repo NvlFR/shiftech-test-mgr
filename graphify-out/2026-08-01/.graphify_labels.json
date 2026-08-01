@@ -193,5 +193,9 @@
   "191": "csvImport.ts",
   "192": "dashboardRepository.ts",
   "193": "registry.ts",
-  "194": "react-hook-form"
+  "194": "react-hook-form",
+  "195": "react-markdown",
+  "196": "@supabase/supabase-js",
+  "197": "@tanstack/react-query",
+  "198": "zod"
 }

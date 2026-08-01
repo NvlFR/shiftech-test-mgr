@@ -1589,3 +1589,12 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menambahkan migration `schema_058_mcp_analysis.sql` tanpa menjalankannya ke target. Seluruh metrik dihitung on-the-fly; flaky ditentukan dari transisi pass/fail pada jendela run, sedangkan rekomendasi retest diranking dari status, priority, issue aktif, dan instabilitas historis.
 - Menambahkan batas jendela 2–50 run, batas respons 1–100 kandidat, validasi UUID/project scope, mapper snake_case ke camelCase, dokumentasi, dan unit/contract test.
 - Verifikasi lulus: `cd mcp && npm test` (17/17), `cd mcp && npm run build`, `git diff --check`, dan `graphify update .` (2.373 node/4.913 edge). Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak mengubah dependency, tidak commit, dan tidak push.
+
+## 2026-07-31 — MCP-16 rate limit dan audit tool MCP
+
+- Menjalankan `graphify query` sebelum menelusuri fondasi MCP dan mengikuti keputusan Section 8.1 `FEATURE_BACKLOG.md`.
+- Menambahkan governance global pada registrasi tool sehingga seluruh tool MCP melewati layering `Tool → GovernanceService → GovernanceRepository → Supabase RPC` tanpa perubahan handler satu per satu.
+- Menambahkan rate limit atomik yang dapat dikonfigurasi per API token dan nama tool (`TM_MCP_RATE_LIMIT`, `TM_MCP_RATE_LIMIT_WINDOW_SECONDS`), dengan penolakan sebelum business operation dijalankan.
+- Menambahkan migration `schema_059_mcp_rate_limit_audit.sql` tanpa menjalankannya ke target. Setiap panggilan membuat `ai_audit_events` berisi nama tool, status, dan latency; argumen, hasil, payload mentah, serta token tidak disimpan di audit.
+- Menambahkan test repository/service/wrapper untuk metadata minimal, status sukses/gagal/rate-limited, latency, dan redaksi kegagalan upstream; fixture konfigurasi existing disesuaikan untuk opsi baru.
+- Verifikasi lulus: `cd mcp && npm test` (19/19 test file, termasuk build TypeScript) dan `git diff --check`. Tidak menjalankan migration ke Supabase target, tidak menghapus data, tidak menambah dependency, tidak commit, dan tidak push.

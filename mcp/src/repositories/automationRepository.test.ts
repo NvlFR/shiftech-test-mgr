@@ -3,7 +3,7 @@ import test from "node:test";
 import type { ServerConfig } from "../config.js";
 import { AutomationRepository, AutomationRepositoryError } from "./automationRepository.js";
 
-const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: `tm_${"a".repeat(64)}`, projectId: "11111111-1111-4111-8111-111111111111", readonly: false, rerunFailedMaxTests: 25, repositoryCacheDir: "/tmp/testmanager-mcp-test" };
+const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: `tm_${"a".repeat(64)}`, projectId: "11111111-1111-4111-8111-111111111111", readonly: false, rerunFailedMaxTests: 25, repositoryCacheDir: "/tmp/testmanager-mcp-test", toolRateLimit: 120, toolRateLimitWindowSeconds: 60 };
 
 test("automation calls scoped RPC and keeps token out of URL", async () => {
   const calls: Array<{ url: string; body: Record<string, unknown> }> = [];

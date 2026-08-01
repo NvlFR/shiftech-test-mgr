@@ -7,6 +7,8 @@ export interface ServerConfig {
   supabaseAccessToken?: string;
   rerunFailedMaxTests: number;
   repositoryCacheDir: string;
+  toolRateLimit: number;
+  toolRateLimitWindowSeconds: number;
 }
 
 const requiredEnv = (
@@ -43,6 +45,15 @@ const parseRerunFailedMaxTests = (value: string | undefined): number => {
   return parsed;
 };
 
+const parseBoundedInteger = (value: string | undefined, name: string, defaultValue: number, maximum: number): number => {
+  if (value === undefined || value === "") return defaultValue;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > maximum) {
+    throw new Error(`Environment variable ${name} must be an integer between 1 and ${maximum}`);
+  }
+  return parsed;
+};
+
 export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ServerConfig => ({
   supabaseUrl: requiredEnv(env, "TM_SUPABASE_URL").replace(/\/+$/, ""),
   supabaseAnonKey: requiredEnv(env, "TM_SUPABASE_ANON_KEY"),
@@ -52,4 +63,6 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): ServerConfig =
   supabaseAccessToken: env.TM_SUPABASE_ACCESS_TOKEN?.trim() || undefined,
   rerunFailedMaxTests: parseRerunFailedMaxTests(env.TM_MCP_RERUN_FAILED_MAX_TESTS?.trim()),
   repositoryCacheDir: env.TM_MCP_REPOSITORY_CACHE_DIR?.trim() || "/tmp/testmanager-mcp-repositories",
+  toolRateLimit: parseBoundedInteger(env.TM_MCP_RATE_LIMIT?.trim(), "TM_MCP_RATE_LIMIT", 120, 10_000),
+  toolRateLimitWindowSeconds: parseBoundedInteger(env.TM_MCP_RATE_LIMIT_WINDOW_SECONDS?.trim(), "TM_MCP_RATE_LIMIT_WINDOW_SECONDS", 60, 86_400),
 });

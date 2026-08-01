@@ -3,7 +3,7 @@ import test from "node:test";
 import type { ServerConfig } from "../config.js";
 import { RepoRepository, RepoRepositoryError } from "./repoRepository.js";
 
-const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: "sensitive-token", projectId: "11111111-1111-4111-8111-111111111111", readonly: true, rerunFailedMaxTests: 25, repositoryCacheDir: "/tmp/testmanager-mcp-test" };
+const config: ServerConfig = { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "anon", apiToken: "sensitive-token", projectId: "11111111-1111-4111-8111-111111111111", readonly: true, rerunFailedMaxTests: 25, repositoryCacheDir: "/tmp/testmanager-mcp-test", toolRateLimit: 120, toolRateLimitWindowSeconds: 60 };
 
 test("repository configuration RPC is project scoped and maps credential internally", async () => {
   let body: Record<string, unknown> = {};

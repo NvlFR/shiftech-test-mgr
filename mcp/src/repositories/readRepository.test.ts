@@ -12,6 +12,8 @@ const config: ServerConfig = {
   readonly: true,
   rerunFailedMaxTests: 25,
   repositoryCacheDir: "/tmp/testmanager-mcp-test",
+  toolRateLimit: 120,
+  toolRateLimitWindowSeconds: 60,
 };
 
 test("search sends project scope and token in RPC body, then maps snake_case rows", async () => {

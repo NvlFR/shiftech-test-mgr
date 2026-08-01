@@ -14,12 +14,14 @@ import { RepoRepository } from "./repositories/repoRepository.js";
 import { RepoService } from "./services/repoService.js";
 import { AnalysisRepository } from "./repositories/analysisRepository.js";
 import { AnalysisService } from "./services/analysisService.js";
+import { GovernanceRepository } from "./repositories/governanceRepository.js";
+import { GovernanceService } from "./services/governanceService.js";
 import { createAutomationReadToolRegistrar, createAutomationWriteToolRegistrar } from "./tools/automationTools.js";
 import { createReadToolRegistrar } from "./tools/readTools.js";
 import { createWriteToolRegistrar } from "./tools/writeTools.js";
 import { createRepoToolRegistrar } from "./tools/repoTools.js";
 import { createAnalysisToolRegistrar } from "./tools/analysisTools.js";
-import { registerTools, toolRegistry } from "./tools/registry.js";
+import { installToolGovernance, registerTools, toolRegistry } from "./tools/registry.js";
 
 const config = loadConfig();
 const authService = new AuthService(config, new AuthRepository(config));
@@ -34,6 +36,8 @@ const server = new McpServer({
   name: "testmanager",
   version: "0.1.0",
 });
+
+installToolGovernance(server, new GovernanceService(new GovernanceRepository(config)));
 
 registerTools(server, {
   read: [...toolRegistry.read, createReadToolRegistrar(session, readService), createAutomationReadToolRegistrar(session, automationService), createRepoToolRegistrar(session, repoService), createAnalysisToolRegistrar(session, analysisService)],

@@ -384,7 +384,7 @@ AI Agent (Claude/Cursor)  ──MCP──▶  TestManager MCP Server  ──RPC/
       Token disimpan di env (`TM_API_TOKEN`), tidak pernah di argumen tool.
 - [ ] **Project scoping wajib**: satu sesi MCP terikat pada satu `project_id`;
       semua tool menolak akses lintas project (dijaga RLS, divalidasi ulang di server).
-- [ ] Rate limit + audit: setiap pemanggilan tool tercatat di `ai_audit_events`
+- [x] Rate limit + audit: setiap pemanggilan tool tercatat di `ai_audit_events`
       (tool name, latency, status — bukan payload mentah).
 - [ ] Mode **read-only** (flag `TM_MCP_READONLY=1`) supaya agent bisa dipakai untuk
       analisis tanpa risiko menulis data.

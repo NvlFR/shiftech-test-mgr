@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785542039.5644515,
-    "ast_hash": "1b071e55c5ec12243739d67501139ae4",
+    "mtime": 1785542126.4969277,
+    "ast_hash": "3279c0d85955bbd03d8294c7c4ed4652",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -3090,8 +3090,8 @@
     "semantic_hash": ""
   },
   "supabase/schema_058_mcp_analysis.sql": {
-    "mtime": 1785542072.718005,
-    "ast_hash": "942d7153d8df9ea5925200ae4653d650",
+    "mtime": 1785542126.211923,
+    "ast_hash": "e64c54cd19fd13dc69f4ca7ada9f15cc",
     "semantic_hash": ""
   }
 }
