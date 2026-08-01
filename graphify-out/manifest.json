@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785552753.1257808,
-    "ast_hash": "0bb38b42047bc7a7735abf99413677f8",
+    "mtime": 1785554300.9187791,
+    "ast_hash": "9c2fc8cb2ea94b9461e08151b720d3e4",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -255,13 +255,13 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/test-plans/TestPlanDetailPage.tsx": {
-    "mtime": 1785531226.3201532,
-    "ast_hash": "89e38030752461d27d082491a62d7e00",
+    "mtime": 1785554339.699501,
+    "ast_hash": "f64447f65aad389ec6f9c9a79d5881cc",
     "semantic_hash": ""
   },
   "frontend/src/pages/test-plans/TestPlansPage.tsx": {
-    "mtime": 1785532691.1135619,
-    "ast_hash": "fe4d45d83f180ce518922facb5a1317b",
+    "mtime": 1785554333.1532035,
+    "ast_hash": "ca4ddbf48214dbdb8114247342056f1b",
     "semantic_hash": ""
   },
   "frontend/src/pages/test-runs/TestRunDetailPage.tsx": {
@@ -335,9 +335,9 @@
     "semantic_hash": ""
   },
   "frontend/src/repositories/testPlanRepository.ts": {
-    "mtime": 1785529933.1612065,
-    "ast_hash": "027d049e966243f5f7b5318c5dfd8c59",
-    "semantic_hash": "027d049e966243f5f7b5318c5dfd8c59"
+    "mtime": 1785554332.8711908,
+    "ast_hash": "ffb7f5462a43d6379b79254eff76d66d",
+    "semantic_hash": ""
   },
   "frontend/src/repositories/testResultRepository.ts": {
     "mtime": 1785549016.5986712,
@@ -400,9 +400,9 @@
     "semantic_hash": ""
   },
   "frontend/src/services/testPlanService.ts": {
-    "mtime": 1784700432.6477952,
-    "ast_hash": "d60b78696c01472b1ce04f5e8c47786d",
-    "semantic_hash": "d60b78696c01472b1ce04f5e8c47786d"
+    "mtime": 1785554333.012197,
+    "ast_hash": "2f10387d3ac56730856eb13eab278768",
+    "semantic_hash": ""
   },
   "frontend/src/services/testRunService.ts": {
     "mtime": 1785546866.0308883,
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785552752.980791,
-    "ast_hash": "650887cb3fff58ff0a4c8a7a1d650bea",
+    "mtime": 1785554300.7677727,
+    "ast_hash": "53ca1fbc39f59ac32fb9e253444435ab",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785553911.336618,
-    "ast_hash": "480070cbc383e21b08ecc336d275f79d",
+    "mtime": 1785554381.8974788,
+    "ast_hash": "b3f95bfa9080457113ee3e7d9cc2ccc8",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785554000.2287877,
-    "ast_hash": "ab44a53b89b81114c2de78a8bb857df9",
+    "mtime": 1785554443.5955336,
+    "ast_hash": "cfa7eb2f4283770cddb16ccd4e5d4c54",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -2595,9 +2595,9 @@
     "semantic_hash": "7ccca11783abc019f49413d18594e3be"
   },
   "frontend/src/pages/projects/ProjectTestPlanTab.tsx": {
-    "mtime": 1785527099.076542,
-    "ast_hash": "c15b3742e7075506be504424adfee88f",
-    "semantic_hash": "c15b3742e7075506be504424adfee88f"
+    "mtime": 1785554333.2922099,
+    "ast_hash": "0e57b9c5f00bbd2d807b26645ba5089d",
+    "semantic_hash": ""
   },
   "frontend/src/components/dialogs/ImportCasesDialog.tsx": {
     "mtime": 1785531208.761139,
@@ -3290,13 +3290,13 @@
     "semantic_hash": ""
   },
   "frontend/src/hooks/useAiTestCaseReview.ts": {
-    "mtime": 1785552893.301687,
-    "ast_hash": "e6f2350e3c2a2c2875f3ff99e4007fbd",
+    "mtime": 1785554301.3527977,
+    "ast_hash": "e953e1b02e719f201ab46cedfd9ef960",
     "semantic_hash": ""
   },
   "frontend/src/pages/test-cases/AiTestCaseReviewPage.tsx": {
-    "mtime": 1785553072.7634287,
-    "ast_hash": "f7c725198cd286ed051ed47d9a307791",
+    "mtime": 1785554301.5078044,
+    "ast_hash": "0d84a135de9ca2bfff364b045af39962",
     "semantic_hash": ""
   },
   "supabase/schema_071_ai_test_case_review.sql": {
@@ -3307,6 +3307,11 @@
   "supabase/schema_072_e2e07_close_approval_bypass.sql": {
     "mtime": 1785553939.561113,
     "ast_hash": "8c75f3ef5c47bb9b52f88dec315ce4a6",
+    "semantic_hash": ""
+  },
+  "supabase/schema_073_e2e08_reviewed_test_plan.sql": {
+    "mtime": 1785554431.417917,
+    "ast_hash": "0873426f90f5b5842e1178ca014ce200",
     "semantic_hash": ""
   }
 }

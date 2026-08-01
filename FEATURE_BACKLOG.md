@@ -640,7 +640,7 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 
 ### 11.3 Tahap 3 — Test Plan disetujui → Test Run dijalankan AI
 
-- [ ] Test Plan dibentuk dari test case yang lolos review; status approval eksplisit.
+- [x] Test Plan dibentuk dari test case yang lolos review; status approval eksplisit.
 - [ ] AI (via MCP `testrun.create` + `automation.enqueue`) membuat **Test Run baru**
       dan mengantre job automation. Test case yang belum punya script tetap muncul
       sebagai eksekusi manual — AI tidak boleh menebak hasilnya.

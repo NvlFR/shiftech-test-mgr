@@ -13,6 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { MultiSelect } from 'primereact/multiselect';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
+import { Message } from 'primereact/message';
 import { BulkActionsBar } from '../../components/ui/BulkActionsBar';
 import { ActivityPanel } from '../../components/ui/ActivityPanel';
 import { TestPlanDialog } from '../../components/dialogs/TestPlanDialog';
@@ -100,8 +101,10 @@ export function TestPlanDetailPage() {
       });
       setTestPlan({ ...updated, status: planStatus });
       if (planStatus !== updated.status) {
-        await testPlanService.changeStatus(updated.id, planStatus);
-        setTestPlan((current) => current ? { ...current, status: planStatus } : current);
+        const statusUpdated = planStatus === 'active'
+          ? await testPlanService.approve(updated.id, true)
+          : await testPlanService.changeStatus(updated.id, planStatus);
+        setTestPlan(statusUpdated);
       }
       setPlanDialogOpen(false);
       toast.current?.show({ severity: 'success', summary: 'Test plan diperbarui' });
@@ -262,7 +265,9 @@ export function TestPlanDetailPage() {
 
   async function handleChangeStatus(status: TestPlanStatus) {
     if (!testPlan || status === testPlan.status) return;
-    const updated = await testPlanService.changeStatus(testPlan.id, status);
+    const updated = status === 'active'
+      ? await testPlanService.approve(testPlan.id, true)
+      : await testPlanService.changeStatus(testPlan.id, status);
     setTestPlan(updated);
     toast.current?.show({ severity: 'success', summary: `Status diubah ke ${TEST_PLAN_STATUS_LABEL[status]}` });
   }
@@ -316,6 +321,10 @@ export function TestPlanDetailPage() {
           )
         }
       />
+
+      {testPlan?.approvedAt && (
+        <Message severity="success" text={`Disetujui secara eksplisit pada ${formatDateTime(testPlan.approvedAt)}.`} className="mb-3" />
+      )}
 
       <TabView>
         <TabPanel header="Test Cases">

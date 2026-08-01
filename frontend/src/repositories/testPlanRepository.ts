@@ -53,6 +53,27 @@ export const testPlanRepository = {
     return mapTestPlanRow(data);
   },
 
+  async createApprovedFromReviewedCases(input: { projectId: string; name: string; description: string | null; testCaseIds: string[]; explicitApproval: boolean }): Promise<TestPlan> {
+    const { data, error } = await supabase.rpc('create_approved_test_plan_from_reviewed_cases', {
+      p_project_id: input.projectId,
+      p_name: input.name,
+      p_description: input.description,
+      p_test_case_ids: input.testCaseIds,
+      p_explicit_approval: input.explicitApproval,
+    });
+    if (error) throw error;
+    return mapTestPlanRow(data);
+  },
+
+  async approve(id: string, explicitApproval: boolean): Promise<TestPlan> {
+    const { data, error } = await supabase.rpc('approve_test_plan', {
+      p_test_plan_id: id,
+      p_explicit_approval: explicitApproval,
+    });
+    if (error) throw error;
+    return mapTestPlanRow(data);
+  },
+
   async update(id: string, changes: Partial<Pick<TestPlan, 'name' | 'description' | 'status' | 'code'>>): Promise<TestPlan> {
     const { data, error } = await supabase
       .from('test_plans')

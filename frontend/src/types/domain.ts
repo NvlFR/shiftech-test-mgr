@@ -154,6 +154,8 @@ export interface TestPlan {
   description: string | null;
   status: TestPlanStatus;
   createdBy?: string | null;
+  approvedBy: string | null;
+  approvedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

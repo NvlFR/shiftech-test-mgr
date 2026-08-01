@@ -43,7 +43,8 @@ export function TestPlansPage() {
 
   async function handleChangeStatus(row: TestPlan, status: TestPlanStatus) {
     if (status === row.status) return;
-    await testPlanService.changeStatus(row.id, status);
+    if (status === 'active') await testPlanService.approve(row.id, true);
+    else await testPlanService.changeStatus(row.id, status);
     await reload();
     toast.current?.show({ severity: 'success', summary: `Status diubah ke ${TEST_PLAN_STATUS_LABEL[status]}` });
   }
@@ -100,7 +101,7 @@ export function TestPlansPage() {
             body={(row: TestPlan) => (
               <RowActionsMenu
                 items={TEST_PLAN_STATUS_OPTIONS.filter((s) => s !== row.status).map((status) => ({
-                  label: `Ubah ke ${TEST_PLAN_STATUS_LABEL[status]}`,
+                  label: status === 'active' ? 'Setujui & aktifkan' : `Ubah ke ${TEST_PLAN_STATUS_LABEL[status]}`,
                   command: () => handleChangeStatus(row, status),
                 }))}
               />

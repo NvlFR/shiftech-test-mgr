@@ -58,7 +58,8 @@ export function ProjectTestPlanTab({
       if (!name || name === plan.name) return;
       await testPlanService.rename(plan.id, name);
     } else if (value !== plan.status) {
-      await testPlanService.changeStatus(plan.id, value as TestPlanStatus);
+      if (value === 'active') await testPlanService.approve(plan.id, true);
+      else await testPlanService.changeStatus(plan.id, value as TestPlanStatus);
     }
     await onRefresh();
   }

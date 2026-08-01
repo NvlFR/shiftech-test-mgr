@@ -2051,3 +2051,10 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Migration hanya dibuat dan tidak dijalankan ke Supabase target. Tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd mcp && npm test` (20/20 suite), `cd mcp && npm run build`, `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), pencarian statis memastikan simbol/tool approval tidak tersisa di runtime selain migration historis dan migration pencabutannya, serta `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.640 node dan 5.440 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+## 2026-08-01 — E2E-08 pembentukan Test Plan dari hasil review
+
+- Menambahkan migration aditif `schema_073_e2e08_reviewed_test_plan.sql` tanpa menjalankannya ke Supabase target. Migration menambah metadata approval Test Plan, RPC pembentukan plan atomik yang hanya menerima test case AI aktif dengan keputusan review `approved`, dan RPC approval plan berbasis sesi user dengan konfirmasi eksplisit.
+- Menambahkan alur `AiTestCaseReviewPage -> useAiTestCaseReview -> testPlanService -> testPlanRepository -> Supabase`: reviewer dapat memilih draf, mengonfirmasi approval Test Plan secara eksplisit, lalu membentuk plan aktif dari test case yang baru lolos review.
+- Menampilkan metadata status approval di detail Test Plan dan mengarahkan seluruh transisi Draft ke Aktif melalui service approval eksplisit; transisi status biasa tidak dapat dipakai untuk melewati gate.
+- Memperbarui status Section 11.3 di `FEATURE_BACKLOG.md` serta domain/mapper untuk `approvedBy` dan `approvedAt`.
+- Verifikasi lulus: `cd frontend && npm run build` (hanya warning ukuran chunk Vite yang sudah dikenal), `cd frontend && npm run lint` (lulus dengan tujuh warning existing di file yang tidak terkait), dan `git diff --check`.

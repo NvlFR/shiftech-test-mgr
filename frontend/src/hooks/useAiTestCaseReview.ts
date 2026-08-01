@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { moduleService } from '../services/moduleService';
 import { tagService } from '../services/tagService';
 import { testCaseService } from '../services/testCaseService';
+import { testPlanService } from '../services/testPlanService';
 import type { Module, Tag, TestCase, TestCaseWithDetails } from '../types/domain';
 
 export function useAiTestCaseReview(projectId: string | null) {
@@ -34,5 +35,16 @@ export function useAiTestCaseReview(projectId: string | null) {
     catch (reason) { setError(reason instanceof Error ? reason.message : 'Perubahan draf gagal disimpan.'); throw reason; }
     finally { setSaving(false); }
   }, [projectId, reload]);
-  return { drafts, modules, tags, loading, saving, error, reload, review, update };
+  const approveAndCreatePlan = useCallback(async (ids: string[], name: string, description: string, explicitApproval: boolean) => {
+    if (!projectId) throw new Error('Project wajib dipilih');
+    setSaving(true); setError(null);
+    try {
+      await testCaseService.reviewAiDrafts(ids, 'approved');
+      const plan = await testPlanService.createApprovedFromReviewedCases({ projectId, name, description, testCaseIds: ids, explicitApproval });
+      await reload();
+      return plan;
+    } catch (reason) { setError(reason instanceof Error ? reason.message : 'Test Plan gagal dibentuk.'); throw reason; }
+    finally { setSaving(false); }
+  }, [projectId, reload]);
+  return { drafts, modules, tags, loading, saving, error, reload, review, update, approveAndCreatePlan };
 }

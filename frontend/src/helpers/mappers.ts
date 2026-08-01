@@ -188,6 +188,8 @@ export function mapTestPlanRow(row: any): TestPlan {
     description: row.description,
     status: row.status,
     createdBy: row.created_by ?? null,
+    approvedBy: row.approved_by ?? null,
+    approvedAt: row.approved_at ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

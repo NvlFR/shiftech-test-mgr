@@ -26,6 +26,20 @@ export const testPlanService = {
     });
   },
 
+  createApprovedFromReviewedCases(input: { projectId: string; name: string; description?: string; testCaseIds: string[]; explicitApproval: boolean }): Promise<TestPlan> {
+    if (!input.projectId) throw new Error('Project wajib dipilih');
+    if (!input.name.trim()) throw new Error('Nama test plan tidak boleh kosong');
+    if (!input.testCaseIds.length) throw new Error('Pilih minimal satu test case yang lolos review');
+    if (input.explicitApproval !== true) throw new Error('Persetujuan Test Plan harus diberikan secara eksplisit');
+    return testPlanRepository.createApprovedFromReviewedCases({
+      projectId: input.projectId,
+      name: input.name.trim(),
+      description: input.description?.trim() || null,
+      testCaseIds: [...new Set(input.testCaseIds)],
+      explicitApproval: true,
+    });
+  },
+
   rename(id: string, name: string) {
     if (!name.trim()) throw new Error('Nama test plan tidak boleh kosong');
     return testPlanRepository.update(id, { name: name.trim() });
@@ -41,7 +55,14 @@ export const testPlanService = {
   },
 
   changeStatus(id: string, status: TestPlan['status']) {
+    if (status === 'active') throw new Error('Gunakan aksi approval eksplisit untuk mengaktifkan Test Plan');
     return testPlanRepository.update(id, { status });
+  },
+
+  approve(id: string, explicitApproval: boolean) {
+    if (!id) throw new Error('Test Plan tidak valid');
+    if (explicitApproval !== true) throw new Error('Persetujuan Test Plan harus diberikan secara eksplisit');
+    return testPlanRepository.approve(id, true);
   },
 
   remove(id: string) {

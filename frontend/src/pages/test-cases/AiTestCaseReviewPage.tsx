@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { DataTable } from 'primereact/datatable';
+import { DataTable, type DataTableSelectionMultipleChangeEvent } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Checkbox } from 'primereact/checkbox';
 import { Message } from 'primereact/message';
 import { MultiSelect } from 'primereact/multiselect';
 import { Tag } from 'primereact/tag';
@@ -15,16 +16,22 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { TEST_CASE_PRIORITY_LABEL } from '../../helpers/statusLabels';
 import { useAiTestCaseReview } from '../../hooks/useAiTestCaseReview';
 import { useProjectContext } from '../../hooks/useProjectContext';
+import { useNavigate } from 'react-router-dom';
 import type { TestCasePriority, TestCaseWithDetails } from '../../types/domain';
 
 const priorities = (['low', 'medium', 'high', 'critical'] as const).map((value) => ({ value, label: TEST_CASE_PRIORITY_LABEL[value] }));
 
 export function AiTestCaseReviewPage() {
+  const navigate = useNavigate();
   const { projects, projectId, setProjectId } = useProjectContext();
   const queue = useAiTestCaseReview(projectId);
   const [selected, setSelected] = useState<TestCaseWithDetails[]>([]);
   const [batchId, setBatchId] = useState<string | null>(null);
   const [editing, setEditing] = useState<TestCaseWithDetails | null>(null);
+  const [planCases, setPlanCases] = useState<TestCaseWithDetails[]>([]);
+  const [planName, setPlanName] = useState('');
+  const [planDescription, setPlanDescription] = useState('');
+  const [planApproved, setPlanApproved] = useState(false);
   const [form, setForm] = useState({ title: '', objective: '', preconditions: '', steps: '', expectedResult: '', priority: 'medium' as TestCasePriority, moduleId: null as string | null, tags: [] as string[], notes: '' });
   const batches = useMemo(() => {
     const grouped = new Map<string, TestCaseWithDetails[]>();
@@ -38,14 +45,26 @@ export function AiTestCaseReviewPage() {
   function confirmReview(decision: 'approved' | 'rejected', targets: TestCaseWithDetails[]) {
     confirmDialog({ header: decision === 'approved' ? 'Setujui test case' : 'Tolak test case', message: `${decision === 'approved' ? 'Aktifkan' : 'Arsipkan'} ${targets.length} draf? Keputusan dan approver dicatat di audit log.`, acceptLabel: decision === 'approved' ? 'Setujui' : 'Tolak', rejectLabel: 'Batal', acceptClassName: decision === 'rejected' ? 'p-button-danger' : undefined, accept: () => { void queue.review(targets.map((item) => item.id), decision).then(() => setSelected([])); } });
   }
+  function openPlanDialog(targets: TestCaseWithDetails[]) {
+    setPlanCases(targets);
+    setPlanName(`Test Plan ${new Date().toLocaleDateString('id-ID')}`);
+    setPlanDescription('');
+    setPlanApproved(false);
+  }
+  async function createApprovedPlan() {
+    const plan = await queue.approveAndCreatePlan(planCases.map((item) => item.id), planName, planDescription, planApproved);
+    setPlanCases([]);
+    setSelected([]);
+    navigate(`/test-plans/${plan.id}`);
+  }
   return <div>
     <ConfirmDialog />
     <PageHeader title="Review Test Case AI" actions={<Dropdown value={projectId} options={projects.map((project) => ({ label: project.name, value: project.id }))} onChange={(event) => setProjectId(event.value)} placeholder="Pilih project" className="w-15rem" showClear />} />
     <Message severity="info" text="Gate manusia wajib: edit bila perlu, lalu approve atau reject. Draf baru aktif hanya setelah di-approve." className="mb-3" />
     {queue.error && <Message severity="error" text={queue.error} className="mb-3" />}
     {projectId && batches.length > 0 && <div className="flex align-items-center gap-2 mb-3"><label htmlFor="ai-review-batch" className="font-medium">Batch</label><Dropdown inputId="ai-review-batch" value={batchId} options={batches} onChange={(event) => setBatchId(event.value)} className="w-full md:w-25rem" /></div>}
-    <BulkActionsBar selectedCount={selected.length} onClear={() => setSelected([])} actions={<><Button label="Approve" icon="pi pi-check" size="small" severity="success" loading={queue.saving} onClick={() => confirmReview('approved', selected)} /><Button label="Reject" icon="pi pi-times" size="small" severity="danger" outlined loading={queue.saving} onClick={() => confirmReview('rejected', selected)} /></>} />
-    <DataTable value={rows} loading={queue.loading} selectionMode="multiple" selection={selected} onSelectionChange={(event) => setSelected(event.value)} dataKey="id" paginator rows={10} rowsPerPageOptions={[10, 25, 50]} size="small" emptyMessage={projectId ? 'Tidak ada draf AI yang menunggu review.' : 'Pilih project terlebih dahulu.'}>
+    <BulkActionsBar selectedCount={selected.length} onClear={() => setSelected([])} actions={<><Button label="Approve" icon="pi pi-check" size="small" severity="success" loading={queue.saving} onClick={() => confirmReview('approved', selected)} /><Button label="Approve & Buat Test Plan" icon="pi pi-list-check" size="small" loading={queue.saving} onClick={() => openPlanDialog(selected)} /><Button label="Reject" icon="pi pi-times" size="small" severity="danger" outlined loading={queue.saving} onClick={() => confirmReview('rejected', selected)} /></>} />
+    <DataTable value={rows} loading={queue.loading} selectionMode="multiple" selection={selected} onSelectionChange={(event: DataTableSelectionMultipleChangeEvent<TestCaseWithDetails[]>) => setSelected(event.value)} dataKey="id" paginator rows={10} rowsPerPageOptions={[10, 25, 50]} size="small" emptyMessage={projectId ? 'Tidak ada draf AI yang menunggu review.' : 'Pilih project terlebih dahulu.'}>
       <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} /><Column field="code" header="Kode" style={{ width: '7rem' }} /><Column field="title" header="Judul" /><Column header="Module" body={(row: TestCaseWithDetails) => row.module?.name ?? '-'} /><Column header="Prioritas" body={(row: TestCaseWithDetails) => <Tag value={TEST_CASE_PRIORITY_LABEL[row.priority]} />} /><Column header="Aksi" style={{ width: '7rem' }} body={(row: TestCaseWithDetails) => <Button label="Edit" icon="pi pi-pencil" size="small" text onClick={() => openEdit(row)} />} />
     </DataTable>
     <div className="flex justify-content-end gap-2 mt-3"><Button label="Approve semua batch" icon="pi pi-check-circle" severity="success" disabled={!rows.length} loading={queue.saving} onClick={() => confirmReview('approved', rows)} /><Button label="Reject semua batch" icon="pi pi-times-circle" severity="danger" outlined disabled={!rows.length} loading={queue.saving} onClick={() => confirmReview('rejected', rows)} /></div>
@@ -57,6 +76,13 @@ export function AiTestCaseReviewPage() {
       <div className="grid"><div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor="review-steps">Langkah</label><InputTextarea id="review-steps" value={form.steps} onChange={(event) => setForm({ ...form, steps: event.target.value })} rows={6} /></div><div className="col-12 md:col-6 flex flex-column gap-1"><label htmlFor="review-expected">Hasil yang Diharapkan</label><InputTextarea id="review-expected" value={form.expectedResult} onChange={(event) => setForm({ ...form, expectedResult: event.target.value })} rows={6} /></div></div>
       <div className="flex flex-column gap-1"><label htmlFor="review-notes">Catatan</label><InputTextarea id="review-notes" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} rows={2} /></div>
       <div className="flex justify-content-end gap-2"><Button label="Batal" text onClick={() => setEditing(null)} /><Button label="Simpan Perubahan" icon="pi pi-save" loading={queue.saving} disabled={!form.title.trim() || !form.steps.trim() || !form.expectedResult.trim()} onClick={() => { void saveEdit(); }} /></div>
+    </div></Dialog>
+    <Dialog header="Approve & Bentuk Test Plan" visible={planCases.length > 0} onHide={() => !queue.saving && setPlanCases([])} closable={!queue.saving} style={{ width: 'min(36rem, 96vw)' }}><div className="flex flex-column gap-3">
+      <Message severity="warn" text={`${planCases.length} test case akan di-approve dan dimasukkan ke Test Plan aktif. Approval dicatat atas user yang sedang login.`} />
+      <div className="flex flex-column gap-1"><label htmlFor="approved-plan-name">Nama Test Plan</label><InputText id="approved-plan-name" value={planName} onChange={(event) => setPlanName(event.target.value)} autoFocus /></div>
+      <div className="flex flex-column gap-1"><label htmlFor="approved-plan-description">Deskripsi</label><InputTextarea id="approved-plan-description" value={planDescription} onChange={(event) => setPlanDescription(event.target.value)} rows={3} /></div>
+      <div className="flex align-items-start gap-2"><Checkbox inputId="explicit-plan-approval" checked={planApproved} onChange={(event) => setPlanApproved(Boolean(event.checked))} /><label htmlFor="explicit-plan-approval">Saya menyetujui Test Plan ini secara eksplisit dan memahami bahwa statusnya akan menjadi Aktif.</label></div>
+      <div className="flex justify-content-end gap-2"><Button label="Batal" text disabled={queue.saving} onClick={() => setPlanCases([])} /><Button label="Approve & Buat Test Plan" icon="pi pi-check-circle" loading={queue.saving} disabled={!planName.trim() || !planApproved} onClick={() => { void createApprovedPlan(); }} /></div>
     </div></Dialog>
   </div>;
 }
