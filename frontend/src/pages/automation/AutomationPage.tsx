@@ -9,6 +9,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { Chips } from 'primereact/chips';
+import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Tag } from 'primereact/tag';
 import { Message } from 'primereact/message';
@@ -61,11 +62,13 @@ export function AutomationPage() {
   const [enqueueMaxAttempts, setEnqueueMaxAttempts] = useState(1);
   const [enqueueBrowser, setEnqueueBrowser] = useState<AutomationBrowser>('chromium');
   const [enqueueDeviceProfile, setEnqueueDeviceProfile] = useState<string | null>(null);
+  const [enqueuePauseOnFailure, setEnqueuePauseOnFailure] = useState(false);
   const [localScript, setLocalScript] = useState<AutomationScript | null>(null);
   const [localPlanId, setLocalPlanId] = useState<string | null>(null);
   const [localName, setLocalName] = useState('');
   const [localBrowser, setLocalBrowser] = useState<AutomationBrowser>('chromium');
   const [localDeviceProfile, setLocalDeviceProfile] = useState<string | null>(null);
+  const [localPauseOnFailure, setLocalPauseOnFailure] = useState(false);
   const [localRunning, setLocalRunning] = useState(false);
 
   useEffect(() => {
@@ -109,8 +112,8 @@ export function AutomationPage() {
   async function enqueue() {
     if (!projectId || !enqueuePlanId) return;
     try {
-      const res = await automationService.enqueue({ projectId, testPlanId: enqueuePlanId, name: enqueueName, environmentId: enqueueEnvId, maxAttempts: enqueueMaxAttempts, browser: enqueueBrowser, deviceProfile: enqueueDeviceProfile });
-      setEnqueueDialog(false); setEnqueuePlanId(null); setEnqueueName(''); setEnqueueEnvId(null); setEnqueueMaxAttempts(1); setEnqueueBrowser('chromium'); setEnqueueDeviceProfile(null); await reload();
+      const res = await automationService.enqueue({ projectId, testPlanId: enqueuePlanId, name: enqueueName, environmentId: enqueueEnvId, maxAttempts: enqueueMaxAttempts, browser: enqueueBrowser, deviceProfile: enqueueDeviceProfile, pauseOnFailure: enqueuePauseOnFailure });
+      setEnqueueDialog(false); setEnqueuePlanId(null); setEnqueueName(''); setEnqueueEnvId(null); setEnqueueMaxAttempts(1); setEnqueueBrowser('chromium'); setEnqueueDeviceProfile(null); setEnqueuePauseOnFailure(false); await reload();
       toast.current?.show({ severity: 'success', summary: `Test Run ${res.runCode} dibuat`, detail: `${res.jobCount} job automation di-antrekan` });
     } catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal enqueue automation' }); }
   }
@@ -122,8 +125,8 @@ export function AutomationPage() {
     if (!localScript || !localPlanId) return;
     setLocalRunning(true);
     try {
-      const result = await runLocally({ testPlanId: localPlanId, testCaseId: localScript.testCaseId, name: localName, browser: localBrowser, deviceProfile: localDeviceProfile });
-      setLocalScript(null); setLocalPlanId(null); setLocalName(''); setLocalBrowser('chromium'); setLocalDeviceProfile(null);
+      const result = await runLocally({ testPlanId: localPlanId, testCaseId: localScript.testCaseId, name: localName, browser: localBrowser, deviceProfile: localDeviceProfile, pauseOnFailure: localPauseOnFailure });
+      setLocalScript(null); setLocalPlanId(null); setLocalName(''); setLocalBrowser('chromium'); setLocalDeviceProfile(null); setLocalPauseOnFailure(false);
       toast.current?.show({ severity: 'success', summary: `Test Run ${result.runCode} dibuat`, detail: 'Satu Test Case siap diambil Local Runner' });
     } catch (err) { toast.current?.show({ severity: 'error', summary: err instanceof Error ? err.message : 'Gagal menjalankan Test Case' }); }
     finally { setLocalRunning(false); }
@@ -241,6 +244,8 @@ export function AutomationPage() {
         <label htmlFor="enq-browser">Browser<Dropdown id="enq-browser" className="w-full" value={enqueueBrowser} options={['chromium', 'firefox', 'webkit']} onChange={(e) => setEnqueueBrowser(e.value as AutomationBrowser)} /></label>
         <label htmlFor="enq-device">Device profile<Dropdown id="enq-device" className="w-full" value={enqueueDeviceProfile} options={[{ label: 'Desktop', value: null }, { label: 'Pixel 7', value: 'Pixel 7' }, { label: 'iPhone 13', value: 'iPhone 13' }, { label: 'iPad (gen 7)', value: 'iPad (gen 7)' }]} onChange={(e) => setEnqueueDeviceProfile(e.value)} /></label>
         <label htmlFor="enq-max">Max attempts per job<InputNumber id="enq-max" className="w-full" value={enqueueMaxAttempts} onValueChange={(e) => setEnqueueMaxAttempts(e.value ?? 1)} min={1} max={10} showButtons /></label>
+        <div className="flex align-items-center gap-2"><Checkbox inputId="enq-pause-failure" checked={enqueuePauseOnFailure} onChange={(e) => setEnqueuePauseOnFailure(e.checked ?? false)} /><label htmlFor="enq-pause-failure">Pause & inspect saat gagal</label></div>
+        {enqueuePauseOnFailure && <small className="text-color-secondary">Browser lokal tetap terbuka sampai tester menekan Resume di Playwright Inspector.</small>}
         <small className="text-color-secondary">Hanya Test Case yang punya mapping script yang di-antrekan. Sisanya tetap <code>not_run</code> untuk tes manual.</small>
         <Button label="Enqueue" onClick={enqueue} disabled={!enqueuePlanId} />
       </div>
@@ -253,6 +258,8 @@ export function AutomationPage() {
         <label htmlFor="local-name">Nama Run (opsional)<InputText id="local-name" className="w-full" value={localName} onChange={(e) => setLocalName(e.target.value)} /></label>
         <label htmlFor="local-browser">Browser<Dropdown id="local-browser" className="w-full" value={localBrowser} options={['chromium', 'firefox', 'webkit']} onChange={(e) => setLocalBrowser(e.value as AutomationBrowser)} /></label>
         <label htmlFor="local-device">Device profile<Dropdown id="local-device" className="w-full" value={localDeviceProfile} options={[{ label: 'Desktop', value: null }, { label: 'Pixel 7', value: 'Pixel 7' }, { label: 'iPhone 13', value: 'iPhone 13' }, { label: 'iPad (gen 7)', value: 'iPad (gen 7)' }]} onChange={(e) => setLocalDeviceProfile(e.value)} /></label>
+        <div className="flex align-items-center gap-2"><Checkbox inputId="local-pause-failure" checked={localPauseOnFailure} onChange={(e) => setLocalPauseOnFailure(e.checked ?? false)} /><label htmlFor="local-pause-failure">Pause & inspect saat gagal</label></div>
+        {localPauseOnFailure && <small className="text-color-secondary">Browser lokal tetap terbuka sampai tester menekan Resume di Playwright Inspector.</small>}
         <Button label="Run locally" icon="pi pi-play" onClick={startLocalRun} disabled={!localPlanId} loading={localRunning} />
       </div>
     </Dialog>

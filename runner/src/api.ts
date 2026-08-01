@@ -15,6 +15,7 @@ export interface AutomationJob {
   slow_mo_ms?: number | null;
   browser?: 'chromium' | 'firefox' | 'webkit';
   device_profile?: string | null;
+  pause_on_failure?: boolean;
   base_url?: string | null;
   build_version?: string | null;
   repository: JobRepository | null;

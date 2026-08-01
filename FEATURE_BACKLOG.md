@@ -508,7 +508,7 @@ tertaut ke `test_result`:
 
 ### 9.5 Interaktivitas terarah
 
-- [ ] **Pause & inspect**: job bisa di-set `pauseOnFailure` — browser tetap terbuka di
+- [x] **Pause & inspect**: job bisa di-set `pauseOnFailure` — browser tetap terbuka di
       mesin lokal supaya tester bisa memeriksa state saat itu juga.
 - [ ] **Step-through** dari UI: kirim perintah next/continue ke runner lokal (channel
       lokal, tetap outbound-only ke server).

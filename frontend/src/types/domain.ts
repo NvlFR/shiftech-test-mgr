@@ -379,6 +379,7 @@ export interface AutomationJob {
   maxAttempts: number;
   browser: AutomationBrowser;
   deviceProfile: string | null;
+  pauseOnFailure: boolean;
   runnerId: string | null;
   artifacts: AutomationArtifact[];
   errorMessage: string | null;

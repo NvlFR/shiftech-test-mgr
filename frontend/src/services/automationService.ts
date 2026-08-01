@@ -56,17 +56,17 @@ export const automationService = {
     if (!jobId) throw new Error('Job tidak valid');
     return automationRepository.subscribeJobLogs(jobId, onInsert);
   },
-  enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts?: number; browser: AutomationBrowser; deviceProfile?: string | null }) {
+  enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts?: number; browser: AutomationBrowser; deviceProfile?: string | null; pauseOnFailure?: boolean }) {
     if (!input.projectId || !input.testPlanId) throw new Error('Project dan Test Plan wajib dipilih');
     const maxAttempts = input.maxAttempts ?? 1;
     if (maxAttempts < 1 || maxAttempts > 10) throw new Error('Max attempts harus antara 1 dan 10');
     if (!['chromium', 'firefox', 'webkit'].includes(input.browser)) throw new Error('Browser tidak didukung');
-    return automationRepository.enqueue({ ...input, deviceProfile: input.deviceProfile?.trim() || null, maxAttempts });
+    return automationRepository.enqueue({ ...input, deviceProfile: input.deviceProfile?.trim() || null, maxAttempts, pauseOnFailure: input.pauseOnFailure ?? false });
   },
-  runLocally(input: { projectId: string; testPlanId: string; testCaseId: string; name?: string; browser: AutomationBrowser; deviceProfile?: string | null }) {
+  runLocally(input: { projectId: string; testPlanId: string; testCaseId: string; name?: string; browser: AutomationBrowser; deviceProfile?: string | null; pauseOnFailure?: boolean }) {
     if (!input.projectId || !input.testPlanId || !input.testCaseId) throw new Error('Project, Test Plan, dan Test Case wajib dipilih');
     if (!['chromium', 'firefox', 'webkit'].includes(input.browser)) throw new Error('Browser tidak didukung');
-    return automationRepository.runLocally({ ...input, name: input.name?.trim() || undefined, deviceProfile: input.deviceProfile?.trim() || null });
+    return automationRepository.runLocally({ ...input, name: input.name?.trim() || undefined, deviceProfile: input.deviceProfile?.trim() || null, pauseOnFailure: input.pauseOnFailure ?? false });
   },
   cancelJob(id: string) {
     if (!id) throw new Error('Job tidak valid');

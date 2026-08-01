@@ -43,9 +43,14 @@ test('opsi job mengalahkan default runner', () => {
   assert.deepEqual(resolveExecutionMode({ ...config, headed: true, slowMoMs: 50 }, { ...job, headed: false, slow_mo_ms: 10 }), {
     headed: false,
     slowMoMs: 10,
+    pauseOnFailure: false,
   });
 });
 
 test('slow-mo job tanpa headed eksplisit mengaktifkan browser terlihat', () => {
-  assert.deepEqual(resolveExecutionMode(config, { ...job, slow_mo_ms: 75 }), { headed: true, slowMoMs: 75 });
+  assert.deepEqual(resolveExecutionMode(config, { ...job, slow_mo_ms: 75 }), { headed: true, slowMoMs: 75, pauseOnFailure: false });
+});
+
+test('pauseOnFailure selalu mengaktifkan browser terlihat', () => {
+  assert.deepEqual(resolveExecutionMode(config, { ...job, headed: false, pause_on_failure: true }), { headed: true, slowMoMs: 0, pauseOnFailure: true });
 });

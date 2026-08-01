@@ -17,6 +17,7 @@ export interface ExecutionOutcome {
 export interface ExecutionMode {
   headed: boolean;
   slowMoMs: number;
+  pauseOnFailure: boolean;
 }
 
 const SUPPORTED_BROWSERS = ['chromium', 'firefox', 'webkit'] as const;
@@ -36,8 +37,9 @@ export function resolveExecutionMode(config: RunnerConfig, job: AutomationJob): 
     throw new Error('slow_mo_ms pada job harus berupa integer milidetik >= 0');
   }
   return {
-    headed: job.headed ?? (slowMoMs > 0 ? true : config.headed),
+    headed: job.pause_on_failure ? true : job.headed ?? (slowMoMs > 0 ? true : config.headed),
     slowMoMs,
+    pauseOnFailure: job.pause_on_failure ?? false,
   };
 }
 
@@ -87,16 +89,24 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
     log.info('Executing job', { jobId: job.id, testCase: job.test_case_code, script: job.script_ref, attempt: job.attempt, ...executionMode, ...executionTarget });
     const child = spawn(cmd ?? 'npx', args, {
       cwd: projectDir,
-      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '' },
+      env: { ...process.env, TM_PLAYWRIGHT_SLOW_MO_MS: String(executionMode.slowMoMs), TM_PLAYWRIGHT_DEVICE_PROFILE: executionTarget.deviceProfile ?? '', TM_PAUSE_ON_FAILURE: executionMode.pauseOnFailure ? '1' : '0' },
     });
 
     let stdout = '';
     let stderr = '';
     let settled = false;
-    child.stdout.on('data', (chunk: Buffer) => { const content = chunk.toString(); stdout += content; onLog?.('stdout', content); });
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    child.stdout.on('data', (chunk: Buffer) => {
+      const content = chunk.toString(); stdout += content; onLog?.('stdout', content);
+      if (executionMode.pauseOnFailure && content.includes('[TM_PAUSE_ON_FAILURE]') && timer) {
+        clearTimeout(timer);
+        timer = null;
+        onLog?.('system', 'Job gagal dan dijeda untuk inspeksi lokal; tekan Resume di Playwright Inspector.\n');
+      }
+    });
     child.stderr.on('data', (chunk: Buffer) => { const content = chunk.toString(); stderr += content; onLog?.('stderr', content); });
 
-    const timer = setTimeout(() => {
+    timer = setTimeout(() => {
       if (settled) return;
       settled = true;
       child.kill('SIGKILL');
@@ -113,14 +123,14 @@ export async function executeJob(config: RunnerConfig, job: AutomationJob, proje
     child.on('error', (err) => {
       if (settled) return;
       settled = true;
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
       finalize('blocked', `Failed to spawn Playwright: ${err.message}`);
     });
 
     child.on('close', (code) => {
       if (settled) return;
       settled = true;
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
       if (code === 0) finalize('pass');
       else finalize('fail', `Playwright exited with code ${code}`);
     });

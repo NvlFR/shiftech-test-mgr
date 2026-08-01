@@ -13,7 +13,7 @@ import type {
 // token_hash is intentionally excluded so it never reaches the browser.
 const RUNNER_COLUMNS = 'id,project_id,name,labels,token_prefix,active,last_seen_at,created_by,created_at,updated_at';
 const SCRIPT_COLUMNS = 'id,project_id,test_case_id,script_ref,runner_labels,created_by,created_at,updated_at';
-const JOB_COLUMNS = 'id,project_id,test_run_id,test_case_id,script_ref,required_labels,status,attempt,max_attempts,browser,device_profile,runner_id,artifacts,error_message,queued_at,started_at,finished_at,created_by,created_at,updated_at';
+const JOB_COLUMNS = 'id,project_id,test_run_id,test_case_id,script_ref,required_labels,status,attempt,max_attempts,browser,device_profile,pause_on_failure,runner_id,artifacts,error_message,queued_at,started_at,finished_at,created_by,created_at,updated_at';
 
 export const automationRepository = {
   async listRunners(projectId: string): Promise<AutomationRunner[]> {
@@ -81,20 +81,22 @@ export const automationRepository = {
     return () => { void supabase.removeChannel(channel); };
   },
 
-  async enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts: number; browser: string; deviceProfile?: string | null }): Promise<AutomationEnqueueResponse> {
+  async enqueue(input: { projectId: string; testPlanId: string; name?: string; environmentId?: string | null; maxAttempts: number; browser: string; deviceProfile?: string | null; pauseOnFailure: boolean }): Promise<AutomationEnqueueResponse> {
     const { data, error } = await supabase.rpc('enqueue_automation_jobs', {
       p_project_id: input.projectId, p_test_plan_id: input.testPlanId, p_name: input.name ?? null,
       p_environment_id: input.environmentId ?? null, p_max_attempts: input.maxAttempts,
       p_browser: input.browser, p_device_profile: input.deviceProfile ?? null,
+      p_pause_on_failure: input.pauseOnFailure,
     });
     if (error) throw error;
     return { runId: data.run_id, runCode: data.run_code, jobCount: data.job_count };
   },
 
-  async runLocally(input: { projectId: string; testPlanId: string; testCaseId: string; name?: string; browser: string; deviceProfile?: string | null }): Promise<AutomationLocalRunResponse> {
+  async runLocally(input: { projectId: string; testPlanId: string; testCaseId: string; name?: string; browser: string; deviceProfile?: string | null; pauseOnFailure: boolean }): Promise<AutomationLocalRunResponse> {
     const { data, error } = await supabase.rpc('run_automation_test_case_locally', {
       p_project_id: input.projectId, p_test_plan_id: input.testPlanId, p_test_case_id: input.testCaseId,
       p_name: input.name ?? null, p_browser: input.browser, p_device_profile: input.deviceProfile ?? null,
+      p_pause_on_failure: input.pauseOnFailure,
     });
     if (error) throw error;
     return { runId: data.run_id, runCode: data.run_code, jobId: data.job_id };

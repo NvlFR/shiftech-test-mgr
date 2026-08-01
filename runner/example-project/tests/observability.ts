@@ -83,6 +83,11 @@ export const test = base.extend<{ failureEvidence: void }>({
       await writeFile(domPath, `<!doctype html><meta charset="utf-8"><script type="application/json" id="tm-computed-styles">${serialized}</script>${snapshot.html}`, 'utf8');
       await testInfo.attach('dom-snapshot', { path: domPath, contentType: 'text/html' });
     }
+
+    if (process.env.TM_PAUSE_ON_FAILURE === '1' && !page.isClosed()) {
+      console.log('[TM_PAUSE_ON_FAILURE] Test gagal. Browser dipertahankan untuk inspeksi; tekan Resume di Playwright Inspector untuk menyelesaikan job.');
+      await page.pause();
+    }
   }, { auto: true }],
 });
 

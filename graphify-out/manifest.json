@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785547909.8451853,
-    "ast_hash": "ec0267b2fcedde05843595391e5870a9",
+    "mtime": 1785550408.6773674,
+    "ast_hash": "19e92930f83f004cba81f3307c2d6a5d",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785548651.1606717,
-    "ast_hash": "e0c5b67e8673d66f41273d550e43013e",
+    "mtime": 1785550408.5443738,
+    "ast_hash": "d0c341a094ed80fa24399307a53a3093",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785550149.3995583,
-    "ast_hash": "03fdd24aff0b8a34f080cdf22939bcd8",
+    "mtime": 1785550547.215942,
+    "ast_hash": "22aa7f34a83d0efd02482d8164ee62e2",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785550149.5405507,
-    "ast_hash": "bb751e23c2f1620d340df84fbbc88c24",
+    "mtime": 1785550576.5096247,
+    "ast_hash": "bb79447feaf9c3c0486bae96352c62f9",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1035,18 +1035,18 @@
     "semantic_hash": "eb35cd398c8b17dc561e462ce0bbdb35"
   },
   "frontend/src/hooks/useAutomation.ts": {
-    "mtime": 1785548654.076672,
-    "ast_hash": "6056c65db35012c5a3fa6d8ab855fc6c",
+    "mtime": 1785550409.1353457,
+    "ast_hash": "d4806c010660fa7c5f6a3bd2a6c8dc71",
     "semantic_hash": ""
   },
   "frontend/src/repositories/automationRepository.ts": {
-    "mtime": 1785548652.4586718,
-    "ast_hash": "aad913fd8fe288a88ea40cfbf897bc91",
+    "mtime": 1785550408.856359,
+    "ast_hash": "cc009395f854473e1d4a9692ed80fc65",
     "semantic_hash": ""
   },
   "frontend/src/services/automationService.ts": {
-    "mtime": 1785548653.350672,
-    "ast_hash": "c28e15b45c59bf826670665ddd3d1319",
+    "mtime": 1785550408.9953523,
+    "ast_hash": "51e6abc4cdd04dad22a32edc69bcbb43",
     "semantic_hash": ""
   },
   "supabase/schema_024_p3_automation.sql": {
@@ -1055,8 +1055,8 @@
     "semantic_hash": "b04d53ae5067ad6cb7062ccd4fab40a7"
   },
   "frontend/src/pages/automation/AutomationPage.tsx": {
-    "mtime": 1785548687.8166769,
-    "ast_hash": "7940dae5908d581c5203dfc4b7f67c93",
+    "mtime": 1785550433.5971854,
+    "ast_hash": "2de39afb5a8bc61689856ca87257e45f",
     "semantic_hash": ""
   },
   "frontend/src/components/ai/AiAssistantPanel.tsx": {
@@ -1075,8 +1075,8 @@
     "semantic_hash": ""
   },
   "runner/src/api.ts": {
-    "mtime": 1785549618.1166346,
-    "ast_hash": "0b831d28ce613d6382f6605577c64d45",
+    "mtime": 1785550409.272339,
+    "ast_hash": "e33589ea10393f696c2fd0040f68dbd4",
     "semantic_hash": ""
   },
   "runner/src/artifacts.ts": {
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "runner/src/executor.ts": {
-    "mtime": 1785548302.4617279,
-    "ast_hash": "936fb815f30f135045b7cd459882c446",
+    "mtime": 1785550576.100643,
+    "ast_hash": "02414ece0e7b914a7fa232408e7e6247",
     "semantic_hash": ""
   },
   "runner/src/index.ts": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "runner/README.md": {
-    "mtime": 1785550114.1345072,
-    "ast_hash": "5b34319e8611766cc0ed916e1e379f44",
+    "mtime": 1785550576.367631,
+    "ast_hash": "1749e4ff64c6cc69a4c35318e95f6fd0",
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
@@ -3140,8 +3140,8 @@
     "semantic_hash": ""
   },
   "runner/test/executionMode.test.mjs": {
-    "mtime": 1785545357.07642,
-    "ast_hash": "bdc6b8632db7d40307c5d753bb45595d",
+    "mtime": 1785550409.6773198,
+    "ast_hash": "de38dd4469b6d7bc130422facd0d93c4",
     "semantic_hash": ""
   },
   "supabase/schema_060_fix_test_runs_rls_recursion.sql": {
@@ -3160,8 +3160,8 @@
     "semantic_hash": ""
   },
   "runner/example-project/tests/observability.ts": {
-    "mtime": 1785545660.5895593,
-    "ast_hash": "72173a04a1942fdd83513fcf982ec8a1",
+    "mtime": 1785550576.233637,
+    "ast_hash": "a4c6d20f1ae088441de5e3e058e93bdf",
     "semantic_hash": ""
   },
   "runner/test/artifacts.test.mjs": {
@@ -3272,6 +3272,11 @@
   "runner/test/init.test.mjs": {
     "mtime": 1785550149.2655656,
     "ast_hash": "1934b294c48fb0861d9e75c2cbac8085",
+    "semantic_hash": ""
+  },
+  "supabase/schema_068_pw18_pause_on_failure.sql": {
+    "mtime": 1785550480.0130157,
+    "ast_hash": "64043d4ad13f3e677f53dd10ad905cea",
     "semantic_hash": ""
   }
 }

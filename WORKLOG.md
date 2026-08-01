@@ -1912,3 +1912,13 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Tidak menambah dependency atau migration, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
 - Verifikasi lulus: `cd runner && npm test` (9/9 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
 - `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.590 node dan 5.347 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.
+
+## 2026-08-01 — PW-18 pauseOnFailure
+
+- Menjalankan `graphify query` sebelum menelusuri alur job automation, Local Runner, dan keputusan Section 9.5 `FEATURE_BACKLOG.md`.
+- Menambahkan migration `schema_068_pw18_pause_on_failure.sql` untuk menyimpan flag `pause_on_failure`, meneruskannya melalui enqueue batch/single-case dan payload polling runner; migration hanya dibuat dan tidak dijalankan ke target Supabase.
+- Menambahkan opsi **Pause & inspect saat gagal** pada dialog enqueue dan Run locally melalui alur Page → Hook → Service → Repository → Supabase, serta menampilkan nilai flag pada domain job.
+- Runner otomatis memakai browser headed dan meneruskan `TM_PAUSE_ON_FAILURE=1`. Fixture observability mengumpulkan bukti kegagalan lebih dulu, lalu memberi sinyal runner untuk menghentikan timeout dan menjalankan `page.pause()` agar browser serta state halaman bertahan sampai tester menekan Resume di Playwright Inspector; timeout tetap aktif sebelum kegagalan.
+- Menambahkan unit test resolusi execution mode dan dokumentasi kewajiban spec mengimpor fixture observability. Tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+- Verifikasi lulus: `cd runner && npm test` (9/9 file test), `cd frontend && npm run build` (warning ukuran chunk Vite yang sudah ada), dan `git diff --check`.
+- `graphify update .` berhasil menyinkronkan knowledge graph menjadi 2.596 node dan 5.353 edge; warning tujuh file konfigurasi/hasil test tanpa node tidak menggagalkan proses.

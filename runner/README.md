@@ -176,6 +176,16 @@ browser bertimestamp, HAR, serta HTML DOM dan computed style penting dibuat pada
 titik gagal. Semua bukti ditempatkan di output test per job sehingga ikut dalam
 upload artifact runner.
 
+Jika opsi **Pause & inspect saat gagal** diaktifkan pada job, runner memaksa mode
+headed dan meneruskan `TM_PAUSE_ON_FAILURE=1`. Fixture observability memanggil
+`page.pause()` setelah seluruh bukti kegagalan dikumpulkan, sehingga browser dan
+state halaman tetap terbuka. Tester menekan **Resume** di Playwright Inspector
+untuk melanjutkan teardown dan pelaporan job. Saat fixture mengumumkan bahwa
+pause sudah aktif, timeout job dihentikan agar sesi inspeksi tidak diputus oleh
+runner; timeout tetap berlaku normal sebelum terjadi kegagalan. Karena pause dipasang lewat fixture,
+spec yang ingin memakai opsi ini wajib mengimpor `test` dari fixture
+`observability.ts` seperti contoh project runner.
+
 ## Docker
 
 ```bash

@@ -28,7 +28,7 @@ export function useAutomation(projectId: string | null) {
   }, [projectId]);
 
   useEffect(() => { void reload(); }, [reload]);
-  const runLocally = useCallback(async (input: { testPlanId: string; testCaseId: string; name?: string; browser: AutomationBrowser; deviceProfile?: string | null }) => {
+  const runLocally = useCallback(async (input: { testPlanId: string; testCaseId: string; name?: string; browser: AutomationBrowser; deviceProfile?: string | null; pauseOnFailure?: boolean }) => {
     if (!projectId) throw new Error('Project wajib dipilih');
     const result = await automationService.runLocally({ projectId, ...input });
     await reload();
