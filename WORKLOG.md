@@ -2058,3 +2058,9 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Menampilkan metadata status approval di detail Test Plan dan mengarahkan seluruh transisi Draft ke Aktif melalui service approval eksplisit; transisi status biasa tidak dapat dipakai untuk melewati gate.
 - Memperbarui status Section 11.3 di `FEATURE_BACKLOG.md` serta domain/mapper untuk `approvedBy` dan `approvedAt`.
 - Verifikasi lulus: `cd frontend && npm run build` (hanya warning ukuran chunk Vite yang sudah dikenal), `cd frontend && npm run lint` (lulus dengan tujuh warning existing di file yang tidak terkait), dan `git diff --check`.
+# 2026-08-01 — E2E-09 fallback eksekusi manual tanpa automation script
+
+- Memverifikasi kontrak Section 11.3 pada RPC MCP automation: semua test case dalam Test Plan tetap di-seed sebagai `test_results` berstatus awal `not_run`, sedangkan `automation_jobs` hanya dibuat melalui inner join ke mapping `automation_scripts`.
+- Menambahkan regression contract test di `mcp/src/services/automationService.test.ts` yang membuktikan kasus tanpa script tetap tersedia untuk eksekusi manual, tidak masuk antrean automation, dan hasil otomatis hanya dapat berasal dari job runner yang valid.
+- Tidak menjalankan migration atau mengubah data Supabase.
+- Verifikasi lulus: `cd mcp && npm test` (20/20 suite), `cd frontend && npm run build`, dan `git diff --check`. `graphify update .` sudah meregenerasi output graph; proses watch lanjutannya berhenti karena sandbox melaporkan `Operation not permitted`.
