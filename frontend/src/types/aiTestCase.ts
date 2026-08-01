@@ -70,4 +70,5 @@ export interface AiTestCaseSaveInput {
   projectId: string;
   moduleId: string | null;
   draft: AiTestCaseDraft;
+  batchId: string;
 }

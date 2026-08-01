@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-08-01 — E2E-05 perbaikan gate verifikasi DataTable
+
+- Memperbaiki overload TypeScript PrimeReact pada tabel review batch AI dengan mendeklarasikan `selectionMode="multiple"` langsung pada `DataTable` dan menghapus type assertion array yang keliru pada `onSelectionChange`.
+- Verifikasi ulang: `cd frontend && npm run build` dan `npm run lint` lulus; lint hanya melaporkan 7 warning lama pada file yang tidak terkait, sedangkan peringatan ukuran chunk Vite tetap bersifat non-blocking. `git diff --check` juga lulus.
+- Menjalankan `graphify update .`; ekstraksi melaporkan tidak ada pembaruan lalu proses watch gagal dengan `Operation not permitted` karena batas izin lingkungan.
+
+## 2026-08-01 — E2E-05 review batch Test Case AI
+
+- Menambahkan migration `schema_071_ai_test_case_review.sql` untuk identitas batch AI, keputusan review, approver, waktu review, indeks antrean, dan RPC bulk review atomik. Migration hanya dibuat sebagai file dan tidak dijalankan ke Supabase target.
+- Menambahkan halaman `/test-cases/ai-review` dengan pemilih batch, seleksi massal, approve/reject per pilihan atau seluruh batch, serta editor field utama/module/tag sebelum keputusan.
+- Menambahkan alur lengkap `AiTestCaseReviewPage -> useAiTestCaseReview -> testCaseService -> testCaseRepository -> Supabase`; keputusan manusia mengaktifkan atau mengarsipkan draf dan metadata approver ikut masuk ke audit trigger yang sudah ada.
+- Generator sekarang memberi satu UUID batch pada seluruh draf dalam satu penyimpanan dan label aksi diperjelas menjadi `Simpan sebagai Draf`.
+- Verifikasi: `cd frontend && npm run build` lulus; `cd frontend && npm run lint` lulus dengan 7 warning lama di file yang tidak terkait; `git diff --check` lulus.
+
 ## 2026-08-01 — 37 task baru masuk antrean Codex
 
 - Menambahkan 37 task ke `scripts/codex-loop/queue.md` dari Section 12, 13, dan 14

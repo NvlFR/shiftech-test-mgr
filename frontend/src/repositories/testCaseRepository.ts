@@ -28,6 +28,30 @@ export const testCaseRepository = {
     return (data ?? []).map(mapTestCaseRow);
   },
 
+  async findPendingAiReview(projectId: string): Promise<TestCaseWithDetails[]> {
+    const { data, error } = await supabase
+      .from('test_cases')
+      .select('*, module:modules(*), test_case_tags(tag:tags(*)), target_role:test_roles(*)')
+      .eq('project_id', projectId)
+      .eq('source', 'ai')
+      .eq('status', 'draft')
+      .is('review_decision', null)
+      .order('created_at');
+    if (error) throw error;
+    return (data ?? []).map((row: any) => ({
+      ...mapTestCaseRow(row),
+      module: row.module ? mapModuleRow(row.module) : null,
+      tags: (row.test_case_tags ?? []).map((item: any) => mapTagRow(item.tag)),
+      targetRole: row.target_role ? mapTestRoleRow(row.target_role) : null,
+    }));
+  },
+
+  async reviewAiDrafts(ids: string[], decision: 'approved' | 'rejected'): Promise<number> {
+    const { data, error } = await supabase.rpc('review_ai_test_cases', { p_test_case_ids: ids, p_decision: decision });
+    if (error) throw error;
+    return data as number;
+  },
+
   // Includes module + tags in one round trip — used by the list page so the
   // Module column and tag chips don't need N+1 queries.
   async findAllByProjectWithDetails(projectId: string, options?: { search?: string; statuses?: TestCase['status'][]; priorities?: TestCase['priority'][]; moduleIds?: string[]; tagIds?: string[]; testRoleIds?: string[] }): Promise<TestCaseWithDetails[]> {
@@ -115,6 +139,7 @@ export const testCaseRepository = {
         priority: input.priority,
         status: input.status,
         source: input.source,
+        ai_batch_id: input.aiBatchId,
         notes: input.notes,
         assigned_to: input.assignedTo ?? null,
         target_role_id: input.targetRoleId ?? null,
@@ -140,6 +165,7 @@ export const testCaseRepository = {
     if (changes.priority !== undefined) payload.priority = changes.priority;
     if (changes.status !== undefined) payload.status = changes.status;
     if (changes.source !== undefined) payload.source = changes.source;
+    if (changes.aiBatchId !== undefined) payload.ai_batch_id = changes.aiBatchId;
     if (changes.notes !== undefined) payload.notes = changes.notes;
     if (changes.assignedTo !== undefined) payload.assigned_to = changes.assignedTo;
     if (changes.targetRoleId !== undefined) payload.target_role_id = changes.targetRoleId;
@@ -181,6 +207,7 @@ export const testCaseRepository = {
       steps: input.steps, expected_result: input.expectedResult, step_type: input.stepType,
       priority: input.priority, status: input.status, notes: input.notes,
       source: input.source,
+      ai_batch_id: input.aiBatchId,
       assigned_to: input.assignedTo ?? null, target_role_id: input.targetRoleId ?? null,
       external_links: input.externalLinks ?? [], created_by: input.createdBy ?? null,
     }))).select('*');

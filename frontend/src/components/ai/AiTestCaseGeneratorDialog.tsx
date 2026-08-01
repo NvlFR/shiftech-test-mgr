@@ -87,7 +87,8 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
   async function persistDrafts() {
     setSaveError(null);
     try {
-      for (const draft of reviewDrafts) await generator.saveDraft(projectId, draft, draft.moduleId);
+      const batchId = crypto.randomUUID();
+      for (const draft of reviewDrafts) await generator.saveDraft(projectId, draft, draft.moduleId, batchId);
       await onSaved();
       onHide();
     } catch (reason) {
@@ -215,7 +216,7 @@ export function AiTestCaseGeneratorDialog({ visible, projectId, modules, tags, e
           <div className="flex justify-content-end gap-2">
             <Button label="Batal" text onClick={handleClose} />
             <Button label="Unduh CSV" icon="pi pi-download" outlined disabled={!reviewDrafts.length} onClick={downloadCsv} />
-            <Button label="Impor Semua" icon="pi pi-upload" loading={generator.saving} disabled={!reviewDrafts.length || csvPreview.invalidCount > 0} onClick={handleApprove} />
+            <Button label="Simpan sebagai Draf" icon="pi pi-upload" loading={generator.saving} disabled={!reviewDrafts.length || csvPreview.invalidCount > 0} onClick={handleApprove} />
           </div>
         </div>
       </Dialog>

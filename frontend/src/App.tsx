@@ -11,6 +11,7 @@ import { ProjectSettingsPage } from './pages/projects/ProjectSettingsPage';
 import { TestPlansPage } from './pages/test-plans/TestPlansPage';
 import { TestPlanDetailPage } from './pages/test-plans/TestPlanDetailPage';
 import { TestCasesPage } from './pages/test-cases/TestCasesPage';
+import { AiTestCaseReviewPage } from './pages/test-cases/AiTestCaseReviewPage';
 import { TestSuitesPage } from './pages/test-suites/TestSuitesPage';
 import { TestSuiteDetailPage } from './pages/test-suites/TestSuiteDetailPage';
 import { TestCaseDetailPage } from './pages/test-cases/TestCaseDetailPage';
@@ -50,6 +51,7 @@ function App() {
           <Route path="/test-plans" element={<TestPlansPage />} />
           <Route path="/test-plans/:id" element={<TestPlanDetailPage />} />
           <Route path="/test-cases" element={<TestCasesPage />} />
+          <Route path="/test-cases/ai-review" element={<AiTestCaseReviewPage />} />
           <Route path="/test-suites" element={<TestSuitesPage />} />
           <Route path="/test-suites/:id" element={<TestSuiteDetailPage />} />
           <Route path="/test-cases/:id" element={<TestCaseDetailPage />} />

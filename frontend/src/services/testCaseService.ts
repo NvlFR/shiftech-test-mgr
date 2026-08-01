@@ -14,6 +14,16 @@ export const testCaseService = {
     return testCaseRepository.findAllByProjectWithDetails(projectId);
   },
 
+  listPendingAiReview(projectId: string) {
+    if (!projectId) throw new Error('Project wajib dipilih');
+    return testCaseRepository.findPendingAiReview(projectId);
+  },
+
+  reviewAiDrafts(ids: string[], decision: 'approved' | 'rejected') {
+    if (!ids.length) throw new Error('Pilih minimal satu test case');
+    return testCaseRepository.reviewAiDrafts([...new Set(ids)], decision);
+  },
+
   async listFiltered(projectId: string, filters: TestCaseFilters): Promise<TestCaseWithDetails[]> {
     const cases = await testCaseRepository.findAllByProjectWithDetails(projectId);
     return cases.filter((testCase) =>
@@ -75,6 +85,7 @@ export const testCaseService = {
     priority?: TestCase['priority'];
     status?: TestCase['status'];
     source?: TestCase['source'];
+    aiBatchId?: string | null;
     notes?: string;
     tagNames?: string[];
     detailedSteps?: { action: string; expectedResult?: string }[];
@@ -101,6 +112,10 @@ export const testCaseService = {
       priority: input.priority ?? 'medium',
       status: input.status ?? 'active',
       source: input.source ?? 'manual',
+      aiBatchId: input.aiBatchId ?? null,
+      reviewDecision: null,
+      reviewedBy: null,
+      reviewedAt: null,
       notes: input.notes?.trim() || null,
       assignedTo: null,
       targetRoleId: null,

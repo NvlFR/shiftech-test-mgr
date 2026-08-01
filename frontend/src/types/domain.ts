@@ -172,6 +172,7 @@ export interface Environment {
 export type TestCasePriority = 'low' | 'medium' | 'high' | 'critical';
 export type TestCaseStatus = 'draft' | 'active' | 'archived';
 export type TestCaseSource = 'manual' | 'ai';
+export type TestCaseReviewDecision = 'approved' | 'rejected';
 
 export interface TestCase {
   id: string;
@@ -187,6 +188,10 @@ export interface TestCase {
   priority: TestCasePriority;
   status: TestCaseStatus;
   source: TestCaseSource;
+  aiBatchId: string | null;
+  reviewDecision: TestCaseReviewDecision | null;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
   notes: string | null;
   assignedTo: string | null;
   targetRoleId?: string | null;

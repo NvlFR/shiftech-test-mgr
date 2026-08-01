@@ -184,6 +184,48 @@ Page/Component → Hook → Service → Repository → Supabase
 - Notifikasi: pakai `Toast` (belum diinisialisasi — tambahkan `useRef<Toast>` +
   `<Toast ref>` di layout saat dibutuhkan)
 
+#### DataTable dengan selection — WAJIB dibaca sebelum menulis DataTable
+
+Kesalahan ini sudah terjadi berulang kali dan selalu menghasilkan error TS2769
+"No overload matches this call". Tipe `DataTableProps` memakai discriminated union,
+jadi ketiga hal ini harus konsisten:
+
+| Jenis selection | `selectionMode` | Tipe event `onSelectionChange` |
+|---|---|---|
+| Banyak baris (array) | `"multiple"` atau `"checkbox"` | `DataTableSelectionMultipleChangeEvent<T[]>` |
+| Satu baris | `"single"` | `DataTableSelectionSingleChangeEvent<T[]>` |
+
+Aturan yang tidak boleh dilanggar:
+
+- `selectionMode` **tidak boleh `undefined`** saat `selection` diisi. Untuk
+  menonaktifkan secara kondisional, pakai `null`, BUKAN `undefined`:
+  `selectionMode={isMobile ? null : 'checkbox'}`
+- Kalau `selection` berupa array, event-nya **wajib** `...MultipleChangeEvent`.
+  Memakai `...SingleChangeEvent` untuk array adalah penyebab TS2769 + TS2352
+  ("Conversion of type 'T' to type 'T[]' may be a mistake").
+- Jangan menambal dengan `as unknown as T[]`. Kalau butuh cast, berarti tipe
+  event-nya yang salah pilih — perbaiki di sana.
+- Beri tipe eksplisit pada parameter event, jangan andalkan inferensi:
+  `onSelectionChange={(event: DataTableSelectionMultipleChangeEvent<TestPlan[]>) => ...}`
+
+Contoh benar (lihat `pages/projects/ProjectTestPlanTab.tsx`):
+
+```tsx
+import { DataTable, type DataTableSelectionMultipleChangeEvent } from 'primereact/datatable';
+
+<DataTable
+  value={plans}
+  selection={selected}
+  onSelectionChange={(event: DataTableSelectionMultipleChangeEvent<TestPlan[]>) =>
+    onSelectedChange(event.value)
+  }
+  dataKey="id"
+  selectionMode={isMobile ? null : 'checkbox'}
+>
+  <Column selectionMode="multiple" style={{ width: '3rem' }} />
+</DataTable>
+```
+
 ### Module Creation Order (fitur/modul baru)
 
 1. Tabel di file `supabase/schema_*.sql` BARU (jangan edit file yang sudah ada —

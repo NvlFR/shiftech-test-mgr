@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag as PrimeTag } from 'primereact/tag';
@@ -25,6 +26,7 @@ const priorities: { label: string; value: TestCasePriority }[] = (['low', 'mediu
 const statuses: { label: string; value: TestCaseStatus }[] = (['draft', 'active', 'archived'] as const).map((value) => ({ label: TEST_CASE_STATUS_LABEL[value], value }));
 
 export function TestCasesPage() {
+  const navigate = useNavigate();
   const { lt } = useScreenSize();
   const isMobile = lt.sm;
   const { projects, projectId, setProjectId } = useProjectContext();
@@ -62,7 +64,7 @@ export function TestCasesPage() {
   }
 
   return <div>
-    <PageHeader title="Test Cases" actions={<div className="flex gap-2"><Button label="Generate dengan AI" icon="pi pi-sparkles" size="small" outlined disabled={!projectId} onClick={() => setAiDialogOpen(true)} /><Button label={`Bulk update (${selected.length})`} icon="pi pi-pencil" size="small" disabled={!selected.length} onClick={() => setBulkOpen(true)} /><Dropdown value={projectId} options={projects.map((p) => ({ label: p.name, value: p.id }))} onChange={(e) => setProjectId(e.value)} placeholder="Pilih project" className="w-15rem" showClear /></div>} />
+    <PageHeader title="Test Cases" actions={<div className="flex gap-2"><Button label="Review Draf AI" icon="pi pi-verified" size="small" outlined onClick={() => navigate('/test-cases/ai-review')} /><Button label="Generate dengan AI" icon="pi pi-sparkles" size="small" outlined disabled={!projectId} onClick={() => setAiDialogOpen(true)} /><Button label={`Bulk update (${selected.length})`} icon="pi pi-pencil" size="small" disabled={!selected.length} onClick={() => setBulkOpen(true)} /><Dropdown value={projectId} options={projects.map((p) => ({ label: p.name, value: p.id }))} onChange={(e) => setProjectId(e.value)} placeholder="Pilih project" className="w-15rem" showClear /></div>} />
     {!projectId && <p className="text-color-secondary">Pilih project untuk melihat test case.</p>}
     {projectId && <AiAssistantPanel />}
     {projectId && <FilterToolbar>

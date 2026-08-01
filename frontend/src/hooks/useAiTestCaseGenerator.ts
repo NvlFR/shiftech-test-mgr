@@ -47,10 +47,10 @@ export function useAiTestCaseGenerator() {
     }
   }, [source]);
 
-  const saveDraft = useCallback(async (projectId: string, draft: AiTestCaseDraft, moduleId: string | null) => {
+  const saveDraft = useCallback(async (projectId: string, draft: AiTestCaseDraft, moduleId: string | null, batchId: string) => {
     setSaving(true);
     try {
-      return await aiTestCaseService.approveAndSave({ projectId, draft, moduleId });
+      return await aiTestCaseService.approveAndSave({ projectId, draft, moduleId, batchId });
     } finally {
       setSaving(false);
     }

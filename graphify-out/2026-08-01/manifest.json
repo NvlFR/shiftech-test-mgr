@@ -110,8 +110,8 @@
     "semantic_hash": "cc0097d3027def8cbcade024352d4557"
   },
   "frontend/src/helpers/mappers.ts": {
-    "mtime": 1785550408.6773674,
-    "ast_hash": "19e92930f83f004cba81f3307c2d6a5d",
+    "mtime": 1785552446.6153717,
+    "ast_hash": "7d3d6209f107416961fe77e8383ea21f",
     "semantic_hash": ""
   },
   "frontend/src/helpers/pdfExporter.ts": {
@@ -120,8 +120,8 @@
     "semantic_hash": "54f0d45db2ed5ff5b4baad86a54e1719"
   },
   "frontend/src/helpers/statusLabels.ts": {
-    "mtime": 1785534337.9485447,
-    "ast_hash": "36b5127d2c763f1b32bad0475440032f",
+    "mtime": 1785552448.80629,
+    "ast_hash": "a6ce98c178fbbaab415a876415849680",
     "semantic_hash": ""
   },
   "frontend/src/helpers/testCaseExcel.ts": {
@@ -250,8 +250,8 @@
     "semantic_hash": "8ea72a2217637a3d5881437e602f3efb"
   },
   "frontend/src/pages/test-cases/TestCasesPage.tsx": {
-    "mtime": 1785532690.9815624,
-    "ast_hash": "aba812c8eb4b28523859ec392e72bf06",
+    "mtime": 1785552449.3562694,
+    "ast_hash": "25fdf93d5de05db65e4a5881a43dac33",
     "semantic_hash": ""
   },
   "frontend/src/pages/test-plans/TestPlanDetailPage.tsx": {
@@ -330,9 +330,9 @@
     "semantic_hash": "cd7a5f906a53e4063e51fc481b1a486b"
   },
   "frontend/src/repositories/testCaseRepository.ts": {
-    "mtime": 1785529981.795002,
-    "ast_hash": "ab100c8ac163b00e7fe026565a61347e",
-    "semantic_hash": "ab100c8ac163b00e7fe026565a61347e"
+    "mtime": 1785552447.1153529,
+    "ast_hash": "f074ae815f7f7784aeb9ccc742fff7ab",
+    "semantic_hash": ""
   },
   "frontend/src/repositories/testPlanRepository.ts": {
     "mtime": 1785529933.1612065,
@@ -395,9 +395,9 @@
     "semantic_hash": "4ecef8b46fb7d91ab095ddd0b1ffbac3"
   },
   "frontend/src/services/testCaseService.ts": {
-    "mtime": 1785530305.5131624,
-    "ast_hash": "28763b5e4e4d17aeb4b95109e1f917f2",
-    "semantic_hash": "28763b5e4e4d17aeb4b95109e1f917f2"
+    "mtime": 1785552447.6563327,
+    "ast_hash": "1813d7cc6ea0762571488a8eba462061",
+    "semantic_hash": ""
   },
   "frontend/src/services/testPlanService.ts": {
     "mtime": 1784700432.6477952,
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "frontend/src/types/domain.ts": {
-    "mtime": 1785550873.7068732,
-    "ast_hash": "fca91cf0670523b42c6759f78e389ac7",
+    "mtime": 1785552446.307383,
+    "ast_hash": "141e1b67bfb9c58122cc9afeaba35163",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785552190.9089355,
-    "ast_hash": "2b87e166ecfef6f058d38d941afe502c",
+    "mtime": 1785552542.6305494,
+    "ast_hash": "cba00f38af791cf3d7a28adafce1a51b",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -960,8 +960,8 @@
     "semantic_hash": "8cde620ac59f54107b1f582281182707"
   },
   "frontend/src/services/aiTestCaseService.ts": {
-    "mtime": 1785551932.8926287,
-    "ast_hash": "c28368e04c0dd0765718596e6613f780",
+    "mtime": 1785552448.2443109,
+    "ast_hash": "973493fc3bf6b0eb137124893c6251b1",
     "semantic_hash": ""
   },
   "frontend/src/services/aiTestRunAnalysisService.ts": {
@@ -2605,9 +2605,9 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/projects/ProjectTestCaseTab.tsx": {
-    "mtime": 1785527024.5845244,
-    "ast_hash": "26efbed36718f30ea4f49cf3eb4f30e1",
-    "semantic_hash": "26efbed36718f30ea4f49cf3eb4f30e1"
+    "mtime": 1785552449.824252,
+    "ast_hash": "9b8b993e6dab5690451e2add0b3a5dea",
+    "semantic_hash": ""
   },
   "scripts/codex-loop/run.sh": {
     "mtime": 1785524520.9695764,
@@ -3282,6 +3282,11 @@
   "supabase/schema_069_pw19_step_commands.sql": {
     "mtime": 1785550951.2316878,
     "ast_hash": "b4dc6ca8c8e9817a895b5e95330c4c2a",
+    "semantic_hash": ""
+  },
+  "supabase/schema_070_ai_test_case_drafts.sql": {
+    "mtime": 1785552445.990395,
+    "ast_hash": "88054562fae2ba72a41e345492e7d167",
     "semantic_hash": ""
   }
 }

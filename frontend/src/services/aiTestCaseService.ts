@@ -92,6 +92,7 @@ export const aiTestCaseService = {
       priority: draft.priority,
       status: 'draft',
       source: 'ai',
+      aiBatchId: input.batchId,
       notes: draft.notes,
       tagNames: draft.tags,
     });
