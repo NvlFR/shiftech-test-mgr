@@ -1605,7 +1605,16 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Berhasil menerapkan 18 migration berurutan dari `schema_029_project_ownership_visibility.sql` sampai `schema_045_test_run_repository_traceability.sql`.
 - Eksekusi awal `schema_046_runner_repository_scripts.sql` gagal dengan PostgreSQL `42601` karena variabel `%ROWTYPE` dan scalar dipakai bersama dalam satu daftar `SELECT INTO`.
 - Memperbaiki migration `schema_046_runner_repository_scripts.sql` dengan mengambil row repository dan secret Vault melalui dua query terpisah; perilaku expiry credential dan payload runner tetap dipertahankan.
-- Migration `schema_046` hingga `schema_059` akan dilanjutkan melalui MCP Supabase dan history remote diverifikasi setelah rangkaian selesai.
+- Setelah perbaikan, berhasil menerapkan `schema_046_runner_repository_scripts.sql` hingga `schema_059_mcp_rate_limit_audit.sql` melalui MCP Supabase. Error transport HTTP 502 pada percobaan awal `schema_056` direkonsiliasi dengan `list_migrations`, lalu migration diterapkan ulang karena belum tercatat.
+- Verifikasi akhir lewat MCP `list_migrations`: seluruh 61 file migration lokal selain `seed.sql` sudah terwakili. Remote memiliki 62 entri karena migration 028 tercatat sebagai dua bagian (`028a` dan `028b`).
+- Menjalankan `graphify update .` setelah perbaikan migration; graph diperbarui menjadi 2.399 node dan 4.965 edge. Tidak menjalankan seed, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-08-01 — Sinkronisasi output Graphify ke GitHub
+
+- Menjalankan `graphify query` sebelum meninjau perubahan repository.
+- Memastikan tidak ada perubahan pada `frontend/`; commit dibatasi pada perubahan `graphify-out/` dan catatan wajib `WORKLOG.md`.
+- Mengecualikan `graphify-out/.rebuild.lock` karena merupakan file lock sementara, serta mempertahankan perubahan `mcp/` dan `FEATURE_BACKLOG.md` di working tree karena berada di luar cakupan permintaan.
+- Verifikasi sebelum commit: `git diff --check` untuk cakupan commit.
 
 ## 2026-08-01 — MCP-17 audit tool destruktif
 
@@ -1613,3 +1622,11 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Hasil audit: tidak ada tool hapus project, hapus Test Case, atau hapus Test Run yang teregistrasi. Katalog hanya menyediakan baca project/Test Case/Test Run, mutation non-destruktif, `testcase.archive` (soft archive), dan `testplan.remove_cases` yang hanya melepas relasi scope plan tanpa menghapus Test Case.
 - Registrasi aktual ditelusuri dari `mcp/src/index.ts` melalui seluruh registrar di `mcp/src/tools/`; `toolRegistry` bawaan kosong dan mode read-only tetap mengecualikan seluruh registrar write.
 - Verifikasi lulus: pencarian statis seluruh pemanggilan `registerTool` dan pola delete/remove/destroy pada `mcp/`, serta `cd mcp && npm test` (19/19 test file, termasuk build TypeScript). Tidak mengubah kode, tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
+
+## 2026-08-01 — MCP-18 transport HTTP/SSE
+
+- Menjalankan `graphify query` sebelum menelusuri fondasi MCP dan mengikuti keputusan transport serta autentikasi Section 8.1 `FEATURE_BACKLOG.md`.
+- Menambahkan mode `TM_MCP_TRANSPORT=http` dengan Streamable HTTP modern pada `/mcp`, kompatibilitas HTTP/SSE pada `/sse` + `/messages`, dan health check minimal pada `/health`; stdio tetap menjadi default.
+- Mengekstrak factory MCP server agar setiap koneksi remote memperoleh instance server dan transport sendiri, tetapi seluruh mode tetap memakai `AuthService` yang sama sebelum listener dibuka, API token/JWT dari env, project scope sesi yang sama, governance, dan read-only registration yang sama.
+- Menambahkan konfigurasi host/port dengan default loopback, batas request body 1 MiB, lifecycle session in-memory, penutupan bersih, dokumentasi endpoint dan kewajiban TLS/reverse proxy, serta test parsing konfigurasi transport. Tidak menambah dependency atau mengekspos token pada URL/header/argumen tool.
+- Verifikasi lulus: `cd mcp && npm test`, `cd mcp && npm run build`, dan `git diff --check`. Listener HTTP tidak di-smoke-test melalui socket karena sandbox menolak operasi listen (`EPERM`); routing dibangun langsung dengan transport resmi MCP SDK. Tidak menjalankan migration, tidak menghapus data, tidak commit, dan tidak push.
