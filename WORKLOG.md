@@ -1,5 +1,27 @@
 # Worklog
 
+## 2026-08-02 — AUDIT-01 rekonsiliasi FEATURE_BACKLOG Section 6–8
+
+- Menjalankan `graphify query` sebelum menelusuri Section 6–8, lalu
+  memverifikasi setiap item yang masih kosong terhadap source, migration, test,
+  konfigurasi, dan dokumentasi repo.
+- Mencentang hanya deliverable dengan bukti konkret: permission granular
+  (`schema_080`), port halaman/domain dan audit App-new, alasan exclusion
+  TypeScript, sinkronisasi dokumentasi source-new, fondasi/auth/project scope/
+  read-only/docs MCP, tool write Test Case/Test Plan, serta guardrail MCP.
+- Membiarkan item environment tetap kosong: seluruh route tanpa error console,
+  smoke test workflow lengkap, dan migration Supabase target belum memiliki
+  bukti eksekusi yang cukup di repo. Klaim tidak hilangnya fitur/RBAC juga tidak
+  dinaikkan hanya dari pemeriksaan statis.
+- Tidak menjalankan migration, tidak mengakses Supabase target, dan tidak
+  mengubah kode aplikasi.
+- Verifikasi frontend lulus: `npx tsc -b --force`, `npm run build`, dan
+  `npm run lint` (delapan warning existing, tanpa error). Build tetap memuat
+  warning ukuran chunk utama yang sudah dikenal; `git diff --check` dijalankan
+  setelah perubahan dokumentasi final.
+- Verifikasi MCP lulus: `cd mcp && npm test` menjalankan build TypeScript dan
+  21/21 test file tanpa kegagalan.
+
 ## 2026-08-01 — Audit pasca-loop: 59 task salah diblokir, suite test diperbaiki
 
 **Temuan utama: bug pada gate driver memblokir 59 task yang sebenarnya berhasil.**

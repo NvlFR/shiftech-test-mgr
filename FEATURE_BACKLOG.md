@@ -241,7 +241,9 @@ RLS aktif, `get_advisors` 0 ERROR. Detail server-side:
 
 ## 6. Administrasi dan kolaborasi
 
-- [ ] Role dan permission yang lebih detail.
+- [x] Role dan permission yang lebih detail. (Bukti:
+      `supabase/schema_080_adm03_granular_permissions.sql`,
+      `frontend/src/pages/projects/ProjectSettingsPage.tsx`.)
   - Permission terpisah untuk melihat, membuat, mengubah, menghapus, import, export, dan menjalankan automation.
 - [x] Team management.
   - Mengelompokkan user dan mengatur akses team per Project.
@@ -311,7 +313,8 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   realtime, notifications, activity, dan feature-specific hooks. Jangan
   mengganti hook aktif sebelum lifecycle dan permission behavior terverifikasi.
 
-- [ ] **SRC-09 — `pages/pages-new`**
+- [x] **SRC-09 — `pages/pages-new`** (Bukti: halaman hasil port aktif di
+      `frontend/src/pages/` dan audit batch SRC-09a/b/c di `WORKLOG.md`.)
   Port page dan tab utama: Projects, Project Detail, Test Cases, Test Plans,
   Test Runs, Issues, Test Suites, Dashboard, Requirements, Integrations,
   Automation, User/Profile, serta execution detail. Pertahankan route dan
@@ -327,12 +330,15 @@ React Query, routing, domain, atau Supabase-nya berbeda.
   berlaku: run baru untuk re-run, status completed manual, summary dihitung
   on-the-fly, dan Issue hanya dibuat dari Test Result FAIL.
 
-- [ ] **SRC-12 — `types/domain-new`**
+- [x] **SRC-12 — `types/domain-new`** (Bukti: sumber domain tunggal
+      `frontend/src/types/domain.ts` dan rekonsiliasi SRC-12 di `WORKLOG.md`.)
   Bandingkan seluruh type dengan `types/domain.ts`, gabungkan field yang valid,
   hapus duplikasi, dan pastikan mapper/repository/service memakai satu sumber
   domain aktif.
 
-- [ ] **SRC-13 — `App-new.tsx`**
+- [x] **SRC-13 — `App-new.tsx`** (Bukti: audit route/guard dan keputusan tidak
+      mempromosikan kandidat dicatat di `WORKLOG.md`; route aktif tetap di
+      `frontend/src/App.tsx`.)
   Audit route, guard, layout, lazy loading, fallback, dan redirect. App-new
   baru boleh dijadikan `App.tsx` setelah route parity, RBAC, auth, dan smoke
   test seluruh halaman lulus.
@@ -346,16 +352,20 @@ React Query, routing, domain, atau Supabase-nya berbeda.
 
 ### Definition of Done
 
-- [ ] Tidak ada folder source-new yang masih dikecualikan TypeScript tanpa
-  alasan tertulis di `WORKLOG.md`.
+- [x] Tidak ada folder source-new yang masih dikecualikan TypeScript tanpa
+      alasan tertulis di `WORKLOG.md`. (Bukti: exclusion di
+      `frontend/tsconfig.app.json` direkonsiliasi pada entri SRC-DOD
+      `WORKLOG.md`.)
 - [ ] Seluruh route aktif dapat dibuka tanpa error console utama.
-- [ ] `npx tsc -b --force`, `npm run build`, `npm run lint`, dan
-  `git diff --check` lulus.
+- [x] `npx tsc -b --force`, `npm run build`, `npm run lint`, dan
+      `git diff --check` lulus. (Bukti: dijalankan ulang pada audit AUDIT-01;
+      hasilnya dicatat di `WORKLOG.md`.)
 - [ ] Smoke test auth, project, test case, test plan, test run, issue, suite,
   notification, profile, import/export, AI, dan attachment lulus.
 - [ ] Migration Supabase sudah dijalankan dan diverifikasi pada target.
 - [ ] Tidak ada fitur existing yang terhapus atau kehilangan akses RBAC.
-- [ ] `WORKLOG.md`, `FEATURES.md`, dan `TODO.md` sudah diperbarui.
+- [x] `WORKLOG.md`, `FEATURES.md`, dan `TODO.md` sudah diperbarui. (Bukti:
+      ringkasan hasil akhir dan rollout source-new pada ketiga berkas tersebut.)
 
 ## 8. MCP Server TestManager (multi-tool)
 
@@ -381,18 +391,25 @@ AI Agent (Claude/Cursor)  ──MCP──▶  TestManager MCP Server  ──RPC/
 
 ### 8.1 Fondasi MCP server
 
-- [ ] Scaffold `mcp/` — Node 20+, TypeScript, MCP SDK, transport **stdio** (dev lokal).
+- [x] Scaffold `mcp/` — Node 20+, TypeScript, MCP SDK, transport **stdio** (dev lokal).
+      (Bukti: `mcp/package.json`, `mcp/tsconfig.json`, `mcp/src/index.ts`.)
 - [x] Transport **HTTP/SSE** untuk pemakaian remote/self-hosted.
-- [ ] Autentikasi: API token TestManager (reuse tabel token P2) atau Supabase JWT.
+- [x] Autentikasi: API token TestManager (reuse tabel token P2) atau Supabase JWT.
       Token disimpan di env (`TM_API_TOKEN`), tidak pernah di argumen tool.
-- [ ] **Project scoping wajib**: satu sesi MCP terikat pada satu `project_id`;
+      (Bukti: `mcp/src/config.ts`, `mcp/src/repositories/authRepository.ts`,
+      `mcp/src/services/authService.ts`.)
+- [x] **Project scoping wajib**: satu sesi MCP terikat pada satu `project_id`;
       semua tool menolak akses lintas project (dijaga RLS, divalidasi ulang di server).
+      (Bukti: `mcp/src/services/authService.ts` dan
+      `mcp/src/services/authService.test.ts`.)
 - [x] Rate limit + audit: setiap pemanggilan tool tercatat di `ai_audit_events`
       (tool name, latency, status — bukan payload mentah).
-- [ ] Mode **read-only** (flag `TM_MCP_READONLY=1`) supaya agent bisa dipakai untuk
+- [x] Mode **read-only** (flag `TM_MCP_READONLY=1`) supaya agent bisa dipakai untuk
       analisis tanpa risiko menulis data.
-- [ ] Dokumentasi setup di `docs/MCP_SERVER.md` + contoh konfigurasi client
+      (Bukti: `mcp/src/config.ts` dan `mcp/src/tools/registry.ts`.)
+- [x] Dokumentasi setup di `docs/MCP_SERVER.md` + contoh konfigurasi client
       (`claude_desktop_config.json`, `.mcp.json`).
+      (Bukti: `docs/MCP_SERVER.md`.)
 
 ### 8.2 Katalog tools
 
@@ -413,9 +430,15 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 
 **Write / workflow**
 
-- [ ] `testcase.create_bulk` — import banyak test case sekaligus (dipakai alur CSV, §11).
-- [ ] `testcase.update`, `testcase.duplicate`, `testcase.archive`.
-- [ ] `testplan.create`, `testplan.add_cases`, `testplan.remove_cases`.
+- [x] `testcase.create_bulk` — import banyak test case sekaligus (dipakai alur CSV, §11).
+      (Bukti: `mcp/src/tools/writeTools.ts` dan
+      `supabase/schema_051_mcp_write_test_cases_plans.sql`.)
+- [x] `testcase.update`, `testcase.duplicate`, `testcase.archive`. (Bukti:
+      `mcp/src/tools/writeTools.ts`, `mcp/src/services/writeService.ts`, dan
+      `supabase/schema_051_mcp_write_test_cases_plans.sql`.)
+- [x] `testplan.create`, `testplan.add_cases`, `testplan.remove_cases`. (Bukti:
+      `mcp/src/tools/writeTools.ts`, `mcp/src/repositories/writeRepository.ts`,
+      dan `supabase/schema_051_mcp_write_test_cases_plans.sql`.)
 - [x] `testplan.approve` tidak diekspos ke agent — **gate manusia** wajib dilakukan
       dari sesi user di UI; API token/MCP tidak memiliki jalur approval.
 - [x] `testrun.create` — selalu run baru, tidak pernah menimpa run lama.
@@ -447,11 +470,16 @@ Dikelompokkan per domain, penamaan `testmanager.<domain>.<action>`.
 
 ### 8.3 Guardrail
 
-- [ ] Tool **destruktif** (hapus project, hapus test case, hapus run) tidak diekspos
+- [x] Tool **destruktif** (hapus project, hapus test case, hapus run) tidak diekspos
       sama sekali di MCP — hanya lewat UI.
-- [ ] Semua output AI tetap berstatus `draft`/`review_only`; approval selalu manusia.
-- [ ] Pagination + batas ukuran response supaya tidak meledakkan context agent.
-- [ ] Error terstruktur (`code`, `message`, `hint`) agar agent bisa recover sendiri.
+      (Bukti: katalog registrar di `mcp/src/tools/`; archive tersedia tanpa tool delete.)
+- [x] Semua output AI tetap berstatus `draft`/`review_only`; approval selalu manusia.
+      (Bukti: `mcp/src/services/writeService.ts` dan
+      `mcp/src/services/writeService.test.ts`.)
+- [x] Pagination + batas ukuran response supaya tidak meledakkan context agent.
+      (Bukti: `mcp/src/helpers/response.ts` dan `mcp/src/services/readService.ts`.)
+- [x] Error terstruktur (`code`, `message`, `hint`) agar agent bisa recover sendiri.
+      (Bukti: `McpToolError`/`errorResponse` di `mcp/src/helpers/response.ts`.)
 
 ---
 
