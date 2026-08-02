@@ -33,6 +33,7 @@ import { TeamsPage } from './pages/teams/TeamsPage';
 import { ProjectTeamsPage } from './pages/teams/ProjectTeamsPage';
 import { ObservabilityPage } from './pages/admin/ObservabilityPage';
 import { RunnerDistributionPage } from './pages/runner/RunnerDistributionPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 function App() {
   return (
@@ -75,6 +76,11 @@ function App() {
             <Route path="/teams" element={<TeamsPage />} />
             <Route path="/admin/observability" element={<ObservabilityPage />} />
           </Route>
+
+          {/* Catch-all. Ditaruh di dalam AppLayout supaya 404 tetap tampil
+              dengan navigasi aplikasi, bukan halaman telanjang. Pengunjung yang
+              belum login tetap dialihkan ProtectedRoute ke /login lebih dulu. */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
     </Routes>

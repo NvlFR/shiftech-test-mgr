@@ -1,5 +1,48 @@
 # Worklog
 
+## 2026-08-02 — SRC-13 ditutup: App-new ditolak, 404 ditambahkan
+
+**Keputusan produk diambil (sebelumnya memblokir SRC-13):**
+
+- `App-new.tsx` **DITOLAK untuk promosi** dan berkasnya dihapus. Ini bukan
+  judgment call — buktinya diverifikasi ulang pada sesi ini:
+  - `/pending-approval` ada di `App.tsx` aktif tetapi hilang di App-new,
+    padahal itu tujuan redirect `ProtectedRoute` untuk user ber-role `pending`.
+    Mempromosikannya = memutus alur RBAC.
+  - `/dashboard`, `/home`, `/admin/data-retention`, Project integrations,
+    requirements, CI/CD, automation, data management, dan custom Test Run
+    juga hilang. Total 32 route aktif vs 18 route App-new.
+  - Merujuk 4 modul yang tidak ada di source aktif (`AppToast`,
+    `useDialogResizeFix`, `TestRunResultDetailPage`, `PublicProfilePage`),
+    jadi tidak dapat dikompilasi apa adanya.
+  - Berkas gitignored dan tidak pernah ter-commit, sehingga penghapusan tidak
+    dapat dibatalkan lewat git. Dicadangkan ke scratchpad sesi sebelum dihapus.
+
+**Celah nyata yang ditemukan dan diperbaiki:**
+
+- **Kedua app sama-sama tidak punya catch-all `*`.** URL tak dikenal merender
+  halaman kosong tanpa penjelasan — pengguna tidak bisa membedakan salah alamat
+  dari aplikasi rusak. Ditambahkan `pages/NotFoundPage.tsx` dan route `*` di
+  dalam `AppLayout`, sehingga 404 tetap tampil bersama navigasi aplikasi.
+  Pengunjung yang belum login tetap dialihkan `ProtectedRoute` ke `/login`.
+
+**Tiga ide dari App-new dipindah jadi fitur tersendiri (Section 17 baru):**
+
+- 17.1 Halaman Settings user, 17.2 public profile `/@username`, 17.3 landing `/`
+  menjadi Home. Dikerjakan di atas `App.tsx` aktif, bukan lewat penggantian
+  berkas route wholesale.
+- Catatan keputusan teknis ditambah: **jangan memakai wildcard root (`/:param`)
+  untuk profil publik** seperti yang dilakukan App-new — pola itu menangkap
+  setiap URL tak dikenal dan membuat catch-all 404 tidak pernah tercapai.
+  Gunakan prefix eksplisit `/@:username`.
+- Section "Catatan keputusan teknis" bergeser 17 → 18.
+
+**Antrean:** SRC-13 dipindah ke Selesai, 3 task APPNEW-01..03 ditambahkan.
+Status: 12 antrean, 151 selesai, **0 diblokir**.
+
+**Verifikasi:** tsc 0 error, vitest 178/178, `smoke.sh` lolos.
+
+
 ## 2026-08-02 — Loop berhenti karena kuota Codex habis, bukan karena kode
 
 **Penyebab sebenarnya dari 10 task yang "diblokir":**

@@ -1249,7 +1249,52 @@ harus dibayar sebagai pekerjaan tersendiri.
 
 ---
 
-## 17. Catatan keputusan teknis
+## 17. Ide yang diambil dari App-new (pasca SRC-13)
+
+`App-new.tsx` sudah diaudit tuntas (SRC-13) dan **ditolak untuk promosi**: ia
+kehilangan 14 route termasuk `/pending-approval` — tujuan redirect user ber-role
+`pending`, sehingga RBAC-nya rusak — dan merujuk 4 modul yang tidak ada di source
+aktif (`AppToast`, `useDialogResizeFix`, `TestRunResultDetailPage`,
+`PublicProfilePage`) sehingga tidak dapat dikompilasi. Berkasnya dihapus
+2026-08-02; auditnya tetap terekam di WORKLOG.md.
+
+Tiga ide di bawah ini adalah bagian yang memang layak diambil, dikerjakan sebagai
+fitur tersendiri di atas `App.tsx` aktif — bukan lewat penggantian berkas.
+
+### 17.1 Halaman Settings user
+
+- [ ] Tabel preferensi per user (tema, notifikasi, project default) + migration + RLS.
+- [ ] Domain type, mapper, repository, service, hook mengikuti urutan layer.
+- [ ] Route `/settings` di dalam `AppLayout` + item menu.
+- [ ] Preferensi tema menggantikan penyimpanan lokal yang sekarang, tanpa
+      menghilangkan perilaku system/light/dark yang sudah ada.
+
+### 17.2 Public profile `/@username`
+
+Paling mahal dari ketiganya karena menyentuh kontrak identitas.
+
+- [ ] Kolom `username` pada `profiles`: unik, immutable setelah diset, punya
+      aturan format, dan migration untuk mengisi user yang sudah ada.
+- [ ] Kebijakan privasi eksplisit: apa yang boleh dilihat publik dan apa yang tidak.
+      Jangan membocorkan email atau keanggotaan project privat.
+- [ ] RLS terpisah untuk pembacaan profil publik oleh pengguna tak terautentikasi.
+- [ ] Route `/@:username` — **bukan** wildcard root `/:usernameWithAt` seperti
+      App-new, karena pola itu menangkap semua URL tak dikenal dan menutup
+      catch-all 404.
+- [ ] Halaman profil publik + tautan dari mention/komentar.
+
+### 17.3 Landing `/` menjadi Home
+
+- [ ] Pindahkan `/` ke `HomePage`, dan daftar project ke `/projects`.
+- [ ] Perbarui seluruh tautan internal, menu, redirect guard, dan
+      `NotFoundPage` yang saat ini mengarah ke `/` sebagai daftar project.
+- [ ] Pastikan `/home` lama tetap bekerja atau di-redirect, agar bookmark
+      pengguna tidak putus.
+- [ ] Verifikasi dengan `./scripts/codex-loop/smoke.sh` dan E2E alur utama.
+
+---
+
+## 18. Catatan keputusan teknis
 
 - Fokus utama aplikasi adalah manual software testing untuk tim kecil.
 - Fitur Playwright ditambahkan setelah workflow manual dan reporting stabil.
@@ -1290,6 +1335,12 @@ Page/Component → Hook → Service → Repository → Supabase
 - **Kepercayaan berada di level repo, bukan level file.** `npx playwright test`
   memuat `playwright.config.ts` — kode Node biasa — sebelum satu test pun jalan,
   jadi memvalidasi `script_ref` saja tidak pernah cukup.
+- **`App-new.tsx` ditolak dan dihapus (SRC-13).** Penggantian berkas route
+  wholesale tidak dipakai sebagai cara migrasi: yang menang adalah `App.tsx`
+  aktif, dan ide dari referensi diambil sebagai fitur tersendiri (Section 17).
+- **Jangan memakai wildcard root (`/:param`) untuk profil publik.** Pola itu
+  menangkap setiap URL tak dikenal dan membuat catch-all 404 tidak pernah
+  tercapai. Gunakan prefix eksplisit seperti `/@:username`.
 - **Local runner tetap diperlukan bahkan kalau nanti ada cloud runner.** Browser
   tidak bisa dijalankan dari halaman web, sehingga pengujian aplikasi di
   `localhost`/jaringan internal selalu menuntut proses di mesin pengguna.
