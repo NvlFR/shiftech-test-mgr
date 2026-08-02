@@ -1,5 +1,47 @@
 # Worklog
 
+## 2026-08-02 — Loop berhenti karena kuota Codex habis, bukan karena kode
+
+**Penyebab sebenarnya dari 10 task yang "diblokir":**
+
+- Seluruhnya gagal dengan `codex exec gagal (exit 1)` dalam ~75 detik per task,
+  jauh lebih cepat dari siklus normal ~6 menit. Isi session log:
+  `ERROR: You've hit your usage limit ... try again at Aug 8th, 2026 3:33 AM`.
+- Jadi 9 task TIDAK PERNAH benar-benar dijalankan — Codex ditolak server sejak
+  awal. Melabelinya `blocked` menyesatkan: seolah task-nya bermasalah.
+- Kuota reset 8 Agustus 2026 pukul 03:33.
+- Kesalahan sekunder di log: refresh OAuth MCP `supabase` gagal (HTTP 530
+  error 1033). Transien dan bukan penyebab berhentinya loop.
+
+**AUDIT-02 ternyata selesai, hanya gagal melapor:**
+
+- Perubahannya ada di disk (FEATURE_BACKLOG.md Section 9–11 direkonsiliasi +
+  entri WORKLOG), tetapi prosesnya ditolak server sebelum menulis verdict.
+- Klaimnya diverifikasi manual sebelum di-commit: `--headed`, `--slow-mo`,
+  `--ui`, `PWDEBUG`, `deviceProfile` memang ada di `runner/src`;
+  `schema_029_project_repositories.sql` dan domain `ProjectRepository` memang ada.
+- Di-commit sebagai `agent-task 90`.
+
+**Dua perbaikan pada `run.sh`:**
+
+1. **Deteksi kegagalan sistemik.** Bila session log memuat pola kuota/otentikasi
+   (`hit your usage limit`, `quota exceeded`, `rate limit`, `401 Unauthorized`,
+   `not authenticated`), loop BERHENTI TOTAL dan task dikembalikan ke antrean
+   tanpa ditandai `blocked`. Tanpa ini, satu kuota habis akan menghanguskan
+   seluruh sisa antrean dalam hitungan menit. Notifikasi Telegram 🛑 dikirim
+   berisi pesan limit dan waktu reset. Diuji terhadap session log asli: terdeteksi.
+2. **Perbaikan hitungan `blocked_n`.** Versi lama memakai
+   `awk '/^## Diblokir/{f=1;next} f && /^- /'` yang ikut menghitung section
+   "Butuh Manusia" di bawahnya, sehingga melaporkan 17 padahal hanya 11.
+   Kini berhenti pada heading berikutnya dan hanya menghitung `^- [`.
+
+**Antrean dirapikan:** 9 task dikembalikan ke Antrean (AUDIT-03..05,
+E2E-INFRA-01..03, CONN-10, CLEAN-01..02), AUDIT-02 dipindah ke Selesai.
+Status: 9 antrean, 150 selesai, 1 diblokir (SRC-13, butuh keputusan produk).
+
+**Verifikasi repo:** tsc 0 error, semua commit sudah ter-push.
+
+
 ## 2026-08-02 — AUDIT-02 rekonsiliasi FEATURE_BACKLOG Section 9–11
 
 - Menjalankan `graphify query` sebelum audit, lalu merekonsiliasi setiap checkbox
