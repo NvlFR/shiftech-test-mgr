@@ -20,9 +20,9 @@
     "semantic_hash": "2c3c5f6271802130a3a78af7475ec878"
   },
   "frontend/src/App.tsx": {
-    "mtime": 1785581639.2953238,
-    "ast_hash": "346cad0e8c805cce3e3ad8cf597bc4b6",
-    "semantic_hash": "346cad0e8c805cce3e3ad8cf597bc4b6"
+    "mtime": 1785664665.3723629,
+    "ast_hash": "a79d2a31025e312bcccd5a7ca8e30751",
+    "semantic_hash": ""
   },
   "frontend/src/components/auth/AdminRoute.tsx": {
     "mtime": 1784700432.643742,
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "FEATURE_BACKLOG.md": {
-    "mtime": 1785657057.323161,
-    "ast_hash": "db0a5507905da4bfa43f041699d37ac6",
+    "mtime": 1785665034.2106934,
+    "ast_hash": "0bef9310b4bb0dea188f6ee1d1520890",
     "semantic_hash": ""
   },
   "README.md": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785658919.2695146,
-    "ast_hash": "8e112ec63b194ea09316579bad436475",
+    "mtime": 1785665081.198967,
+    "ast_hash": "2b2820afa72912184eb2332986eeb4ec",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1333,11 +1333,6 @@
     "mtime": 1785532936.887676,
     "ast_hash": "f6ce939b2b87e1c68bc694158c5c20f6",
     "semantic_hash": "f6ce939b2b87e1c68bc694158c5c20f6"
-  },
-  "frontend/src/App-new.tsx": {
-    "mtime": 1785517674.513946,
-    "ast_hash": "9c27a6de829a28e0ada237070ac45071",
-    "semantic_hash": ""
   },
   "frontend/src/components/dialogs/TestPlanDialog.tsx": {
     "mtime": 1785531069.7470374,
@@ -3922,6 +3917,11 @@
   "frontend/src/hooks/useOnlineStatus.ts": {
     "mtime": 1785588995.7475848,
     "ast_hash": "15fcc6c07d0ddd7cda8d5a6a39ba2225",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/NotFoundPage.tsx": {
+    "mtime": 1785664648.918698,
+    "ast_hash": "546b5c1f6079fad19f6b8472f204eed0",
     "semantic_hash": ""
   }
 }

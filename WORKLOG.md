@@ -3010,3 +3010,59 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Memperbarui checklist Section 13.6 pada `FEATURE_BACKLOG.md`. Tidak ada migration, akses Supabase target, secret/token, commit, atau push.
 - Verifikasi: `cd frontend && npm run build` lulus; Vite hanya melaporkan warning ukuran chunk utama > 1500 kB yang sudah ada. `cd frontend && npm run lint` lulus tanpa error dengan delapan warning existing di file lain; `git diff --check` lulus.
 - `graphify update .` berhasil menyinkronkan graph menjadi 3.367 node dan 6.769 edge; warning tujuh source tanpa node tidak memblokir pembaruan.
+
+## 2026-08-02 — Penulisan ulang `README.md`
+
+- `README.md` ditulis ulang total (61 → ~470 baris). README lama hanya mencakup
+  frontend dan menyebut folder `backend/` yang sudah tidak ada, serta melewatkan
+  seluruh komponen runner, MCP server, `packages/agent-core`, dan Edge Functions.
+- Struktur baru: daftar isi, rasional produk, diagram arsitektur 4 komponen,
+  enam bagian setup bertahap (database → OAuth → frontend → runner → MCP →
+  edge functions), alur pemakaian (QA manual, automation, AI end-to-end), model
+  domain + invariant, aturan layering frontend, tabel perintah per package,
+  strategi testing, deploy, dan troubleshooting.
+- Urutan eksekusi schema didokumentasikan eksplisit: lima file fondasi berurutan,
+  lalu file fondasi tanpa nomor, lalu seluruh file bernomor urut naik
+  (`schema_011` … `schema_090`). Dicatat pula dua pasang nomor kembar (`029`,
+  `060`) sisa pengembangan paralel agar tidak dikira salah satu harus dilewati.
+- Ditambahkan dua peringatan keamanan yang sebelumnya tidak ada di README:
+  variable `VITE_*` ter-bundle ke browser sehingga `service_role` key tidak boleh
+  ditaruh di sana; dan alasan runner bersifat fail-closed (Playwright memuat
+  `playwright.config.*` sebagai kode Node sebelum file test), sehingga
+  `tm-runner trust <path>` wajib dijalankan sekali per repository.
+- Verifikasi: seluruh 22 tautan file/folder di README dicek keberadaannya di
+  disk — semuanya ada. Jumlah tool MCP (42) diambil dari hitungan registrasi di
+  `mcp/src/tools/*.ts`; daftar env var diambil dari `.env.example` masing-masing
+  package dan tabel di `mcp/README.md`.
+- Tidak ada perubahan kode, migration, akses Supabase, secret, commit, atau push.
+
+## 2026-08-02 — `README.md` diperluas: MCP, Skills, Connect Agent, AI, workflow, styling
+
+- README diperluas dari ~470 menjadi 1.276 baris atas permintaan penambahan
+  cakupan dan desain visual.
+- Bagian baru: **MCP Server** (cara pasang di Claude Code via `.mcp.json`, mode
+  HTTP, dan daftar lengkap 42 tool dikelompokkan read 15 / write 14 /
+  automation 6 / analysis 3 / repo 4); **Agent Skills** (4 skill, tiga metode
+  instalasi, contoh guardrail yang ditegakkan); **Connect Agent** (alur token
+  koneksi, konfigurasi MCP, bootstrap runner, prompt starter); **Fitur AI**
+  (5 action `ai-gateway` beserta pagar `draft`/`review_only`); **Koneksi lain**
+  (API token, webhook + delivery log, CI/CD 5 provider, 4 mode repository);
+  **Workflow lengkap** (QA manual, automation, AI end-to-end) plus tabel gerbang
+  keamanan dan tempat penegakannya.
+- Desain visual: header terpusat, 10 badge shields.io, daftar isi tiga kolom,
+  tujuh diagram Mermaid berwarna, blok `> [!NOTE|TIP|IMPORTANT|WARNING|CAUTION]`
+  GitHub, serta `<details>` collapsible untuk bagian panjang.
+- Bagian **Author & Kontributor** ditambahkan dari riwayat Git: `rx7`
+  (novalfr802@gmail.com, 104 commit) sebagai author/maintainer dan Fahmi Fauzi
+  Rahman (28 commit) sebagai kontributor. Nama tampilan "Noval Fauzi Rahman"
+  diturunkan dari alamat email dan handle GitHub `NvlFR` — perlu dikonfirmasi
+  pemilik repo bila ejaannya berbeda.
+- Verifikasi: seluruh tautan file relatif dicek ke disk, tidak ada yang hilang.
+  Dua diagram Mermaid paling kompleks (arsitektur dan workflow AI end-to-end)
+  divalidasi lewat Mermaid Chart dan mengembalikan `valid: true`; lima diagram
+  lain memakai konstruksi sintaks yang sama.
+- Daftar 42 tool MCP diambil dari `registerTool(...)` di `mcp/src/tools/*.ts`,
+  action AI dari `docs/AI_INTEGRATION.md`, provider CI/CD dan mode repository dari
+  `frontend/src/types/domain.ts`, alur bootstrap dari
+  `skills/testmanager-workflow/SKILL.md`.
+- Tidak ada perubahan kode, migration, akses Supabase, secret, commit, atau push.
