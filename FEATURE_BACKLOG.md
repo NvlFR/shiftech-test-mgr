@@ -496,12 +496,12 @@ MCP tool yang menargetkan runner lokal.
 
 ### 9.1 Mode eksekusi interaktif (sisi runner)
 
-- [ ] `--headed` — jalankan dengan browser terlihat, opsional `--slow-mo` untuk demo.
-- [ ] Mode **UI Mode** (`playwright test --ui`) untuk eksplorasi & re-run per test.
-- [ ] Mode **debug** (`PWDEBUG=1` / `--debug`) dengan Playwright Inspector, breakpoint
+- [x] `--headed` — jalankan dengan browser terlihat, opsional `--slow-mo` untuk demo.
+- [x] Mode **UI Mode** (`playwright test --ui`) untuk eksplorasi & re-run per test.
+- [x] Mode **debug** (`PWDEBUG=1` / `--debug`) dengan Playwright Inspector, breakpoint
       per step.
-- [ ] `--watch` — re-run otomatis saat file test berubah (loop authoring cepat).
-- [ ] Pilih browser & device profile saat run (`chromium|firefox|webkit`, emulasi mobile).
+- [x] `--watch` — re-run otomatis saat file test berubah (loop authoring cepat).
+- [x] Pilih browser & device profile saat run (`chromium|firefox|webkit`, emulasi mobile).
 - [x] Jalankan **satu test case saja** dari UI TestManager ("Run locally") tanpa
       harus lewat antrean job penuh.
 
@@ -558,63 +558,63 @@ script bisa diambil dari repo, (c) Issue bisa menyertakan commit/branch, dan
 
 ### 10.1 Model data
 
-- [ ] Tabel `project_repositories` — satu project bisa punya >1 repo (mis. FE + BE):
+- [x] Tabel `project_repositories` — satu project bisa punya >1 repo (mis. FE + BE):
       `id`, `project_id`, `name`, `source_type`, `url_or_path`, `default_branch`,
       `credential_id`, `subdirectory`, `is_active`, timestamps.
-- [ ] `source_type`: `local_path` | `github_public` | `github_private` | `git_url`.
-- [ ] Domain type + row mapper mengikuti konvensi repo (`snake_case` → `camelCase`).
+- [x] `source_type`: `local_path` | `github_public` | `github_private` | `git_url`.
+- [x] Domain type + row mapper mengikuti konvensi repo (`snake_case` → `camelCase`).
 
 ### 10.2 Mode `local_path`
 
-- [ ] Isi path absolut di mesin runner (mis. `/home/tester/app`) — dipakai runner dan
+- [x] Isi path absolut di mesin runner (mis. `/home/tester/app`) — dipakai runner dan
       MCP server yang jalan di mesin yang sama.
-- [ ] Validasi: path ada, terbaca, dan merupakan git repo (`.git` terdeteksi).
-- [ ] Baca metadata git lokal: branch aktif, commit SHA, dirty/clean.
-- [ ] **Tidak** dikirim ke server pusat sebagai isi file — hanya path + metadata.
+- [x] Validasi: path ada, terbaca, dan merupakan git repo (`.git` terdeteksi).
+- [x] Baca metadata git lokal: branch aktif, commit SHA, dirty/clean.
+- [x] **Tidak** dikirim ke server pusat sebagai isi file — hanya path + metadata.
       Server pusat tidak pernah menyimpan source code.
 
 ### 10.3 Mode GitHub (public & private)
 
-- [ ] Repo public: cukup URL, akses read tanpa kredensial.
-- [ ] Repo private: **Personal Access Token (fine-grained)** dengan scope minimal
+- [x] Repo public: cukup URL, akses read tanpa kredensial.
+- [x] Repo private: **Personal Access Token (fine-grained)** dengan scope minimal
       `contents: read` (+ `metadata: read`), opsional `issues: write` untuk sinkronisasi Issue.
 - [ ] Alternatif yang lebih aman untuk tim: **GitHub App installation token**
       (auto-expire, per-repo) — didukung sebagai opsi kedua.
-- [ ] Uji koneksi ("Test connection") saat menyimpan: tampilkan nama repo, default
+- [x] Uji koneksi ("Test connection") saat menyimpan: tampilkan nama repo, default
       branch, dan permission yang terdeteksi.
-- [ ] Dukungan self-hosted GitHub Enterprise / GitLab lewat `git_url` + token generik.
+- [x] Dukungan self-hosted GitHub Enterprise / GitLab lewat `git_url` + token generik.
 
 ### 10.4 Penyimpanan kredensial (kritis)
 
-- [ ] Token **tidak pernah** disimpan plaintext di tabel dan **tidak pernah** dikirim
+- [x] Token **tidak pernah** disimpan plaintext di tabel dan **tidak pernah** dikirim
       ke browser. Disimpan di **Supabase Vault**, tabel hanya menyimpan `credential_id`.
-- [ ] Akses token hanya dari Edge Function / MCP server (service context), bukan dari
+- [x] Akses token hanya dari Edge Function / MCP server (service context), bukan dari
       frontend.
-- [ ] UI hanya menampilkan mask (`ghp_••••••abcd`), tanggal dibuat, dan tanggal
+- [x] UI hanya menampilkan mask (`ghp_••••••abcd`), tanggal dibuat, dan tanggal
       kedaluwarsa; nilai penuh tidak bisa dibaca ulang setelah disimpan.
 - [ ] Rotate & revoke token dari UI project settings; audit event tercatat.
-- [ ] RLS: hanya admin project yang bisa membuat/mengubah kredensial repo.
-- [ ] Peringatan eksplisit di UI kalau token yang dipakai punya scope berlebihan.
+- [x] RLS: hanya admin project yang bisa membuat/mengubah kredensial repo.
+- [x] Peringatan eksplisit di UI kalau token yang dipakai punya scope berlebihan.
 
 ### 10.5 Pemanfaatan
 
-- [ ] **Konteks AI**: `repo.read_file` / `repo.search` (§8.2) memberi AI potongan kode
+- [x] **Konteks AI**: `repo.read_file` / `repo.search` (§8.2) memberi AI potongan kode
       relevan saat generate test case — hasil jauh lebih akurat daripada dari
       requirement teks saja.
-- [ ] **Sumber automation script**: `script_ref` bisa menunjuk file di repo; runner
+- [x] **Sumber automation script**: `script_ref` bisa menunjuk file di repo; runner
       melakukan clone/pull (private repo memakai token) sebelum eksekusi.
-- [ ] **Traceability commit**: Test Run menyimpan `commit_sha` + `branch`; Issue
+- [x] **Traceability commit**: Test Run menyimpan `commit_sha` + `branch`; Issue
       menampilkan commit yang diuji.
-- [ ] **Regression selection**: `repo.diff` antara commit terakhir yang lulus dan
+- [x] **Regression selection**: `repo.diff` antara commit terakhir yang lulus dan
       commit sekarang → petakan file berubah ke Test Case (via module/tag/path mapping)
       → hanya test itu yang di-enqueue ulang (§11).
 - [ ] Opsional: sinkronisasi dua arah Issue TestManager ↔ GitHub Issue (link, bukan copy).
 
 ### 10.6 UI
 
-- [ ] Tab **Repository** di Project Settings: daftar repo, tambah/edit/hapus, test
+- [x] Tab **Repository** di Project Settings: daftar repo, tambah/edit/hapus, test
       connection, status koneksi terakhir.
-- [ ] Indikator di Test Run: repo + branch + commit yang diuji.
+- [x] Indikator di Test Run: repo + branch + commit yang diuji.
 
 ---
 
@@ -652,44 +652,44 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 
 ### 11.1 Tahap 1 — Requirement → Test Case CSV
 
-- [ ] Input requirement: teks bebas, file (Excel/CSV/dokumen), atau **link repo**
+- [x] Input requirement: teks bebas, file (Excel/CSV/dokumen), atau **link repo**
       (§10) untuk konteks kode.
-- [ ] AI menghasilkan draft test case dalam **format CSV yang kolomnya persis sama**
+- [x] AI menghasilkan draft test case dalam **format CSV yang kolomnya persis sama**
       dengan template import yang sudah ada (`title`, `objective`, `precondition`,
       `steps`, `expected_result`, `priority`, `module`, `tags`).
-- [ ] Sertakan skenario negatif & edge case, bukan hanya happy path.
-- [ ] Setiap baris membawa `requirement_ref` supaya traceability langsung terbentuk.
+- [x] Sertakan skenario negatif & edge case, bukan hanya happy path.
+- [x] Setiap baris membawa `requirement_ref` supaya traceability langsung terbentuk.
 - [x] Preview CSV di UI sebelum diunduh/diimpor.
 
 ### 11.2 Tahap 2 — Import & review manusia (gate wajib)
 
-- [ ] Import CSV masuk sebagai draft dengan penanda `source = ai`, bukan langsung aktif.
-- [ ] Halaman review: bulk approve/reject/edit, target **5–10 menit** untuk satu batch.
+- [x] Import CSV masuk sebagai draft dengan penanda `source = ai`, bukan langsung aktif.
+- [x] Halaman review: bulk approve/reject/edit, target **5–10 menit** untuk satu batch.
 - [x] Deteksi duplikat terhadap test case yang sudah ada sebelum menyimpan.
-- [ ] **Tidak ada jalur bypass**: AI tidak bisa menandai test case sebagai approved,
+- [x] **Tidak ada jalur bypass**: AI tidak bisa menandai test case sebagai approved,
       dan tidak bisa meng-approve Test Plan. Approver tercatat di audit log.
 
 ### 11.3 Tahap 3 — Test Plan disetujui → Test Run dijalankan AI
 
 - [x] Test Plan dibentuk dari test case yang lolos review; status approval eksplisit.
-- [ ] AI (via MCP `testrun.create` + `automation.enqueue`) membuat **Test Run baru**
+- [x] AI (via MCP `testrun.create` + `automation.enqueue`) membuat **Test Run baru**
       dan mengantre job automation. Test case yang belum punya script tetap muncul
       sebagai eksekusi manual — AI tidak boleh menebak hasilnya.
-- [ ] Runner lokal mengeksekusi; status job terpantau real-time di UI.
-- [ ] Test Run menyimpan environment, browser, build version, branch, commit SHA.
+- [x] Runner lokal mengeksekusi; status job terpantau real-time di UI.
+- [x] Test Run menyimpan environment, browser, build version, branch, commit SHA.
 
 ### 11.4 Tahap 4 — Kegagalan → bukti lengkap
 
-- [ ] Setiap `test_result` FAIL membawa bundle bukti §9.3 secara utuh (screenshot,
+- [x] Setiap `test_result` FAIL membawa bundle bukti §9.3 secara utuh (screenshot,
       video, console, network/HAR, DOM snapshot, trace).
-- [ ] Artifact tersimpan di Storage dengan retention sesuai kebijakan Section 3.
+- [x] Artifact tersimpan di Storage dengan retention sesuai kebijakan Section 3.
 - [x] Bukti dapat dibuka langsung dari halaman Test Result, tanpa unduh manual.
 
 ### 11.5 Tahap 5 — AI membuat Issue
 
-- [ ] Issue dibuat dari `test_result` FAIL, **wajib** membawa relasi
+- [x] Issue dibuat dari `test_result` FAIL, **wajib** membawa relasi
       `test_result_id` → `test_run_id` + `test_case_id`.
-- [ ] Isi otomatis: langkah reproduksi (dari steps), actual vs expected, ringkasan
+- [x] Isi otomatis: langkah reproduksi (dari steps), actual vs expected, ringkasan
       error, tautan ke semua artifact, environment + commit SHA.
 - [x] Duplicate detection dijalankan lebih dulu: kalau kandidat duplikat ditemukan,
       AI menambah **komentar pada Issue lama** alih-alih membuat Issue baru.
@@ -726,8 +726,8 @@ Passed → Verified          |          Failed → Issue tetap terbuka + komenta
 
 - [ ] Satu requirement bisa berjalan dari teks sampai `verified` tanpa langkah manual
       selain **review test case** dan **approve test plan**.
-- [ ] Tidak ada tahap yang membuat AI mengubah data resmi tanpa jejak audit.
-- [ ] Seluruh eksekusi browser tetap terjadi di Local Runner, bukan server pusat.
+- [x] Tidak ada tahap yang membuat AI mengubah data resmi tanpa jejak audit.
+- [x] Seluruh eksekusi browser tetap terjadi di Local Runner, bukan server pusat.
 
 ---
 

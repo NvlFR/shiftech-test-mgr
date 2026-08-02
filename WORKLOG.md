@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-08-02 — AUDIT-02 rekonsiliasi FEATURE_BACKLOG Section 9–11
+
+- Menjalankan `graphify query` sebelum audit, lalu merekonsiliasi setiap checkbox
+  Section 9, 10, dan 11 terhadap source, migration, test, dokumentasi runner/MCP,
+  serta bukti implementasi PW-01–19, REPO-01–10, dan E2E-01–19 di worklog.
+- Section 9 kini seluruhnya tercentang; lima item mode headed/slow-mo, UI, debug,
+  watch, serta browser/device yang tertinggal sudah terbukti oleh implementasi dan
+  unit test runner PW-01–03.
+- Dari 25 item Section 10 yang sebelumnya kosong, 22 dicentang berdasarkan bukti
+  model/layer repository, mode local/GitHub/git URL, Vault dan Edge Function,
+  konteks MCP, clone/pull script, traceability/regression, serta UI. Tiga gap riil
+  tetap kosong: GitHub App installation token, aksi revoke kredensial repository
+  dari UI (backend revoke ada, tetapi belum tersambung ke UI), dan sinkronisasi
+  dua arah Issue TestManager dengan GitHub Issue.
+- Section 11 diselaraskan dengan implementasi E2E yang sudah ada. Dua item tetap
+  kosong karena belum ada bukti cukup: pemantauan otomatis Issue `resolved` yang
+  belum diverifikasi, dan acceptance run utuh dari satu requirement sampai
+  `verified` dengan hanya dua langkah manual yang diizinkan.
+- Tidak mengubah kode aplikasi atau schema, tidak menjalankan migration ke target,
+  tidak mengakses credential, tidak menghapus data, serta tidak commit/push.
+
 ## 2026-08-02 — AUDIT-01 rekonsiliasi FEATURE_BACKLOG Section 6–8
 
 - Menjalankan `graphify query` sebelum menelusuri Section 6–8, lalu
