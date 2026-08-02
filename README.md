@@ -158,21 +158,13 @@ kolom yang bisa basi.
 
 ```mermaid
 flowchart TB
-    subgraph client["👤 Pengguna"]
-        B["Browser<br/>Tester / QA / Admin"]
-        A["AI Agent<br/>Claude Code, dll"]
-    end
-
-    subgraph central["☁️ Server Pusat"]
-        F["Frontend SPA<br/>React 19 + Vite"]
-        S[("Supabase<br/>Postgres · Auth · Storage<br/>RPC · Edge Functions")]
-    end
-
-    subgraph local["💻 Mesin Lokal / On-Prem"]
-        M["MCP Server<br/>42 tool"]
-        R["Local Runner<br/>tm-runner"]
-        P["Playwright<br/>+ App Under Test"]
-    end
+    B["👤 Browser<br/>Tester · QA · Admin"]
+    A["🤖 AI Agent<br/>Claude Code, dll"]
+    F["🎨 Frontend SPA<br/>React 19 + Vite"]
+    S["🗄️ Supabase<br/>Postgres · Auth · Storage<br/>RPC · Edge Functions"]
+    M["🔌 MCP Server<br/>42 tool"]
+    R["🎭 Local Runner<br/>tm-runner"]
+    P["🎬 Playwright<br/>+ App Under Test"]
 
     B --> F
     F -->|"anon key + RLS"| S
@@ -186,6 +178,12 @@ flowchart TB
     style M fill:#8A2BE2,color:#fff
     style R fill:#2EAD33,color:#fff
 ```
+
+| Zona | Komponen | Berjalan di |
+|:--|:--|:--|
+| 👤 **Pengguna** | Browser · AI Agent | Mesin masing-masing |
+| ☁️ **Server Pusat** | Frontend SPA · Supabase | Hosting / self-hosted |
+| 💻 **Lokal / On-Prem** | MCP Server · Local Runner · Playwright | Mesin yang bisa mengakses app under test |
 
 <details>
 <summary><b>Tiga keputusan desain yang menentukan bentuk ini</b> (klik untuk buka)</summary>

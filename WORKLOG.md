@@ -3066,3 +3066,21 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
   `frontend/src/types/domain.ts`, alur bootstrap dari
   `skills/testmanager-workflow/SKILL.md`.
 - Tidak ada perubahan kode, migration, akses Supabase, secret, commit, atau push.
+
+## 2026-08-02 — Perbaikan render diagram Arsitektur di README
+
+- GitHub menolak merender diagram Mermaid pada bagian "Arsitektur" dengan pesan
+  "Unable to render rich display", padahal validator Mermaid Chart mengembalikan
+  `valid: true` — indikasi versi Mermaid GitHub lebih tua dari validator.
+- Diagnosis: dua konstruksi hanya dipakai di diagram tersebut dan tidak ada di
+  enam diagram lain yang berhasil dirender, yaitu blok `subgraph` dan node
+  silinder `S[("...")]`. Diverifikasi dengan `grep` bahwa keduanya nol kemunculan
+  di seluruh README setelah perbaikan.
+- Perbaikan: diagram ditulis ulang memakai node persegi `["..."]` biasa dengan
+  emoji sebagai penanda peran, sehingga hanya menggunakan konstruksi yang sudah
+  terbukti dirender GitHub pada enam diagram lain.
+- Informasi pengelompokan zona (Pengguna / Server Pusat / Lokal-On-Prem) yang
+  sebelumnya dibawa oleh `subgraph` dipulihkan sebagai tabel legend di bawah
+  diagram agar tidak hilang.
+- Verifikasi: diagram revisi divalidasi ulang lewat Mermaid Chart, hasil
+  `valid: true`. Tidak ada perubahan kode, migration, secret, commit, atau push.

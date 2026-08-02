@@ -100,6 +100,7 @@
   "98": "csvImport.ts",
   "99": "2026-07-31 — FIX-00b error TypeScript ProjectDetailPage",
   "100": "@supabase/supabase-js",
+  "101": "issueAttachmentRepository.ts",
   "102": "aiIssueService.ts",
   "103": "AppMenu.tsx",
   "104": "AppMenu.tsx",
@@ -110,6 +111,7 @@
   "109": "PageHeader.tsx",
   "110": "schema_030_test_suite_library.sql",
   "111": ".mcp.json",
+  "112": "testPlanScheduleRepository.ts",
   "113": "dashboardRepository.ts",
   "114": "broken.spec.ts",
   "115": "RequirementsPage.tsx",
@@ -131,6 +133,7 @@
   "131": "package.json",
   "132": "tsconfig.json",
   "133": "typescript",
+  "134": "17. Ide yang diambil dari App-new (pasca SRC-13)",
   "135": "schema_issue_attachments.sql",
   "136": "CLAUDE.md",
   "137": "extraction-spec.md",
@@ -181,7 +184,6 @@
   "183": "interactive.ts",
   "184": "package.json",
   "185": "package.json",
-  "186": "primereact",
   "188": "NotificationPanel.tsx",
   "189": "integrationRepository.ts",
   "190": "schema_056_mcp_rerun_failed.sql",
@@ -208,7 +210,6 @@
   "211": "scripts",
   "212": "useAuthContext",
   "213": "contract.test.ts",
-  "214": "package.json",
   "215": "RequirementsPage.tsx",
   "216": "schema_074_e2e12_ai_issue_draft.sql",
   "218": "schema_071_ai_test_case_review.sql",
@@ -287,7 +288,5 @@
   "295": "schema_056_mcp_rerun_failed.sql",
   "296": "schema_060_fix_test_runs_rls_recursion.sql",
   "297": "schema_086_dist03_runner_version_compatibility.sql",
-  "298": "seed.sql",
-  "299": "remark-gfm",
-  "300": "zod"
+  "298": "seed.sql"
 }
