@@ -186,7 +186,6 @@
   "184": "package.json",
   "185": "package.json",
   "186": "primereact",
-  "187": "dashboardRepository.ts",
   "188": "NotificationPanel.tsx",
   "189": "integrationRepository.ts",
   "190": "schema_056_mcp_rerun_failed.sql",
@@ -213,7 +212,6 @@
   "211": "scripts",
   "212": "useAuthContext",
   "213": "contract.test.ts",
-  "214": "package.json",
   "215": "RequirementsPage.tsx",
   "216": "schema_074_e2e12_ai_issue_draft.sql",
   "217": "TestSuiteDialog.tsx",
@@ -237,12 +235,6 @@
   "235": "@supabase/supabase-js",
   "236": "playwrightLocalExecutor.test.mjs",
   "237": "zod",
-  "238": "BreadcrumbContext.tsx",
-  "239": "useProjectPins.tsx",
-  "240": "AppMenu.tsx",
-  "241": "AppMenuitem.tsx",
-  "242": "primeflex",
-  "243": "react",
   "244": "init.test.mjs",
   "245": "schema_016_p1_security_hardening.sql",
   "246": "schema_017_p1_rpc_hardening.sql",
@@ -297,7 +289,5 @@
   "295": "schema_056_mcp_rerun_failed.sql",
   "296": "schema_060_fix_test_runs_rls_recursion.sql",
   "297": "schema_086_dist03_runner_version_compatibility.sql",
-  "298": "seed.sql",
-  "299": "remark-gfm",
-  "300": "zod"
+  "298": "seed.sql"
 }

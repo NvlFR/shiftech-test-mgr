@@ -1,5 +1,74 @@
 # Worklog
 
+## 2026-08-01 — Audit pasca-loop: 59 task salah diblokir, suite test diperbaiki
+
+**Temuan utama: bug pada gate driver memblokir 59 task yang sebenarnya berhasil.**
+
+- `changed_files()` di `run.sh` memakai `git diff --name-only HEAD`, yang TIDAK
+  memuat berkas baru (untracked). Mayoritas task membuat berkas baru, sehingga
+  lapis "klaim jujur" menyimpulkan `files_changed` tidak cocok dengan git.
+- Dari 61 item Diblokir: 59 karena bug ini, 1 (TEST-10) karena sandbox Codex
+  menolak binding localhost, 1 (SRC-13) karena butuh keputusan produk.
+- Hasil kerja 59 task tetap utuh di disk, hanya tidak pernah ter-commit karena
+  driver hanya commit pada status `completed`.
+- Perbaikan: `changed_files()` kini menggabungkan `git diff --name-only HEAD`
+  dengan `git ls-files --others --exclude-standard`.
+
+**Verifikasi independen sebelum commit (tidak memakai laporan Codex):**
+
+- Deliverable tiap blok dicek keberadaannya: `packages/agent-core` (kontrak
+  Transport/Executor/ArtifactStorage/Auth/Repo + `SecretRedactorStream`),
+  `runner/src/init.ts`, `schema_085_boot01_agent_bootstrap_codes.sql`,
+  `.github/workflows/agent-runtime-dependencies.yml`, `ProjectConnectPage.tsx`,
+  `skills/manifest.json`, 5 komponen automation, `vitest.config.ts`,
+  `docs/TEST_DEBT.md`, `docs/MANUAL_SMOKE.md`. Semua ADA.
+- Hasil: tsc 0 error, vitest 178/178 (stabil 3x), build hijau, runner 48/48,
+  `smoke.sh` lolos (build + vite preview + muat aplikasi di headless browser),
+  lint hanya warning.
+- Test frontend naik dari 7 menjadi 178.
+
+**Tiga cacat nyata ditemukan dan diperbaiki:**
+
+1. `runner/test/runnerTokenRevocation.test.mjs` MENGGANTUNG (bukan gagal). Mock
+   API-nya tidak punya `pollDiagnostic()` yang ditambahkan RUI-06 belakangan;
+   pemanggilannya melempar TypeError yang tertangkap catch umum, lalu loop
+   berputar selamanya. Kode runner sendiri benar. Ditambahkan stub.
+2. `frontend/src/helpers/mappers.test.ts` gagal 3 test: daftar mapper usang
+   (52 vs 54 aktual) dan ekspektasi field usang setelah `mapApiTokenRow` dan
+   `mapAutomationRunnerRow` diperluas task berikutnya. Helper diperluas dengan
+   parameter opsional untuk field default yang tidak berasal dari row.
+3. Component test flaky: 3–5 test gagal berubah-ubah tiap run karena
+   `testTimeout` bawaan 5 detik terlampaui saat beban paralel — bukan
+   pencemaran antar-test. `vitest.config.ts` dinaikkan ke 20 detik, plus
+   `restoreMocks`/`clearMocks`/`unstubEnvs`/`unstubGlobals`.
+
+Pola yang sama pada ketiga cacat: task berikutnya memperluas kontrak tanpa
+memperbarui test task sebelumnya, dan karena SEMUA task diblokir, tidak ada satu
+pun yang menjalankan suite penuh sehingga kerusakannya tidak terlihat.
+
+**Antrean dirapikan:**
+
+- 59 task dipindah dari Diblokir ke Selesai dengan catatan bukti verifikasi.
+- TEST-10 dipindah ke Selesai setelah `smoke.sh` dijalankan manual dan lolos.
+- Sisa Diblokir tinggal 1: SRC-13 (butuh keputusan produk soal landing `/`,
+  settings, dan public profile sebelum `App-new.tsx` boleh dipromosikan).
+- Selesai: 148 task.
+
+**Blok N ditambahkan (11 task) — rekonsiliasi backlog & sisa nyata:**
+
+- FEATURE_BACKLOG.md masih memuat ~128 item `- [ ]` karena langkah "perbarui
+  checkbox" pada 59 task yang diblokir tidak pernah dijalankan. Isinya campuran:
+  checkbox usang, pernyataan kebijakan yang salah ditulis sebagai task, dan sisa
+  pekerjaan nyata.
+- AUDIT-01..05 merekonsiliasi per Section dengan syarat mencentang hanya bila ada
+  bukti berkas, lalu menghasilkan `docs/REMAINING_WORK.md`.
+- E2E-INFRA-01..03: Playwright untuk E2E aplikasi sendiri BELUM terpasang sama
+  sekali di `frontend/` — ini sisa nyata, bukan checkbox usang. Dijalankan per
+  batch, tidak dimasukkan ke gate per-task.
+- CONN-10 (daftar skill + checkbox di halaman Connect), CLEAN-01 (berkas yatim),
+  CLEAN-02 (bundle 2,55 MB melewati ambang peringatan Vite).
+
+
 ## 2026-08-01 — TEST-15 daftar smoke test manual sebelum rilis
 
 - Menjalankan `graphify query` sebelum menelusuri autentikasi/RBAC, workflow

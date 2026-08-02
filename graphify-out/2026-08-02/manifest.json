@@ -3330,9 +3330,9 @@
     "semantic_hash": "f043c5771228d8365a8d26eb076261ae"
   },
   "frontend/vitest.config.ts": {
-    "mtime": 1785654350.0424333,
-    "ast_hash": "9770eafe77ad7a22b171e73e4ffed9ac",
-    "semantic_hash": ""
+    "mtime": 1785559333.7321286,
+    "ast_hash": "dbc7a37b39047d758d4aa57560fa13e3",
+    "semantic_hash": "dbc7a37b39047d758d4aa57560fa13e3"
   },
   "frontend/src/test/factories.ts": {
     "mtime": 1785559675.4656863,
@@ -3365,9 +3365,9 @@
     "semantic_hash": "98af54e98783e57d92fbb4b72648dda8"
   },
   "frontend/src/helpers/mappers.test.ts": {
-    "mtime": 1785653947.2628498,
-    "ast_hash": "5ae8e47ed99f62be5b35458ee3735b82",
-    "semantic_hash": ""
+    "mtime": 1785587544.7123122,
+    "ast_hash": "bd41eb34af9cea55496afe2d05828119",
+    "semantic_hash": "bd41eb34af9cea55496afe2d05828119"
   },
   "frontend/src/helpers/dateFormatter.test.ts": {
     "mtime": 1785561804.5444503,
@@ -3700,9 +3700,9 @@
     "semantic_hash": "3cc390b9829b4c3bbf5f4672be99f61b"
   },
   "runner/test/runnerTokenRevocation.test.mjs": {
-    "mtime": 1785653816.2851756,
-    "ast_hash": "788dd303ad7071f9bddaf94279eedf29",
-    "semantic_hash": ""
+    "mtime": 1785580651.20761,
+    "ast_hash": "9246abafaf53364679868e64de4d5de0",
+    "semantic_hash": "9246abafaf53364679868e64de4d5de0"
   },
   "frontend/src/hooks/useRunnerDistribution.ts": {
     "mtime": 1785579986.904037,
