@@ -8,6 +8,7 @@ import { HomePage } from './pages/home/HomePage';
 import { ProjectsPage } from './pages/projects/ProjectsPage';
 import { ProjectDetailPage } from './pages/projects/ProjectDetailPage';
 import { ProjectSettingsPage } from './pages/projects/ProjectSettingsPage';
+import { ProjectConnectPage } from './pages/projects/ProjectConnectPage';
 import { TestPlansPage } from './pages/test-plans/TestPlansPage';
 import { TestPlanDetailPage } from './pages/test-plans/TestPlanDetailPage';
 import { TestCasesPage } from './pages/test-cases/TestCasesPage';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardReportPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/projects/:id/settings" element={<ProjectSettingsPage />} />
+          <Route path="/projects/:id/connect" element={<ProjectConnectPage />} />
           <Route path="/projects/:id/teams" element={<ProjectTeamsPage />} />
           <Route path="/projects/:id/integrations" element={<IntegrationsPage />} />
           <Route path="/projects/:id/requirements" element={<RequirementsPage />} />

@@ -1,0 +1,14 @@
+{
+  "name": "testmanager-skill-pack",
+  "version": "1.0.0",
+  "skills": [
+    "testmanager-workflow",
+    "testmanager-authoring",
+    "testmanager-triage",
+    "testmanager-regression"
+  ],
+  "installation": {
+    "skills_cli": "npx skills add <repository-url> --skill testmanager-workflow --skill testmanager-authoring --skill testmanager-triage --skill testmanager-regression",
+    "claude_code": "Salin setiap folder skills/testmanager-* yang dipilih ke .claude/skills/ pada root project pengguna."
+  }
+}

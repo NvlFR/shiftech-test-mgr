@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     const path = typeof payload.path === "string" ? payload.path.replace(/^\/+/, "") : "";
     const expiresIn = Math.min(Math.max(Number(payload.expires_in) || 120, 30), 3600);
     if (bucket !== BUCKET || !path || path.includes("..")) return json({ error: "invalid_artifact" }, 400);
-    const { data: apiToken } = await admin.from("api_tokens").select("project_id").eq("token_hash", tokenHash).is("revoked_at", null).maybeSingle();
+    const { data: apiToken } = await admin.from("api_tokens").select("project_id").eq("token_hash", tokenHash).is("revoked_at", null).gt("expires_at", new Date().toISOString()).maybeSingle();
     if (!apiToken) return json({ error: "invalid_api_token" }, 401);
     if (!path.startsWith(`${apiToken.project_id}/`)) return json({ error: "cross_project_artifact" }, 403);
     const { data, error } = await admin.storage.from(bucket).createSignedUrl(path, expiresIn, { download: false });

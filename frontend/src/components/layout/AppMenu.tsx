@@ -7,10 +7,12 @@ import { Button } from 'primereact/button';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { Toast } from 'primereact/toast';
+import { Badge } from 'primereact/badge';
 import { AppMenuitem, AppMenuSeparator, type MenuItemModel } from './AppMenuitem';
 import { useAuthContext } from '../../hooks/useAuth';
 import { useProjects } from '../../hooks/useProjects';
 import { useProjectPins } from '../../hooks/useProjectPins';
+import { useQueuedAutomationCounts } from '../../hooks/useQueuedAutomationCounts';
 import { projectService } from '../../services/projectService';
 
 const MAX_VISIBLE_PROJECTS = 10;
@@ -21,6 +23,7 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
   const { isAdmin } = useAuthContext();
   const { projects, reload } = useProjects({ status: 'active', sortField: 'name', sortDirection: 'asc' });
   const { isPinned, togglePin } = useProjectPins();
+  const queuedAutomationCounts = useQueuedAutomationCounts();
 
   const [projectSearch, setProjectSearch] = useState('');
 
@@ -134,6 +137,7 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
             </button>
             <button type="button" className="layout-submenu-pin" title="Automation (Playwright)" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/automation`); }}>
               <i className="pi pi-play" />
+              {(queuedAutomationCounts[project.id] ?? 0) > 0 && <Badge value={queuedAutomationCounts[project.id]} severity="warning" className="absolute" style={{ transform: 'translate(35%, -55%)' }} />}
             </button>
             <button type="button" className="layout-submenu-pin" title="Akses Team" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onNavigate?.(); navigate(`/projects/${project.id}/teams`); }}>
               <i className="pi pi-users" />

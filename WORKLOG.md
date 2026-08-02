@@ -2645,3 +2645,171 @@ TypeScript sisa porting source-new. Keduanya diperbaiki.
 - Mendokumentasikan bahwa `localhost` di dalam container menunjuk ke container sendiri, dengan `--network host` untuk Linux dan `host.docker.internal` untuk Docker Desktop saat aplikasi under test berjalan di host.
 - Menyelaraskan contoh dan komentar `runner/Dockerfile` dengan panduan networking tersebut.
 - Verifikasi lulus melalui `git diff --check`; `graphify update .` berhasil menyinkronkan graph menjadi 3.203 node dan 6.446 edge, dengan warning tujuh file non-source yang tidak menghasilkan node.
+
+## 2026-08-01 — DIST-05 guard CI nol runtime dependency Local Agent
+
+- Menambahkan workflow `.github/workflows/agent-runtime-dependencies.yml` yang menguji guard lalu menggagalkan CI jika `runner/package.json` atau `packages/agent-core/package.json` memiliki `dependencies`, `optionalDependencies`, `peerDependencies`, atau bundled dependencies.
+- Memindahkan workspace package `@testmanager/agent-core` pada manifest runner ke `devDependencies`; proses release tetap membundel agent-core melalui `scripts/release-runner.mjs`, sehingga paket distribusi tidak mengunduh dependency eksternal saat runtime.
+- Menambahkan `scripts/check-agent-runtime-dependencies.mjs` beserta unit test positif dan negatif, serta menandai keputusan Section 14.3 selesai di `FEATURE_BACKLOG.md`.
+- Verifikasi lulus: unit test guard, eksekusi guard pada manifest nyata, 4 test agent-core, 16 test runner, build frontend, dan `git diff --check`. Build frontend hanya menghasilkan warning ukuran chunk yang sudah ada.
+
+## 2026-08-01 — CONN-01 kerangka halaman Connect Agent
+
+- Menambahkan route terlindungi `/projects/:id/connect`, tombol **Connect Agent** pada Project Detail dan Project Settings, serta halaman read-only dengan tab MCP aktif.
+- Menampilkan API Token, Webhook, CI/CD, dan Runner sebagai tab disabled dengan alasan masing-masing; identitas project (ID, nama, dan URL) diambil secara project-scoped melalui layering Page → Hook → Service → Repository → Supabase.
+- Tidak membuat token, mengubah data project, menjalankan migration, atau mencatat secret. Scope dibatasi ke Section 12.1; konfigurasi MCP lanjutan Section 12.2 tidak disertakan.
+- Verifikasi lulus: `cd frontend && npm run build` dan `git diff --check`; build hanya menghasilkan warning ukuran chunk yang sudah ada. `graphify update .` berhasil menyinkronkan graph menjadi 3.219 node dan 6.478 edge, dengan warning tujuh source tanpa node.
+
+## 2026-08-01 — CONN-01 verifikasi ulang
+
+- Menyesuaikan label tab aktif menjadi **MCP (aktif)** sesuai Section 12.1 dan menandai seluruh checklist kerangka halaman yang sudah terpenuhi.
+- Memastikan perubahan tetap terbatas pada route, halaman kerangka read-only, layering pengambilan konfigurasi project, dan tombol navigasi terkait.
+- Verifikasi ulang lulus melalui `cd frontend && npm run build`; Vite hanya melaporkan warning ukuran chunk yang sudah ada.
+
+## 2026-08-01 — CONN-02 panel konfigurasi MCP
+
+- Menambahkan client selector MCP dengan **Claude Code** sebagai satu-satunya opsi aktif; Cursor, Claude Desktop, VS Code, dan Windsurf tetap terlihat dalam dropdown sebagai opsi disabled dengan badge **segera**.
+- Menambahkan toggle mode read-only melalui Hook dan Service yang memetakan pilihan ke `TM_MCP_READONLY=0/1` tanpa menyimpan atau mengekspos secret, serta penghitung 24 tool baca pada mode read-only dan 42 tool saat tool tulis aktif sesuai registry MCP saat ini.
+- Menambahkan unit test untuk pemetaan environment, hitungan tool, dan invariant bahwa hanya Claude Code yang aktif.
+- Verifikasi lulus: unit test service (2 test), `npm run lint` tanpa error (warning existing tetap ada), `npm run build`, dan `git diff --check`. Build hanya melaporkan warning ukuran chunk yang sudah ada; `graphify update .` menyinkronkan graph menjadi 3.228 node dan 6.489 edge dengan warning tujuh source tanpa node. Tidak ada migration, akses Supabase target, commit, atau push.
+
+## 2026-08-01 — CONN-02 verifikasi ulang gate driver
+
+- Menandai checklist client selector dan read-only toggle pada Section 12.2 selesai setelah mengaudit implementasi terhadap registry MCP: 24 tool baca dan 18 tool tulis.
+- Memastikan laporan perubahan hanya mencantumkan berkas CONN-02 yang benar-benar berbeda menurut Git; berkas kerangka CONN-01 tidak dilaporkan sebagai perubahan task ini.
+- Verifikasi ulang lulus: 2 unit test service, lint tanpa error (delapan warning existing), build frontend, dan `graphify update .` yang menyinkronkan graph menjadi 3.229 node dan 6.490 edge dengan warning tujuh source tanpa node.
+
+## 2026-08-01 — CONN-03 feature groups MCP
+
+- Menambahkan multiselect chip untuk sembilan feature group MCP: DISCOVERY, TEST-CASE, TEST-PLAN, TEST-RUN, ISSUE, AUTOMATION, REPO, ANALYSIS, dan DOCS; AUTOMATION serta REPO tidak dipilih secara default.
+- Memusatkan katalog 42 nama tool dan atribut read/write di service agar penghitung live dan preview selalu mengikuti kombinasi group serta mode read-only yang dipilih.
+- Menambahkan peringatan saat jumlah tool aktif melewati ambang 30 dan panel preview nama tool yang dapat dilipat, termasuk empty state ketika tidak ada group dipilih.
+- Menambah regresi unit untuk hitungan pilihan standar, seluruh registry, serta penyaringan tool tulis dalam mode read-only. Verifikasi lulus: 4 unit test service dan `cd frontend && npm run build`; build hanya melaporkan warning ukuran chunk yang sudah ada. Tidak ada migration, akses Supabase target, secret/token, commit, atau push.
+
+## 2026-08-01 — CONN-04 langkah setup dan perintah siap salin
+
+- Menambahkan tiga langkah bernomor untuk Add MCP server, Authenticate, dan Install Agent Skills opsional, lengkap dengan tombol **Copy** per langkah dan **Copy semua**.
+- Memusatkan pembentukan perintah setup di `projectConnectionService`; command Add MCP otomatis memuat project scope, mode read-only, feature groups terpilih, dan endpoint MCP tanpa memasukkan token/secret.
+- Menampilkan catatan autentikasi terminal serta blok command berformat `pre` yang mempertahankan isi utuh dan dapat di-scroll horizontal.
+- Menambahkan regresi unit untuk regenerasi header read-only dan feature groups. Verifikasi lulus: 5 unit test service, `cd frontend && npm run build`, dan `git diff --check`; build hanya melaporkan warning ukuran chunk yang sudah ada. Tidak ada migration, akses Supabase target, secret/token, commit, atau push.
+
+## 2026-08-01 — CONN-05 TestManager Agent Skills pack
+
+- Menambahkan skill pack versi `1.0.0` di `skills/` dengan empat skill: `testmanager-workflow`, `testmanager-authoring`, `testmanager-triage`, dan `testmanager-regression`, masing-masing dilengkapi metadata agent.
+- Mendokumentasikan invariant domain dan bootstrap Local Runner yang aman, pedoman authoring Test Case, triage bundle bukti menjadi Issue actionable, serta regression selektif dengan gate konfirmasi manusia.
+- Menambahkan manifest versi dan dua jalur pemasangan: `npx skills add` atau menyalin skill terpilih ke `.claude/skills/`; tidak ada secret/token yang dicatat.
+- Verifikasi lulus: keempat folder lolos `quick_validate.py`, manifest valid JSON, tidak ada placeholder TODO, `git diff --check` bersih, dan `cd frontend && npm run build` berhasil dengan warning ukuran chunk yang sudah ada. `graphify update .` menyinkronkan graph menjadi 3.273 node dan 6.532 edge dengan warning tujuh source non-skill tanpa node.
+
+## 2026-08-01 — CONN-06 panel Prompt starter
+
+- Menambahkan panel berisi lima prompt siap salin: generate Test Case dari requirement, analisis Test Run terakhir, triage Issue terbuka, pemilihan regression untuk Issue resolved, dan audit coverage requirement.
+- Menyimpan katalog prompt sebagai data terpisah dari komponen; service mengisi nama/ID project serta daftar module dan environment yang diambil melalui repository project-scoped.
+- Menambahkan tombol **Copy prompt** per item dan regresi unit untuk kelengkapan kategori, interpolasi seluruh konteks, serta ketiadaan placeholder tersisa. Fitur prompt custom per project tetap opsional dan tidak dimasukkan ke scope tahap ini, sehingga tidak ada migration atau penyimpanan baru.
+- Verifikasi lulus: `cd frontend && npm run build` dan unit test service; build hanya melaporkan warning ukuran chunk yang sudah ada. Tidak ada akses Supabase target, secret/token, commit, atau push.
+
+## 2026-08-01 — CONN-06 verifikasi ulang gate driver
+
+- Mengaudit ulang panel Prompt starter terhadap Section 12.5 dan memastikan lima kategori wajib berasal dari katalog data terpisah, diinterpolasi dengan konteks project, module, dan environment, serta memiliki aksi **Copy prompt** per item.
+- Memastikan laporan retry dibatasi pada berkas implementasi CONN-06 yang benar-benar berbeda menurut Git dan tidak memasukkan berkas navigasi atau kerangka koneksi dari task sebelumnya.
+- Verifikasi ulang lulus: 6 unit test `projectConnectionService` dan `cd frontend && npm run build`; build hanya melaporkan warning ukuran chunk yang sudah ada.
+
+## 2026-08-01 — CONN-07 bootstrap runner satu perintah
+
+- Menambahkan prompt starter **Pasang & sambungkan runner** yang menerbitkan bootstrap code project-scoped BOOT-01 hanya saat diminta dan menghasilkan satu perintah `npx @testmanager/runner init --code <BOOTSTRAP_CODE>`.
+- Menjaga alur Page → Hook → Service → Repository → Supabase: service mengorkestrasi snapshot runner, penerbitan kode sekali pakai, dan deteksi runner baru; hook melakukan polling dua detik sampai heartbeat pertama tanpa refresh manual.
+- Halaman otomatis mengganti status menjadi **Runner terhubung** serta hanya menampilkan nama runner, label, dan project; prompt melarang agent melaporkan bootstrap code, runner token, atau secret lain.
+- Tidak menambah atau menjalankan migration karena RPC BOOT-01 dan heartbeat runner sudah tersedia. Unit test service (7 test) dan build frontend lulus; build hanya menghasilkan warning ukuran chunk yang sudah ada.
+
+## 2026-08-01 — CONN-07 verifikasi ulang gate driver
+
+- Menambahkan regresi service yang membuktikan kode BOOT-01 diterbitkan setelah snapshot runner lama dan perintah yang dihasilkan persis satu baris `npx @testmanager/runner init --code <BOOTSTRAP_CODE>`.
+- Menambahkan regresi deteksi koneksi yang menolak runner baru sebelum heartbeat pertama, mengabaikan runner lama, lalu menerima runner baru setelah `last_seen_at` tersedia.
+- Verifikasi ulang lulus melalui 9 unit test `projectConnectionService`, build frontend, dan `git diff --check`; build hanya menghasilkan warning ukuran chunk yang sudah ada.
+
+## 2026-08-01 — CONN-08 keamanan halaman Connect
+
+- Menambahkan pengelolaan token project-scoped pada halaman Connect melalui alur Page → Hook → Service → Repository → Supabase: pembuatan token, daftar token aktif, waktu kedaluwarsa/pemakaian terakhir, dan aksi cabut dengan konfirmasi.
+- Raw token hanya ditampilkan sekali dengan peringatan eksplisit dan tidak pernah dirangkai ke command; contoh command menggunakan environment variable `TM_API_TOKEN` serta menjelaskan risiko shell history dan screenshot.
+- Menambahkan peringatan eksplisit saat read-only dimatikan dan menurunkan scope token dari mode serta feature group aktif.
+- Menambahkan migration `schema_087_conn08_connect_token_security.sql` (tidak dijalankan ke Supabase target) untuk expiry 30 hari, `last_used_at`, enforcement pada autentikasi MCP/heartbeat, serta mempertahankan audit pembuatan/pencabutan tanpa menyimpan raw token. Validasi Edge Function artifact juga menolak token kedaluwarsa.
+- Verifikasi lulus: 12 unit test `projectConnectionService`, `cd frontend && npm run build`, `npm run lint` tanpa error (delapan warning existing), dan `git diff --check`. Build hanya menghasilkan warning ukuran chunk yang sudah ada.
+## 2026-08-01 — CONN-09 kualitas UI halaman Connect
+
+- Menambahkan status penggunaan MCP terakhir dari `ai_audit_events` melalui alur lengkap repository → service → hook/page, dengan query project-scoped untuk event yang memiliki `tool_name`.
+- Mengganti judul manual halaman Connect dengan `PageHeader` dan memakai token warna tema PrimeReact/PrimeFlex (`surface-*`, `text-color-*`) agar konsisten di mode light/dark.
+- Menambahkan status/empty state edukatif untuk project yang belum pernah memakai MCP dan daftar token yang masih kosong.
+- Menangani clipboard API yang tidak tersedia atau ditolak dengan fallback `InputTextarea` read-only yang otomatis terseleksi dan dapat disalin manual; nilai perintah/prompt tetap tampil sebagai teks yang bisa dipilih.
+- Verifikasi: `npm run test -- --run src/services/projectConnectionService.test.ts` lulus (12 test), `npm run build` lulus, dan `npm run lint` lulus tanpa error (8 warning existing di file lain). Build memberi warning chunk utama > 1500 kB yang sudah ada dan tidak terkait CONN-09. Knowledge graph disinkronkan dengan `graphify update .`.
+
+## 2026-08-01 — CONN-09 verifikasi ulang gate driver
+
+- Menambahkan regresi service yang membuktikan timestamp penggunaan MCP terbaru dari repository diteruskan ke konfigurasi Connect dan kondisi tanpa audit event tetap menghasilkan status kosong yang edukatif di UI.
+- Mengaudit ulang fallback clipboard: kegagalan atau ketiadaan Clipboard API membuka `InputTextarea` read-only, dapat dipilih manual, dan otomatis menyeleksi isi saat fokus.
+- Membatasi laporan retry pada berkas CONN-09 yang benar-benar berbeda menurut Git; tidak ada migration, akses Supabase target, secret/token, commit, atau push.
+- Verifikasi lulus: 14 unit test `projectConnectionService`, build frontend, dan lint tanpa error (delapan warning existing di file lain). Build hanya memberi warning ukuran chunk utama yang sudah ada; `graphify update .` berhasil menyinkronkan graph menjadi 3.296 node dan 6.591 edge.
+
+## 2026-08-01 — RUI-01 wizard Hubungkan Runner
+
+- Menambahkan satu wizard reusable untuk alur CONN-07 dan tab Runner: nama runner, label kapabilitas, bootstrap code sekali pakai, perintah instalasi npm/Docker, serta status menunggu heartbeat pertama sampai **Runner terhubung**.
+- Mengganti pembuatan runner/token lama di halaman Automation dengan bootstrap aman; token permanen dibuat pada mesin lokal dan nama/label diteruskan melalui environment bootstrap yang divalidasi `agent-core`.
+- Menambahkan empty state edukatif pada tab Runner dan menjelaskan bahwa runner perlu berjalan lokal tetapi hanya membuat koneksi keluar sehingga tidak memerlukan port inbound.
+- Verifikasi lulus: build frontend, 14 unit test `projectConnectionService`, lint frontend tanpa error (delapan warning existing), 4 test `agent-core`, dan 16 test runner. Tidak menjalankan migration ke Supabase target, commit, atau push.
+
+## 2026-08-01 — RUI-02 status runner yang terbaca
+
+- Mengganti tabel runner dengan kartu responsif yang menampilkan status **Online/Idle/Sibuk/Offline**, heartbeat relatif berbahasa manusia, label, versi, OS, browser yang pernah terdeteksi dari job, job terakhir, dan uptime proses runner.
+- Memperluas heartbeat bersama secara kompatibel dengan metadata runtime OS serta waktu proses mulai; menambahkan migration `schema_088_rui02_runner_readable_status.sql` untuk menyimpannya tanpa pernah menyimpan atau mencatat raw token. Migration tidak dijalankan ke Supabase target.
+- Menjaga alur Page/Component → Hook → Service → Repository → Supabase: service menggabungkan runner, heartbeat, dan job; status runner dihitung sebagai business rule di service.
+- Menambahkan refresh heartbeat otomatis setiap 15 detik, peringatan ketika job masih antre dan runner telah offline melewati ambang 60 detik, serta aksi rotate/revoke token dengan konfirmasi eksplisit dan penjelasan dampaknya.
+- Verifikasi lulus: build frontend, 3 unit test frontend baru, lint frontend tanpa error (delapan warning existing), 4 test `agent-core`, 16 test runner, dan `git diff --check`.
+
+## 2026-08-01 — RUI-03 diagnosis job yang belum diambil runner
+
+- Menambahkan diagnosis antrean di service untuk membedakan semua runner offline, label wajib tidak cocok, environment tidak terjangkau berdasarkan hasil sanity-check Base URL dari attempt yang di-requeue, serta kondisi normal menunggu polling runner yang cocok.
+- Menampilkan diagnosis dan langkah penanganan pada dialog detail/log job, termasuk label wajib job, tanpa query langsung dari page dan tanpa migration baru.
+- Menandai scope RUI-03 Section 13.2 selesai serta menambahkan regresi unit untuk seluruh cabang diagnosis dan invariant bahwa job non-queued tidak didiagnosis sebagai masalah antrean.
+- Verifikasi lulus: `npm run test -- --run src/services/automationService.test.ts` (6 test), `npm run build`, dan `git diff --check`. Build hanya memberi warning ukuran chunk utama yang sudah ada. Tidak menjalankan migration ke Supabase target, commit, atau push.
+
+## 2026-08-01 — RUI-04 papan job automation
+
+- Menambahkan tampilan papan job alternatif dengan kolom Queued, Running, Passed, dan Failed/Canceled, beserta toggle kembali ke tabel.
+- Menambahkan filter cepat runner, environment, test plan, dan status; metadata papan diambil melalui alur Page/Component → Hook → Service → Repository → Supabase.
+- Menampilkan langkah/log terbaru, durasi berjalan, progress, dan estimasi durasi dari riwayat job Test Case yang sama; dialog live log yang sudah memakai subscription realtime tetap dapat dibuka dari kartu.
+- Menambahkan aksi batalkan job queued, retry job failed melalui RPC retry Test Result yang sudah ada, serta navigasi ke Test Result terkait pada papan dan tabel.
+- Menambahkan badge jumlah job queued per project pada tombol Automation di sidebar, diperbarui setiap 15 detik.
+- Memperbarui checklist Section 13.3 pada `FEATURE_BACKLOG.md`.
+- Verifikasi: `cd frontend && npm run build` lulus. Vite tetap melaporkan warning chunk utama > 1500 kB yang sudah ada dan tidak memblokir build.
+- `graphify update .` berhasil menyinkronkan graph menjadi 3.331 node dan 6.678 edge; warning tujuh source tanpa node tidak memblokir pembaruan.
+- `cd frontend && npm run lint` lulus tanpa error; delapan warning hook/Fast Refresh yang sudah ada tetap tercatat.
+- Verifikasi regresi relevan lulus: 1 test mapper Automation Job dan 6 test automation service. Suite mapper penuh masih memiliki tiga kegagalan existing pada daftar ekspor, API token, dan runner yang tidak terkait RUI-04.
+
+## 2026-08-01 — RUI-05 mapping script yang terarah
+
+- Menonjolkan daftar Test Case yang belum memiliki script sebagai pekerjaan utama di tab Mapping Script, lengkap dengan multi-selection dan bulk mapping memakai placeholder `{code}` / `{slug}`.
+- Menambahkan inventaris file test Playwright pada heartbeat runner (maksimal 5.000 path relatif) dan migration aditif `schema_089_rui05_script_mapping.sql`; migration tidak dijalankan ke Supabase target.
+- Memvalidasi `script_ref` tepat sebelum single maupun bulk insert melalui service: penyimpanan ditolak jika tidak ada runner online yang memenuhi label atau file tidak ditemukan pada runner yang eligible.
+- Menampilkan label wajib dan nama runner online yang memenuhi label sekaligus memiliki file, baik saat input maupun pada mapping yang sudah tersimpan.
+- Menjaga layering Component/Page → Service → Repository → Supabase dan melakukan bulk insert hanya setelah seluruh kandidat lolos validasi agar kegagalan validasi tidak menghasilkan mapping parsial.
+- Verifikasi lulus: build frontend, 8 unit test automation service, build + 16 test runner, build `agent-core`, `git diff --check`, dan `graphify update .` (3.344 node / 6.718 edge). Build frontend hanya memberi warning ukuran chunk utama yang sudah ada. Suite mapper penuh masih memiliki tiga kegagalan existing yang telah tercatat pada RUI-04 dan tidak terkait RUI-05.
+
+## 2026-08-01 — RUI-05 koreksi layering dan gate laporan
+
+- Memindahkan aksi create, bulk create, dan delete Mapping Script dari pemanggilan service langsung di page ke `useAutomation`, serta memasok evaluasi runner dan preview pola ke komponen melalui kontrak props agar alur Mapping Script tetap Component/Page → Hook → Service → Repository → Supabase.
+- Mengaudit ulang scope Section 13.4 dan membatasi daftar berkas laporan akhir hanya pada path RUI-05 yang benar-benar berbeda menurut Git; perubahan task lain di worktree tidak diklaim sebagai bagian RUI-05.
+## 2026-08-01 — RUI-06 Diagnostik runner
+
+- Menambahkan migration `schema_090_rui06_runner_diagnostics.sql` untuk job diagnostik no-op per runner, RLS project, serta RPC enqueue/poll/report tanpa menjalankannya ke Supabase target.
+- Menambahkan model dan mapper hasil sanity check (Base URL, browser Playwright, versi Playwright, ruang disk), repository, service, dan hook sesuai layering frontend.
+- Menambahkan panel Diagnostik kontekstual pada setiap Runner Card, tombol **Uji koneksi**, petunjuk perbaikan berdasarkan kondisi, dan peringatan runner tertinggal dari versi server.
+- Local Runner kini memprioritaskan diagnostic job, menjalankan pemeriksaan lokal tanpa script test, lalu melaporkan hasil end-to-end ke server.
+- Verifikasi: `cd frontend && npm run build` lulus (warning ukuran chunk existing); `cd runner && npm test` lulus (10/10 berkas test).
+
+## 2026-08-01 — RUI-07 halaman automation responsif dan state UI
+
+- Mengganti tabel Mapping Script dengan kartu yang dapat dipilih pada layar mobile dan memaksa papan job berbasis kartu pada mobile; tabel tetap tersedia sebagai opsi desktop.
+- Menambahkan state loading kontekstual untuk pemeriksaan akses, workspace automation, mapping, dan papan job; empty state untuk runner, mapping, job, serta hasil filter kosong; dan error state dengan aksi retry.
+- Menambahkan hook status jaringan browser dan banner offline yang menjelaskan bahwa data dapat stale serta menonaktifkan retry sampai koneksi kembali tersedia.
+- Mempertahankan `PageHeader` dan memakai token warna/surface PrimeReact agar seluruh state dan kartu konsisten pada tema light/dark.
+- Memperbarui checklist Section 13.6 pada `FEATURE_BACKLOG.md`. Tidak ada migration, akses Supabase target, secret/token, commit, atau push.
+- Verifikasi: `cd frontend && npm run build` lulus; Vite hanya melaporkan warning ukuran chunk utama > 1500 kB yang sudah ada. `cd frontend && npm run lint` lulus tanpa error dengan delapan warning existing di file lain; `git diff --check` lulus.
+- `graphify update .` berhasil menyinkronkan graph menjadi 3.367 node dan 6.769 edge; warning tujuh source tanpa node tidak memblokir pembaruan.

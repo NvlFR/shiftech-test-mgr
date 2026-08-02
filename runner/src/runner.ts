@@ -12,6 +12,8 @@ import type { LocalRepositoryMetadata } from './localRepository.js';
 import { prepareJobRepository } from './repositoryWorkspace.js';
 import { registerSecret, redactSecrets } from './security.js';
 import { evaluateRunnerCompatibility, type RunnerVersionPolicy } from './versionCompatibility.js';
+import { discoverScriptRefs } from './scriptInventory.js';
+import { runDiagnostics } from './diagnostics.js';
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -68,6 +70,7 @@ export class Runner {
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private compatibilityError: Error | null = null;
   private warnedServerVersion: string | null = null;
+  private scriptRefs: string[] = [];
 
   constructor(
     private readonly config: RunnerConfig,
@@ -85,7 +88,7 @@ export class Runner {
 
   private startHeartbeat(): void {
     const beat = async () => {
-      try { this.checkVersionCompatibility(await this.api.heartbeat()); }
+      try { this.checkVersionCompatibility(await this.api.heartbeat(this.scriptRefs)); }
       catch (err) { log.warn('Heartbeat failed', { error: (err as Error).message }); }
     };
     void beat();
@@ -130,10 +133,11 @@ export class Runner {
 
   async start(): Promise<void> {
     log.info('Runner workspace ready', { repositoryCacheDir: this.config.repositoryCacheDir });
+    this.scriptRefs = await discoverScriptRefs(this.config.projectDir);
 
     // Fail fast if the token is invalid so operators get a clear error on boot.
     try {
-      const hb = await this.api.heartbeat();
+      const hb = await this.api.heartbeat(this.scriptRefs);
       this.checkVersionCompatibility(hb);
       if (this.compatibilityError) throw this.compatibilityError;
       log.info('Runner authenticated', { agentId: hb.agent_id, active: hb.active });
@@ -150,6 +154,13 @@ export class Runner {
 
     while (!this.stopping) {
       try {
+        const diagnostic = await this.api.pollDiagnostic();
+        if (diagnostic) {
+          const result = await runDiagnostics(diagnostic.base_url, this.config.projectDir);
+          await this.api.reportDiagnostic(diagnostic.id, result as unknown as Record<string, unknown>);
+          log.info('Diagnostic no-op reported', { diagnosticId: diagnostic.id, passed: !result.errorMessage });
+          continue;
+        }
         const job = await this.api.poll();
         if (!job) {
           await sleep(this.config.pollIntervalMs);

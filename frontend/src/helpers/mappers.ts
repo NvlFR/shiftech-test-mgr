@@ -30,6 +30,8 @@ import type {
   WebhookDelivery,
   CicdPipeline,
   AutomationRunner,
+  AutomationRunnerHeartbeat,
+  AutomationRunnerDiagnostic,
   AutomationScript,
   AutomationJob,
   AutomationJobLog,
@@ -41,19 +43,22 @@ import type {
   ActivityEvent,
   Notification,
   TestResultScreenshotHistory,
+  McpUsageEvent,
 } from '../types/domain';
 import type { Attachment, IssueAttachment } from '../types/domain';
 
-export function mapApiTokenRow(row: any): ApiToken { return { id: row.id, projectId: row.project_id, name: row.name, tokenPrefix: row.token_prefix, scopes: row.scopes ?? [], revokedAt: row.revoked_at ?? null, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapApiTokenRow(row: any): ApiToken { return { id: row.id, projectId: row.project_id, name: row.name, tokenPrefix: row.token_prefix, scopes: row.scopes ?? [], revokedAt: row.revoked_at ?? null, expiresAt: row.expires_at ?? null, lastUsedAt: row.last_used_at ?? null, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapWebhookRow(row: any): Webhook { return { id: row.id, projectId: row.project_id, name: row.name, url: row.url, events: row.events ?? [], isActive: row.is_active, maxRetries: row.max_retries, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapWebhookDeliveryRow(row: any): WebhookDelivery { return { id: row.id, webhookId: row.webhook_id, projectId: row.project_id, event: row.event, resourceId: row.resource_id, status: row.status, attemptCount: row.attempt_count, nextAttemptAt: row.next_attempt_at, responseStatus: row.response_status ?? null, deliveredAt: row.delivered_at ?? null, lastError: row.last_error ?? null, createdAt: row.created_at }; }
 export function mapCicdPipelineRow(row: any): CicdPipeline { return { id: row.id, projectId: row.project_id, testPlanId: row.test_plan_id, name: row.name, provider: row.provider, tokenPrefix: row.token_prefix, active: row.active, lastUsedAt: row.last_used_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
-export function mapAutomationRunnerRow(row: any): AutomationRunner { return { id: row.id, projectId: row.project_id, name: row.name, labels: row.labels ?? [], tokenPrefix: row.token_prefix, active: row.active, lastSeenAt: row.last_seen_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapAutomationRunnerRow(row: any): AutomationRunner { return { id: row.id, projectId: row.project_id, name: row.name, labels: row.labels ?? [], tokenPrefix: row.token_prefix, active: row.active, lastSeenAt: row.last_seen_at ?? null, version: null, os: null, startedAt: null, scriptRefs: [], browsers: [], lastJob: null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
 export function mapTestResultScreenshotHistoryRow(row: any): TestResultScreenshotHistory {
   return { testResultId: row.id, testRunId: row.test_run_id, runCode: row.test_run.code, runName: row.test_run.name, startedAt: row.test_run.started_at, artifacts: (row.automation_artifacts ?? []).filter((artifact: any) => artifact.type === 'screenshot') };
 }
 export function mapAutomationScriptRow(row: any): AutomationScript { return { id: row.id, projectId: row.project_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, runnerLabels: row.runner_labels ?? [], createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
-export function mapAutomationJobRow(row: any): AutomationJob { return { id: row.id, projectId: row.project_id, testRunId: row.test_run_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, requiredLabels: row.required_labels ?? [], status: row.status, attempt: row.attempt, maxAttempts: row.max_attempts, browser: row.browser ?? 'chromium', deviceProfile: row.device_profile ?? null, pauseOnFailure: row.pause_on_failure ?? false, runnerId: row.runner_id ?? null, artifacts: row.artifacts ?? [], errorMessage: row.error_message ?? null, queuedAt: row.queued_at, startedAt: row.started_at ?? null, finishedAt: row.finished_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at }; }
+export function mapAutomationRunnerHeartbeatRow(row: any): AutomationRunnerHeartbeat { return { runnerId: row.credential_id, version: row.version, os: row.os ?? null, startedAt: row.started_at ?? null, scriptRefs: row.script_refs ?? [] }; }
+export function mapAutomationRunnerDiagnosticRow(row: any): AutomationRunnerDiagnostic { const result = row.result ?? {}; return { id: row.id, runnerId: row.runner_id, status: row.status, baseUrl: row.base_url ?? null, baseUrlReachable: result.baseUrlReachable ?? null, browserInstalled: result.browserInstalled ?? null, playwrightVersion: result.playwrightVersion ?? null, diskFreeBytes: result.diskFreeBytes == null ? null : Number(result.diskFreeBytes), errorMessage: row.error_message ?? result.errorMessage ?? null, requestedAt: row.requested_at, finishedAt: row.finished_at ?? null }; }
+export function mapAutomationJobRow(row: any): AutomationJob { return { id: row.id, projectId: row.project_id, testRunId: row.test_run_id, testCaseId: row.test_case_id, scriptRef: row.script_ref, requiredLabels: row.required_labels ?? [], status: row.status, attempt: row.attempt, maxAttempts: row.max_attempts, browser: row.browser ?? 'chromium', deviceProfile: row.device_profile ?? null, pauseOnFailure: row.pause_on_failure ?? false, runnerId: row.runner_id ?? null, artifacts: row.artifacts ?? [], errorMessage: row.error_message ?? null, queuedAt: row.queued_at, startedAt: row.started_at ?? null, finishedAt: row.finished_at ?? null, createdBy: row.created_by, createdAt: row.created_at, updatedAt: row.updated_at, testPlanId: row.test_plan_id ?? null, environmentId: row.environment_id ?? null, testResultId: row.test_result_id ?? null, currentStep: row.current_step ?? null, estimatedDurationMs: row.estimated_duration_ms ?? null }; }
 export function mapAutomationJobLogRow(row: any): AutomationJobLog { return { id: Number(row.id), projectId: row.project_id, jobId: row.job_id, attempt: row.attempt, sequence: row.sequence, stream: row.stream, content: row.content, createdAt: row.created_at }; }
 
 // Supabase columns are snake_case; domain types are camelCase.
@@ -527,4 +532,7 @@ export function mapOperationalHealth(payload: any) {
 }
 export function mapOperationalErrorLogRow(row: any) {
   return { id: Number(row.id), source: row.source, severity: row.severity, code: row.code ?? null, message: row.message, projectId: row.project_id ?? null, resourceType: row.resource_type ?? null, resourceId: row.resource_id ?? null, context: row.context ?? {}, occurredAt: row.occurred_at, resolvedAt: row.resolved_at ?? null };
+}
+export function mapMcpUsageEventRow(row: any): McpUsageEvent {
+  return { usedAt: row.created_at };
 }

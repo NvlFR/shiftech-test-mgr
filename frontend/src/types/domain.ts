@@ -104,7 +104,7 @@ export type ProjectPermissions = Record<ProjectPermission, boolean>;
 export type ProjectMemberStatus = 'invited' | 'accepted' | 'declined';
 
 export type ApiTokenScope = 'read:project' | 'write:test-runs' | 'write:test-results' | 'write:issues';
-export interface ApiToken { id: string; projectId: string; name: string; tokenPrefix: string; scopes: ApiTokenScope[]; revokedAt: string | null; createdAt: string; updatedAt: string; }
+export interface ApiToken { id: string; projectId: string; name: string; tokenPrefix: string; scopes: ApiTokenScope[]; revokedAt: string | null; expiresAt: string | null; lastUsedAt: string | null; createdAt: string; updatedAt: string; }
 export interface CreatedApiToken extends ApiToken { token: string; }
 export type WebhookEvent = 'test_run.created' | 'test_run.updated' | 'test_result.updated' | 'issue.created' | 'issue.updated' | 'issue.resolved';
 export interface Webhook { id: string; projectId: string; name: string; url: string; events: WebhookEvent[]; isActive: boolean; maxRetries: number; createdAt: string; updatedAt: string; }
@@ -369,11 +369,24 @@ export interface AutomationRunner {
   tokenPrefix: string;
   active: boolean;
   lastSeenAt: string | null;
+  version: string | null;
+  os: string | null;
+  startedAt: string | null;
+  scriptRefs: string[];
+  browsers: AutomationBrowser[];
+  lastJob: AutomationRunnerLastJob | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
 }
+export interface AutomationRunnerLastJob { id: string; status: AutomationJobStatus; browser: AutomationBrowser; finishedAt: string | null; startedAt: string | null; queuedAt: string; }
+export interface AutomationRunnerHeartbeat { runnerId: string; version: string; os: string | null; startedAt: string | null; scriptRefs: string[]; }
 export interface AutomationRunnerSecret { runner: AutomationRunner; token: string; }
+export interface AutomationRunnerDiagnostic {
+  id: string; runnerId: string; status: 'queued' | 'running' | 'passed' | 'failed'; baseUrl: string | null;
+  baseUrlReachable: boolean | null; browserInstalled: boolean | null; playwrightVersion: string | null;
+  diskFreeBytes: number | null; errorMessage: string | null; requestedAt: string; finishedAt: string | null;
+}
 
 export interface AutomationScript {
   id: string;
@@ -430,6 +443,11 @@ export interface AutomationJob {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  testPlanId: string | null;
+  environmentId: string | null;
+  testResultId: string | null;
+  currentStep: string | null;
+  estimatedDurationMs: number | null;
 }
 
 export type AutomationJobLogStream = 'stdout' | 'stderr' | 'system';
@@ -760,6 +778,10 @@ export interface RetentionCleanupPreview { projectId: string | null; attachmentC
 export interface RetentionCleanupResult { testAttachments: number; issueAttachments: number; cutoff: string; }
 export interface RestorePreview { valid: boolean; projectName: string; modules: number; tags: number; testCases: number; testPlans: number; testRuns: number; testResults: number; issues: number; attachments: number; storageObjects: number; }
 export interface RestoreResult { projectId: string; inserted: number; skipped: number; storageRestored: number; storageSkipped: number; }
+
+export interface McpUsageEvent {
+  usedAt: string;
+}
 
 export interface BackupStorageObject {
   bucket: 'test-attachments' | 'issue-attachments';

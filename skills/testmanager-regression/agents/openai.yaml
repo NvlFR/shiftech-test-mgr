@@ -1,0 +1,4 @@
+interface:
+  display_name: "TestManager Regression"
+  short_description: "Pilih regression test relevan dengan aman"
+  default_prompt: "Gunakan $testmanager-regression untuk memilih cakupan regression yang relevan dan aman."

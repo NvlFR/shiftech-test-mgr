@@ -28,7 +28,7 @@ test('init menukar code, menulis config 0600, lalu mengirim heartbeat tanpa meng
   let output = '';
   await bootstrapRunner(code, {
     cwd: root,
-    env: { TM_SUPABASE_URL: 'https://example.test', TM_SUPABASE_ANON_KEY: 'anon-public' },
+    env: { TM_SUPABASE_URL: 'https://example.test', TM_SUPABASE_ANON_KEY: 'anon-public', TM_RUNNER_NAME: 'Runner CI', TM_RUNNER_LABELS: ' Chromium, staging,chromium ' },
     transport,
     stdout: { write(value) { output += value; return true; } },
   });
@@ -36,6 +36,8 @@ test('init menukar code, menulis config 0600, lalu mengirim heartbeat tanpa meng
   assert.deepEqual(calls.map((call) => call.operation), ['redeem_agent_bootstrap_code', 'heartbeat_local_agent']);
   const token = calls[0].body.p_runner_token;
   assert.match(token, /^tm_[A-Za-z0-9_-]{48}$/);
+  assert.equal(calls[0].body.p_runner_name, 'Runner CI');
+  assert.deepEqual(calls[0].body.p_runner_labels, ['chromium', 'staging']);
   assert.equal(calls[1].auth.body.p_token, token);
   const config = await readFile(join(root, '.env'), 'utf8');
   assert.match(config, new RegExp(`TM_RUNNER_TOKEN=${token}`));

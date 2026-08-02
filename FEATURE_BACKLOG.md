@@ -722,50 +722,50 @@ alur intinya terbukti.
 
 ### 12.1 Kerangka halaman
 
-- [ ] Route `/projects/:id/connect` + tombol **Connect Agent** di Project Detail
+- [x] Route `/projects/:id/connect` + tombol **Connect Agent** di Project Detail
       dan Project Settings.
-- [ ] Tab bar mode koneksi, meniru struktur Supabase — tahap 1 hanya **MCP** yang
+- [x] Tab bar mode koneksi, meniru struktur Supabase — tahap 1 hanya **MCP** yang
       aktif; sisanya placeholder disabled dengan label alasan:
       `MCP (aktif)` · `API Token` · `Webhook` · `CI/CD` · `Runner`.
-- [ ] Semua nilai yang ditampilkan **project-scoped**: project id, nama, dan URL
+- [x] Semua nilai yang ditampilkan **project-scoped**: project id, nama, dan URL
       diambil dari project yang sedang dibuka, bukan diketik user.
-- [ ] Halaman ini read-only terhadap data project — ia hanya membaca konfigurasi
+- [x] Halaman ini read-only terhadap data project — ia hanya membaca konfigurasi
       dan membuat token; tidak mengubah test case/plan/run apa pun.
 
 ### 12.2 Panel konfigurasi MCP
 
-- [ ] **Client selector** — dropdown. Tahap 1: `Claude Code` (satu-satunya
+- [x] **Client selector** — dropdown. Tahap 1: `Claude Code` (satu-satunya
       enabled). Entri `Cursor`, `Claude Desktop`, `VS Code`, `Windsurf` tampil
       disabled + badge "segera".
-- [ ] **Read-only toggle** — memetakan langsung ke `TM_MCP_READONLY=1` (Section
+- [x] **Read-only toggle** — memetakan langsung ke `TM_MCP_READONLY=1` (Section
       8.1). Saat aktif, tool tulis tidak diregistrasikan sama sekali, dan UI
       menampilkan berapa tool yang akan tersedia.
-- [ ] **Feature groups** — multiselect chip yang memilih grup tool mana yang
+- [x] **Feature groups** — multiselect chip yang memilih grup tool mana yang
       diaktifkan, memakai pengelompokan Section 8.2:
       `DISCOVERY` · `TEST-CASE` · `TEST-PLAN` · `TEST-RUN` · `ISSUE` ·
       `AUTOMATION` · `REPO` · `ANALYSIS` · `DOCS`.
-- [ ] Grup yang berat/berisiko (`AUTOMATION`, `REPO`) **off secara default** —
+- [x] Grup yang berat/berisiko (`AUTOMATION`, `REPO`) **off secara default** —
       alasan sama dengan Supabase mematikan Storage: menjaga jumlah tool tetap
       terkelola dan mengurangi permukaan risiko.
-- [ ] Penghitung live: "N tool akan aktif" + peringatan kalau N melewati ambang
+- [x] Penghitung live: "N tool akan aktif" + peringatan kalau N melewati ambang
       yang bikin context agent membengkak.
-- [ ] Preview daftar nama tool yang akan teregistrasi, bisa dilipat.
+- [x] Preview daftar nama tool yang akan teregistrasi, bisa dilipat.
 
 ### 12.3 Langkah bernomor + perintah siap salin
 
-- [ ] **Langkah 1 — Add MCP server.** Menghasilkan perintah lengkap, contoh
+- [x] **Langkah 1 — Add MCP server.** Menghasilkan perintah lengkap, contoh
       bentuknya:
       `claude mcp add --scope project --transport http testmanager <url>`
       dengan URL dan header yang sudah terisi sesuai project + opsi terpilih.
-- [ ] **Langkah 2 — Authenticate.** Instruksi `claude /mcp` lalu pilih server dan
+- [x] **Langkah 2 — Authenticate.** Instruksi `claude /mcp` lalu pilih server dan
       jalankan flow auth. Sertakan catatan bahwa ini harus dijalankan di terminal
       biasa, bukan di dalam ekstensi IDE.
-- [ ] **Langkah 3 — Install Agent Skills (opsional).** Perintah pemasangan skill
+- [x] **Langkah 3 — Install Agent Skills (opsional).** Perintah pemasangan skill
       pack TestManager (lihat 12.4).
-- [ ] Tombol **Copy** per langkah + tombol **Copy semua** di header panel.
-- [ ] Setiap perintah yang disalin ikut menyesuaikan pilihan read-only dan feature
+- [x] Tombol **Copy** per langkah + tombol **Copy semua** di header panel.
+- [x] Setiap perintah yang disalin ikut menyesuaikan pilihan read-only dan feature
       group — bukan template statis.
-- [ ] Blok perintah bisa di-scroll horizontal dan tidak pernah memotong isi
+- [x] Blok perintah bisa di-scroll horizontal dan tidak pernah memotong isi
       diam-diam (perintah terpotong = user menempel perintah rusak).
 
 ### 12.4 Agent Skills pack
@@ -773,61 +773,61 @@ alur intinya terbukti.
 Skill = instruksi + resource siap pakai supaya agent memakai TestManager dengan
 benar tanpa harus diajari ulang tiap sesi.
 
-- [ ] Folder `skills/` berisi skill pack TestManager, dapat dipasang ke project
+- [x] Folder `skills/` berisi skill pack TestManager, dapat dipasang ke project
       user (pola `npx skills add ...` atau salin ke `.claude/skills/`).
-- [ ] Skill **`testmanager-workflow`** — aturan main domain: re-run selalu Test Run
+- [x] Skill **`testmanager-workflow`** — aturan main domain: re-run selalu Test Run
       baru, Test Case tidak pernah menyimpan hasil, Issue hanya dari Test Result
       FAIL, approval selalu manusia.
-- [ ] Skill **`testmanager-authoring`** — cara menulis Test Case yang baik:
+- [x] Skill **`testmanager-authoring`** — cara menulis Test Case yang baik:
       struktur steps, expected result, skenario negatif, edge case.
-- [ ] Skill **`testmanager-triage`** — cara membaca Test Run gagal, membaca bundle
+- [x] Skill **`testmanager-triage`** — cara membaca Test Run gagal, membaca bundle
       bukti, dan menyusun Issue yang actionable.
-- [ ] Skill **`testmanager-regression`** — cara memilih test regression yang
+- [x] Skill **`testmanager-regression`** — cara memilih test regression yang
       relevan (sinyal Section 11.7) dan kapan harus minta konfirmasi manusia.
 - [ ] Halaman menampilkan daftar skill + deskripsi singkat, dengan checkbox mana
       yang ikut dipasang.
-- [ ] Skill pack diversipkan dan dicatat versinya, supaya bisa diperbarui tanpa
+- [x] Skill pack diversipkan dan dicatat versinya, supaya bisa diperbarui tanpa
       menebak-nebak.
 
 ### 12.5 Prompt starter
 
-- [ ] Panel **Prompt** berisi prompt siap pakai yang sudah terisi konteks project
+- [x] Panel **Prompt** berisi prompt siap pakai yang sudah terisi konteks project
       (nama, id, module, environment aktif).
-- [ ] Kategori prompt minimal: *generate test case dari requirement*, *analisis
+- [x] Kategori prompt minimal: *generate test case dari requirement*, *analisis
       Test Run terakhir*, *triage Issue terbuka*, *pilih regression untuk Issue
       resolved*, *audit coverage requirement*.
-- [ ] Tombol **Copy prompt** per item (sejajar dengan tombol "Copy prompt" di pola
+- [x] Tombol **Copy prompt** per item (sejajar dengan tombol "Copy prompt" di pola
       Supabase).
-- [ ] Prompt disimpan sebagai data, bukan hardcode di komponen, supaya bisa
+- [x] Prompt disimpan sebagai data, bukan hardcode di komponen, supaya bisa
       ditambah tanpa menyentuh UI.
 - [ ] Opsional: user bisa menyimpan prompt sendiri per project (butuh tabel baru —
       putuskan dulu apakah masuk scope tahap 1).
 
 ### 12.6 Keamanan (jangan dilewat)
 
-- [ ] Token **tidak pernah ditanam di dalam string perintah yang ditampilkan**.
+- [x] Token **tidak pernah ditanam di dalam string perintah yang ditampilkan**.
       Perintah yang disalin merujuk ke variabel environment atau flow auth
       interaktif; kalau token harus muncul, tampilkan sekali dengan peringatan
       eksplisit.
-- [ ] Alasannya: perintah yang ditempel ke shell masuk ke `~/.bash_history`, dan
+- [x] Alasannya: perintah yang ditempel ke shell masuk ke `~/.bash_history`, dan
       screenshot halaman ini akan beredar di grup chat. Dua-duanya membocorkan
       token permanen.
-- [ ] Token yang dibuat dari halaman ini **project-scoped**, punya masa berlaku,
+- [x] Token yang dibuat dari halaman ini **project-scoped**, punya masa berlaku,
       dan bisa dicabut dari halaman yang sama.
-- [ ] Tampilkan daftar token aktif yang pernah dibuat lewat halaman ini beserta
+- [x] Tampilkan daftar token aktif yang pernah dibuat lewat halaman ini beserta
       pemakaian terakhir, supaya token menganggur bisa dicabut.
-- [ ] Pembuatan/pencabutan token tercatat di audit log.
-- [ ] Peringatan eksplisit saat read-only dimatikan: agent akan bisa menulis data
+- [x] Pembuatan/pencabutan token tercatat di audit log.
+- [x] Peringatan eksplisit saat read-only dimatikan: agent akan bisa menulis data
       project.
 
 ### 12.7 Kualitas UI
 
-- [ ] Status koneksi: deteksi apakah project ini sudah pernah dipakai lewat MCP
+- [x] Status koneksi: deteksi apakah project ini sudah pernah dipakai lewat MCP
       (dari `ai_audit_events`) dan tampilkan "terakhir dipakai <waktu>".
-- [ ] Empty state yang mengajari, bukan sekadar "belum ada data".
-- [ ] Seluruh perintah punya fallback teks yang bisa diseleksi manual kalau
+- [x] Empty state yang mengajari, bukan sekadar "belum ada data".
+- [x] Seluruh perintah punya fallback teks yang bisa diseleksi manual kalau
       clipboard API diblokir browser.
-- [ ] Konsisten dengan `PageHeader` dan tema light/dark yang sudah ada.
+- [x] Konsisten dengan `PageHeader` dan tema light/dark yang sudah ada.
 
 ---
 
@@ -837,20 +837,20 @@ Tester tidak boleh disuruh membuka dokumentasi terpisah untuk memasang runner.
 Dari sudut pandang agent, memasang dan menyambungkan runner harus **satu
 perintah**, dan prompt di halaman Connect yang membawanya.
 
-- [ ] Prompt starter menyertakan varian **"Pasang & sambungkan runner"** yang
+- [x] Prompt starter menyertakan varian **"Pasang & sambungkan runner"** yang
       menginstruksikan agent memasang Local Runner lalu menyambungkannya ke
       project ini.
-- [ ] Perintah yang dihasilkan berbentuk satu baris, contoh bentuknya:
+- [x] Perintah yang dihasilkan berbentuk satu baris, contoh bentuknya:
       `npx @testmanager/runner init --code <BOOTSTRAP_CODE>`
-- [ ] `BOOTSTRAP_CODE` adalah **kode sekali pakai berumur pendek** (default 10
+- [x] `BOOTSTRAP_CODE` adalah **kode sekali pakai berumur pendek** (default 10
       menit), bukan runner token. Lihat 14.4 — ini yang membuat perintahnya aman
       ditempel ke prompt, di-screenshot, atau dikirim lewat chat.
-- [ ] Setelah `init` berhasil, halaman Connect mendeteksi heartbeat pertama dan
+- [x] Setelah `init` berhasil, halaman Connect mendeteksi heartbeat pertama dan
       berpindah sendiri ke status "Runner terhubung" (sinkron dengan wizard 13.1 —
       satu alur, bukan dua yang mirip).
-- [ ] Agent diberi tahu apa yang harus dilaporkan balik ke user: nama runner,
+- [x] Agent diberi tahu apa yang harus dilaporkan balik ke user: nama runner,
       label, dan project yang tersambung. Tidak boleh menampilkan token.
-- [ ] Skill `testmanager-workflow` (12.4) memuat instruksi setup runner ini,
+- [x] Skill `testmanager-workflow` (12.4) memuat instruksi setup runner ini,
       supaya agent tahu caranya tanpa harus diberi prompt panjang tiap kali.
 
 ---
@@ -867,66 +867,66 @@ Section 9 mengurus *kemampuan* runner. Section ini mengurus *pengalaman memakain
 
 ### 13.1 Onboarding runner
 
-- [ ] Wizard **"Hubungkan Runner"** berlangkah: beri nama runner → pilih label
+- [x] Wizard **"Hubungkan Runner"** berlangkah: beri nama runner → pilih label
       kapabilitas → dapatkan token sekali tampil → salin perintah instalasi →
       halaman menunggu heartbeat pertama dan mengonfirmasi "Runner terhubung".
-- [ ] Deteksi otomatis heartbeat pertama tanpa perlu refresh manual.
-- [ ] Perintah instalasi siap salin untuk dua jalur: **npm** (`npm install` +
+- [x] Deteksi otomatis heartbeat pertama tanpa perlu refresh manual.
+- [x] Perintah instalasi siap salin untuk dua jalur: **npm** (`npm install` +
       `npm start`) dan **Docker** (`docker run` dengan `--env-file`).
-- [ ] Empty state di tab Runner yang mengarah langsung ke wizard, bukan tabel kosong.
-- [ ] Penjelasan singkat satu paragraf di halaman: kenapa runner harus di mesin
+- [x] Empty state di tab Runner yang mengarah langsung ke wizard, bukan tabel kosong.
+- [x] Penjelasan singkat satu paragraf di halaman: kenapa runner harus di mesin
       lokal dan kenapa tidak perlu buka port.
 
 ### 13.2 Status runner yang terbaca
 
-- [ ] Indikator status jelas: `Online` · `Idle` · `Sibuk` · `Offline`, dengan
+- [x] Indikator status jelas: `Online` · `Idle` · `Sibuk` · `Offline`, dengan
       warna dan waktu heartbeat terakhir dalam bahasa manusia ("2 menit lalu").
-- [ ] Kartu runner (bukan hanya baris tabel) di layar lebar: nama, label, versi
+- [x] Kartu runner (bukan hanya baris tabel) di layar lebar: nama, label, versi
       runner, OS, browser tersedia, job terakhir, dan uptime.
-- [ ] Peringatan kalau runner offline > ambang tertentu padahal masih ada job antre.
-- [ ] Tombol rotate/revoke token per runner dengan konfirmasi eksplisit.
-- [ ] Tampilkan **kenapa** sebuah job tidak diambil runner mana pun (label tidak
+- [x] Peringatan kalau runner offline > ambang tertentu padahal masih ada job antre.
+- [x] Tombol rotate/revoke token per runner dengan konfirmasi eksplisit.
+- [x] Tampilkan **kenapa** sebuah job tidak diambil runner mana pun (label tidak
       cocok, semua runner offline, atau environment tidak terjangkau) — ini
       penyebab kebingungan paling umum pada pola pull-based.
 
 ### 13.3 Papan job
 
-- [ ] Tampilan papan berkolom status: `Queued` → `Running` → `Passed`/`Failed`,
+- [x] Tampilan papan berkolom status: `Queued` → `Running` → `Passed`/`Failed`,
       sebagai alternatif tabel.
-- [ ] Progres per job: langkah yang sedang jalan, durasi berjalan, dan perkiraan
+- [x] Progres per job: langkah yang sedang jalan, durasi berjalan, dan perkiraan
       selesai berdasarkan run sebelumnya.
-- [ ] Live log streaming saat job `running` (bergantung pada Section 9.4).
-- [ ] Filter cepat: per runner, per environment, per test plan, per status.
-- [ ] Aksi baris: batalkan job antre, ulangi job gagal, buka Test Result terkait.
-- [ ] Badge jumlah job antre di menu sidebar supaya terlihat tanpa membuka halaman.
+- [x] Live log streaming saat job `running` (bergantung pada Section 9.4).
+- [x] Filter cepat: per runner, per environment, per test plan, per status.
+- [x] Aksi baris: batalkan job antre, ulangi job gagal, buka Test Result terkait.
+- [x] Badge jumlah job antre di menu sidebar supaya terlihat tanpa membuka halaman.
 
 ### 13.4 Mapping script yang tidak membingungkan
 
-- [ ] Tampilkan Test Case yang **belum** punya script secara menonjol — inilah
+- [x] Tampilkan Test Case yang **belum** punya script secara menonjol — inilah
       pekerjaan yang tersisa, bukan daftar yang sudah selesai.
-- [ ] Validasi `script_ref` saat disimpan: beri tahu kalau file tidak ditemukan di
+- [x] Validasi `script_ref` saat disimpan: beri tahu kalau file tidak ditemukan di
       runner mana pun yang online.
-- [ ] Bulk mapping: pilih banyak Test Case sekaligus lalu petakan berdasarkan pola
+- [x] Bulk mapping: pilih banyak Test Case sekaligus lalu petakan berdasarkan pola
       penamaan file.
-- [ ] Tampilkan label runner yang dibutuhkan beserta runner mana yang memenuhi,
+- [x] Tampilkan label runner yang dibutuhkan beserta runner mana yang memenuhi,
       dievaluasi saat itu juga.
 
 ### 13.5 Diagnostik & troubleshooting
 
-- [ ] Panel **Diagnostik** per runner: hasil sanity check terakhir (base URL
+- [x] Panel **Diagnostik** per runner: hasil sanity check terakhir (base URL
       reachable, browser terpasang, versi Playwright, ruang disk).
-- [ ] Daftar penyebab kegagalan umum beserta cara memperbaikinya, ditampilkan
+- [x] Daftar penyebab kegagalan umum beserta cara memperbaikinya, ditampilkan
       kontekstual saat kondisinya terdeteksi — bukan halaman FAQ terpisah.
-- [ ] Tombol "Uji koneksi" yang mengirim job no-op ke runner untuk membuktikan
+- [x] Tombol "Uji koneksi" yang mengirim job no-op ke runner untuk membuktikan
       jalur end-to-end hidup.
-- [ ] Tampilkan versi runner dan peringatkan kalau tertinggal dari versi server.
+- [x] Tampilkan versi runner dan peringatkan kalau tertinggal dari versi server.
 
 ### 13.6 Responsif & konsisten
 
-- [ ] Layout mobile: kartu, bukan tabel yang harus digeser horizontal.
-- [ ] Ikuti konvensi `PageHeader` untuk halaman list (lihat CLAUDE.md) dan tema
+- [x] Layout mobile: kartu, bukan tabel yang harus digeser horizontal.
+- [x] Ikuti konvensi `PageHeader` untuk halaman list (lihat CLAUDE.md) dan tema
       light/dark.
-- [ ] Semua state (loading, kosong, error, offline) punya tampilan yang dirancang,
+- [x] Semua state (loading, kosong, error, offline) punya tampilan yang dirancang,
       tidak ada spinner tanpa konteks.
 
 ---
@@ -1010,7 +1010,7 @@ project yang diuji, jadi paket yang didistribusikan tetap kecil.
 - [ ] **Tidak memakai `curl | bash`** selama belum ada penandatanganan rilis.
       Kalau nanti dipakai, wajib: domain sendiri, binary tertandatangani,
       checksum dipublikasikan, dan script bisa diunduh dulu sebelum dijalankan.
-- [ ] **Nol runtime dependency dipertahankan.** Ini bukan estetika — setiap
+- [x] **Nol runtime dependency dipertahankan.** Ini bukan estetika — setiap
       dependency adalah pintu masuk supply chain ke mesin developer pelanggan.
       Penambahan dependency harus keputusan sadar dan tercatat.
 - [ ] Publikasi paket wajib memakai npm provenance + 2FA.

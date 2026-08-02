@@ -24,10 +24,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@testmanager/agent-core": "file:../packages/agent-core"
-  },
   "devDependencies": {
+    "@testmanager/agent-core": "file:../packages/agent-core",
     "@types/node": "^22.10.0",
     "typescript": "^5.7.0"
   }

@@ -9,16 +9,19 @@ export interface AgentHeartbeatPayload {
   readonly version: typeof LOCAL_AGENT_VERSION;
   readonly process: AgentProcess;
   readonly capabilities: readonly string[];
+  readonly runtime?: { readonly os: string; readonly startedAt: string; readonly scriptRefs?: readonly string[] };
 }
 
 export function createAgentHeartbeat(
   process: AgentProcess,
   capabilities: readonly string[],
+  runtime?: AgentHeartbeatPayload['runtime'],
 ): AgentHeartbeatPayload {
   return {
     agent: LOCAL_AGENT_NAME,
     version: LOCAL_AGENT_VERSION,
     process,
     capabilities: [...capabilities].sort(),
+    ...(runtime ? { runtime } : {}),
   };
 }

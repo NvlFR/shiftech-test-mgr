@@ -58,7 +58,9 @@ export async function bootstrapRunner(code: string, options: BootstrapInitOption
   registerSecret(runnerToken);
 
   const api = new BootstrapApi({ supabaseUrl, supabaseAnonKey }, options.transport);
-  const runner = await api.redeem(code, runnerToken, `Local Runner (${hostname()})`);
+  const runnerName = sourceEnv.TM_RUNNER_NAME?.trim() || `Local Runner (${hostname()})`;
+  const runnerLabels = Array.from(new Set((sourceEnv.TM_RUNNER_LABELS ?? '').split(',').map((label) => label.trim().toLowerCase()).filter(Boolean)));
+  const runner = await api.redeem(code, runnerToken, runnerName, runnerLabels);
   await writePrivateConfig(configPath, serializeConfig(supabaseUrl, supabaseAnonKey, runnerToken, cwd));
   await api.heartbeat(runnerToken);
 

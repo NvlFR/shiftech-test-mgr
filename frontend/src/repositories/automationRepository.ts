@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabaseClient';
-import { mapAutomationJobLogRow, mapAutomationJobRow, mapAutomationRunnerRow, mapAutomationScriptRow } from '../helpers/mappers';
+import { mapAutomationJobLogRow, mapAutomationJobRow, mapAutomationRunnerDiagnosticRow, mapAutomationRunnerHeartbeatRow, mapAutomationRunnerRow, mapAutomationScriptRow } from '../helpers/mappers';
 import type {
   AutomationEnqueueResponse,
   AutomationJob,
@@ -7,6 +7,7 @@ import type {
   AutomationLocalRunResponse,
   AutomationRunner,
   AutomationRunnerSecret,
+  AutomationRunnerHeartbeat,
   AutomationScript,
 } from '../types/domain';
 
@@ -20,6 +21,22 @@ export const automationRepository = {
     const { data, error } = await supabase.from('automation_runners').select(RUNNER_COLUMNS).eq('project_id', projectId).order('created_at', { ascending: false });
     if (error) throw error;
     return (data ?? []).map(mapAutomationRunnerRow);
+  },
+
+  async listRunnerHeartbeats(projectId: string): Promise<AutomationRunnerHeartbeat[]> {
+    const { data, error } = await supabase.from('local_agent_heartbeats').select('credential_id,version,os,started_at,script_refs').eq('project_id', projectId).eq('credential_kind', 'runner').eq('process', 'runner');
+    if (error) throw error;
+    return (data ?? []).map(mapAutomationRunnerHeartbeatRow);
+  },
+  async listRunnerDiagnostics(projectId: string) {
+    const { data, error } = await supabase.from('automation_runner_diagnostics').select('id,runner_id,status,base_url,result,error_message,requested_at,finished_at').eq('project_id', projectId).order('requested_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    return (data ?? []).map(mapAutomationRunnerDiagnosticRow);
+  },
+  async enqueueRunnerDiagnostic(runnerId: string) {
+    const { data, error } = await supabase.rpc('enqueue_runner_diagnostic', { p_runner_id: runnerId });
+    if (error) throw error;
+    return mapAutomationRunnerDiagnosticRow(data);
   },
 
   async createRunner(input: { projectId: string; name: string; labels: string[]; token: string }): Promise<AutomationRunnerSecret> {
@@ -57,6 +74,15 @@ export const automationRepository = {
     return mapAutomationScriptRow(data);
   },
 
+  async createScripts(inputs: Array<{ projectId: string; testCaseId: string; scriptRef: string; runnerLabels: string[]; createdBy: string }>): Promise<AutomationScript[]> {
+    const { data, error } = await supabase.from('automation_scripts').insert(inputs.map((input) => ({
+      project_id: input.projectId, test_case_id: input.testCaseId, script_ref: input.scriptRef,
+      runner_labels: input.runnerLabels, created_by: input.createdBy,
+    }))).select(SCRIPT_COLUMNS);
+    if (error) throw error;
+    return (data ?? []).map(mapAutomationScriptRow);
+  },
+
   async deleteScript(id: string): Promise<void> {
     const { error } = await supabase.from('automation_scripts').delete().eq('id', id);
     if (error) throw error;
@@ -65,7 +91,30 @@ export const automationRepository = {
   async listJobs(projectId: string): Promise<AutomationJob[]> {
     const { data, error } = await supabase.from('automation_jobs').select(JOB_COLUMNS).eq('project_id', projectId).order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
-    return (data ?? []).map(mapAutomationJobRow);
+    const rows = data ?? [];
+    if (!rows.length) return [];
+    const runIds = Array.from(new Set(rows.map((row: any) => row.test_run_id)));
+    const jobIds = rows.map((row: any) => row.id);
+    const [{ data: runs, error: runsError }, { data: results, error: resultsError }, { data: logs, error: logsError }] = await Promise.all([
+      supabase.from('test_runs').select('id,test_plan_id,environment_id').in('id', runIds),
+      supabase.from('test_results').select('id,test_run_id,test_case_id').in('test_run_id', runIds),
+      supabase.from('automation_job_logs').select('job_id,content,sequence,attempt').in('job_id', jobIds).order('attempt', { ascending: false }).order('sequence', { ascending: false }),
+    ]);
+    if (runsError) throw runsError;
+    if (resultsError) throw resultsError;
+    if (logsError) throw logsError;
+    return rows.map((row: any) => {
+      const run = runs?.find((item: any) => item.id === row.test_run_id);
+      const result = results?.find((item: any) => item.test_run_id === row.test_run_id && item.test_case_id === row.test_case_id);
+      const log = logs?.find((item: any) => item.job_id === row.id);
+      return mapAutomationJobRow({ ...row, test_plan_id: run?.test_plan_id, environment_id: run?.environment_id, test_result_id: result?.id, current_step: log?.content?.trim() || null });
+    });
+  },
+
+  async listQueuedJobProjectIds(): Promise<string[]> {
+    const { data, error } = await supabase.from('automation_jobs').select('project_id').eq('status', 'queued');
+    if (error) throw error;
+    return (data ?? []).map((row: any) => row.project_id);
   },
 
   async listJobLogs(jobId: string): Promise<AutomationJobLog[]> {

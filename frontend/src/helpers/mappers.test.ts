@@ -24,9 +24,9 @@ describe('mappers', () => {
   it('menguji setiap mapper yang diekspor agar penambahan mapper baru tidak luput', () => {
     expect(Object.keys(mappers).sort()).toEqual([
       'mapActivityEventRow', 'mapApiTokenRow', 'mapAttachmentRow', 'mapAutomationJobLogRow',
-      'mapAutomationJobRow', 'mapAutomationRunnerRow', 'mapAutomationScriptRow', 'mapCicdPipelineRow',
+      'mapAutomationJobRow', 'mapAutomationRunnerDiagnosticRow', 'mapAutomationRunnerHeartbeatRow', 'mapAutomationRunnerRow', 'mapAutomationScriptRow', 'mapCicdPipelineRow',
       'mapCommentMentionRow', 'mapCommentRow', 'mapDashboardQaLoopAuditRow', 'mapDashboardReportRunRow', 'mapEnvironmentRow',
-      'mapIssueAttachmentRow', 'mapIssueRow', 'mapModuleRow', 'mapNotificationRow', 'mapOperationalErrorLogRow',
+      'mapIssueAttachmentRow', 'mapIssueRow', 'mapMcpUsageEventRow', 'mapModuleRow', 'mapNotificationRow', 'mapOperationalErrorLogRow',
       'mapOperationalHealth', 'mapProfileRow',
       'mapProjectMemberRow', 'mapProjectMemberWithProfileRow', 'mapProjectRepositoryRow', 'mapProjectRow',
       'mapProjectTeamRow', 'mapRequirementLinkRow', 'mapRequirementRow', 'mapRestorePreviewRow', 'mapRestoreResultRow',
@@ -40,14 +40,17 @@ describe('mappers', () => {
   });
 
   describe('mapper langsung snake_case ke camelCase', () => {
-    const cases: Array<[string, Mapper, Record<string, unknown>]> = [
-      ['API token', mappers.mapApiTokenRow, { id: 'token-1', project_id: 'project-1', name: 'CI', token_prefix: 'tm_123', scopes: ['read:project'], revoked_at: null, ...timestamps }],
+    // Elemen ke-4 (opsional) untuk mapper yang sengaja menambahkan field default
+    // yang TIDAK berasal dari row — field itu diisi belakangan oleh RPC/join,
+    // sehingga tidak bisa diturunkan dari camelize(row).
+    const cases: Array<[string, Mapper, Record<string, unknown>, Record<string, unknown>?]> = [
+      ['API token', mappers.mapApiTokenRow, { id: 'token-1', project_id: 'project-1', name: 'CI', token_prefix: 'tm_123', scopes: ['read:project'], revoked_at: null, expires_at: null, last_used_at: null, ...timestamps }],
       ['webhook', mappers.mapWebhookRow, { id: 'webhook-1', project_id: 'project-1', name: 'Run hook', url: 'https://example.test/hook', events: ['test_run.created'], is_active: true, max_retries: 3, ...timestamps }],
       ['webhook delivery', mappers.mapWebhookDeliveryRow, { id: 'delivery-1', webhook_id: 'webhook-1', project_id: 'project-1', event: 'issue.created', resource_id: 'issue-1', status: 'retrying', attempt_count: 2, next_attempt_at: '2026-08-02T10:00:00Z', response_status: null, delivered_at: null, last_error: null, created_at: timestamps.created_at }],
       ['CI/CD pipeline', mappers.mapCicdPipelineRow, { id: 'pipeline-1', project_id: 'project-1', test_plan_id: 'plan-1', name: 'Main', provider: 'github_actions', token_prefix: 'ci_123', active: true, last_used_at: null, created_by: 'user-1', ...timestamps }],
-      ['automation runner', mappers.mapAutomationRunnerRow, { id: 'runner-1', project_id: 'project-1', name: 'Local', labels: ['linux'], token_prefix: 'runner_1', active: true, last_seen_at: null, created_by: 'user-1', ...timestamps }],
+      ['automation runner', mappers.mapAutomationRunnerRow, { id: 'runner-1', project_id: 'project-1', name: 'Local', labels: ['linux'], token_prefix: 'runner_1', active: true, last_seen_at: null, created_by: 'user-1', ...timestamps }, { version: null, os: null, startedAt: null, scriptRefs: [], browsers: [], lastJob: null }],
       ['automation script', mappers.mapAutomationScriptRow, { id: 'script-1', project_id: 'project-1', test_case_id: 'case-1', script_ref: 'tests/login.spec.ts', runner_labels: ['linux'], created_by: 'user-1', ...timestamps }],
-      ['automation job', mappers.mapAutomationJobRow, { id: 'job-1', project_id: 'project-1', test_run_id: 'run-1', test_case_id: 'case-1', script_ref: 'tests/login.spec.ts', required_labels: ['linux'], status: 'queued', attempt: 1, max_attempts: 3, browser: 'firefox', device_profile: null, pause_on_failure: false, runner_id: null, artifacts: [], error_message: null, queued_at: timestamps.created_at, started_at: null, finished_at: null, created_by: 'user-1', ...timestamps }],
+      ['automation job', mappers.mapAutomationJobRow, { id: 'job-1', project_id: 'project-1', test_run_id: 'run-1', test_case_id: 'case-1', script_ref: 'tests/login.spec.ts', required_labels: ['linux'], status: 'queued', attempt: 1, max_attempts: 3, browser: 'firefox', device_profile: null, pause_on_failure: false, runner_id: null, artifacts: [], error_message: null, queued_at: timestamps.created_at, started_at: null, finished_at: null, created_by: 'user-1', test_plan_id: null, environment_id: null, test_result_id: null, current_step: null, estimated_duration_ms: null, ...timestamps }],
       ['project', mappers.mapProjectRow, { id: 'project-1', name: 'TestManager', description: null, status: 'active', owner_id: null, visibility: 'private', ...timestamps }],
       ['project repository', mappers.mapProjectRepositoryRow, { id: 'repository-1', project_id: 'project-1', name: 'Frontend', source_type: 'github_private', url_or_path: 'org/repo', default_branch: null, credential_id: null, credential_mask: null, credential_created_at: null, credential_expires_at: null, subdirectory: null, is_active: true, ...timestamps }],
       ['test suite', mappers.mapTestSuiteRow, { id: 'suite-1', owner_id: 'user-1', name: 'Public suite', description: null, visibility: 'public', ...timestamps }],
@@ -75,8 +78,8 @@ describe('mappers', () => {
       ['requirement link', mappers.mapRequirementLinkRow, { id: 'link-1', requirement_id: 'requirement-1', type: 'test_case', target_id: 'case-1', target_label: 'TC-0001', created_by: null, created_at: timestamps.created_at }],
     ];
 
-    it.each(cases)('%s mempertahankan seluruh field dan nilai nullable', (_, mapper, row) => {
-      expectLosslessMapping(mapper, row);
+    it.each(cases)('%s mempertahankan seluruh field dan nilai nullable', (_, mapper, row, extras) => {
+      expectLosslessMapping(mapper, row, { ...camelizeRow(row), ...(extras ?? {}) });
     });
   });
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "TestManager Triage"
+  short_description: "Triase kegagalan dan bukti menjadi Issue"
+  default_prompt: "Gunakan $testmanager-triage untuk menganalisis kegagalan Test Run dan menyusun Issue actionable."

@@ -23,6 +23,8 @@ export const AGENT_ENV_SCHEMA = {
   TM_SUPABASE_URL: { processes: ['runner', 'mcp'], requiredFor: ['runner', 'mcp'] },
   TM_SUPABASE_ANON_KEY: { processes: ['runner', 'mcp'], requiredFor: ['runner', 'mcp'] },
   TM_RUNNER_TOKEN: { processes: ['runner'], requiredFor: ['runner'] },
+  TM_RUNNER_NAME: { processes: ['runner'], validate: (value) => value.trim().length <= 120, expectation: 'at most 120 characters' },
+  TM_RUNNER_LABELS: { processes: ['runner'] },
   TM_API_TOKEN: { processes: ['mcp'], requiredFor: ['mcp'] },
   TM_PROJECT_ID: { processes: ['mcp'], requiredFor: ['mcp'] },
   TM_SUPABASE_ACCESS_TOKEN: { processes: ['mcp'] },

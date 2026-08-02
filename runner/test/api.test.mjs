@@ -20,11 +20,11 @@ test('AutomationApi delegates RPC operation and body to its transport', async ()
 
   const result = await new AutomationApi(config, transport).heartbeat();
 
-  assert.deepEqual(requests, [{
-    operation: 'heartbeat_local_agent',
-    body: { p_payload: { agent: 'testmanager-agent', version: '0.1.0', process: 'runner', capabilities: ['artifacts', 'execute', 'repository'] } },
-    auth: { headers: {}, body: { p_token: 'runner-token' } },
-  }]);
+  assert.equal(requests[0].operation, 'heartbeat_local_agent');
+  assert.deepEqual(requests[0].auth, { headers: {}, body: { p_token: 'runner-token' } });
+  assert.deepEqual(requests[0].body.p_payload.capabilities, ['artifacts', 'execute', 'repository']);
+  assert.match(requests[0].body.p_payload.runtime.os, /\S/);
+  assert.ok(!Number.isNaN(Date.parse(requests[0].body.p_payload.runtime.startedAt)));
   assert.equal(result.agent_id, 'runner-1');
   assert.equal(result.minimum_supported_runner_version, '0.1.0');
 });

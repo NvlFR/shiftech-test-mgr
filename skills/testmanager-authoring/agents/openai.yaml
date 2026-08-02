@@ -1,0 +1,4 @@
+interface:
+  display_name: "TestManager Authoring"
+  short_description: "Tulis Test Case TestManager berkualitas tinggi"
+  default_prompt: "Gunakan $testmanager-authoring untuk menyusun Test Case yang terstruktur dan dapat diuji."

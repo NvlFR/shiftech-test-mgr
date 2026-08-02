@@ -43,6 +43,7 @@ export type JobResult = 'pass' | 'fail' | 'blocked' | 'skip';
 export type JobLogStream = 'stdout' | 'stderr' | 'system';
 export type StepCommand = 'next' | 'continue';
 export interface AutomationJobCommand { id: number; command: StepCommand; requested_at: string; }
+export interface RunnerDiagnosticJob { id: string; base_url: string | null; }
 
 export interface EnvironmentMetadata {
   browser: 'chromium' | 'firefox' | 'webkit';
@@ -110,14 +111,14 @@ export class BootstrapApi {
     this.transport = transport ?? new SupabaseRpcTransport(config);
   }
 
-  async redeem(code: string, runnerToken: string, runnerName: string): Promise<RedeemedRunner> {
+  async redeem(code: string, runnerToken: string, runnerName: string, runnerLabels: string[] = ['local', 'playwright']): Promise<RedeemedRunner> {
     const response = await this.transport.request<{ runner: RedeemedRunner }>({
       operation: 'redeem_agent_bootstrap_code',
       body: {
         p_code: code,
         p_runner_token: runnerToken,
         p_runner_name: runnerName,
-        p_runner_labels: ['local', 'playwright'],
+        p_runner_labels: runnerLabels,
       },
     });
     return response.data.runner;
@@ -138,6 +139,7 @@ export class BootstrapApi {
 export class AutomationApi {
   private readonly transport: TransportAdapter;
   private readonly auth: AuthAdapter;
+  private readonly startedAt = new Date().toISOString();
 
   constructor(config: RunnerConfig, transport?: TransportAdapter, auth?: AuthAdapter) {
     this.transport = transport ?? new SupabaseRpcTransport({
@@ -159,15 +161,26 @@ export class AutomationApi {
     return response.data;
   }
 
-  heartbeat(): Promise<{ agent_id: string; active: boolean; last_seen_at: string } & RunnerVersionPolicy> {
+  heartbeat(scriptRefs: string[] = []): Promise<{ agent_id: string; active: boolean; last_seen_at: string } & RunnerVersionPolicy> {
     return this.rpc('heartbeat_local_agent', {
-      p_payload: createAgentHeartbeat('runner', ['execute', 'artifacts', 'repository']),
+      p_payload: createAgentHeartbeat('runner', ['execute', 'artifacts', 'repository'], {
+        os: `${process.platform} ${process.arch}`,
+        startedAt: this.startedAt,
+        scriptRefs,
+      }),
     });
   }
 
   async poll(): Promise<AutomationJob | null> {
     const data = await this.rpc<{ job: AutomationJob | null }>('poll_automation_job', {});
     return data.job ?? null;
+  }
+  async pollDiagnostic(): Promise<RunnerDiagnosticJob | null> {
+    const data = await this.rpc<{ job: RunnerDiagnosticJob | null }>('poll_runner_diagnostic', {});
+    return data.job ?? null;
+  }
+  reportDiagnostic(jobId: string, result: Record<string, unknown>): Promise<unknown> {
+    return this.rpc('report_runner_diagnostic', { p_job_id: jobId, p_result: result });
   }
 
   report(jobId: string, payload: ReportPayload): Promise<{ job_id: string; status: string; requeued: boolean }> {

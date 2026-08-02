@@ -800,6 +800,7 @@ export function ProjectDetailPage() {
             <p className="text-color-secondary text-sm m-0">{project.description || 'Tidak ada deskripsi'}</p>
           </div>
           <div className="flex gap-2">
+            <Button label="Connect Agent" icon="pi pi-link" outlined size="small" onClick={() => navigate(`/projects/${id}/connect`)} />
             <Button icon="pi pi-cog" outlined size="small" onClick={() => navigate(`/projects/${id}/settings`)} />
             <Button text rounded size="small" severity="secondary" icon={detailCollapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up'} aria-label={detailCollapsed ? 'Tampilkan detail' : 'Sembunyikan detail'} onClick={() => setDetailCollapsed((value) => !value)} />
           </div>

@@ -26,6 +26,12 @@ test('Runner berhenti pada poll pertama setelah token dicabut dan tidak retry ta
     async heartbeat() {
       return { agent_id: 'runner-1', active: true, last_seen_at: 'now', server_version: '0.1.0', minimum_supported_runner_version: '0.1.0' };
     },
+    // Loop runner memanggil pollDiagnostic() sebelum poll(). Tanpa stub ini,
+    // pemanggilannya melempar TypeError yang tertangkap catch umum, lalu loop
+    // berputar selamanya dan test menggantung — bukan gagal.
+    async pollDiagnostic() {
+      return null;
+    },
     async poll() {
       pollCount += 1;
       throw new SupabaseRpcError(
@@ -51,6 +57,7 @@ test('Runner menolak berjalan ketika versinya di bawah minimum server', async ()
     async heartbeat() {
       return { agent_id: 'runner-1', active: true, last_seen_at: 'now', server_version: '1.0.0', minimum_supported_runner_version: '0.2.0' };
     },
+    async pollDiagnostic() { return null; },
     async poll() { pollCount += 1; return null; },
   };
   const runner = new Runner(config, { async execute() {} }, { async store() {} }, api);

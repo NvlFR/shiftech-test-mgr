@@ -1,0 +1,4 @@
+interface:
+  display_name: "TestManager Workflow"
+  short_description: "Jalankan workflow domain TestManager dengan aman"
+  default_prompt: "Gunakan $testmanager-workflow untuk menjalankan workflow TestManager dan menyiapkan runner dengan aman."

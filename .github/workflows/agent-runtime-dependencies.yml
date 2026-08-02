@@ -1,0 +1,33 @@
+name: Agent runtime dependency guard
+
+on:
+  pull_request:
+    paths:
+      - 'runner/**'
+      - 'packages/agent-core/**'
+      - 'scripts/check-agent-runtime-dependencies.mjs'
+      - 'scripts/check-agent-runtime-dependencies.test.mjs'
+      - '.github/workflows/agent-runtime-dependencies.yml'
+  push:
+    paths:
+      - 'runner/**'
+      - 'packages/agent-core/**'
+      - 'scripts/check-agent-runtime-dependencies.mjs'
+      - 'scripts/check-agent-runtime-dependencies.test.mjs'
+      - '.github/workflows/agent-runtime-dependencies.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  zero-runtime-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Test guard
+        run: node --test scripts/check-agent-runtime-dependencies.test.mjs
+      - name: Reject runtime dependencies
+        run: node scripts/check-agent-runtime-dependencies.mjs

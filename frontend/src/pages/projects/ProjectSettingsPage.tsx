@@ -707,6 +707,7 @@ export function ProjectSettingsPage() {
           </div>
           <div className="flex align-items-center gap-2 flex-shrink-0">
             <Button icon="pi pi-pencil" text rounded severity="secondary" aria-label="Edit project" onClick={openEditProjectDialog} />
+            <Button label="Connect Agent" icon="pi pi-link" size="small" outlined onClick={() => navigate(`/projects/${id}/connect`)} />
             <Button label="Integrasi" icon="pi pi-share-alt" size="small" outlined onClick={() => navigate(`/projects/${id}/integrations`)} />
             <Button label="Backup & Retensi" icon="pi pi-database" size="small" outlined onClick={() => navigate(`/projects/${id}/data-management`)} />
           </div>
