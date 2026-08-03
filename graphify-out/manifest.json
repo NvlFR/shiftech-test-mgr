@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785740441.8777447,
-    "ast_hash": "2adebab957c75615667a1124d81a6c86",
+    "mtime": 1785744650.5192454,
+    "ast_hash": "b7a1b51e4b1a702bf3c6eaeebbd2d38d",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -3970,8 +3970,8 @@
     "semantic_hash": ""
   },
   "docs/REMAINING_WORK.md": {
-    "mtime": 1785740463.2329066,
-    "ast_hash": "9d8c185ef9ee114eeacf067913a16d48",
+    "mtime": 1785744676.0164845,
+    "ast_hash": "bb2f2d69a5b97c28fc0b4ed6aab44084",
     "semantic_hash": ""
   },
   "frontend/e2e/smoke.spec.ts": {
@@ -4082,6 +4082,11 @@
   "supabase/schema_100_fix_mcp_complete_test_run_custom_runs.sql": {
     "mtime": 1785740327.6922593,
     "ast_hash": "0406ac3daef53e5f54c6b48306d8daf4",
+    "semantic_hash": ""
+  },
+  "supabase/schema_101_fix_issue_code_custom_runs.sql": {
+    "mtime": 1785744556.7306147,
+    "ast_hash": "02dbdb7a61467989f32e65c71e39e692",
     "semantic_hash": ""
   }
 }

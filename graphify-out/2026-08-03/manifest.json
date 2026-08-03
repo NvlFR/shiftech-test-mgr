@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "WORKLOG.md": {
-    "mtime": 1785738935.1348634,
-    "ast_hash": "e2221de293683b8d439da87c21611c20",
+    "mtime": 1785740441.8777447,
+    "ast_hash": "2adebab957c75615667a1124d81a6c86",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -3970,8 +3970,8 @@
     "semantic_hash": ""
   },
   "docs/REMAINING_WORK.md": {
-    "mtime": 1785738949.7562444,
-    "ast_hash": "4928a148dee107c8f65538b9c010eb90",
+    "mtime": 1785740463.2329066,
+    "ast_hash": "9d8c185ef9ee114eeacf067913a16d48",
     "semantic_hash": ""
   },
   "frontend/e2e/smoke.spec.ts": {
@@ -4062,6 +4062,26 @@
   ".agents/skills/testmanager-workflow/agents/openai.yaml": {
     "mtime": 1785737962.7543468,
     "ast_hash": "8ac7d7c0013264c815299f0f36df018a",
+    "semantic_hash": ""
+  },
+  "supabase/schema_097_fix_custom_run_code_generation.sql": {
+    "mtime": 1785739949.4958713,
+    "ast_hash": "9e2906588bb6e3679936b4d2dab44407",
+    "semantic_hash": ""
+  },
+  "supabase/schema_098_fix_poll_automation_job_search_path.sql": {
+    "mtime": 1785740050.6966648,
+    "ast_hash": "1f3cdbb569c0a7016812f5130c9e6e39",
+    "semantic_hash": ""
+  },
+  "supabase/schema_099_fix_poll_automation_job_commands_search_path.sql": {
+    "mtime": 1785740234.5573773,
+    "ast_hash": "7cdc83b8e7b0d57a40dcae3ac9019088",
+    "semantic_hash": ""
+  },
+  "supabase/schema_100_fix_mcp_complete_test_run_custom_runs.sql": {
+    "mtime": 1785740327.6922593,
+    "ast_hash": "0406ac3daef53e5f54c6b48306d8daf4",
     "semantic_hash": ""
   }
 }
