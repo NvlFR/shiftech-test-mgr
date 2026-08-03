@@ -1,6 +1,36 @@
 import { projectConnectionRepository } from '../repositories/projectConnectionRepository';
+import { runnerDistributionRepository } from '../repositories/runnerDistributionRepository';
 import { PROJECT_PROMPT_STARTERS } from '../data/projectPromptStarters';
 import type { ApiToken, ApiTokenScope, CreatedApiToken, Environment, Module } from '../types/domain';
+
+export interface SkillEntry {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export const SKILLS_CATALOG: SkillEntry[] = [
+  {
+    id: 'testmanager-workflow',
+    name: 'testmanager-workflow',
+    description: 'Menjalankan workflow TestManager secara aman melalui MCP: membuat Test Run, mencatat hasil, membuat Issue, menjaga approval manusia, dan memasang Local Runner.',
+  },
+  {
+    id: 'testmanager-authoring',
+    name: 'testmanager-authoring',
+    description: 'Menulis dan mereview Test Case yang terstruktur, terukur, dan siap dieksekusi, termasuk steps, expected result, skenario negatif, edge case, dan traceability.',
+  },
+  {
+    id: 'testmanager-triage',
+    name: 'testmanager-triage',
+    description: 'Menganalisis Test Run dan Test Result gagal, membaca bundle bukti automation, mendeteksi duplikat, dan menyusun Issue yang actionable dari kegagalan.',
+  },
+  {
+    id: 'testmanager-regression',
+    name: 'testmanager-regression',
+    description: 'Memilih dan menjalankan scope regression yang relevan untuk Issue resolved atau perubahan kode, dengan sinyal relasi Test Case, module/tag, requirement, dan repository diff.',
+  },
+];
 
 export interface ProjectConnectionConfig {
   projectId: string;
@@ -11,6 +41,7 @@ export interface ProjectConnectionConfig {
   prompts: ProjectPromptStarter[];
   activeTokens: ApiToken[];
   lastMcpUsedAt: string | null;
+  selectedSkills: string[];
 }
 
 export interface ProjectPromptStarter {
@@ -166,14 +197,18 @@ function shellQuote(value: string): string {
   return `'${value.replace(/'/g, `'"'"'`)}'`;
 }
 
-function createRunnerPrompt(projectId: string, projectName: string, bootstrapCode: string, name = 'Local Runner', labels: string[] = []): { command: string; prompt: string; npmCommands: string; dockerCommands: string } {
+function createRunnerPrompt(projectId: string, projectName: string, bootstrapCode: string, runnerInstallCommand: string, name = 'Local Runner', labels: string[] = []): { command: string; prompt: string; npmCommands: string; dockerCommands: string } {
   if (!/^tmb_[0-9a-f]{48}$/.test(bootstrapCode)) throw new Error('Bootstrap code runner tidak valid');
   const runnerEnvironment = `TM_RUNNER_NAME=${shellQuote(name)} TM_RUNNER_LABELS=${shellQuote(labels.join(','))}`;
-  const command = `${runnerEnvironment} npx @testmanager/runner init --code ${bootstrapCode}`;
+  // @testmanager/runner TIDAK dipublish ke npm registry publik — package ini
+  // cuma didistribusikan sebagai tarball self-hosted lewat /runner/release.json
+  // (lihat runnerDistributionService.installCommand). `npm install @testmanager/runner`
+  // langsung dari registry akan selalu 404.
+  const command = `${runnerEnvironment} tm-runner init --code ${bootstrapCode}`;
   const npmCommands = [
-    'npm install --save-dev @testmanager/runner',
+    runnerInstallCommand,
     command,
-    'npx tm-runner start',
+    'tm-runner start',
   ].join('\n');
   const dockerEnvironment = `-e TM_RUNNER_NAME=${shellQuote(name)} -e TM_RUNNER_LABELS=${shellQuote(labels.join(','))}`;
   const dockerCommands = [
@@ -211,16 +246,33 @@ function createMcpConfig(readOnly: boolean, selectedFeatureGroups = DEFAULT_FEAT
   };
 }
 
-function createSetupSteps(projectId: string, applicationOrigin: string, mcp: McpConnectionConfig): ProjectConnectionSetupStep[] {
+// Owner/repo GitHub tempat skills/testmanager-*/SKILL.md sebenarnya di-host —
+// HARUS sinkron dengan `git remote -v` origin repo ini. Sempat salah ke
+// "ffrz/shiftech-test-mgr" (repo lain yang kosong), bikin `npx skills add`
+// selalu gagal "No skills found" walau argumen --skill sudah benar.
+const SKILLS_REPO = 'NvlFR/shiftech-test-mgr';
+
+function buildSkillInstallCommand(selectedSkills: string[]): string {
+  if (selectedSkills.length === 0) return `npx skills add ${SKILLS_REPO}`;
+  const skillFlags = selectedSkills.map((skill) => `--skill ${skill}`).join(' ');
+  return `npx skills add ${SKILLS_REPO} ${skillFlags}`;
+}
+
+function createSetupSteps(projectId: string, applicationOrigin: string, mcp: McpConnectionConfig, selectedSkills: string[] = SKILLS_CATALOG.map(({ id }) => id)): ProjectConnectionSetupStep[] {
   const mcpUrl = `${applicationOrigin.replace(/\/$/, '')}/mcp`;
   const featureGroups = mcp.selectedFeatureGroups.join(',');
+  // Argumen posisional (nama server, URL) HARUS mendahului flag --header:
+  // --header di Commander.js bersifat variadic (menampung banyak nilai) dan
+  // akan "melahap" argumen posisional apa pun yang ditaruh setelahnya,
+  // menyebabkan "error: missing required argument 'name'".
   const addServerCommand = [
-    'claude mcp add --scope project --transport http',
+    'claude mcp add',
+    'testmanager',
+    mcpUrl,
+    '--scope project --transport http',
     `--header "X-TestManager-Project-ID: ${projectId}"`,
     `--header "X-TestManager-Read-Only: ${mcp.readOnly ? '1' : '0'}"`,
     `--header "X-TestManager-Feature-Groups: ${featureGroups}"`,
-    'testmanager',
-    mcpUrl,
   ].join(' ');
 
   return [
@@ -241,7 +293,7 @@ function createSetupSteps(projectId: string, applicationOrigin: string, mcp: Mcp
       id: 'install-skills',
       title: 'Install Agent Skills',
       description: 'Pasang skill pack TestManager ke project aktif.',
-      command: 'npx skills add ffrz/shiftech-test-mgr',
+      command: buildSkillInstallCommand(selectedSkills),
       optional: true,
     },
   ];
@@ -249,7 +301,12 @@ function createSetupSteps(projectId: string, applicationOrigin: string, mcp: Mcp
 
 function withMcpConfig(config: ProjectConnectionConfig, mcp: McpConnectionConfig): ProjectConnectionConfig {
   const applicationOrigin = new URL(config.projectUrl).origin;
-  return { ...config, mcp, setupSteps: createSetupSteps(config.projectId, applicationOrigin, mcp) };
+  return { ...config, mcp, setupSteps: createSetupSteps(config.projectId, applicationOrigin, mcp, config.selectedSkills) };
+}
+
+function withSelectedSkills(config: ProjectConnectionConfig, selectedSkills: string[]): ProjectConnectionConfig {
+  const applicationOrigin = new URL(config.projectUrl).origin;
+  return { ...config, selectedSkills, setupSteps: createSetupSteps(config.projectId, applicationOrigin, config.mcp, selectedSkills) };
 }
 
 export const projectConnectionService = {
@@ -265,16 +322,18 @@ export const projectConnectionService = {
       projectConnectionRepository.findLatestMcpUsageByProjectId(projectId),
     ]);
 
+    const defaultSkills = SKILLS_CATALOG.map(({ id }) => id);
     const mcp = createMcpConfig(false);
     return {
       projectId: project.id,
       projectName: project.name,
       projectUrl: `${applicationOrigin.replace(/\/$/, '')}/projects/${project.id}`,
       mcp,
-      setupSteps: createSetupSteps(project.id, applicationOrigin, mcp),
+      setupSteps: createSetupSteps(project.id, applicationOrigin, mcp, defaultSkills),
       prompts: createProjectPromptStarters(project.id, project.name, modules, environments),
       activeTokens,
       lastMcpUsedAt: latestMcpUsage?.usedAt ?? null,
+      selectedSkills: defaultSkills,
     };
   },
 
@@ -288,14 +347,24 @@ export const projectConnectionService = {
     return withMcpConfig(config, createMcpConfig(config.mcp.readOnly, selectedFeatureGroups));
   },
 
-  async issueRunnerBootstrap(projectId: string, projectName: string, name = 'Local Runner', labels: string[] = []): Promise<RunnerBootstrapPrompt & { npmCommands: string; dockerCommands: string }> {
+  setSelectedSkills(config: ProjectConnectionConfig, selectedSkills: string[]): ProjectConnectionConfig {
+    const validIds = new Set(SKILLS_CATALOG.map(({ id }) => id));
+    return withSelectedSkills(config, selectedSkills.filter((id) => validIds.has(id)));
+  },
+
+  async issueRunnerBootstrap(projectId: string, projectName: string, applicationOrigin: string, name = 'Local Runner', labels: string[] = []): Promise<RunnerBootstrapPrompt & { npmCommands: string; dockerCommands: string }> {
     if (!projectId.trim()) throw new Error('Project ID tidak valid');
+
     if (!name.trim()) throw new Error('Nama runner wajib diisi');
     if (name.trim().length > 120) throw new Error('Nama runner maksimal 120 karakter');
     const normalizedLabels = Array.from(new Set(labels.map((label) => label.trim().toLowerCase()).filter(Boolean)));
-    const existingRunners = await projectConnectionRepository.findRunnersByProjectId(projectId);
-    const issued = await projectConnectionRepository.issueRunnerBootstrapCode(projectId);
-    const generated = createRunnerPrompt(projectId, projectName, issued.bootstrapCode, name.trim(), normalizedLabels);
+    const [existingRunners, issued, release] = await Promise.all([
+      projectConnectionRepository.findRunnersByProjectId(projectId),
+      projectConnectionRepository.issueRunnerBootstrapCode(projectId),
+      runnerDistributionRepository.getRelease(),
+    ]);
+    const runnerInstallCommand = `npm i -g ${applicationOrigin.replace(/\/$/, '')}${release.url}`;
+    const generated = createRunnerPrompt(projectId, projectName, issued.bootstrapCode, runnerInstallCommand, name.trim(), normalizedLabels);
     return { ...generated, expiresAt: issued.expiresAt, existingRunnerIds: existingRunners.map(({ id }) => id) };
   },
 

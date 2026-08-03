@@ -27,7 +27,7 @@ export function useRunnerConnection(projectId: string | undefined, projectName: 
   async function issue(name: string, labels: string[]) {
     if (!projectId) return false;
     setIssuing(true); setError(null); setConnectedRunner(null);
-    try { setBootstrap(await projectConnectionService.issueRunnerBootstrap(projectId, projectName, name, labels)); return true; }
+    try { setBootstrap(await projectConnectionService.issueRunnerBootstrap(projectId, projectName, window.location.origin, name, labels)); return true; }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'Gagal membuat bootstrap code runner'); return false; }
     finally { setIssuing(false); }
   }

@@ -86,7 +86,7 @@ export const issueRepository = {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), target_role:test_roles(*), verified_test_run:test_runs!verified_test_run_id(id, code, name), test_result:test_results!inner(id, test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, custom_project_id, test_plan:test_plans(project_id)))',
+        '*, assignee:profiles!issues_assigned_to_fkey(*), target_role:test_roles(*), verified_test_run:test_runs!verified_test_run_id(id, code, name), test_result:test_results!inner(id, test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name, custom_project_id, test_plan:test_plans(project_id)))',
       )
       .eq('id', id)
       .maybeSingle();
@@ -119,7 +119,7 @@ export const issueRepository = {
   async findAllByTestResult(testResultId: string): Promise<IssueWithDetails[]> {
     const { data, error } = await supabase
       .from('issues')
-      .select('*, assignee:profiles(*), target_role:test_roles(*)')
+      .select('*, assignee:profiles!issues_assigned_to_fkey(*), target_role:test_roles(*)')
       .eq('test_result_id', testResultId)
       .order('created_at', { ascending: false });
 
@@ -148,7 +148,7 @@ export const issueRepository = {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name))',
+        '*, assignee:profiles!issues_assigned_to_fkey(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title, priority, module:modules(*), test_case_tags(tag:tags(*))), test_run:test_runs(id, code, name))',
       )
       .in('test_result.test_run_id', runIds)
       .order('created_at', { ascending: false });
@@ -166,7 +166,7 @@ export const issueRepository = {
     const { data, error } = await supabase
       .from('issues')
       .select(
-        '*, assignee:profiles(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name))',
+        '*, assignee:profiles!issues_assigned_to_fkey(*), test_result:test_results!inner(test_run_id, test_case:test_cases(id, code, title), test_run:test_runs(id, code, name))',
       )
       .eq('test_result.test_run_id', testRunId)
       .order('created_at', { ascending: false });

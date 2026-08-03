@@ -66,7 +66,7 @@ export function useProjectConnection(projectId: string | undefined) {
     setRunnerBootstrapError(null);
     setConnectedRunner(null);
     try {
-      setRunnerBootstrap(await projectConnectionService.issueRunnerBootstrap(projectId, config.projectName));
+      setRunnerBootstrap(await projectConnectionService.issueRunnerBootstrap(projectId, config.projectName, window.location.origin));
     } catch (cause) {
       setRunnerBootstrapError(cause instanceof Error ? cause.message : 'Gagal membuat bootstrap code runner');
     } finally {
@@ -83,6 +83,12 @@ export function useProjectConnection(projectId: string | undefined) {
   const setFeatureGroups = (featureGroups: McpFeatureGroupId[]) => {
     setConfig((current) => current
       ? projectConnectionService.setFeatureGroups(current, featureGroups)
+      : current);
+  };
+
+  const setSelectedSkills = (selectedSkills: string[]) => {
+    setConfig((current) => current
+      ? projectConnectionService.setSelectedSkills(current, selectedSkills)
       : current);
   };
 
@@ -115,5 +121,5 @@ export function useProjectConnection(projectId: string | undefined) {
     }
   };
 
-  return { config, loading, error, setReadOnly, setFeatureGroups, runnerBootstrap, connectedRunner, issuingRunnerBootstrap, runnerBootstrapError, issueRunnerBootstrap, oneTimeToken, dismissOneTimeToken: () => setOneTimeToken(null), tokenActionPending, tokenActionError, createToken, revokeToken };
+  return { config, loading, error, setReadOnly, setFeatureGroups, setSelectedSkills, runnerBootstrap, connectedRunner, issuingRunnerBootstrap, runnerBootstrapError, issueRunnerBootstrap, oneTimeToken, dismissOneTimeToken: () => setOneTimeToken(null), tokenActionPending, tokenActionError, createToken, revokeToken };
 }

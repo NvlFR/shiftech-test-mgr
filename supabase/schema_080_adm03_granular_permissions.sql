@@ -127,5 +127,5 @@ create policy "project content creators - tags insert" on tags for insert
 -- Permission changes are manager/admin-only and cannot be self-escalated.
 drop policy if exists "project managers - project_members write" on project_members;
 create policy "project managers - project_members write" on project_members for all
-  using (is_admin() or can_manage_project(project_id))
-  with check (is_admin() or can_manage_project(project_id));
+  using (is_admin() or is_project_manager(project_id))
+  with check (is_admin() or is_project_manager(project_id));

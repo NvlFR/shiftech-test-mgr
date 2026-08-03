@@ -2,7 +2,7 @@ import { supabase } from '../config/supabaseClient';
 import { mapCommentRow } from '../helpers/mappers';
 import type { Comment, CommentTargetType } from '../types/domain';
 
-const commentSelect = '*, author:profiles(*), comment_mentions(*, profile:profiles(*))';
+const commentSelect = '*, author:profiles!comments_author_id_fkey(*), comment_mentions(*, profile:profiles(*))';
 
 export const commentRepository = {
   async findAll(targetType: CommentTargetType, targetId: string): Promise<Comment[]> {

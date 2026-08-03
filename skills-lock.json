@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "testmanager-authoring": {
+      "source": "NvlFR/shiftech-test-mgr",
+      "sourceType": "github",
+      "skillPath": "skills/testmanager-authoring/SKILL.md",
+      "computedHash": "03d3a97f11acbf62d0aa4704b803e41d5d69b5523d08184c48a9b005da10f4f1"
+    },
+    "testmanager-regression": {
+      "source": "NvlFR/shiftech-test-mgr",
+      "sourceType": "github",
+      "skillPath": "skills/testmanager-regression/SKILL.md",
+      "computedHash": "839260b27346031342e7ac3c57ada3c97fbcf2b5087fe50a172d0b6efbfed01d"
+    },
+    "testmanager-triage": {
+      "source": "NvlFR/shiftech-test-mgr",
+      "sourceType": "github",
+      "skillPath": "skills/testmanager-triage/SKILL.md",
+      "computedHash": "ed4c26feaf032dc7307330ecd3a1edaa7e50962c48dc42ca81e33846d304c3ed"
+    },
+    "testmanager-workflow": {
+      "source": "NvlFR/shiftech-test-mgr",
+      "sourceType": "github",
+      "skillPath": "skills/testmanager-workflow/SKILL.md",
+      "computedHash": "65b57ff1efd09295a980b8a4341e29bae189db8dcf6bb1603630ff9a2556287b"
+    }
+  }
+}

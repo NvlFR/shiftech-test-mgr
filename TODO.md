@@ -34,6 +34,10 @@ _(kosong)_
 
 ## Selesai (recent)
 
+- [x] APPNEW-03 — Pindah landing `/` ke `HomePage` dan daftar project ke `/projects` sesuai FEATURE_BACKLOG.md Section 17.3 (2026-08-02)
+- [x] APPNEW-02 — Implementasi public profile sesuai FEATURE_BACKLOG.md Section 17.2 (2026-08-02)
+- [x] APPNEW-01 — Implementasi halaman Settings user sesuai FEATURE_BACKLOG.md Section 17.1 (2026-08-02)
+
 - [x] E08-T15 — Attachment Issue lengkap end-to-end: upload/list/hapus private
   Storage, clean layering, RLS, retention, dan cleanup object saat metadata
   terhapus cascade (`schema_042`) (2026-07-31)

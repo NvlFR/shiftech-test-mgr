@@ -56,7 +56,7 @@ from public, anon, authenticated;
 
 alter table test_plan_schedules enable row level security;
 drop policy if exists "project access - schedules select" on test_plan_schedules;
-create policy "project access - schedules select" on test_plan_schedules for select using (can_access_project(project_id));
+create policy "project access - schedules select" on test_plan_schedules for select using (has_project_access(project_id));
 drop policy if exists "project managers - schedules insert" on test_plan_schedules;
 create policy "project managers - schedules insert" on test_plan_schedules for insert
 with check (can_edit_project_content(project_id) and created_by = auth.uid());

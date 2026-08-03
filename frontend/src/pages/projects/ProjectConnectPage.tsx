@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import { Checkbox } from 'primereact/checkbox';
 import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputText } from 'primereact/inputtext';
@@ -16,6 +17,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { useProjectConnection } from '../../hooks/useProjectConnection';
 import { formatDateTime } from '../../helpers/dateFormatter';
 import { RunnerConnectionWizard } from '../../components/automation/RunnerConnectionWizard';
+import { SKILLS_CATALOG } from '../../services/projectConnectionService';
 
 const DISABLED_MODES = [
   { name: 'API Token', reason: 'Belum tersedia pada tahap 1' },
@@ -27,7 +29,7 @@ const DISABLED_MODES = [
 export function ProjectConnectPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { config, loading, error, setReadOnly, setFeatureGroups, oneTimeToken, dismissOneTimeToken, tokenActionPending, tokenActionError, createToken, revokeToken } = useProjectConnection(id);
+  const { config, loading, error, setReadOnly, setFeatureGroups, setSelectedSkills, oneTimeToken, dismissOneTimeToken, tokenActionPending, tokenActionError, createToken, revokeToken } = useProjectConnection(id);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [clipboardFallback, setClipboardFallback] = useState<string | null>(null);
   const [tokenName, setTokenName] = useState('Claude Code');
@@ -175,6 +177,50 @@ export function ProjectConnectPage() {
                       {config.mcp.activeToolNames.map((toolName) => <li key={toolName}><code>{toolName}</code></li>)}
                     </ul>
                   )}
+              </Panel>
+              <Panel header="Agent Skills">
+                <p className="mt-0 mb-3 text-color-secondary">
+                  Pilih skill yang akan ikut dipasang bersama perintah instalasi di Langkah 3.
+                  Centang semua untuk paket lengkap, atau hanya skill yang relevan untuk tim kamu.
+                </p>
+                <div className="flex flex-column gap-3">
+                  {SKILLS_CATALOG.map((skill) => {
+                    const isChecked = config.selectedSkills.includes(skill.id);
+                    const toggleSkill = () => {
+                      const next = isChecked
+                        ? config.selectedSkills.filter((s) => s !== skill.id)
+                        : [...config.selectedSkills, skill.id];
+                      setSelectedSkills(next);
+                    };
+                    return (
+                      <div
+                        key={skill.id}
+                        className={`flex align-items-start gap-3 border-round p-3 cursor-pointer surface-ground ${isChecked ? 'border-1 border-primary' : ''}`}
+                        onClick={toggleSkill}
+                        role="checkbox"
+                        aria-checked={isChecked}
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleSkill(); } }}
+                      >
+                        <Checkbox
+                          inputId={`skill-${skill.id}`}
+                          checked={isChecked}
+                          onChange={toggleSkill}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="min-w-0">
+                          <label htmlFor={`skill-${skill.id}`} className="font-medium block cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            <code>{skill.name}</code>
+                          </label>
+                          <p className="m-0 mt-1 text-sm text-color-secondary">{skill.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {config.selectedSkills.length === 0 && (
+                  <Message className="mt-3 w-full" severity="warn" text="Tidak ada skill dipilih — perintah instalasi akan memasang semua skill." />
+                )}
               </Panel>
               <Panel
                 header="Setup Claude Code"

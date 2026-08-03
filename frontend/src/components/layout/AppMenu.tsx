@@ -64,10 +64,11 @@ export function AppMenu({ onNavigate }: { onNavigate?: () => void }) {
   const visibleProjects = sortedProjects.slice(0, MAX_VISIBLE_PROJECTS);
 
   const mainItems: MenuItemModel[] = [
-    { label: 'Home', icon: 'pi pi-home', url: '/home' },
+    { label: 'Home', icon: 'pi pi-home', url: '/' },
     { label: 'Trend & Reporting', icon: 'pi pi-chart-line', url: '/dashboard' },
     { label: 'Test Suite Library', icon: 'pi pi-book', url: '/test-suites' },
-    { label: 'Projects', icon: 'pi pi-folder', url: '/', end: true },
+    { label: 'Settings', icon: 'pi pi-cog', url: '/settings' },
+    { label: 'Projects', icon: 'pi pi-folder', url: '/projects' },
     ...(isAdmin ? [{ label: 'Users', icon: 'pi pi-users', url: '/users' }, { label: 'Teams', icon: 'pi pi-sitemap', url: '/teams' }, { label: 'Retensi Global', icon: 'pi pi-database', url: '/admin/data-retention' }, { label: 'Observability', icon: 'pi pi-chart-bar', url: '/admin/observability' }] : []),
   ];
 

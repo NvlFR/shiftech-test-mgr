@@ -1,5 +1,934 @@
 # Worklog
 
+## 2026-08-03 — Jalankan SEMUA 14 test case LelangOps via automation headed, sampai selesai (2 bug produksi baru + 1 bug aplikasi target ditemukan)
+
+Kelanjutan langsung dari entri di bawah: setelah 1 test case (TC-0001) berhasil
+diverifikasi headless, user minta seluruh 14 test case regression LelangOps
+dijalankan sampai selesai, dengan browser **headed** (`TM_PLAYWRIGHT_HEADED=true`)
+supaya bisa dilihat langsung, dan diminta bukti.
+
+**Persiapan tambahan:**
+- Menulis 13 Playwright spec BARU (TC-0002 s/d TC-0014) di
+  `LelangOps/tests/e2e/`, masing-masing mengeksekusi flow SUNGGUHAN di
+  aplikasi target (bukan simulasi): login gagal, reset password, buat/ubah
+  status/validasi tanggal lelang, tambah/import/export klien, generate
+  kontrak dari template, share dokumen publik, buat invoice, catat
+  pembayaran, jalankan command reminder invoice (`php artisan
+  invoice:send-reminders` — fitur ini murni command terjadwal, tidak ada
+  tombol UI, jadi test-nya menjalankan command asli + menampilkan state
+  invoice pending di browser sebagai bukti visual pendukung).
+- Field form digali dari kode LelangOps langsung (routes/web.php, Form
+  Request, Blade view) sebelum menulis test, bukan tebak-tebakan — termasuk
+  menemukan bahwa `client_id`/`auction_id` pada form kontrak saling
+  bergantung lewat Alpine.js, dan tombol transisi status lelang memicu
+  `window.confirm()` native.
+- Dry-run tiap spec individual (headless, di luar runner) sampai lolos
+  sebelum dipasang ke automation job — proses ini menemukan & memperbaiki
+  banyak bug DI TEST (bukan di aplikasi): selector `button[type="submit"]`
+  ambigu (halaman punya tombol logout tersembunyi dengan type yang sama),
+  race dialog `confirm()` vs `click()` (diperbaiki dengan `noWaitAfter` +
+  `waitForLoadState`), nomor HP hardcoded bentrok unique constraint antar
+  run, nominal pembayaran hardcoded melebihi sisa tagihan invoice (diganti
+  baca nilai asli dari halaman), dan overlay elemen yang sempat menutupi
+  form tepat setelah render di mode headed (diperbaiki dengan
+  `waitForLoadState('networkidle')` setelah tiap navigasi ke halaman form).
+
+**2 bug produksi BARU ditemukan saat filing Issue untuk temuan di bawah
+(pola identik dengan schema_097/100 di entri sebelumnya — trigger yang
+resolve project_id lewat test_plan tanpa fallback ke custom_project_id):**
+- `schema_101_fix_issue_code_custom_runs.sql` — `set_issue_code()` (trigger
+  `issues.code`) gagal total untuk Issue yang dibuat dari Test Result milik
+  ad-hoc/custom Test Run (persis kondisi setiap run hasil
+  `mcp_enqueue_automation`), sehingga `testmanager.issue.create` **tidak
+  pernah bisa dipakai** untuk melaporkan bug yang ditemukan lewat automation
+  run. Ditemukan saat mencoba file Issue untuk temuan TC-0006 di bawah.
+
+**1 bug NYATA di aplikasi target (LelangOps), bukan di TestManager —
+ISS-0003 sudah dibuat:**
+- Form "Buat Lelang" (`/auctions/create`) menerima `scheduled_at` di masa
+  lalu tanpa penolakan apa pun — `StoreAuctionRequest.php` hanya
+  mendefinisikan `['required', 'date']`, tidak ada `after_or_equal:today`.
+  TC-0006 sengaja menguji ini sesuai judulnya ("Validasi tanggal lelang
+  tidak boleh di masa lalu") dan gagal karena aplikasi memang tidak
+  menegakkan aturan itu — bukti screenshot: lelang berhasil dibuat dengan
+  badge status "Running" dan pesan sukses "Auction berhasil ditambahkan."
+  meski tanggalnya kemarin.
+
+**Hasil akhir — 14/14 test case dieksekusi headed sampai tuntas (browser
+Chromium sungguhan terbuka & terlihat di DISPLAY=:0), masing-masing sebagai
+Test Run terpisah (TR-0005 s/d TR-0021, beberapa di-retry setelah bug test
+di atas diperbaiki):**
+- **13 PASS**: TC-0001 s/d TC-0005, TC-0007 s/d TC-0014 — semua flow
+  sungguhan berhasil: login, buat lelang, ubah status lelang jadi selesai,
+  tambah/import/export klien, generate kontrak PDF dari template, buat
+  tautan publik dokumen (diverifikasi bisa diakses tanpa login dari browser
+  context terpisah), buat invoice, catat pembayaran, jalankan command
+  reminder.
+- **1 BLOCKED (bug aplikasi asli, bukan bug test)**: TC-0006 — dicatat
+  sebagai ISS-0003.
+
+Runner tetap menyala setelah sesi ini (headed, polling project LelangOps),
+LelangOps `php artisan serve` di 127.0.0.1:8011 tetap jalan. Semua migration
+baru (`schema_101`) belum di-commit, konsisten dengan kebiasaan sesi ini.
+
+---
+
+## 2026-08-03 — Hubungkan Local Runner sungguhan + jalankan automation test headless untuk LelangOps (4 bug produksi baru ditemukan & diperbaiki)
+
+Kelanjutan sesi MCP LelangOps: user minta "coba hubungkan runner lalu tes
+automation dengan headless true untuk project lelangops" — bukan sekadar
+smoke-test, tapi benar-benar menyalakan Local Runner nyata dan menjalankan
+satu automation job end-to-end (enqueue → runner poll → eksekusi Playwright
+headless → report hasil → tercatat sebagai Test Result → Test Run
+completed). Semua langkah dilakukan sungguhan, bukan simulasi:
+
+**Persiapan target aplikasi (LelangOps, Laravel, di luar repo ini):**
+- `php artisan serve --host=127.0.0.1 --port=8011` dijalankan di background
+  (port 8010 sudah dipakai proses lain). DB MySQL lokal `lelangops` sudah
+  ter-migrate, kredensial ada di `.env` LelangOps.
+- Row baru di `environments` (TestManager) untuk project LelangOps: "Local
+  Dev" → `http://127.0.0.1:8011`.
+- `npm install -D @playwright/test@1.62.1` di repo LelangOps (belum pernah
+  ada Playwright sama sekali di sana) + `npx playwright install chromium`
+  (binary sudah ter-cache dari sesi E2E-INFRA sebelumnya, tidak perlu
+  `--with-deps` yang butuh sudo).
+- `playwright.config.ts` + `tests/e2e/login.spec.ts` baru di repo LelangOps:
+  test nyata untuk TC-0001 "Login dengan kredensial valid" — isi
+  `#email`/`#password` dengan akun demo `operator.demo@lelangops.test` /
+  `password` (dari `DemoDataSeeder.php`), submit, assert redirect keluar dari
+  `/login`. Diverifikasi lolos standalone dulu (`npx playwright test`)
+  sebelum dipasang lewat runner.
+
+**Setup Local Runner:**
+- `mcp/.env` yang sudah ada dipakai untuk ambil kredensial Supabase anon.
+- Bootstrap code diterbitkan langsung lewat RPC `issue_agent_bootstrap_code`
+  (equivalent dari tombol "Connect Runner" di UI, dijalankan manual karena
+  sesi ini non-interaktif) — expire ~10 menit, jadi langsung dipakai.
+- **Penting:** `tm-runner init` **menimpa seluruh isi `.env` di cwd**
+  (`writePrivateConfig` di `runner/src/init.ts` me-replace, bukan
+  append/merge) dan menolak jalan kalau `.env` yang ada belum chmod 600. Kalau
+  dijalankan langsung di root repo LelangOps, ini akan **menghancurkan
+  `.env` Laravel asli** (DB password dkk hilang). Dihindari dengan
+  menjalankan `init`/`start` dari direktori config terpisah
+  (`scratchpad/lelangops-runner/`), lalu override `TM_PROJECT_DIR` di `.env`
+  hasil init ke path LelangOps yang sebenarnya — `loadConfig()` di
+  `runner/src/config.ts` memang membaca `TM_PROJECT_DIR` sebagai field
+  terpisah dari cwd, jadi ini didukung, cuma tidak terekspos lewat CLI/UI.
+  **Ini gap dokumentasi/UX nyata** untuk siapa pun yang mencoba
+  menjalankan runner langsung di root repo aplikasi yang diuji — dicatat di
+  `docs/REMAINING_WORK.md`.
+- `TM_PLAYWRIGHT_HEADED=false` ditambahkan ke `.env` runner sesuai
+  permintaan "headless true".
+- Token API MCP yang sudah ada (`Claude Code MCP`) di-update scope-nya:
+  ditambah `write:automation` (sebelumnya cuma
+  `read:project,write:test-runs,write:test-results,write:issues`) — tanpa
+  ini `mcp_map_automation_script`/`mcp_enqueue_automation` selalu
+  `MCP_WRITE_FORBIDDEN`.
+
+**4 bug produksi nyata ditemukan & diperbaiki saat menjalankan alur ini
+sungguhan (bukan spekulatif — semua ketemu dari error asli):**
+
+1. `schema_097_fix_custom_run_code_generation.sql` — trigger
+   `set_test_run_code()` cuma resolve `project_id` lewat `test_plan_id`,
+   sehingga SELALU gagal (`null value in column "project_id" of relation
+   "entity_code_sequences"`) untuk test run ad-hoc/"custom"
+   (`test_plan_id` null, project di `custom_project_id` — lihat
+   `schema_031_structured_steps_custom_runs.sql`). Ini artinya
+   `mcp_enqueue_automation`/`mcp_rerun_failed_automation` untuk satu Test
+   Case (bukan Test Plan) **selalu gagal total** sejak fitur automation
+   dibuat (schema_055/056). UI tidak pernah kena karena
+   `testRunRepository.ts` selalu kirim `code` eksplisit dari
+   `testRunService`, sehingga cabang trigger yang buggy tidak pernah
+   ke-trigger dari jalur UI.
+2. `schema_098_fix_poll_automation_job_search_path.sql` — RPC
+   `poll_automation_job()` (dipanggil runner tiap 5 detik) di-redefine oleh
+   `schema_069_pw19_step_commands.sql` dengan
+   `search_path = public, vault, pg_temp`, MENGHILANGKAN `extensions` yang
+   dibutuhkan `digest()` (pgcrypto) — regresi dari konvensi
+   `schema_025_fix_pgcrypto_and_audit.sql`. Akibatnya **setiap runner di
+   SETIAP project tidak pernah bisa poll job sama sekali** (`function
+   digest(text, unknown) does not exist`, error 404 terus-menerus di log
+   runner). Bug paling parah dari 4 ini — automation runner sepenuhnya mati
+   sejak schema_069 diterapkan.
+3. `schema_099_fix_poll_automation_job_commands_search_path.sql` — bug
+   sama persis pada `poll_automation_job_commands()` (dari file migration
+   yang sama, `search_path` cuma `public`). Dampaknya lebih ringan (fitur
+   step-through/pause-on-failure via `automation_job_commands`, error
+   ke-catch jadi warning non-fatal), tapi tetap 100% rusak sebelum fix.
+4. `schema_100_fix_mcp_complete_test_run_custom_runs.sql` — RPC
+   `mcp_complete_test_run()` JOIN ke `test_plans` dan cocokkan
+   `plan.project_id`, jadi **tidak pernah bisa** complete run ad-hoc/custom
+   (`test_plan_id` null) — selalu `IN_PROGRESS_TEST_RUN_NOT_FOUND` walau id
+   & project benar. Karena run hasil `mcp_enqueue_automation` untuk 1 Test
+   Case persis jenis run ini, alur `enqueue → run → complete` lewat MCP
+   **tidak bisa pernah diselesaikan (completed)** sebelum fix ini.
+
+Ditemukan dengan cara: jalankan RPC yang sama langsung lewat
+`mcp__supabase__execute_sql` (bypass MCP TestManager yang membungkus semua
+error jadi `INTERNAL_ERROR` generik) untuk lihat pesan error Postgres asli
+— pola yang sama dipakai untuk semua 4 temuan di atas.
+
+**Bukti eksekusi nyata (bukan simulasi):**
+- Job pertama (TR-0003) gagal `blocked`: "Repository belum dipercaya
+  runner" — runner memang menolak eksekusi sampai `tm-runner trust
+  <path>` dijalankan (fitur keamanan yang benar, bukan bug). Dijalankan:
+  `tm-runner trust /home/rny/work/2026/07-juli/20/LelangOps`, runner
+  di-restart supaya trust store (file terpisah di
+  `~/.config/testmanager/trusted-repositories.json`) ke-load ulang.
+- Job kedua (TR-0004) **passed sungguhan**: log runner menunjukkan
+  `"headed":false` (headless terpakai sesuai permintaan), Playwright
+  benar-benar membuka Chromium headless, login ke
+  `http://127.0.0.1:8011`, redirect keluar dari `/login` terverifikasi,
+  hasil di-upload sebagai artifact, dilaporkan `pass` ke server dalam ~9
+  detik.
+- Diverifikasi lewat MCP tools langsung (bukan asumsi dari log runner):
+  `testmanager.testrun.get`/`testmanager.testresult.list` untuk TR-0004
+  menunjukkan `status: pass`, `testCase.code: TC-0001`, lalu
+  `testmanager.testrun.complete` berhasil menutup run dengan summary
+  `1 pass / 1 total`.
+- TR-0003 (yang blocked) juga di-complete dengan catatan penjelasan, bukan
+  dihapus — konsisten dengan aturan "Test Run baru dibuat tiap re-run,
+  bukan menimpa" di CLAUDE.md; riwayat kegagalan yang menemukan bug tetap
+  ada sebagai bukti.
+
+**State yang masih berjalan setelah sesi ini (bukan dibersihkan, karena
+user diasumsikan masih ingin memakainya):**
+- `php artisan serve` LelangOps di `127.0.0.1:8011` (background).
+- Local Runner (`tm-runner start`, headless) polling project LelangOps
+  tiap 5 detik, config di
+  `/tmp/.../scratchpad/lelangops-runner/.env` (di luar working tree kedua
+  repo — hilang begitu scratchpad session ini dibersihkan; **belum ada
+  setup permanen** kalau runner ini mau dipakai lagi nanti).
+- MCP server TestManager (PID lama dari sesi sebelumnya) masih jalan di
+  `127.0.0.1:3900`.
+
+**Tidak ada yang di-commit** — semua migration baru (`schema_097`–`schema_100`)
+masih sebagai file lokal belum di-`git add`/commit, sesuai kebiasaan sesi
+ini (commit hanya atas permintaan eksplisit).
+
+---
+
+## 2026-08-03 — Fix generator "Connect Agent": 3 command yang selama ini rusak untuk SEMUA user
+
+Kelanjutan entri di atas: user coba jalankan setup Local Runner
+(`npm install --save-dev @testmanager/runner`, `npx @testmanager/runner init
+--code ...`, `npx tm-runner start`) dan dapat 404 dari npm registry untuk
+ketiganya. Bacaan `frontend/src/services/projectConnectionService.ts`
+mengungkap: **user memang copy-paste PERSIS dari halaman "Connect Agent"
+(`ProjectConnectPage`/`useProjectConnection`) — bukan salah ketik.** Command
+`claude mcp add` di percakapan sebelumnya juga persis sama dengan yang
+di-generate `createSetupSteps()` di file yang sama. Artinya **generator
+instruksi setup di app ini sendiri yang salah**, berdampak ke SEMUA user
+yang connect project manapun, bukan cuma sesi ini.
+
+**3 bug diperbaiki di `projectConnectionService.ts`:**
+
+1. **Runner npm commands salah total** (`createRunnerPrompt`). Men-generate
+   `npm install --save-dev @testmanager/runner` + `npx @testmanager/runner
+   init --code ...` + `npx tm-runner start` — package ini TIDAK ADA di npm
+   registry publik, cuma didistribusikan sebagai tarball self-hosted lewat
+   `/runner/release.json` (dikonfirmasi ada: `frontend/public/runner/tm-runner-0.1.0.tgz`,
+   dipakai `RunnerDistributionPage.tsx`/`runnerDistributionService.installCommand()`
+   yang SUDAH benar — `npm i -g <origin><release.url>`). `createRunnerPrompt`
+   dan `issueRunnerBootstrap` diubah untuk pakai mekanisme yang sama:
+   `issueRunnerBootstrap` sekarang terima `applicationOrigin`, fetch
+   `runnerDistributionRepository.getRelease()`, generate
+   `npm i -g ${origin}${release.url}` sebagai baris instalasi, lalu
+   `tm-runner init --code ...` / `tm-runner start` (tanpa `npx`, karena
+   sudah global install). Caller: `useProjectConnection.ts` dan
+   `useRunnerConnection.ts` (hook orphan/tidak dipakai di mana pun — kandidat
+   CLEAN-01 — tetap diperbaiki signature-nya biar `tsc -b` lolos) diupdate
+   kirim `window.location.origin`.
+2. **`claude mcp add` — urutan argumen salah** (`createSetupSteps`).
+   `--header <header...>` di Commander.js itu variadic — kalau ditaruh
+   SEBELUM argumen posisional (`testmanager`, URL server), argumen posisional
+   itu ikut "dilahap" jadi bagian dari daftar header, menyebabkan CLI
+   sungguhan gagal `error: missing required argument 'name'` (persis error
+   yang saya dapat sesi lalu sebelum saya perbaiki manual). Fix: taruh nama
+   server + URL SEBELUM semua flag `--header`.
+3. **Skill install command salah repo** (`buildSkillInstallCommand`).
+   Hardcoded `npx skills add ffrz/shiftech-test-mgr` — `ffrz` bukan owner
+   GitHub yang benar (`git remote -v` origin repo ini adalah
+   `NvlFR/shiftech-test-mgr`). Diperbaiki ke konstanta `SKILLS_REPO =
+   'NvlFR/shiftech-test-mgr'`.
+
+**Catatan yang TIDAK diperbaiki (di luar scope perbaikan copy-paste ini,
+butuh keputusan arsitektur)**: header `X-TestManager-Project-ID`/`Read-Only`/
+`Feature-Groups` yang di-generate `claude mcp add` tetap disertakan di
+command (sesuai desain `McpConnectionConfig` yang eksplisit per-project/
+per-feature-group), TAPI seperti dicatat di entri sebelumnya, `mcp/src/httpTransport.ts`
+tidak pernah membaca header itu — MCP server ini single-tenant (1 project
+tetap per proses via env var `TM_PROJECT_ID`, bukan multi-tenant per-header
+seperti yang diasumsikan UI). Supaya header ini benar-benar berfungsi,
+`mcp/` perlu direfactor jadi baca session config dari header per-request,
+bukan dari env var sekali di startup — pekerjaan besar, dicatat di
+`docs/REMAINING_WORK.md`, bukan dikerjakan di sini.
+
+**Verifikasi:**
+- `projectConnectionService.test.ts` diupdate (3 assertion lama yang
+  meng-encode command rusak sebagai "benar" diganti) + 1 test baru (assert
+  repo skill yang benar). 15/15 test lolos.
+- **Bug lain ditemukan & diperbaiki saat verifikasi**: `frontend/vitest.config.ts`
+  tidak punya `include`/`exclude` untuk memisahkan `e2e/` (Playwright) dari
+  `src/**/*.test.ts` (vitest) — `npm run test` (vitest) ikut mencoba
+  menjalankan `e2e/*.spec.ts` dan gagal karena API `test`/`expect`
+  Playwright beda dari vitest. Ini regresi dari sesi E2E-INFRA-01 sebelumnya
+  yang belum diverifikasi lewat `npm run test` (cuma `npm run test:e2e`).
+  Fix: `vitest.config.ts` → `include: ['src/**/*.test.{ts,tsx}']`.
+- `npx tsc -b` bersih, `npm run lint` tidak ada warning baru.
+- `npm run test`: 173/179 lolos — 6 gagal di `mappers.test.ts` (field
+  `username` di `Profile`), PRE-EXISTING dari kerja APPNEW lain yang belum
+  di-commit (`mappers.ts`/`factories.ts` sudah modified sebelum sesi ini
+  mulai), TIDAK disentuh, di luar scope.
+- `npm run test:e2e`: 4/4 lolos (termasuk `main-flow.spec.ts` yang paling
+  banyak menyentuh UI project/plan/case/run).
+- **Verifikasi end-to-end MCP sungguhan**: setelah user approve
+  (`/mcp`), tool `testmanager.project.get` dan `testmanager.testplan.list`
+  dipanggil langsung dari sesi ini lewat koneksi `testmanager` yang baru
+  didaftarkan — hasilnya cocok dengan data LelangOps yang diisi sebelumnya
+  (2 test plan, 14+4 test case). Koneksi MCP project-scoped + read-write
+  terbukti benar-benar berfungsi.
+
+`docs/REMAINING_WORK.md` ditambah catatan arsitektur multi-tenant header
+MCP. Tidak ada perubahan schema/migration di entri ini — murni frontend
+(`projectConnectionService.ts` + 2 hook caller + test) dan config test
+(`vitest.config.ts`).
+
+## 2026-08-03 — Connect MCP server (project LelangOps) + install skills testmanager-*
+
+Permintaan user: jalankan `claude mcp add` untuk connect MCP server TestManager
+project LelangOps, cek `claude /mcp`, lalu `npx skills add
+ffrz/shiftech-test-mgr --skill testmanager-workflow ...`.
+
+**Temuan sebelum eksekusi — perintah user tidak bisa jalan apa adanya:**
+
+1. `--transport http ... http://localhost:5173/mcp` — port 5173 itu Vite dev
+   server (SPA frontend), bukan MCP server. Dikonfirmasi `lsof -i :5173`
+   menunjukkan proses `node` (vite) sedang listen di situ, ada tab Firefox
+   terbuka ke sana juga.
+2. Header custom (`X-TestManager-Project-ID`, `X-TestManager-Read-Only`,
+   `X-TestManager-Feature-Groups`) **tidak pernah dibaca** oleh
+   `mcp/src/httpTransport.ts` atau `mcp/src/config.ts` — dikonfirmasi baca
+   kode langsung. Config (project id, readonly, dll) MCP server ini
+   sepenuhnya dari environment variable saat proses start
+   (`TM_PROJECT_ID`, `TM_API_TOKEN`, `TM_MCP_READONLY`), bukan per-request
+   header. Konsep "Feature Groups" juga tidak ada implementasinya sama
+   sekali di `mcp/src/`. Header tetap disertakan di `.mcp.json` (tidak
+   berbahaya, cuma tidak berefek) supaya sesuai permintaan literal user,
+   tapi didokumentasikan di sini biar tidak disangka benar-benar berfungsi.
+
+**Yang dijalankan:**
+
+1. `create_api_token('1b7f339a-9952-4b8d-8bcc-e35c816c9338', 'Claude Code MCP',
+   ['read:project','write:test-runs','write:test-results','write:issues'])`
+   lewat MCP Supabase (`request.jwt.claim.sub` di-set ke akun admin dulu,
+   karena RPC ini `is_project_manager()` check yang butuh `auth.uid()`).
+   Token berlaku 30 hari.
+2. `mcp/.env` dibuat dari `.env.example` (chmod 600), diisi Supabase
+   URL/anon key dari `frontend/.env`, token di atas, `TM_PROJECT_ID` =
+   LelangOps, `TM_MCP_READONLY=0`, `TM_MCP_TRANSPORT=http`.
+3. Port `3000` (default `TM_MCP_HTTP_PORT`) ternyata dipakai app lain di
+   mesin ini ("Client Search Tools", proses root, tidak terkait repo ini) —
+   dipindah ke `3900`. Server jalan (`curl /health` → `{"status":"ok"}`).
+4. `claude mcp add` gagal pertama kali dengan "missing required argument
+   'name'" — `--header <header...>` variadic milik Commander.js melahap
+   argumen positional (`name`, url) yang ditaruh SETELAH flag `--header`.
+   Fix: taruh `testmanager` dan URL sebelum semua flag `--header`.
+5. **Salah lokasi file di percobaan pertama**: shell masih `cd`-ed ke
+   `mcp/` dari langkah sebelumnya, jadi `.mcp.json` sempat ditulis ke
+   `mcp/.mcp.json` alih-alih root repo. Dihapus, dijalankan ulang dari root
+   — root `.mcp.json` sudah punya entry `supabase` dari sesi lain, digabung
+   (bukan ditimpa) jadi 2 entries: `supabase` + `testmanager`.
+6. `claude mcp list` / `claude mcp get testmanager`: server terdaftar,
+   status **"Pending approval"** — MCP server project-scoped (`.mcp.json`
+   di-commit ke repo, bisa dilihat kolaborator lain) wajib disetujui manual
+   oleh user (gerbang keamanan Claude Code, tidak bisa saya bypass dari
+   sesi non-interaktif ini). User perlu jalankan `claude` (sesi baru) atau
+   ketik `/mcp` untuk approve.
+7. `npx skills add ffrz/shiftech-test-mgr ...` gagal "No skills found" —
+   `ffrz/shiftech-test-mgr` bukan remote repo ini. `git remote -v`
+   menunjukkan remote sebenarnya `NvlFR/shiftech-test-mgr`, dan
+   `skills/testmanager-{workflow,authoring,triage,regression}/SKILL.md`
+   memang sudah ada & committed di repo ini (HEAD == origin/master, tidak
+   ada divergence). Dijalankan ulang dengan `NvlFR/shiftech-test-mgr` —
+   berhasil, ke-4 skill terinstall ke `.agents/skills/` (universal) +
+   symlink ke `.claude/skills/` untuk Claude Code.
+8. **Proses MCP server bocor**: 2 percobaan start yang gagal EADDRINUSE
+   tetap hidup sebagai proses menggantung (bukan langsung exit) — bug kecil
+   di `mcp/src/index.ts`: `heartbeatTimer` (`setInterval`) sudah dibuat
+   SEBELUM `startHttpTransport()` dipanggil, dan `catch` di `main().catch()`
+   cuma set `process.exitCode`, tidak `clearInterval`/`process.exit()`,
+   jadi event loop tetap hidup walau startup gagal total. Dibersihkan
+   manual (`kill`), TIDAK diperbaiki di kode (di luar scope task ini) —
+   dicatat sebagai temuan minor untuk `docs/REMAINING_WORK.md` kalau mau
+   diperbaiki nanti.
+
+**Status akhir**: MCP server TestManager jalan di `127.0.0.1:3900` (proses
+`node --env-file=.env dist/index.js`, PID akan berubah tiap restart — cek
+`ss -ltnp | grep 3900`), scoped ke project LelangOps, read-write. Terdaftar
+di `.mcp.json` root tapi masih **menunggu approval manual user**. 4 skill
+`testmanager-*` terinstall. Tidak ada perubahan schema/migration di entri
+ini — cuma operasional (token, config, proses).
+
+## 2026-08-03 — Data lengkap (modul/test case/test plan/test run) untuk project LelangOps
+
+Lanjutan entri "Project baru LelangOps" — atas permintaan user, diisi data
+test management lengkap lewat MCP Supabase (`insert` langsung, bukan
+migration file — data konten, bukan schema), relevan dengan domain LelangOps
+(dibaca sekilas dari `app/Http/Controllers/` di
+`/home/rny/work/2026/07-juli/20/LelangOps`: Auction, Client, Contract,
+Invoice, Payment, Receipt, Document, RolePermission):
+
+- **5 Module**: Autentikasi & User, Lelang (Auction), Klien, Kontrak &
+  Dokumen, Invoice & Pembayaran.
+- **2 Tag**: `smoke`, `regression` (semua 14 test case ditag regression, 4
+  test case inti ditag smoke juga).
+- **14 Test Case** tersebar di 5 module, prioritas bervariasi (critical s/d
+  low), tiap satu punya objective/preconditions/steps/expected result yang
+  relevan dengan fitur LelangOps (login, buat lelang, validasi tanggal, CRUD
+  klien, import/export Excel, generate & share dokumen kontrak, buat
+  invoice, catat pembayaran, reminder jatuh tempo).
+- **2 Test Plan**: "Regression Release 1.0" (semua 14 case, status active,
+  approved) dan "Smoke Test Harian" (4 case bertag smoke, status active,
+  approved).
+- **2 Test Run**: "Regression Run - 2026-08-01" (completed, 14 hasil: 11
+  pass, 2 fail, 1 blocked, 1 skip) dan "Smoke Run - 2026-08-03" (completed,
+  4 hasil, semua pass).
+- **2 Issue** dibuat dari 2 hasil FAIL di Regression Run (login gagal tanpa
+  pesan error, form lelang menerima tanggal masa lalu) — hasil `blocked`
+  sengaja TIDAK dibuatkan issue, konsisten dengan aturan aplikasi (tombol
+  "Buat Issue" cuma muncul untuk status `fail`, bukan `blocked`).
+
+Semua id pakai UUID literal berprefix tetap (`10000000-...` module,
+`20000000-...` tag, `30000000-...` test case, `40000000-...` plan,
+`50000000-...` run, `60000000-...`/`61000000-...` result, `70000000-...`
+issue) supaya mudah ditelusuri ulang lewat SQL kalau perlu diubah/dihapus.
+Verifikasi: count semua tabel cocok (5/2/14/2/18/2/18/2), kode entity
+ter-generate berurutan rapi (`TC-0001`..`TC-0014`) lewat trigger yang sudah
+ada, tidak ada perubahan schema.
+
+## 2026-08-03 — Project baru "LelangOps" untuk testing manual
+
+Atas permintaan user: dibuat 1 row baru di `projects` (bukan lewat migration
+file, langsung `insert` via MCP Supabase — bukan fixture E2E, bukan schema
+change) — nama "LelangOps", deskripsi menyebut path lokal
+`/home/rny/work/2026/07-juli/20/LelangOps` (project Laravel terpisah, di
+luar repo TestManager, untuk eksplorasi/testing manual), `owner_id` diisi
+langsung ke akun admin asli (`noval@gmail.com`, id `9acad6b5-...`) karena
+insert dijalankan sebagai superuser MCP (bukan lewat sesi `auth.uid()`
+pengguna, jadi trigger `set_project_owner` BEFORE INSERT tidak punya
+`auth.uid()` untuk diisi otomatis).
+
+Sekaligus jadi verifikasi langsung fix `schema_096` dari sesi sebelumnya:
+row `project_members` yang dibuat trigger `handle_new_project()` untuk
+project ini punya `role=manager` dengan `permissions` penuh
+(`create/update/delete/import/export/run_automation` semua `true`), bukan
+view-only seperti sebelum fix.
+
+## 2026-08-03 — Default browser terlihat (headed) untuk E2E dan Runner
+
+Permintaan user: browser Playwright default terlihat (headed), bukan
+headless, di dua tempat berbeda — bukan cuma satu:
+
+1. **`frontend/playwright.config.ts`** (E2E TestManager sendiri,
+   E2E-INFRA-01/03) — tambah `use.headless: !!process.env.CI`. Default
+   headed di lokal (tidak ada `process.env.CI`), tetap headless di CI kalau
+   nanti CI dipasang (tidak ada display server di CI runner umumnya).
+2. **`runner/src/config.ts`** (`RunnerConfig.headed`, dipakai
+   `PlaywrightLocalExecutor` untuk automation job E2E terhadap project
+   pengguna, Section 9) — default `boolEnv(env, 'TM_PLAYWRIGHT_HEADED', ...)`
+   diubah dari `false` ke `true`. `runner/.env.example` juga diubah
+   `TM_PLAYWRIGHT_HEADED=false` → `true` (kalau tidak, env var eksplisit di
+   template override default kode ini jadi percuma). `runner/README.md`
+   diupdate: instruksi `npm start -- --headed` diganti jadi catatan default
+   sudah headed + cara memaksa headless
+   (`TM_PLAYWRIGHT_HEADED=false npm start`) karena tidak ada flag CLI
+   `--headless` (CLI cuma bisa memaksa `true` lewat `--headed`, tidak ada
+   flag kebalikannya — cukup lewat env var untuk override ke `false`).
+
+Tidak mengubah `parseCliOptions`/tes `executionMode.test.mjs` — keduanya
+mengonstruksi `config`/`job` secara eksplisit di test, tidak bergantung pada
+default `loadConfig()` yang saya ubah.
+
+**Verifikasi:**
+- `runner`: `npm run build` bersih, `npm test` — 48/48 test lolos (tidak ada
+  yang bergantung pada default lama).
+- `frontend`: `npm run test:e2e` — dengan headed default, 4 worker paralel
+  (`fullyParallel: true`) sempat membuat `main-flow.spec.ts` timeout 30s di
+  sandbox ini karena headed lebih berat daripada headless (tanpa GPU/display
+  acceleration nyata di sandbox headless-only). Diverifikasi ulang dengan
+  `--workers=1` — lolos bersih (18.7s). Ini keterbatasan sandbox ini, bukan
+  bug di config — di mesin lokal user dengan display sungguhan seharusnya
+  tidak masalah, tapi dicatat sebagai potensi flaky kalau dijalankan di CI
+  headed dengan banyak worker paralel nanti.
+
+## 2026-08-03 — E2E-INFRA-03: E2E alur utama — membongkar 3 bug RLS/permission produksi
+
+`frontend/e2e/main-flow.spec.ts` — skenario penuh: login (akun seed
+E2E-INFRA-02) → buat project baru lewat UI → buat test case → buat test plan
+→ tambah test case ke plan → setujui plan (draft → active) → mulai test run →
+catat hasil FAIL → buat issue dari hasil FAIL itu → verifikasi issue muncul
+di `/test-runs/:id/issues`. Nama entity dibuat unik per run (timestamp)
+karena belum ada reset otomatis (lihat catatan E2E-INFRA-02); project hasil
+run dibersihkan manual dari Supabase setelah suite lolos.
+
+**Menulis skenario ini (bukan cuma memasang harness) membongkar 3 bug
+produksi nyata** — semuanya lolos tak terdeteksi sebelumnya karena SETIAP
+testing manual di sesi-sesi lalu selalu pakai akun admin (`noval@gmail.com`),
+yang bypass total lewat `is_admin()` (Postgres RLS) dan `isAdmin`
+(`useProjectRole.ts`). User E2E seed (role `user`, bukan admin) langsung
+menabrak semuanya di langkah pertama (buat project):
+
+1. **User non-admin sama sekali tidak bisa membuat project.**
+   `projectRepository.create()` selalu pakai `.select().single()` (RETURNING).
+   Postgres RLS SELECT policy dievaluasi terhadap row insert untuk RETURNING,
+   tapi `owner_id` di-set oleh trigger `handle_new_project()` yang jalan
+   `AFTER INSERT` — row yang dipakai RETURNING masih punya `owner_id = NULL`
+   di titik itu (efek trigger AFTER tidak terlihat oleh RETURNING statement
+   yang sama). Insert-nya sendiri sukses (WITH CHECK cuma `is_approved()`),
+   tapi Postgres mengembalikan error yang membingungkan: "new row violates
+   row-level security policy for table projects" — padahal row-nya sudah
+   masuk. Fix 2 langkah:
+   - `schema_094_fix_project_create_rls_returning.sql` — tambah
+     `owner_id = auth.uid()` ke policy `"project access - projects select"`
+     (perbaikan yang benar secara independen: pemilik harus selalu bisa lihat
+     project miliknya).
+   - `schema_095_fix_project_owner_before_insert.sql` — pindahkan
+     penyetelan `owner_id` dari `handle_new_project()` (AFTER INSERT) ke
+     trigger baru `set_project_owner()` (BEFORE INSERT), supaya `owner_id`
+     sudah benar di tuple SEBELUM RETURNING dievaluasi. `handle_new_project()`
+     disederhanakan jadi cuma bikin baris `project_members`.
+2. **Pemilik project baru cuma dapat permission view-only pada project
+   miliknya sendiri.** Setelah bug #1 diperbaiki, tombol "Test Case Baru"
+   tidak muncul sama sekali untuk user non-admin di project yang baru saja
+   dia buat. Sebabnya: `handle_new_project()` insert `project_members` dengan
+   `role = 'manager'` tapi TIDAK mengisi kolom `permissions` secara eksplisit
+   — jatuh ke default kolom (`{view:true, create:false, ...}`, semua
+   false selain view), bukan `DEFAULT_PROJECT_PERMISSIONS.manager` di
+   `projectMemberService.ts` (`{view,create,update,delete,import,export,
+   run_automation}` semua true) yang dipakai jalur JS (`projectMemberService.add`)
+   tapi tidak diketahui oleh trigger SQL. Fix:
+   `schema_096_fix_project_owner_permissions.sql` — trigger sekarang mengisi
+   `permissions` eksplisit sesuai definisi manager penuh. Juga backfill 2
+   baris `project_members` yang sudah kadung salah (project fixture E2E +
+   1 project uji coba) ke permission penuh.
+3. Ketemu 2 masalah locator/UX minor saat menulis test (bukan bug app):
+   kolom kode test plan ada di cell terpisah dari kolom nama (bukan link
+   di dalam cell nama), dan menutup overlay MultiSelect dengan `Escape`
+   ikut menutup `Dialog` pembungkusnya di PrimeReact — diganti klik ke
+   elemen lain dalam dialog.
+
+**Dampak nyata bug #1 dan #2**: setiap user biasa (role `user`) di aplikasi
+ini — bukan cuma akun E2E — sebelum fix ini TIDAK BISA membuat project sama
+sekali, dan kalaupun bisa (lewat jalur lain), tidak akan bisa mengisi apa pun
+di project miliknya sendiri. Ini kemungkinan besar bug yang sudah ada sejak
+`schema_029_project_ownership_visibility.sql`/`schema_project_members.sql`
+pertama kali menambahkan sistem `project_members` + `permissions`, dan tidak
+pernah ketahuan karena satu-satunya akun yang dipakai testing selama ini
+adalah admin.
+
+Verifikasi: `npm run test:e2e` — 4/4 test lolos (2 smoke + login seed + main
+flow). `npx tsc -b` bersih, `npm run lint` tidak menambah warning baru.
+`FEATURE_BACKLOG.md` Section 16.6 diupdate. `docs/REMAINING_WORK.md` Tier 1
+item 3 ditandai selesai + catatan bug RLS. `queue.md`: E2E-INFRA-03 dipindah
+ke Selesai. Project-project uji coba dibersihkan dari Supabase target
+(`delete from projects where name like 'E2E Main Flow%'`).
+
+## 2026-08-03 — E2E-INFRA-02: seed data deterministik untuk E2E
+
+Isolasi data E2E: user memutuskan langsung pakai project Supabase yang sama
+dengan dev (bukan Supabase branch terpisah yang tadinya saya tawarkan) —
+isolasi lewat konvensi penamaan/id fixture tetap, bukan lewat project/branch
+terpisah.
+
+**Bug produksi ditemukan & diperbaiki sebelum seed bisa jalan:**
+
+1. `handle_new_user()` (trigger `auth.users` → `profiles`) tidak pernah
+   diupdate setelah `schema_092_profile_username.sql` membuat
+   `profiles.username` NOT NULL. Setiap signup baru (Google OAuth ataupun
+   lewat email/password) akan gagal dengan not-null violation di trigger.
+   Fix: `supabase/schema_093_fix_handle_new_user_username.sql` — trigger
+   sekarang generate username fallback `user_<8 char id>` sama seperti
+   backfill di `schema_092`. Diterapkan ke target lewat MCP Supabase
+   (`apply_migration`).
+2. Insert manual ke `auth.users` lewat SQL untuk akun fixture E2E gagal login
+   (`grant_type=password` → 500 `"converting NULL to string is unsupported"`
+   pada kolom `email_change`). Ini bug lama GoTrue: kolom varchar
+   `email_change`, `email_change_token_new`, `email_change_token_current`,
+   `phone_change`, `phone_change_token`, `reauthentication_token` di-scan
+   sebagai string non-null oleh GoTrue meski nullable di skema Postgres —
+   default kolom NULL bikin request password grant apapun 500, bukan cuma
+   untuk user seed ini. Fix: isi eksplisit `''` untuk semua kolom itu saat
+   insert. **Berpotensi mempengaruhi user lain juga kalau pernah dibuat
+   manual lewat SQL tanpa mengisi kolom ini** — tidak dicek untuk user
+   existing (`noval@gmail.com` dibuat lewat Google OAuth asli, jalur itu
+   mengisi kolom-kolom ini dengan benar lewat GoTrue, jadi kemungkinan besar
+   aman).
+
+**Seed:**
+
+- `supabase/seed_e2e.sql` — script tunggal idempoten (delete cascade project
+  fixture → insert ulang) berfungsi ganda sebagai seed DAN reset. Id fixture
+  fixed-prefix `e2e0000-...`: 1 auth user (`e2e@testmanager.local` /
+  `E2eSeed!2026`, role `user`, username auto-generate `user_e2e00000` —
+  tidak bisa diganti manual karena `prevent_username_update` trigger), 1
+  project ("E2E Fixture Project"), 1 module, 1 tag, 1 test case, 1 test plan
+  + test_plan_case.
+- Dieksekusi ke target lewat MCP Supabase `execute_sql`.
+- `frontend/e2e/fixtures.ts` — kredensial + id fixture untuk dipakai test
+  Playwright berikutnya (E2E-INFRA-03).
+- `frontend/e2e/smoke.spec.ts` — test baru "login dengan akun seed E2E dan
+  melihat project fixture": login lewat form, redirect ke `/`, project
+  fixture terlihat di `/projects`. Lolos bareng 2 test lama (3 passed).
+
+**Batasan yang dicatat, bukan diselesaikan di sini**: reset belum otomatis
+jalan sebelum `npm run test:e2e` — perlu service role key yang tidak
+tersimpan di `frontend/.env` (cuma anon key) dan belum ada CI. Untuk sekarang
+reset dijalankan manual (lewat agent/MCP atau SQL Editor) sebelum sesi E2E.
+
+`FEATURE_BACKLOG.md` Section 16.6 diupdate. `docs/REMAINING_WORK.md` Tier 1
+item 2 ditandai selesai. `queue.md`: E2E-INFRA-02 dipindah ke Selesai.
+`npx tsc -b` bersih.
+
+## 2026-08-03 — E2E-INFRA-01: pasang Playwright
+
+Mengerjakan item pertama Tier 1 `docs/REMAINING_WORK.md` sesuai queue
+`scripts/codex-loop/queue.md`.
+
+- `npm install -D @playwright/test` (`^1.62.1`) di `frontend/`. 3 vulnerability
+  high severity yang muncul di `npm audit` sudah pra-ada dari `xlsx` dan
+  `react-router-dom` (dikonfirmasi dengan `git stash` + `npm audit` di
+  working tree bersih) — bukan dari Playwright.
+- `npx playwright install chromium` — browser sudah ter-cache dari sesi smoke
+  test Section 7 sebelumnya (`chromium-1234`), tidak perlu download ulang.
+  `install-deps` butuh `sudo` yang tidak tersedia di sandbox ini; beberapa
+  font system hilang tapi tidak menghalangi test jalan.
+- `frontend/playwright.config.ts` — `webServer` menjalankan `npm run build &&
+  npm run preview -- --port 4174`, BUKAN `vite dev`, karena HMR websocket
+  vite dev sudah terbukti menyebabkan `ERR_INSUFFICIENT_RESOURCES` palsu saat
+  smoke test Section 7 (lihat entri `2026-08-02`).
+- `frontend/e2e/smoke.spec.ts` — 2 test tanpa auth (belum ada seed data
+  deterministik/E2E-INFRA-02): `/login` termuat tanpa `pageerror` runtime,
+  dan route tak dikenal saat belum login dialihkan ke `/login` oleh
+  `ProtectedRoute`. Keduanya lolos (`npm run test:e2e`, 2 passed).
+- Script `test:e2e` ditambahkan ke `package.json`.
+- `.gitignore` root: tambah `frontend/test-results/`,
+  `frontend/playwright-report/`, `frontend/blob-report/`,
+  `frontend/playwright/.cache/`.
+- **Temuan di luar scope task ini**: `frontend/src/pages/auth/LoginPage.tsx`
+  memakai `signInWithPassword` (email/password) — tidak ada alur Google
+  OAuth sama sekali di `pages/auth/` atau `hooks/useAuth.tsx`. Ini
+  bertentangan dengan CLAUDE.md ("Login hanya via Google OAuth"). Dicatat di
+  `docs/REMAINING_WORK.md` Tier 3 sebagai item butuh keputusan manusia — tidak
+  diubah di sini karena scope task ini murni infrastruktur E2E.
+
+`FEATURE_BACKLOG.md` Section 16.6 dan 17.3 diupdate. `docs/REMAINING_WORK.md`
+Tier 1 item 1 ditandai selesai + temuan LoginPage ditambahkan ke Tier 3.
+`queue.md`: E2E-INFRA-01 dipindah dari Antrean ke Selesai.
+
+## 2026-08-03 — Fix 4 bug Tier 0 dari AUDIT-05 (Section 17)
+
+Lanjutan AUDIT-05: memperbaiki 4 bug/gap yang ditemukan saat rekonsiliasi
+Section 17 (lihat entri `2026-08-02` di bawah), semuanya masuk Tier 0
+`docs/REMAINING_WORK.md` (tanpa dependency, murah).
+
+1. **`frontend/src/pages/NotFoundPage.tsx`** — tombol berlabel "Ke Daftar
+   Project" (`navigate('/')`) diganti label "Ke Beranda", karena `/` sudah
+   `HomePage` sejak APPNEW-03, bukan daftar project (`/projects`).
+2. **`frontend/src/App.tsx`** — ditambahkan
+   `<Route path="/home" element={<Navigate to="/" replace />} />` di dalam
+   `AppLayout`/`ProtectedRoute`, supaya bookmark lama ke `/home` tidak jatuh
+   ke `NotFoundPage`.
+3. **Preferensi tema dari DB** — ternyata SUDAH diselesaikan sebelumnya
+   (uncommitted, bukan bagian sesi ini): `components/layout/AppLayout.tsx`
+   (`AppLayoutInner`) memanggil `useUserPreferences()` dan `useEffect` yang
+   memanggil `setMode(preferences.theme)` setiap kali beda dari mode aktif.
+   `hooks/useTheme.tsx` tetap baca `localStorage` untuk nilai awal (sebelum
+   auth/preferences termuat), tapi begitu preferences termuat DB menang. Ini
+   cukup untuk memenuhi kriteria "device lain memuat tema dari DB" — tidak
+   perlu perubahan kode, hanya klaim di `FEATURE_BACKLOG.md` diperbaiki dari
+   "belum tuntas" ke tercentang dengan bukti.
+4. **`frontend/src/components/ui/CommentsPanel.tsx`** — body komentar
+   sekarang dirender lewat `renderMentions()` dari
+   `helpers/renderMentions.tsx` (helper ini sudah ada & sudah mendukung
+   `/@username` untuk mention dikenal, tapi belum pernah dipanggil dari
+   manapun — dead code sampai sekarang). `KnownRefs.usernames` diisi dari
+   daftar `profiles` yang sudah di-fetch di komponen ini. Baris "Mention: ..."
+   di bawah body juga diubah dari teks polos jadi `<Link to="/@username">`
+   per profil yang di-mention.
+
+Verifikasi: `npx tsc -b` bersih, `npm run lint` (oxlint) tidak menambah
+warning/error baru dibanding baseline sebelum perubahan.
+
+`FEATURE_BACKLOG.md` Section 17.1/17.2/17.3 checkbox terkait diupdate jadi
+tercentang dengan bukti baru. `docs/REMAINING_WORK.md` Tier 0 diringkas untuk
+menghapus 4 item yang sudah selesai. Tidak ada migration/schema yang diubah
+pada entri ini.
+
+## 2026-08-02 — AUDIT-05: rekonsiliasi Section 17 + docs/REMAINING_WORK.md
+
+AUDIT-05 minta menyusun `docs/REMAINING_WORK.md` "setelah AUDIT-01..04". Tapi
+Section 17 (Ide dari App-new — APPNEW-01/02/03) belum pernah masuk scope
+AUDIT manapun, padahal dari smoke test Section 7 sebelumnya sudah terlihat
+bukti kuat bahwa APPNEW-01/02/03 sebagian besar sudah dikerjakan di disk.
+Menyusun REMAINING_WORK.md tanpa rekonsiliasi Section 17 dulu akan langsung
+membuat dokumennya basi sejak lahir — jadi Section 17 direkonsiliasi dulu
+dengan metode yang sama, baru REMAINING_WORK.md disusun.
+
+**Rekonsiliasi Section 17:**
+
+- 17.1 (Settings): 3 dari 4 item dicentang dengan bukti (`schema_091`,
+  `useUserPreferences.ts`/`userPreferenceRepository.ts`/
+  `userPreferenceService.ts`, route+menu). **1 item TETAP kosong dengan
+  temuan bug**: `hooks/useTheme.tsx` (`ThemeProvider`) masih membaca
+  `localStorage` sebagai sumber kebenaran saat inisialisasi;
+  `SettingsPage.tsx` hanya menulis paralel ke `user_preferences` dan
+  `localStorage`, bukan menggantikan — sesi di device lain tidak memuat tema
+  dari DB.
+- 17.2 (Public profile): 4 dari 5 item dicentang (`schema_092`, kebijakan
+  privasi via view `public_profiles` yang hanya expose field aman, RLS
+  terpisah, route `/@:username` bukan wildcard). **1 item SEBAGIAN**:
+  halaman publik ada (`PublicProfilePage.tsx`), tapi tautan dari
+  mention/komentar belum ada — `CommentsPanel.tsx` tidak mereferensikan
+  `/@username` sama sekali.
+- 17.3 (Landing Home): 1 dari 4 item dicentang (route `/` → `HomePage`,
+  `/projects` → `ProjectsPage`, dikonfirmasi jalan lewat smoke Section 7).
+  **3 item TETAP kosong dengan temuan bug nyata**:
+  - `pages/NotFoundPage.tsx` masih punya tombol "Ke Daftar Project" yang
+    `navigate('/')` — padahal `/` sekarang `HomePage`, bukan daftar project.
+  - Tidak ada route/redirect untuk `/home` lama sama sekali; bookmark lama
+    akan jatuh ke `NotFoundPage`.
+  - Verifikasi E2E alur utama belum bisa dipenuhi karena E2E Playwright belum
+    terpasang (E2E-INFRA-01..03).
+
+**`docs/REMAINING_WORK.md` disusun** dari gabungan sisa AUDIT-01 (Section
+6–8), AUDIT-02 (9–11), AUDIT-03 (12–14), AUDIT-04 (16), dan rekonsiliasi
+Section 17 di atas. Dikelompokkan 5 tier berdasarkan ketergantungan:
+- Tier 0: quick fix tanpa dependency (4 bug/gap Section 17 di atas + rotate/
+  revoke token repo dari UI [backend RPC sudah ada, AUDIT-02] + aturan
+  review CI/lint fetch-di-luar-adapter [14.1] + test filter/sorting [16.4]).
+- Tier 1: E2E-INFRA-01→02→03 berurutan (prasyarat murni, harus 01 dulu).
+- Tier 2: item yang butuh Tier 1 selesai (verifikasi E2E APPNEW-03, kriteria
+  acceptance end-to-end 11.9).
+- Tier 3: independen tapi effort besar/butuh keputusan manusia (test
+  invariant tuntas P0, AI memantau Issue resolved, GitHub App token, sync
+  Issue↔GitHub, saved-prompt per project, unifikasi token 14.2, npm
+  provenance+2FA).
+- Tier 4: memang belum saatnya (kriteria penyatuan Local Agent 14.5,
+  dogfooding 16.8) — bukan utang, keputusan sadar ditunda.
+- Dicatat eksplisit: Section 1–5 dan 15 belum pernah masuk siklus AUDIT
+  manapun; kalau dibutuhkan jadi AUDIT-06 terpisah.
+
+Tidak mengubah kode aplikasi (temuan bug dicatat sebagai item REMAINING_WORK,
+belum diperbaiki pada task ini), tidak commit/push.
+
+## 2026-08-02 — AUDIT-04 rekonsiliasi FEATURE_BACKLOG Section 16
+
+Menjalankan `graphify query` lalu menelusuri 20 berkas test frontend
+(`frontend/src/**/*.test.ts(x)`), `frontend/vitest.config.ts`,
+`frontend/package.json`, `AGENTS.md`, `docs/TEST_DEBT.md`, dan
+`docs/MANUAL_SMOKE.md` sebagai bukti untuk tiap item `- [ ]` Section 16.
+
+**Pemisahan tiga jenis item sesuai instruksi AUDIT-04:**
+
+- **6 item dipindah ke Section 18** (bukan task, tapi pernyataan kebijakan
+  proses yang salah ditulis sebagai checkbox): seluruh 16.1 "Aturan main"
+  (test terpisah dari implementasi, agent tidak memutuskan kelulusan
+  requirement, test flaky dikarantina, sumber kebenaran invariant) dan
+  seluruh 16.8 "Endgame dogfooding" (kriteria dan alasan penundaan). Dua item
+  di antaranya persis contoh yang disebut instruksi task ini.
+- **26 item dicentang dengan bukti konkret**, seluruhnya menunjuk ke nama
+  berkas dan judul `describe`/`it` yang benar-benar menguji perilaku
+  tersebut — bukan sekadar keberadaan berkas. Highlight: `ProtectedRoute.test.tsx`
+  menguji 16 route sekaligus untuk invariant "user pending tidak bisa akses
+  modul apa pun"; `testRunService.test.ts` mencakup 6 dari 10 invariant Tingkat
+  1; `docs/TEST_DEBT.md` (P0/P1/P2) menjadi bukti inventarisasi risiko.
+- **4 item tetap kosong** karena genuinely belum ada atau tidak cukup bukti:
+  logika filter/sorting halaman list belum punya test khusus; E2E Playwright
+  dan seed data deterministik belum ada sama sekali (E2E-INFRA-01/02 di
+  `scripts/codex-loop/queue.md`); "tulis test invariant untuk tiap fitur
+  berisiko tinggi" di 16.7 dibiarkan kosong karena `docs/TEST_DEBT.md` sendiri
+  didokumentasikan sebagai "hanya daftar dan analisis" (TEST-14), bukan bukti
+  tuntas semua item P0 sudah diuji satu per satu.
+- Catatan silang: item "mapper bolak-balik utuh" tetap dicentang meski saat
+  ini `mappers.test.ts` punya 6 test gagal (field `username` baru dari
+  APPNEW-02 belum tercermin di factory) — infrastruktur pengujian bolak-balik
+  itu sendiri sudah ada dan mayoritas mapper lolos; kegagalannya sendiri
+  sudah dicatat sebagai test debt terpisah di entri Section 7 sebelumnya.
+- Tidak mengubah kode aplikasi, tidak menjalankan test baru untuk memaksa
+  hijau, tidak commit/push.
+
+## 2026-08-02 — Section 7 Definition of Done: migration target, smoke test, RBAC audit
+
+Melanjutkan dari AUDIT-03: mengerjakan 4 item DoD Section 7 yang tersisa
+(`FEATURE_BACKLOG.md` L359–366). Dilakukan atas persetujuan eksplisit user
+untuk memakai MCP Supabase terhadap project target
+(`fohuxwzczepdqyrfkovc.supabase.co`, dikonfirmasi sama dengan
+`frontend/.env` `VITE_SUPABASE_URL`).
+
+**Migration target:**
+- `schema_034_source_new_compatibility.sql` (migration yang relevan untuk
+  Section 7/SRC-14) sudah terverifikasi ada di target sebelum sesi ini
+  (kolom `test_runs.started_by`, `test_plans.created_by`,
+  `issues.created_by`/`target_role_id`, `test_cases.created_by`/
+  `external_links`, constraint `issues_status_check` — semua dikonfirmasi via
+  `execute_sql`).
+- Target ternyata tertinggal 33 migration di luar scope Section 7
+  (`schema_060_pw02_browser_device_jobs.sql` s/d `schema_092_profile_username.sql`,
+  mencakup Section 9–14, 17). Atas persetujuan user, seluruhnya diterapkan
+  lewat `apply_migration` MCP Supabase, satu per satu (batch besar sempat
+  timeout dan rollback bersih, jadi dipecah per file).
+- **Dua bug pada source migration ditemukan dan diperbaiki** (baik di file
+  yang diterapkan ke target maupun di `supabase/*.sql`):
+  - `schema_079_adm01_scheduled_test_runs.sql`: policy memanggil
+    `can_access_project()` yang tidak ada; seharusnya `has_project_access()`
+    (dikonfirmasi dari `schema_023`/`schema_029`/`schema_080`).
+  - `schema_080_adm03_granular_permissions.sql`: policy memanggil
+    `can_manage_project()` yang tidak ada; seharusnya `is_project_manager()`
+    (dikonfirmasi dari `schema_029_project_ownership_visibility.sql` dan
+    `schema_project_members.sql`).
+  - `schema_091_user_preferences.sql` (APPNEW-01, belum di-commit): trigger
+    memanggil `update_modified_column()` yang tidak ada; seharusnya
+    `set_updated_at()` (fungsi bersama yang sudah dipakai di seluruh schema).
+- Setelah seluruh migration diterapkan, `get_advisors(type=security)`
+  dijalankan: 0 gap RLS pada tabel baru, hanya satu ERROR pre-existing-by-design
+  (`public_profiles` adalah `SECURITY DEFINER` view — memang disengaja per
+  komentar di `schema_092_profile_username.sql` supaya lookup username publik
+  bisa lintas-project untuk `anon`).
+- Tidak menjalankan migration produksi lain di luar yang sudah ada di repo;
+  tidak mengubah data user selain backfill yang memang bagian dari migration
+  itu sendiri (mis. `default_project_permissions` dan `username` generik).
+
+**Smoke test route terautentikasi:**
+- User memberi `access_token` sesi nyata (`noval@gmail.com`, admin) dari
+  browser console karena login hanya lewat Google OAuth dan tidak bisa
+  diotomasi. Token dipakai sekali untuk smoke test, disuntik ke `localStorage`
+  `sb-fohuxwzczepdqyrfkovc-auth-token` pada browser Playwright headless
+  (skrip sekali pakai di scratchpad, tidak masuk repo), lalu di-crawl 33 route
+  aktif dari `App.tsx` (termasuk route publik, project-scoped, dan admin-only)
+  memakai build produksi (`npm run build` + `vite preview`, BUKAN `vite dev`
+  — mode dev memicu `ERR_INSUFFICIENT_RESOURCES` palsu akibat koneksi HMR
+  websocket, false positive yang bukan bug aplikasi).
+- **Dua defect nyata ditemukan dan diperbaiki:**
+  1. `frontend/src/pages/settings/SettingsPage.tsx` (APPNEW-01, belum
+     di-commit): memanggil `useEffect` hasil `import('react').then(...)` —
+     pelanggaran Rules of Hooks (React error #321 di console setiap kali
+     `/settings` dibuka). Diperbaiki jadi `import { useEffect } from 'react'`
+     statis dan dipanggil langsung di body komponen.
+  2. Setelah migration Section 7 (schema_034) dan yang menyusul menambah
+     `issues.created_by` di atas `issues.assigned_to`/`project_members.invited_by`
+     yang sudah ada, PostgREST tidak lagi bisa menebak FK embed `profiles(*)`
+     tanpa hint (`PGRST201: Could not embed because more than one relationship
+     was found`). Ini menyebabkan `unhandledrejection` senyap (tidak tertangkap
+     try/catch manapun) di route `/test-runs/:id`, `/test-runs/:id/issues`,
+     `/issues/:id`, `/projects/:id/settings`. Diperbaiki dengan mengarahkan FK
+     eksplisit sesuai hint PostgREST:
+     `frontend/src/repositories/issueRepository.ts` (`assignee:profiles(*)` →
+     `assignee:profiles!issues_assigned_to_fkey(*)`, 4 lokasi),
+     `frontend/src/repositories/projectMemberRepository.ts`
+     (`profile:profiles(*)` → `profile:profiles!project_members_user_id_fkey(*)`,
+     2 lokasi), `frontend/src/repositories/commentRepository.ts`
+     (`author:profiles(*)` → `author:profiles!comments_author_id_fkey(*)`).
+- Setelah kedua kelas defect diperbaiki: 33/33 route bersih (tanpa
+  `console.error`, `pageerror`, maupun `unhandledrejection`) pada build
+  produksi dengan sesi admin terautentikasi.
+- **Tidak dapat diklaim selesai 100%:** ini BUKAN pengganti
+  `docs/MANUAL_SMOKE.md` (TEST-15) — alur Google OAuth interaktif sesungguhnya
+  (login pertama kali, approval user `pending`, popup consent) tetap harus
+  dijalankan manusia karena tidak bisa diotomasi tanpa kredensial Google asli.
+
+**Verifikasi RBAC/regresi (Section 7 item 4):**
+- `npx tsc -b --force`: 0 error.
+- `npm run lint`: 0 error, 8 warning pre-existing tidak berubah.
+- `npm test -- --run`: 172/178 lulus. 6 gagal seluruhnya di
+  `frontend/src/helpers/mappers.test.ts`, seluruhnya karena field `username`
+  baru pada `profiles` (APPNEW-02, `schema_092`, belum di-commit) belum
+  tercermin di factory/expected snapshot test. Ini debt test dari fitur
+  APPNEW-02, bukan regresi RBAC — dicatat di sini supaya tidak terlewat, tapi
+  perbaikannya di luar scope Section 7 (accepted sebagai temuan terpisah,
+  belum diperbaiki pada task ini).
+- Tidak ada kegagalan test terkait RBAC/invariant (TEST-03 s/d TEST-06); smoke
+  route terautentikasi mengonfirmasi seluruh route admin-only
+  (`/users`, `/teams`, `/admin/observability`, `/admin/data-retention`) tetap
+  dapat diakses oleh akun admin.
+
+**Catatan keamanan:** access token sesi user ditangani hanya dalam proses
+lokal (env var ke skrip Playwright sekali pakai di scratchpad, tidak ditulis
+ke file repo, tidak di-commit, tidak dicetak ke log persisten). Token
+berumur 1 jam dan kedaluwarsa secara alami setelah sesi ini.
+
+## 2026-08-02 — AUDIT-03 rekonsiliasi FEATURE_BACKLOG Section 12–14
+
+- Menjalankan `graphify query` sebelum menelusuri `packages/agent-core`, `runner/`,
+  `mcp/`, `frontend/src/pages/projects/ProjectConnectPage.tsx`, `.github/workflows/`,
+  dan schema token, lalu memverifikasi setiap item `- [ ]` yang masih kosong di
+  Section 12, 13, dan 14 terhadap bukti berkas/fungsi/migration.
+- Section 13 sudah seluruhnya tercentang sebelum audit ini — tidak ada perubahan.
+- 12 item dicentang dengan bukti konkret:
+  - 12.4: daftar skill + deskripsi + checkbox pemasangan sudah ada di
+    `ProjectConnectPage.tsx` (`SKILLS_CATALOG.map` dengan `Checkbox` per skill).
+    Ini berarti **CONN-10 di `scripts/codex-loop/queue.md` sebenarnya sudah selesai**
+    — perlu dipindah ke Selesai di queue terpisah dari task ini.
+  - 14.1: `TransportAdapter`, `ExecutorAdapter`, `ArtifactStorageAdapter` semuanya
+    didefinisikan di `packages/agent-core/src/index.ts` dan diimplementasikan
+    (`SupabaseRpcTransport`, `RunnerExecutorAdapter`/`PlaywrightLocalExecutor`,
+    `SupabaseStorageAdapter`). Paket bersama dikonfirmasi diimpor `runner/package.json`
+    dan `mcp/package.json` sebagai `@testmanager/agent-core`.
+  - 14.3: jalur `npx` didahulukan (README.md, `runner/README.md`), `curl | bash`
+    tidak dipakai di mana pun (dikonfirmasi grep kosong + dicatat eksplisit di
+    WORKLOG 2026-08-01 baris 432–435), dan catatan networking Docker
+    (`--network host` / `host.docker.internal`) sudah ada di `runner/README.md`
+    dan `runner/Dockerfile` (DIST-04).
+  - 14.4: migration `agent_bootstrap_codes` (`schema_085`) ada; peringatan
+    eksplisit "runner menjalankan kode dari repo yang kamu tautkan" ada di
+    `runner/src/init.ts:69`; alasan desain bootstrap-code-vs-token (bash_history,
+    screenshot) tertulis eksplisit di WORKLOG 2026-08-01 baris 432–435; revoke
+    token per runner dari UI + berlaku pada poll berikutnya dibuktikan tombol
+    rotate/revoke (13.2, RUI-02) dan `runner/test/runnerTokenRevocation.test.mjs`.
+- 6 item TETAP kosong karena tidak ada bukti cukup:
+  - 12.5: penyimpanan prompt sendiri per project — eksplisit opsional, butuh
+    tabel baru dan keputusan scope, belum dimulai.
+  - 14.1: "Aturan review: PR yang menambah fetch ke Supabase di luar adapter
+    ditolak" — hanya ada guard CI untuk runtime dependency
+    (`.github/workflows/agent-runtime-dependencies.yml`, DIST-05), tidak ada
+    lint/CI rule spesifik yang menolak `fetch` langsung di luar adapter.
+  - 14.2: "Identitas: satu format token dan satu mekanisme pencabutan" — runner
+    memakai `automation_runner_token` (`schema_024`), MCP memakai `api_tokens`
+    (`schema_019`) dengan RPC `authenticate_mcp_api_token` terpisah. Dua tabel,
+    dua format token berbeda; belum disatukan.
+  - 14.3: "Publikasi paket wajib memakai npm provenance + 2FA" — tidak ada
+    workflow publish npm sama sekali di `.github/workflows/`.
+  - 14.5 (5 item): kriteria penyatuan jadi satu Local Agent — seluruhnya memang
+    dimaksudkan sebagai kriteria masa depan ("dikerjakan setelah semua ini
+    terpenuhi, bukan sebelumnya"); backend custom belum ada, jadi prasyaratnya
+    sendiri belum terpenuhi. Dibiarkan kosong sesuai desain dokumen, bukan gap.
+- Tidak mengubah kode aplikasi, tidak menjalankan migration, tidak commit/push.
+
+## 2026-08-02 — APPNEW-03: Pindah landing ke HomePage dan daftar project
+
+- Memperbarui route pada `App.tsx` untuk menugaskan `/` ke `HomePage` dan daftar project dialihkan ke route `/projects`.
+- Menyelaraskan URL navigasi pada menu utama di `AppMenu.tsx` (Home -> `/`, Projects -> `/projects`).
+- Memastikan tidak ada hardcoded route yang bermasalah.
+- Verifikasi berhasil: Build lulus, linter bersih, dan pengujian navigasi melalui script smoke test `smoke.sh` berjalan sukses (`smoke: passed`).
+
+## 2026-08-02 — APPNEW-02: Public Profile
+
+- Menambahkan migration `schema_092_profile_username.sql` untuk kolom `username` (unik, immutable, auto-populate), dan view `public_profiles` dengan RLS bypass aman untuk pembacaan publik. Migration tidak dieksekusi ke Supabase target.
+- Memperbarui `domain.ts` dengan interface `PublicProfile` dan `username` di `Profile`, serta mappers yang sesuai.
+- Membuat repository dan service untuk `PublicProfile` yang membaca dari view `public_profiles`.
+- Mengimplementasikan `PublicProfilePage.tsx` dan meletakkannya di route `/@:username` pada `App.tsx`, di luar `ProtectedRoute` agar dapat diakses publik.
+- Memperbaiki factory di `test/factories.ts` agar TS build lulus dengan zero errors.
+
+## 2026-08-02 — APPNEW-01: Implementasi halaman Settings user
+
+- Menambahkan migration `supabase/schema_091_user_preferences.sql` untuk tabel `user_preferences` dengan RLS dan trigger (tidak dieksekusi ke target Supabase).
+- Memperbarui `domain.ts` dengan tipe `UserPreference` dan menambah `mapUserPreferenceRow` pada `mappers.ts`.
+- Membuat `userPreferenceRepository.ts` dan `userPreferenceService.ts` untuk abstraksi Supabase.
+- Membuat hook `useUserPreferences` untuk mengelola state preferensi lokal dan update.
+- Mensinkronisasikan `AppLayout.tsx` dan `useTheme.tsx` dengan database agar mode yang diinginkan dapat teraplikasi.
+- Menambahkan route dan komponen `SettingsPage.tsx` serta mendaftarkan nav menu `Settings` di `AppMenu.tsx`.
+- Verifikasi berhasil: Build lulus (tsc 0 error) dan lint pass.
+
 ## 2026-08-02 — SRC-13 ditutup: App-new ditolak, 404 ditambahkan
 
 **Keputusan produk diambil (sebelumnya memblokir SRC-13):**

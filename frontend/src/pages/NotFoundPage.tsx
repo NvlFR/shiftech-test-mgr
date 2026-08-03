@@ -26,7 +26,7 @@ export function NotFoundPage() {
             outlined
             onClick={() => navigate(-1)}
           />
-          <Button label="Ke Daftar Project" icon="pi pi-home" onClick={() => navigate('/')} />
+          <Button label="Ke Beranda" icon="pi pi-home" onClick={() => navigate('/')} />
         </div>
       </Card>
     </div>

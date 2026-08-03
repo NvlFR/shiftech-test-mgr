@@ -3,12 +3,32 @@ export type UserRole = 'pending' | 'rejected' | 'user' | 'admin';
 export interface Profile {
   id: string;
   email: string;
+  username: string;
   fullName: string | null;
   avatarUrl: string | null;
   role: UserRole;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+}
+
+export type ThemeMode = 'system' | 'light' | 'dark';
+
+export interface PublicProfile {
+  id: string;
+  username: string;
+  fullName: string;
+  avatarUrl: string | null;
+  createdAt: string;
+}
+
+export interface UserPreference {
+  userId: string;
+  theme: ThemeMode;
+  notificationsEnabled: boolean;
+  defaultProjectId: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type ProjectStatus = 'active' | 'inactive' | 'archived';

@@ -6,6 +6,7 @@ import type {
   Project,
   ProjectRepository,
   Profile,
+  PublicProfile,
   Module,
   Tag,
   TestRole,
@@ -42,8 +43,9 @@ import type {
   TestResultStep,
   ActivityEvent,
   Notification,
-  TestResultScreenshotHistory,
   McpUsageEvent,
+  UserPreference,
+  TestResultScreenshotHistory,
 } from '../types/domain';
 import type { Attachment, IssueAttachment } from '../types/domain';
 
@@ -385,12 +387,23 @@ export function mapProfileRow(row: any): Profile {
   return {
     id: row.id,
     email: row.email,
+    username: row.username ?? null,
     fullName: row.full_name,
     avatarUrl: row.avatar_url,
     role: row.role as UserRole,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     deletedAt: row.deleted_at,
+  };
+}
+
+export function mapPublicProfileRow(row: any): PublicProfile {
+  return {
+    id: row.id,
+    username: row.username,
+    fullName: row.full_name,
+    avatarUrl: row.avatar_url,
+    createdAt: row.created_at,
   };
 }
 
@@ -535,4 +548,15 @@ export function mapOperationalErrorLogRow(row: any) {
 }
 export function mapMcpUsageEventRow(row: any): McpUsageEvent {
   return { usedAt: row.created_at };
+}
+
+export function mapUserPreferenceRow(row: any): UserPreference {
+  return {
+    userId: row.user_id,
+    theme: row.theme,
+    notificationsEnabled: row.notifications_enabled,
+    defaultProjectId: row.default_project_id ?? null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createProjectPromptStarters, projectConnectionService, type ProjectConnectionConfig } from './projectConnectionService';
 import { projectConnectionRepository } from '../repositories/projectConnectionRepository';
+import { runnerDistributionRepository } from '../repositories/runnerDistributionRepository';
 import type { AutomationRunner } from '../types/domain';
 
 const baseConfig: ProjectConnectionConfig = {
@@ -11,6 +12,7 @@ const baseConfig: ProjectConnectionConfig = {
   prompts: [],
   activeTokens: [],
   lastMcpUsedAt: null,
+  selectedSkills: ['testmanager-workflow', 'testmanager-authoring', 'testmanager-triage', 'testmanager-regression'],
   mcp: {
     clientId: 'claude-code',
     clients: [],
@@ -24,6 +26,7 @@ const baseConfig: ProjectConnectionConfig = {
     exceedsToolCountWarning: true,
   },
 };
+
 
 describe('projectConnectionService', () => {
   afterEach(() => vi.restoreAllMocks());
@@ -106,10 +109,20 @@ describe('projectConnectionService', () => {
   it('regenerates the add-server command when feature groups change', () => {
     const result = projectConnectionService.setFeatureGroups(baseConfig, ['DISCOVERY', 'DOCS']);
 
+    // Argumen posisional (nama server, URL) HARUS sebelum --header: --header
+    // Commander.js variadic, kalau ditaruh duluan dia melahap argumen setelahnya
+    // dan menyebabkan "error: missing required argument 'name'" di CLI sungguhan.
     expect(result.setupSteps[0]?.command).toBe(
-      'claude mcp add --scope project --transport http --header "X-TestManager-Project-ID: project-id" --header "X-TestManager-Read-Only: 0" --header "X-TestManager-Feature-Groups: DISCOVERY,DOCS" testmanager https://example.test/mcp',
+      'claude mcp add testmanager https://example.test/mcp --scope project --transport http --header "X-TestManager-Project-ID: project-id" --header "X-TestManager-Read-Only: 0" --header "X-TestManager-Feature-Groups: DISCOVERY,DOCS"',
     );
     expect(result.setupSteps.map((step) => step.id)).toEqual(['add-server', 'authenticate', 'install-skills']);
+  });
+
+  it('uses the real GitHub repo for the skills install command', () => {
+    const result = projectConnectionService.setFeatureGroups(baseConfig, ['DISCOVERY']);
+    const installStep = result.setupSteps.find((step) => step.id === 'install-skills');
+    expect(installStep?.command.startsWith('npx skills add NvlFR/shiftech-test-mgr')).toBe(true);
+    expect(installStep?.command).not.toContain('ffrz/shiftech-test-mgr');
   });
 
   it('creates every prompt category with project, module, and environment context', () => {
@@ -136,11 +149,11 @@ describe('projectConnectionService', () => {
 
   it('renders the runner prompt with a one-command bootstrap setup', () => {
     const code = `tmb_${'a'.repeat(48)}`;
-    const prompt = createProjectPromptStarters('project-id', 'Checkout App', [], [], `npx @testmanager/runner init --code ${code}`)
+    const prompt = createProjectPromptStarters('project-id', 'Checkout App', [], [], `tm-runner init --code ${code}`)
       .find(({ id }) => id === 'connect-runner');
 
     expect(prompt?.requiresBootstrapCode).toBe(false);
-    expect(prompt?.prompt).toContain(`npx @testmanager/runner init --code ${code}`);
+    expect(prompt?.prompt).toContain(`tm-runner init --code ${code}`);
     expect(prompt?.prompt).toContain('nama runner, label, dan project yang tersambung');
     expect(prompt?.prompt).not.toContain('{{');
   });
@@ -152,12 +165,26 @@ describe('projectConnectionService', () => {
       bootstrapCode: `tmb_${'b'.repeat(48)}`,
       expiresAt: '2026-08-01T12:10:00.000Z',
     });
+    // @testmanager/runner TIDAK ada di npm registry publik — cuma distribusi
+    // tarball self-hosted lewat /runner/release.json.
+    vi.spyOn(runnerDistributionRepository, 'getRelease').mockResolvedValue({
+      version: '0.1.0',
+      filename: 'tm-runner-0.1.0.tgz',
+      url: '/runner/tm-runner-0.1.0.tgz',
+      sha256: 'a'.repeat(64),
+      checksumFilename: 'tm-runner-0.1.0.tgz.sha256',
+      checksumUrl: '/runner/tm-runner-0.1.0.tgz.sha256',
+      size: 44342,
+      generatedAt: '2026-08-01T10:32:28.644Z',
+      minimumNodeVersion: '20',
+    });
 
-    const result = await projectConnectionService.issueRunnerBootstrap('project-id', 'Checkout App', ' CI Runner ', [' Chromium ', 'staging']);
+    const result = await projectConnectionService.issueRunnerBootstrap('project-id', 'Checkout App', 'https://testmanager.example', ' CI Runner ', [' Chromium ', 'staging']);
 
     expect(result.command).toContain(`TM_RUNNER_NAME='CI Runner' TM_RUNNER_LABELS='chromium,staging'`);
-    expect(result.npmCommands).toContain('npm install --save-dev @testmanager/runner');
-    expect(result.npmCommands).toContain('npx tm-runner start');
+    expect(result.npmCommands).toContain('npm i -g https://testmanager.example/runner/tm-runner-0.1.0.tgz');
+    expect(result.npmCommands).not.toContain('@testmanager/runner');
+    expect(result.npmCommands).toContain('tm-runner start');
     expect(result.dockerCommands).toContain('docker run --rm --env-file .env');
     expect(result.existingRunnerIds).toEqual(['existing-runner']);
     expect(projectConnectionRepository.issueRunnerBootstrapCode).toHaveBeenCalledWith('project-id');

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminRoute } from './components/auth/AdminRoute';
@@ -34,6 +34,8 @@ import { ProjectTeamsPage } from './pages/teams/ProjectTeamsPage';
 import { ObservabilityPage } from './pages/admin/ObservabilityPage';
 import { RunnerDistributionPage } from './pages/runner/RunnerDistributionPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { SettingsPage } from './pages/settings/SettingsPage';
+import { PublicProfilePage } from './pages/users/PublicProfilePage';
 
 function App() {
   return (
@@ -41,12 +43,15 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/pending-approval" element={<PendingApprovalPage />} />
       <Route path="/runner/install" element={<RunnerDistributionPage />} />
+      <Route path="/@:username" element={<PublicProfilePage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<ProjectsPage />} />
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/home" element={<Navigate to="/" replace />} />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/dashboard" element={<DashboardReportPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/projects/:id/settings" element={<ProjectSettingsPage />} />
           <Route path="/projects/:id/connect" element={<ProjectConnectPage />} />

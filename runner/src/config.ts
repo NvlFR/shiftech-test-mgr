@@ -150,7 +150,7 @@ export function loadConfig(envPath = '.env', cliOptions: RunnerCliOptions = {}):
     repositoryCacheDir: resolve(process.cwd(), env.TM_REPOSITORY_CACHE_DIR?.trim() || './repositories'),
     playwrightCmd: env.TM_PLAYWRIGHT_CMD?.trim() || 'npx playwright test',
     trustedRepositories: loadTrustedRepositories(),
-    headed: cliOptions.headed ?? boolEnv(env, 'TM_PLAYWRIGHT_HEADED', false),
+    headed: cliOptions.headed ?? boolEnv(env, 'TM_PLAYWRIGHT_HEADED', true),
     slowMoMs: cliOptions.slowMoMs ?? nonNegativeIntEnv(env, 'TM_PLAYWRIGHT_SLOW_MO_MS', 0),
     pollIntervalMs: intEnv(env, 'TM_POLL_INTERVAL_SECONDS', 5) * 1000,
     heartbeatIntervalMs: intEnv(env, 'TM_HEARTBEAT_INTERVAL_SECONDS', 30) * 1000,

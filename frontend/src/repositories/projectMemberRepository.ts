@@ -6,7 +6,7 @@ export const projectMemberRepository = {
   async findAllByProject(projectId: string): Promise<ProjectMemberWithProfile[]> {
     const { data, error } = await supabase
       .from('project_members')
-      .select('*, profile:profiles(*)')
+      .select('*, profile:profiles!project_members_user_id_fkey(*)')
       .eq('project_id', projectId)
       .order('created_at');
     if (error) throw error;
@@ -29,7 +29,7 @@ export const projectMemberRepository = {
     const { data, error } = await supabase
       .from('project_members')
       .insert({ project_id: projectId, user_id: userId, role, permissions, status: 'invited' })
-      .select('*, profile:profiles(*)')
+      .select('*, profile:profiles!project_members_user_id_fkey(*)')
       .single();
     if (error) throw error;
     return mapProjectMemberWithProfileRow(data);

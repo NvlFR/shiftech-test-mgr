@@ -4,6 +4,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Batasi ke src/ secara eksplisit, bukan blacklist e2e/ — e2e/ pakai
+    // @playwright/test (test/expect beda API), bukan vitest, dan tanpa ini
+    // vitest ikut mencoba menjalankannya lalu gagal.
+    include: ['src/**/*.test.{ts,tsx}'],
 
     // Component test dengan jsdom + testing-library memang lambat: render penuh,
     // userEvent yang menunggu, dan efek async. Dengan batas bawaan 5 detik,

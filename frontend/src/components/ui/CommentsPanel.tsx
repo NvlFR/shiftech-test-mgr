@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { MultiSelect } from 'primereact/multiselect';
 import { Toast } from 'primereact/toast';
+import { Link } from 'react-router-dom';
 import { useRef } from 'react';
 import { useAuthContext } from '../../hooks/useAuth';
 import { useComments } from '../../hooks/useComments';
 import { commentService } from '../../services/commentService';
 import { profileService } from '../../services/profileService';
 import { formatDateTime } from '../../helpers/dateFormatter';
+import { renderMentions, type KnownRefs } from '../../helpers/renderMentions';
 import type { CommentTargetType, Profile } from '../../types/domain';
 
 export function CommentsPanel({ projectId, targetType, targetId, canManage }: { projectId: string; targetType: CommentTargetType; targetId: string; canManage: boolean }) {
@@ -24,6 +26,12 @@ export function CommentsPanel({ projectId, targetType, targetId, canManage }: { 
   useEffect(() => {
     profileService.listAll().then((rows) => setProfiles(rows.filter((profile) => profile.role !== 'pending'))).catch(() => setProfiles([]));
   }, []);
+
+  const knownRefs: KnownRefs = useMemo(() => ({
+    usernames: new Set(profiles.map((profile) => profile.username.toLowerCase())),
+    testCaseCodes: new Map(),
+    issueCodes: new Map(),
+  }), [profiles]);
 
   async function submit() {
     if (!session?.user.id) return;
@@ -59,8 +67,13 @@ export function CommentsPanel({ projectId, targetType, targetId, canManage }: { 
             <span className="font-semibold">{comment.author?.fullName ?? comment.author?.email ?? 'User'}</span>
             <span className="text-color-secondary text-sm">{formatDateTime(comment.createdAt)}</span>
           </div>
-          <div style={{ whiteSpace: 'pre-wrap' }}>{comment.body}</div>
-          {comment.mentions.length > 0 && <small className="text-color-secondary block mt-2">Mention: {comment.mentions.map((mention) => mention.profile.fullName ?? mention.profile.email).join(', ')}</small>}
+          <div style={{ whiteSpace: 'pre-wrap' }}>{renderMentions(comment.body, knownRefs)}</div>
+          {comment.mentions.length > 0 && <small className="text-color-secondary block mt-2">
+            Mention: {comment.mentions.map((mention, index) => <span key={mention.profile.id}>
+              {index > 0 && ', '}
+              <Link to={`/@${mention.profile.username}`} className="entity-link">{mention.profile.fullName ?? mention.profile.email}</Link>
+            </span>)}
+          </small>}
           {(comment.authorId === session?.user.id || canManage) && <Button label="Hapus" icon="pi pi-trash" text severity="danger" size="small" className="mt-2 p-0" onClick={() => remove(comment.id)} />}
         </div>)}
       </div>}

@@ -13,6 +13,9 @@ dist-ssr
 *.local
 .env
 
+# Claude Code local settings (personal, per-machine — never shared)
+.claude/settings.local.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -36,6 +39,12 @@ scripts/.runner-release-cache/
 # Playwright MCP browser artifacts
 .playwright-mcp/
 .archive/
+
+# Playwright E2E artifacts (E2E-INFRA-01)
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/playwright/.cache/
 
 # Codex task loop — tooling lokal, jangan di-commit
 scripts/codex-loop/

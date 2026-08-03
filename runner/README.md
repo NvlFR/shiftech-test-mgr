@@ -53,8 +53,9 @@ npm run build
 # Setelah memeriksa source dan playwright.config.*, trust folder satu kali:
 node dist/index.js trust /absolute/path/to/playwright-project
 npm start
-# Browser terlihat untuk semua job pada sesi runner ini:
-npm start -- --headed
+# Browser sudah terlihat secara default (TM_PLAYWRIGHT_HEADED=true di .env.example).
+# Untuk paksa headless di satu sesi tanpa mengubah .env, set env var langsung:
+TM_PLAYWRIGHT_HEADED=false npm start
 # Browser terlihat dengan delay 250 ms per operasi:
 npm start -- --slow-mo=250
 # Playwright UI Mode (argumen setelah subcommand diteruskan ke Playwright):
@@ -149,8 +150,10 @@ Lihat [`.env.example`](.env.example) untuk daftar lengkap dan penjelasan tiap
 variabel (URL server, token, direktori project, interval poll/heartbeat, timeout,
 dan opsi artifact).
 
-Mode interaktif dapat dijadikan default melalui `TM_PLAYWRIGHT_HEADED=true` dan
-`TM_PLAYWRIGHT_SLOW_MO_MS=<milidetik>`. Nilai `headed`/`slow_mo_ms` pada payload
+Mode interaktif (browser terlihat) aktif secara default lewat
+`TM_PLAYWRIGHT_HEADED=true` di `.env.example` — set ke `false` untuk kembali
+headless. `TM_PLAYWRIGHT_SLOW_MO_MS=<milidetik>` untuk delay tiap operasi.
+Nilai `headed`/`slow_mo_ms` pada payload
 job memiliki prioritas lebih tinggi. Karena Playwright Test tidak menyediakan
 flag CLI `--slow-mo`, project Playwright perlu meneruskan env runner ini:
 

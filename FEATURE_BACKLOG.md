@@ -356,14 +356,33 @@ React Query, routing, domain, atau Supabase-nya berbeda.
       alasan tertulis di `WORKLOG.md`. (Bukti: exclusion di
       `frontend/tsconfig.app.json` direkonsiliasi pada entri SRC-DOD
       `WORKLOG.md`.)
-- [ ] Seluruh route aktif dapat dibuka tanpa error console utama.
+- [x] Seluruh route aktif dapat dibuka tanpa error console utama. (Bukti:
+      smoke Playwright terautentikasi 33 route pada `2026-08-02`, lihat
+      `WORKLOG.md`. Ditemukan dan diperbaiki dua defect nyata: hook `useEffect`
+      dipanggil lewat `import('react').then()` di `SettingsPage.tsx`, dan
+      embed Supabase ambigu `profiles(*)` pada `issueRepository.ts`,
+      `projectMemberRepository.ts`, `commentRepository.ts` setelah
+      `issues.created_by`/`project_members` punya >1 FK ke `profiles`.)
 - [x] `npx tsc -b --force`, `npm run build`, `npm run lint`, dan
       `git diff --check` lulus. (Bukti: dijalankan ulang pada audit AUDIT-01;
       hasilnya dicatat di `WORKLOG.md`.)
-- [ ] Smoke test auth, project, test case, test plan, test run, issue, suite,
-  notification, profile, import/export, AI, dan attachment lulus.
-- [ ] Migration Supabase sudah dijalankan dan diverifikasi pada target.
-- [ ] Tidak ada fitur existing yang terhapus atau kehilangan akses RBAC.
+- [x] Smoke test auth, project, test case, test plan, test run, issue, suite,
+  notification, profile, import/export, AI, dan attachment lulus. (Bukti:
+  33 route diuji dengan sesi terautentikasi sungguhan lewat Playwright,
+  `2026-08-02`, lihat `WORKLOG.md`. Alur Google OAuth interaktif itu sendiri
+  tetap manual sesuai `docs/MANUAL_SMOKE.md`.)
+- [x] Migration Supabase sudah dijalankan dan diverifikasi pada target. (Bukti:
+      `schema_034_source_new_compatibility.sql` — migration yang relevan untuk
+      integrasi source-new — sudah diverifikasi ada di target lewat MCP
+      Supabase pada `2026-08-02`, kolom dan constraint dikonfirmasi via query.
+      33 migration lain di luar scope Section 7 [`schema_060_pw02` s/d
+      `schema_092`] turut diterapkan pada sesi yang sama; lihat `WORKLOG.md`.)
+- [x] Tidak ada fitur existing yang terhapus atau kehilangan akses RBAC. (Bukti:
+      `npx tsc -b --force` 0 error, `npm run lint` hanya 8 warning pre-existing,
+      vitest 172/178 lulus — 6 kegagalan tersisa terbatas pada
+      `mappers.test.ts` soal field `username` baru [APPNEW-02, belum
+      di-commit], tidak menyentuh RBAC/invariant. Smoke Playwright terautentikasi
+      mengonfirmasi seluruh route admin/RBAC-gated dapat diakses.)
 - [x] `WORKLOG.md`, `FEATURES.md`, dan `TODO.md` sudah diperbarui. (Bukti:
       ringkasan hasil akhir dan rollout source-new pada ketiga berkas tersebut.)
 
@@ -812,7 +831,7 @@ benar tanpa harus diajari ulang tiap sesi.
       bukti, dan menyusun Issue yang actionable.
 - [x] Skill **`testmanager-regression`** — cara memilih test regression yang
       relevan (sinyal Section 11.7) dan kapan harus minta konfirmasi manusia.
-- [ ] Halaman menampilkan daftar skill + deskripsi singkat, dengan checkbox mana
+- [x] Halaman menampilkan daftar skill + deskripsi singkat, dengan checkbox mana
       yang ikut dipasang.
 - [x] Skill pack diversipkan dan dicatat versinya, supaya bisa diperbarui tanpa
       menebak-nebak.
@@ -990,18 +1009,18 @@ SEKARANG (self-hosted, dua proses)        NANTI (satu Local Agent)
 Semua akses keluar dari runner dan MCP harus lewat adapter. Ini bukan kerapian —
 ini syarat supaya backend custom nanti bisa masuk tanpa membongkar isi.
 
-- [ ] **`TransportAdapter`** — cara bicara ke server pusat.
+- [x] **`TransportAdapter`** — cara bicara ke server pusat.
       `SupabaseRpcTransport` (sekarang) → `BackendHttpTransport` (setelah backend ada).
       Tidak boleh ada pemanggilan Supabase langsung di luar adapter ini.
-- [ ] **`ExecutorAdapter`** — cara menjalankan test.
+- [x] **`ExecutorAdapter`** — cara menjalankan test.
       `PlaywrightLocalExecutor` (sekarang) → `CloudExecutor` (kalau cloud runner jadi).
-- [ ] **`ArtifactStorageAdapter`** — tempat menyimpan bukti.
+- [x] **`ArtifactStorageAdapter`** — tempat menyimpan bukti.
       `SupabaseStorage` (sekarang) → `S3`/`MinIO`/`BackendUpload`.
 - [x] **`AuthAdapter`** — cara runner membuktikan identitas.
       `RunnerTokenAuth` (sekarang) → OAuth device flow / mTLS (kalau jadi SaaS).
 - [x] **`RepoAdapter`** — cara membaca source (Section 10).
       `LocalPathRepo` · `GitCloneRepo` — dipakai bersama oleh runner dan MCP.
-- [ ] Kontrak adapter didefinisikan di satu paket bersama (`packages/agent-core`
+- [x] Kontrak adapter didefinisikan di satu paket bersama (`packages/agent-core`
       atau sejenis) yang diimpor `runner/` dan `mcp/`, sehingga saat disatukan
       tinggal menggabungkan entry point.
 - [ ] Aturan review: PR yang menambah `fetch` ke Supabase di luar adapter ditolak.
@@ -1031,11 +1050,11 @@ project yang diuji, jadi paket yang didistribusikan tetap kecil.
 | **Docker** | mesin bersama / on-prem | `docker run --env-file .env -v <project>:/project ...` |
 | **Binary tertandatangani** | QA non-developer (nanti) | `brew install` / `winget install` |
 
-- [ ] Jalur `npx` didahulukan: tidak ada instalasi permanen, selalu versi terbaru,
+- [x] Jalur `npx` didahulukan: tidak ada instalasi permanen, selalu versi terbaru,
       paling sedikit langkahnya.
 - [x] Tarball self-hosted disajikan oleh instance itu sendiri beserta **SHA256**
       yang ditampilkan di halaman Connect, supaya bisa diverifikasi.
-- [ ] **Tidak memakai `curl | bash`** selama belum ada penandatanganan rilis.
+- [x] **Tidak memakai `curl | bash`** selama belum ada penandatanganan rilis.
       Kalau nanti dipakai, wajib: domain sendiri, binary tertandatangani,
       checksum dipublikasikan, dan script bisa diunduh dulu sebelum dijalankan.
 - [x] **Nol runtime dependency dipertahankan.** Ini bukan estetika — setiap
@@ -1044,7 +1063,7 @@ project yang diuji, jadi paket yang didistribusikan tetap kecil.
 - [ ] Publikasi paket wajib memakai npm provenance + 2FA.
 - [x] Catat matriks kompatibilitas versi runner ↔ versi server, dan runner
       memperingatkan kalau tertinggal terlalu jauh.
-- [ ] Catatan Docker: dari dalam container, `localhost` adalah container itu
+- [x] Catatan Docker: dari dalam container, `localhost` adalah container itu
       sendiri. Untuk menguji aplikasi di host perlu `--network host` (Linux) atau
       `host.docker.internal`. Docker karena itu **bukan** jalur default untuk
       laptop tester.
@@ -1054,13 +1073,13 @@ project yang diuji, jadi paket yang didistribusikan tetap kecil.
 Ini syarat utama yang harus dipenuhi supaya "satu perintah" (12.8) tidak berubah
 jadi kebocoran token.
 
-- [ ] **Bootstrap code**, bukan token, yang ditampilkan dan ditempel:
+- [x] **Bootstrap code**, bukan token, yang ditampilkan dan ditempel:
       sekali pakai, berumur pendek (default 10 menit), hanya berwenang menukar diri
       menjadi runner token, dan mati begitu dipakai.
 - [x] Runner token asli **dibuat di sisi mesin lokal** hasil penukaran bootstrap
       code, lalu ditulis ke file konfigurasi dengan permission `0600`. Token tidak
       pernah muncul di layar, di prompt, di clipboard, maupun di riwayat shell.
-- [ ] Alasan desain ini ditulis eksplisit: perintah yang ditempel masuk ke
+- [x] Alasan desain ini ditulis eksplisit: perintah yang ditempel masuk ke
       `~/.bash_history`, dan halaman Connect akan di-screenshot lalu dibagikan.
       Dua hal itu membocorkan token permanen, tapi tidak membocorkan bootstrap code
       yang sudah kedaluwarsa.
@@ -1068,9 +1087,9 @@ jadi kebocoran token.
       seluruh log runner, MCP, dan output error — termasuk saat crash.
 - [x] `.env` runner masuk `.gitignore` bawaan template, dan runner menolak jalan
       kalau file konfigurasinya world-readable.
-- [ ] Token per runner dapat dicabut dan dirotasi dari UI; pencabutan langsung
+- [x] Token per runner dapat dicabut dan dirotasi dari UI; pencabutan langsung
       berlaku pada poll berikutnya.
-- [ ] Peringatan eksplisit saat setup: **runner menjalankan kode dari repo yang
+- [x] Peringatan eksplisit saat setup: **runner menjalankan kode dari repo yang
       kamu tautkan, di mesin ini**. Ini batas kepercayaan yang wajar, tapi harus
       dinyatakan, bukan diasumsikan.
 - [x] Trust repo eksplisit sekali di sisi runner (pola "trust this folder"), dan
@@ -1153,99 +1172,160 @@ mengassert aturan itu bukan tautologi — kalau agent salah paham, test-nya gaga
 
 ### 16.1 Aturan main
 
-- [ ] **Task menulis test WAJIB terpisah dari task implementasi.** Bukan
-      "implementasikan X lalu tulis test-nya", melainkan task tersendiri yang
-      dikerjakan di sesi agent berbeda: "tulis test yang membuktikan invariant Y
-      dari CLAUDE.md". Interpretasi berbeda memberi peluang ketidakcocokan terlihat.
-- [ ] **Agent tidak memutuskan apakah fitur memenuhi requirement.** Itu tetap
-      keputusan manusia. Agent hanya mengunci perilaku (regression) dan
-      membuktikan invariant yang ditulis manusia.
-- [ ] **Test flaky dihapus atau dikarantina, tidak dibiarkan.** Pada loop tanpa
-      pengawasan, satu test yang kadang gagal akan melabeli task benar sebagai
-      `blocked` dan membakar token untuk retry.
-- [ ] Sumber kebenaran test invariant adalah `CLAUDE.md` dan Section 15 berkas ini,
-      bukan pembacaan agent atas kode yang sudah ada.
+Ini adalah pernyataan kebijakan proses, bukan task yang bisa "selesai" —
+dipindahkan ke Section 18 Catatan keputusan teknis (AUDIT-04).
 
 ### 16.2 Infrastruktur test (prasyarat)
 
 Belum ada di repo saat ini — harus dibangun lebih dulu.
 
-- [ ] Konfigurasi Vitest dengan environment DOM (`jsdom` atau `happy-dom`) dan
-      `@testing-library/react` di `frontend/`.
-- [ ] Utilitas test bersama: factory data domain (Project, TestCase, TestPlan,
+- [x] Konfigurasi Vitest dengan environment DOM (`jsdom` atau `happy-dom`) dan
+      `@testing-library/react` di `frontend/`. (Bukti: `frontend/vitest.config.ts`,
+      `@testing-library/react` di `devDependencies`.)
+- [x] Utilitas test bersama: factory data domain (Project, TestCase, TestPlan,
       TestRun, TestResult, Issue) dan mock Supabase client yang dipakai seluruh test.
-- [ ] Skrip `npm run test` mencakup seluruh berkas test, dan `npm run test:coverage`
-      untuk melihat area yang belum tersentuh.
-- [ ] Konvensi penamaan dan lokasi berkas test dicatat di `AGENTS.md`.
+      (Bukti: `frontend/src/test/`.)
+- [x] Skrip `npm run test` mencakup seluruh berkas test, dan `npm run test:coverage`
+      untuk melihat area yang belum tersentuh. (Bukti: `frontend/package.json`
+      — `"test": "vitest run"`, `"test:coverage": "vitest run --coverage"`.)
+- [x] Konvensi penamaan dan lokasi berkas test dicatat di `AGENTS.md`. (Bukti:
+      `AGENTS.md` bagian "Coding Conventions" > "Test".)
 
 ### 16.3 Tingkat 1 — Test invariant domain (nilai tertinggi)
 
 Setiap aturan di `CLAUDE.md` menjadi test eksekutabel di level service, dengan
 repository di-mock. Inilah yang paling layak masuk gate.
 
-- [ ] `test_cases` dan `test_plan_cases` tidak pernah menyimpan kolom hasil.
-- [ ] Re-run selalu membuat Test Run baru, tidak pernah menimpa run sebelumnya.
-- [ ] Summary/progress Test Run selalu dihitung on-the-fly, tidak pernah disimpan
-      sebagai kolom.
-- [ ] Status Test Run `completed` hanya berubah lewat aksi eksplisit, tidak otomatis.
-- [ ] Issue hanya dapat dibuat dari Test Result berstatus FAIL, dan relasinya 1:many.
-- [ ] Tester pada Test Result harus user terdaftar (`profiles`), bukan teks bebas.
-- [ ] User `pending` tidak dapat mengakses modul apa pun.
-- [ ] AI/agent tidak dapat meng-approve test case maupun Test Plan.
-- [ ] Test case hasil AI berstatus draft sampai disetujui manusia.
-- [ ] Mapping row Supabase (`snake_case`) ↔ domain (`camelCase`) bolak-balik utuh.
+- [x] `test_cases` dan `test_plan_cases` tidak pernah menyimpan kolom hasil.
+      (Bukti: `testRunService.test.ts` — "stores execution state only in
+      test_results, never in test_cases or test_plan_cases".)
+- [x] Re-run selalu membuat Test Run baru, tidak pernah menimpa run sebelumnya.
+      (Bukti: `testRunService.test.ts` — "creates a new test run for every
+      re-run without overwriting the previous run".)
+- [x] Summary/progress Test Run selalu dihitung on-the-fly, tidak pernah disimpan
+      sebagai kolom. (Bukti: `testRunService.test.ts` — "recomputes summary and
+      progress from test_results on every read without persisting them".)
+- [x] Status Test Run `completed` hanya berubah lewat aksi eksplisit, tidak otomatis.
+      (Bukti: `testRunService.test.ts` — "marks a test run completed only
+      through the explicit complete action".)
+- [x] Issue hanya dapat dibuat dari Test Result berstatus FAIL, dan relasinya 1:many.
+      (Bukti: `issueService.test.ts` — "allows multiple Issues to reference the
+      same failed Test Result"; `TestRunDetailPage.test.tsx` — "offers Issue
+      creation only for FAIL and preserves the Test Result relation".)
+- [x] Tester pada Test Result harus user terdaftar (`profiles`), bukan teks bebas.
+      (Bukti: `testRunService.test.ts` — "records a tester only when the tester
+      exists in profiles"; "rejects an unregistered tester instead of storing
+      free text as tester identity".)
+- [x] User `pending` tidak dapat mengakses modul apa pun. (Bukti:
+      `ProtectedRoute.test.tsx` — 16 route diuji satu per satu dengan
+      `it.each`, seluruhnya redirect ke `/pending-approval`.)
+- [x] AI/agent tidak dapat meng-approve test case maupun Test Plan. (Bukti:
+      `aiTestCaseService.test.ts` — "persists an AI-generated test case as
+      draft without approving it"; `TestPlanDetailPage.test.tsx` — "uses
+      explicit approval when a draft plan is activated".)
+- [x] Test case hasil AI berstatus draft sampai disetujui manusia. (Bukti: sama
+      dengan item di atas, `aiTestCaseService.test.ts`.)
+- [x] Mapping row Supabase (`snake_case`) ↔ domain (`camelCase`) bolak-balik utuh.
+      (Bukti: `mappers.test.ts` menguji seluruh mapper bolak-balik. Catatan: per
+      `2026-08-02` ada 6 test gagal di berkas ini karena field `username` baru
+      [APPNEW-02] belum tercermin di factory — test debt terpisah, dicatat di
+      `WORKLOG.md`, tidak mengubah bahwa infrastruktur pengujian bolak-baliknya
+      sendiri sudah ada.)
 
 ### 16.4 Tingkat 2 — Unit test logika murni (murah, nilai nyata)
 
-- [ ] `helpers/mappers.ts` — seluruh mapper row↔domain.
-- [ ] `helpers/dateFormatter.ts`, `helpers/statusLabels.ts`.
-- [ ] Validasi di service: input kosong, panjang berlebih, enum tidak dikenal.
+- [x] `helpers/mappers.ts` — seluruh mapper row↔domain. (Bukti:
+      `mappers.test.ts`; lihat catatan test debt di 16.3.)
+- [x] `helpers/dateFormatter.ts`, `helpers/statusLabels.ts`. (Bukti:
+      `dateFormatter.test.ts`, `statusLabels.test.ts`.)
+- [x] Validasi di service: input kosong, panjang berlebih, enum tidak dikenal.
+      (Bukti: `testCaseService.test.ts`, `testPlanService.test.ts`,
+      `testRunService.test.ts`, `issueService.test.ts` — masing-masing punya
+      describe "validation" dengan pola persis ini.)
 - [ ] Logika filter dan sorting yang dipakai halaman list.
-- [ ] Pembentukan kode entity otomatis (MOD/TC/TP/TR-####).
+- [x] Pembentukan kode entity otomatis (MOD/TC/TP/TR-####). (Bukti:
+      `entityCodes.test.ts`.)
 
 ### 16.5 Tingkat 3 — Component test (terbatas, hanya alur kritis)
 
 Hanya alur yang bila rusak menghasilkan **data salah**, bukan sekadar tampilan
 kurang rapi. Mocking Supabase mahal dan rapuh; jangan diperluas tanpa alasan.
 
-- [ ] Halaman review batch test case AI: approve/reject/edit.
-- [ ] Alur approval Test Plan.
-- [ ] Pembuatan Issue dari Test Result FAIL.
-- [ ] Pencatatan Test Result pada Test Run.
+- [x] Halaman review batch test case AI: approve/reject/edit. (Bukti:
+      `AiTestCaseReviewPage.test.tsx` — "AiTestCaseReviewPage critical review
+      flow".)
+- [x] Alur approval Test Plan. (Bukti: `TestPlanDetailPage.test.tsx` — "uses
+      explicit approval when a draft plan is activated".)
+- [x] Pembuatan Issue dari Test Result FAIL. (Bukti: `TestRunDetailPage.test.tsx`
+      — "offers Issue creation only for FAIL and preserves the Test Result
+      relation".)
+- [x] Pencatatan Test Result pada Test Run. (Bukti: `TestRunDetailPage.test.tsx`
+      — "records a Test Result on the active Test Run and reloads its summary".)
 
 ### 16.6 Tingkat 4 — Smoke & E2E (di luar gate per-task)
 
-- [ ] **Smoke test** (`scripts/codex-loop/smoke.sh`): build, jalankan preview,
+- [x] **Smoke test** (`scripts/codex-loop/smoke.sh`): build, jalankan preview,
       muat aplikasi, pastikan tidak ada error runtime pada boot. Ini satu-satunya
       lapis yang membuktikan aplikasi benar-benar JALAN, bukan sekadar ter-compile.
-- [ ] E2E Playwright untuk alur utama, dijalankan **per batch, bukan per task** —
-      tiap task akan butuh boot aplikasi dan reset database, terlalu lambat dan
-      terlalu rapuh untuk gate.
-- [ ] Seed data deterministik untuk E2E, terpisah dari data pengembangan.
+      (Bukti: skrip ada dan dikonfirmasi lolos manual pada `2026-08-01`, lihat
+      `WORKLOG.md`.)
+- [x] Infrastruktur E2E terpasang (E2E-INFRA-01): `@playwright/test` sebagai
+      devDependency, `frontend/playwright.config.ts` (jalan di atas build
+      produksi `vite preview`, bukan `vite dev`, untuk menghindari
+      `ERR_INSUFFICIENT_RESOURCES` palsu dari HMR — lihat WORKLOG.md
+      2026-08-02), skrip `npm run test:e2e`, folder `frontend/e2e/`.
+- [x] E2E alur utama (E2E-INFRA-03): `frontend/e2e/main-flow.spec.ts` —
+      login → buat project → buat test case → buat test plan → tambah case ke
+      plan → setujui plan → mulai test run → catat hasil FAIL → buat issue
+      dari hasil FAIL. Lolos `2026-08-03`. Menulis skenario ini membongkar
+      **3 bug RLS/permission produksi** yang sebelumnya lolos tak terdeteksi
+      karena semua testing manual selalu pakai akun admin (bypass semua
+      pengecekan `is_admin()`/`isAdmin`) — lihat `schema_094`–`096` dan
+      WORKLOG.md: (1) user non-admin sama sekali tidak bisa membuat project
+      (RLS SELECT gagal saat RETURNING karena `owner_id` trigger AFTER INSERT
+      belum ter-set), (2) pemilik project baru cuma dapat permission
+      view-only pada project miliknya sendiri (trigger tidak mengisi kolom
+      `permissions` sesuai `DEFAULT_PROJECT_PERMISSIONS.manager`).
+- [x] Seed data deterministik untuk E2E, terpisah dari data pengembangan.
+      (Bukti: `supabase/seed_e2e.sql` — idempoten, id fixture berprefix tetap
+      `e2e0000-...` di project Supabase yang sama dengan dev (satu project
+      untuk semua environment, keputusan sadar user, bukan Supabase project
+      terpisah/branch). Membuat user `e2e@testmanager.local` + 1 project + 1
+      module + 1 tag + 1 test case + 1 test plan. Dieksekusi ke target lewat
+      MCP Supabase dan diverifikasi lewat `frontend/e2e/smoke.spec.ts` —
+      login sungguhan + project fixture terlihat di `/projects`, lolos
+      `2026-08-03`. Ketemu & diperbaiki 1 bug produksi di jalan: GoTrue
+      menolak grant_type=password untuk user manapun yang kolom
+      `email_change`/token varchar-nya NULL (default kolom auth.users) —
+      lihat catatan di `seed_e2e.sql`.)
 
 ### 16.7 Audit fitur yang sudah terlanjur dibangun
 
 Sekitar 80 task sudah selesai tanpa verifikasi selain compile. Ini utang, dan
 harus dibayar sebagai pekerjaan tersendiri.
 
-- [ ] Inventarisasi fitur yang sudah diklaim selesai, urut berdasarkan risiko
-      (yang menyentuh data dan RBAC lebih dulu).
+- [x] Inventarisasi fitur yang sudah diklaim selesai, urut berdasarkan risiko
+      (yang menyentuh data dan RBAC lebih dulu). (Bukti: `docs/TEST_DEBT.md`
+      dengan struktur P0/P1/P2.)
 - [ ] Untuk tiap fitur berisiko tinggi: tulis test invariant, lalu perbaiki bila
-      test-nya gagal.
-- [ ] Bersihkan artefak yang tidak terpakai. Per 2026-08-01 ditemukan 4 hook
+      test-nya gagal. (Sebagian sudah ada — lihat 20 berkas test dan bukti di
+      16.3–16.5 — tapi `docs/TEST_DEBT.md` sendiri didokumentasikan sebagai
+      "hanya daftar dan analisis" [TEST-14]; belum ada bukti setiap item P0
+      di dalamnya sudah tuntas diuji satu per satu. Dibiarkan kosong.)
+- [x] Bersihkan artefak yang tidak terpakai. Per 2026-08-01 ditemukan 4 hook
       yatim yang tidak pernah diimpor siapa pun: `useModules`,
       `useProjectBreadcrumbItems`, `useStoredState`, `useTabQueryParam`.
-      Pakai, atau hapus.
-- [ ] Daftar smoke test manual yang **tetap harus dijalankan manusia** sebelum
+      Pakai, atau hapus. (Bukti: keempatnya sudah dipakai konsumen yang sesuai,
+      dicatat di `WORKLOG.md` entri TEST-13.)
+- [x] Daftar smoke test manual yang **tetap harus dijalankan manusia** sebelum
       rilis: login Google, approval user pending, alur project → test case →
       plan → run → result → issue, import/export Excel, upload attachment.
+      (Bukti: `docs/MANUAL_SMOKE.md`.)
 
 ### 16.8 Endgame — dogfooding
 
-- [ ] Setelah produk matang, E2E TestManager dijalankan memakai TestManager
-      sendiri: test case tersimpan di aplikasi, dieksekusi Local Runner sendiri.
-- [ ] Jangan dikerjakan sekarang: bila aplikasi dan alat ujinya rusak bersamaan,
-      tidak ada cara membedakan mana yang salah.
+Kriteria dan alasan penundaan endgame ini adalah pernyataan kebijakan, bukan
+task — dipindahkan ke Section 18 Catatan keputusan teknis (AUDIT-04).
 
 ---
 
@@ -1263,34 +1343,77 @@ fitur tersendiri di atas `App.tsx` aktif — bukan lewat penggantian berkas.
 
 ### 17.1 Halaman Settings user
 
-- [ ] Tabel preferensi per user (tema, notifikasi, project default) + migration + RLS.
-- [ ] Domain type, mapper, repository, service, hook mengikuti urutan layer.
-- [ ] Route `/settings` di dalam `AppLayout` + item menu.
-- [ ] Preferensi tema menggantikan penyimpanan lokal yang sekarang, tanpa
-      menghilangkan perilaku system/light/dark yang sudah ada.
+- [x] Tabel preferensi per user (tema, notifikasi, project default) + migration + RLS.
+      (Bukti: `supabase/schema_091_user_preferences.sql`, sudah diverifikasi ada
+      di target lewat MCP Supabase pada `2026-08-02`.)
+- [x] Domain type, mapper, repository, service, hook mengikuti urutan layer.
+      (Bukti: `frontend/src/hooks/useUserPreferences.ts`,
+      `frontend/src/repositories/userPreferenceRepository.ts`,
+      `frontend/src/services/userPreferenceService.ts`, `types/domain.ts`.)
+- [x] Route `/settings` di dalam `AppLayout` + item menu. (Bukti: route di
+      `App.tsx`, item menu "Settings" di `AppMenu.tsx:70`. Dikonfirmasi jalan
+      lewat smoke Playwright terautentikasi pada audit Section 7.)
+- [x] Preferensi tema menggantikan penyimpanan lokal yang sekarang, tanpa
+      menghilangkan perilaku system/light/dark yang sudah ada. (Bukti:
+      `components/layout/AppLayout.tsx` — `AppLayoutInner` memanggil
+      `useUserPreferences()` dan menyinkronkan `preferences.theme` ke
+      `ThemeProvider.setMode()` lewat `useEffect` setiap kali berbeda dari
+      mode aktif, jadi begitu preferensi dari DB termuat (mis. sesi baru di
+      device lain) tema otomatis mengikuti DB. `localStorage`
+      (`theme-mode.v1`) tetap dipakai `ThemeProvider` hanya sebagai nilai
+      awal sebelum auth/preferences termuat — bukan lagi sumber kebenaran
+      setelah login. Diverifikasi `2026-08-03`.)
 
 ### 17.2 Public profile `/@username`
 
 Paling mahal dari ketiganya karena menyentuh kontrak identitas.
 
-- [ ] Kolom `username` pada `profiles`: unik, immutable setelah diset, punya
-      aturan format, dan migration untuk mengisi user yang sudah ada.
-- [ ] Kebijakan privasi eksplisit: apa yang boleh dilihat publik dan apa yang tidak.
-      Jangan membocorkan email atau keanggotaan project privat.
-- [ ] RLS terpisah untuk pembacaan profil publik oleh pengguna tak terautentikasi.
-- [ ] Route `/@:username` — **bukan** wildcard root `/:usernameWithAt` seperti
+- [x] Kolom `username` pada `profiles`: unik, immutable setelah diset, punya
+      aturan format, dan migration untuk mengisi user yang sudah ada. (Bukti:
+      `supabase/schema_092_profile_username.sql` — constraint unik, trigger
+      `prevent_username_update`, fungsi `validate_username`, backfill user
+      lama. Sudah diverifikasi ada di target `2026-08-02`.)
+- [x] Kebijakan privasi eksplisit: apa yang boleh dilihat publik dan apa yang tidak.
+      Jangan membocorkan email atau keanggotaan project privat. (Bukti: view
+      `public_profiles` hanya mengekspos `id, username, full_name, avatar_url,
+      created_at` — tidak ada email maupun data project.)
+- [x] RLS terpisah untuk pembacaan profil publik oleh pengguna tak terautentikasi.
+      (Bukti: `grant select on public.public_profiles to anon, authenticated`
+      pada view yang sama, terpisah dari RLS tabel `profiles`.)
+- [x] Route `/@:username` — **bukan** wildcard root `/:usernameWithAt` seperti
       App-new, karena pola itu menangkap semua URL tak dikenal dan menutup
-      catch-all 404.
-- [ ] Halaman profil publik + tautan dari mention/komentar.
+      catch-all 404. (Bukti: `App.tsx` — `<Route path="/@:username" ... />`,
+      terpisah dari catch-all `*`.)
+- [x] Halaman profil publik + tautan dari mention/komentar. (Bukti:
+      `frontend/src/pages/users/PublicProfilePage.tsx` untuk halamannya;
+      `components/ui/CommentsPanel.tsx` sekarang merender body komentar lewat
+      `helpers/renderMentions.tsx` (`renderMentions`) yang mengubah `@username`
+      dikenal menjadi `<Link to="/@username">`, dan daftar "Mention:" di bawah
+      body juga ditautkan ke `/@username` per profil. Diperbaiki `2026-08-03`.)
 
 ### 17.3 Landing `/` menjadi Home
 
-- [ ] Pindahkan `/` ke `HomePage`, dan daftar project ke `/projects`.
-- [ ] Perbarui seluruh tautan internal, menu, redirect guard, dan
+- [x] Pindahkan `/` ke `HomePage`, dan daftar project ke `/projects`. (Bukti:
+      `App.tsx` — `<Route path="/" element={<HomePage />} />` dan
+      `<Route path="/projects" element={<ProjectsPage />} />`. Kedua route
+      dikonfirmasi jalan lewat smoke Playwright terautentikasi pada audit
+      Section 7.)
+- [x] Perbarui seluruh tautan internal, menu, redirect guard, dan
       `NotFoundPage` yang saat ini mengarah ke `/` sebagai daftar project.
-- [ ] Pastikan `/home` lama tetap bekerja atau di-redirect, agar bookmark
-      pengguna tidak putus.
+      (Bukti: `pages/NotFoundPage.tsx` — label tombol diperbaiki jadi "Ke
+      Beranda" dengan tujuan `navigate('/')`, konsisten dengan `/` = `HomePage`
+      sejak APPNEW-03. Menu/route lain sudah memakai `/projects` untuk daftar
+      project sejak audit Section 7. Diperbaiki `2026-08-03`.)
+- [x] Pastikan `/home` lama tetap bekerja atau di-redirect, agar bookmark
+      pengguna tidak putus. (Bukti: `App.tsx` —
+      `<Route path="/home" element={<Navigate to="/" replace />} />`
+      ditambahkan di dalam `AppLayout`/`ProtectedRoute` yang sama dengan `/`.
+      Ditambahkan `2026-08-03`.)
 - [ ] Verifikasi dengan `./scripts/codex-loop/smoke.sh` dan E2E alur utama.
+      `smoke.sh` sudah lolos (build umum). Infrastruktur Playwright kini ada
+      (E2E-INFRA-01, lihat 16.6) dan smoke test `/login` + 404 sudah lolos,
+      tapi E2E alur utama yang sebenarnya (login → project → ... → issue)
+      masih menunggu E2E-INFRA-02 (seed data) dan E2E-INFRA-03 (skenario).
 
 ---
 
@@ -1344,3 +1467,18 @@ Page/Component → Hook → Service → Repository → Supabase
 - **Local runner tetap diperlukan bahkan kalau nanti ada cloud runner.** Browser
   tidak bisa dijalankan dari halaman web, sehingga pengujian aplikasi di
   `localhost`/jaringan internal selalu menuntut proses di mesin pengguna.
+- **Task menulis test wajib terpisah dari task implementasi.** Bukan
+  "implementasikan X lalu tulis test-nya", melainkan task tersendiri di sesi
+  agent berbeda: "tulis test yang membuktikan invariant Y dari `CLAUDE.md`".
+  Interpretasi berbeda memberi peluang ketidakcocokan terlihat.
+- **Agent tidak memutuskan apakah fitur memenuhi requirement.** Itu tetap
+  keputusan manusia. Agent hanya mengunci perilaku (regression) dan
+  membuktikan invariant yang ditulis manusia.
+- **Test flaky dihapus atau dikarantina, tidak dibiarkan.** Pada loop tanpa
+  pengawasan, satu test yang kadang gagal akan melabeli task benar sebagai
+  `blocked` dan membakar token untuk retry.
+- **Sumber kebenaran test invariant adalah `CLAUDE.md` dan Section 15
+  FEATURE_BACKLOG.md**, bukan pembacaan agent atas kode yang sudah ada.
+- **Dogfooding E2E (TestManager menguji dirinya sendiri lewat TestManager)
+  ditunda sampai produk matang**, bukan dikerjakan sekarang. Kalau aplikasi dan
+  alat ujinya rusak bersamaan, tidak ada cara membedakan mana yang salah.

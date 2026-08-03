@@ -3,6 +3,15 @@
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=fohuxwzczepdqyrfkovc&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
+    },
+    "testmanager": {
+      "type": "http",
+      "url": "http://localhost:3900/mcp",
+      "headers": {
+        "X-TestManager-Project-ID": "1b7f339a-9952-4b8d-8bcc-e35c816c9338",
+        "X-TestManager-Read-Only": "0",
+        "X-TestManager-Feature-Groups": "DISCOVERY,TEST-CASE,TEST-PLAN,TEST-RUN,ISSUE,ANALYSIS,DOCS"
+      }
     }
   }
 }
